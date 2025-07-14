@@ -1,0 +1,99 @@
+<?php
+
+namespace App\DataTables\Budget;
+
+use App\Models\BeginCredit\InitialBudget;
+use App\Models\BudgetPlan\InitialVoucher;
+use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Yajra\DataTables\EloquentDataTable;
+use Yajra\DataTables\Html\Builder as HtmlBuilder;
+use Yajra\DataTables\Html\Button;
+use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Editor\Editor;
+use Yajra\DataTables\Html\Editor\Fields;
+use Yajra\DataTables\Services\DataTable;
+
+class InitialVoucherDataTable extends DataTable
+{
+    /**
+     * Build the DataTable class.
+     *
+     * @param QueryBuilder $query Results from query() method.
+     */
+    public function dataTable(QueryBuilder $query): EloquentDataTable
+    {
+        return (new EloquentDataTable($query))
+            ->addIndexColumn()
+            ->editColumn('soft_delete', function ($model) {
+                return is_null($model->deleted_at)
+                    ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
+                    : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+            })
+            ->editColumn('program', function ($model) {
+                return optional($model->beginCredit)->program ?? $model->program;
+            })
+            ->addColumn('action', function ($model) {
+                return view('budgetplan::initialVoucher.action', ['module' => $model]);
+            })
+            ->rawColumns(['soft_delete', 'action']);
+    }
+
+    /**
+     * Get the query source of dataTable.
+     */
+    public function query(InitialBudget $model): QueryBuilder
+    {
+        // return $model->newQuery();
+        $query = $model->newQuery();
+
+        if (request()->has('year') && request('year') !== null) {
+            $query->where('year', request('year'));
+        }
+        return $query;
+    }
+    /**
+     * Optional method if you want to use the html builder.
+     */
+    public function html(): HtmlBuilder
+    {
+        return $this->builder()
+            ->setTableId('initialvoucher-table')
+            ->parameters([
+                'language' => [
+                    'url' => asset('assets/lang/language.json'),
+                ],
+            ])
+            ->columns($this->getColumns())
+            ->orderBy(2, 'ASC');
+    }
+
+    /**
+     * Get the dataTable columns definition.
+     */
+    public function getColumns(): array
+    {
+        return [
+            Column::computed(
+                'DT_RowIndex',
+                __('tables.th.no')
+            )->width(30)->addClass('text-center align-middle')->orderable(false),
+            Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
+            Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
+            Column::make('sub_title')->title(__('tables.th.sub.title'))->addClass('align-middle'),
+            Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::computed(
+                'action',
+                __('tables.th.action')
+            )->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
+
+        ];
+    }
+
+    /**
+     * Get the filename for export.
+     */
+    protected function filename(): string
+    {
+        return 'InitialVoucher_' . date('YmdHis');
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/loanbudget",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\LoanBudget\\": "",
+            "Modules\\LoanBudget\\App\\": "app/",
+            "Modules\\LoanBudget\\Database\\Factories\\": "database/factories/",
+            "Modules\\LoanBudget\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\LoanBudget\\Tests\\": "tests/"
+        }
+    }
+}

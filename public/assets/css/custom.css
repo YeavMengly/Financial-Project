@@ -1,0 +1,60 @@
+@font-face {
+    font-family: 'Angkor';
+    src: url('../fonts/Angkor.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'SiemReap';
+    src: url('../fonts/Siemreap.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Moul';
+    src: url('../fonts/Moul-Regular.ttf') format('truetype');
+    font-weight: normal;
+}
+
+body {
+    font-family: "SiemReap", "IBM Plex Sans", sans-serif;
+    font-size: 15px;
+}
+
+hr {
+    margin: 5px 0px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Moul", "IBM Plex Sans", sans-serif;
+}
+
+.btn {
+    font-family: "Angkor", "IBM Plex Sans", sans-serif;
+}
+
+.form-control {
+    font-family: "SiemReap", "IBM Plex Sans", sans-serif;
+    font-size: 15px;
+}
+
+.dataTables_filter {
+    display: none;
+}
+
+.oftions-content-search {
+    background: #ffffff;
+    padding: 7px 15px;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    border: 1px solid #d7dde9;
+    width: 250px;
+    height: 40px;
+    transition: border-color 0.5s ease;
+}
+
+.note-editor .note-toolbar {
+    border-bottom: 1px solid silver;
+}
+

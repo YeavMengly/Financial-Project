@@ -1,0 +1,11 @@
+{
+    "name": "LoanBudget",
+    "alias": "loanbudget",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\LoanBudget\\App\\Providers\\LoanBudgetServiceProvider"
+    ],
+    "files": []
+}

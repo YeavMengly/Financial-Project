@@ -1,0 +1,14 @@
+{
+    "Dashboard": true,
+    "Setting": true,
+    "Document": true,
+    "Profile": true,
+    "Notes": true,
+    "BeginningCredit": true,
+    "ChapterNumber": true,
+    "BudgetVoucher": true,
+    "LoanBudget": true,
+    "BudgetPlan": true,
+    "General": true,
+    "InitialBudget": true
+}

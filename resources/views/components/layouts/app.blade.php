@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    <title>{{ __("labels.mlvt") }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ asset("assets/images/favicon.ico") }}">
+    @yield("css")
+    <link rel="stylesheet" href="{{ asset("assets/css/preloader.min.css") }}" type="text/css"/>
+    <link href="{{ asset("assets/css/bootstrap.min.css") }}" id="bootstrap-style" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset("assets/css/icons.min.css") }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset("assets/css/app.min.css") }}" id="app-style" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset("assets/css/custom.css") }}" id="app-style" rel="stylesheet" type="text/css"/>
+</head>
+<body data-sidebar="brand">
+<div id="layout-wrapper">
+    @include("layouts/partials/header")
+    @include("layouts/partials/sidebar")
+    <div class="main-content">
+        <div class="page-content">
+            <div class="container-fluid">
+                {{ $slot }}
+            </div>
+        </div>
+        @include("layouts/partials/footer")
+    </div>
+</div>
+<script src="{{ asset("assets/libs/jquery/jquery.min.js") }}"></script>
+<script src="{{ asset("assets/libs/bootstrap/js/bootstrap.bundle.min.js") }}"></script>
+<script src="{{ asset("assets/libs/metismenu/metisMenu.min.js") }}"></script>
+<script src="{{ asset("assets/libs/simplebar/simplebar.min.js") }}"></script>
+<script src="{{ asset("assets/libs/node-waves/waves.min.js") }}"></script>
+<script src="{{ asset("assets/libs/feather-icons/feather.min.js") }}"></script>
+<script src="{{ asset("assets/libs/pace-js/pace.min.js") }}"></script>
+@yield("script")
+<script src="{{ asset("assets/js/app.js") }}"></script>
+</body>
+</html>

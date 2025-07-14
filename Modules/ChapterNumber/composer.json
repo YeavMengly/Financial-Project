@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/chapternumber",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ChapterNumber\\": "",
+            "Modules\\ChapterNumber\\App\\": "app/",
+            "Modules\\ChapterNumber\\Database\\Factories\\": "database/factories/",
+            "Modules\\ChapterNumber\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ChapterNumber\\Tests\\": "tests/"
+        }
+    }
+}

@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Modules\LoanBudget\App\Http\Controllers\LoanBudgetController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+// Route::group([], function () {
+//     Route::resource('loanbudget', LoanBudgetController::class)->names('loanbudget');
+// });
+
+Route::prefix('loanbudget')->middleware(['auth'])->group(function () {
+    require_once __DIR__ . '/voucher.php';
+    require_once __DIR__ . '/mandate.php';
+    require_once __DIR__ . '/voucherLoan.php';
+    require_once __DIR__ . '/mandateLoan.php';
+});

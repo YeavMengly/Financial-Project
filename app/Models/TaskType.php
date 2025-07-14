@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\BudgetPlan\BudgetVoucher;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class TaskType extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'task'
+    ];
+
+    public function budgetVoucher()
+    {
+        return $this->hasMany(BudgetVoucher::class, 'task_type', 'task');
+    }
+}

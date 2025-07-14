@@ -1,0 +1,11 @@
+{
+    "name": "ChapterNumber",
+    "alias": "chapternumber",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ChapterNumber\\App\\Providers\\ChapterNumberServiceProvider"
+    ],
+    "files": []
+}

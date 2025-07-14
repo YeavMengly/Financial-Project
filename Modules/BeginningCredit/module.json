@@ -1,0 +1,11 @@
+{
+    "name": "BeginningCredit",
+    "alias": "beginningcredit",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\BeginningCredit\\App\\Providers\\BeginningCreditServiceProvider"
+    ],
+    "files": []
+}
