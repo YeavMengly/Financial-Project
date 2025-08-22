@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\Chapter;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -33,38 +34,30 @@ class ChapterDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Chapter $model): QueryBuilder
+    public function query(Chapter $model, Request $request): QueryBuilder
     {
         /**
          * ================       Step 1:  Start a new query with selected columns        ================
          */
+        $params = $request->params;
+        $id = decode_params($params);
+
         $query = $model->newQuery()
             ->select([
                 'id',
-                'chapterNumber as CNA',
-                'txtChapter as SNA',
-                'deleted_at',
+                'ministry_id',
+                'no',
+                'name',
             ])
-            ->orderBy('created_at', 'DESC');
+            ->orderBy('created_at', 'ASC');
 
         /**
          * ================       Step 2:  Filter by chapter number if provided        ================
          */
-        if (request()->filled('chapter')) {
-            $query->where('chapterNumber', request('chapter'));
-        }
-
-        /**
-         * ================       Step 3:  Filter by chapter title (partial match)        ================
-         */
-        if (request()->filled('txtChapter')) {
-            $query->where('txtChapter', 'like', '%' . request('txtChapter') . '%');
-        }
+        $query->where('chapters.ministry_id', $id);
 
         return $query;
     }
-
-
 
     /**
      * Optional method if you want to use the html builder.
@@ -92,8 +85,8 @@ class ChapterDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('CNA')->title(__('tables.th.chapter'))->addClass('align-middle'),
-            Column::make('SNA')->title(__('tables.th.txtChapter'))->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.chapter'))->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.txtChapter'))->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

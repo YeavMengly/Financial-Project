@@ -1,13 +1,9 @@
 @extends('layouts.master')
-@section('css')
-    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-@endsection
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapter') }}</h4>
-
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
@@ -32,10 +28,10 @@
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.chapter') }}</label>
-                                    <input type="text" class="form-control" name="chapterNumber" required
+                                    <input type="text" class="form-control" name="no" required
                                         data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ $data->chapterNumber }}" />
-                                    @error('chapterNumber')
+                                        value="{{ $data->no }}" />
+                                    @error('no')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -44,10 +40,10 @@
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.name') }}</label>
-                                    <input type="text" class="form-control" name="txtChapter" required
+                                    <input type="text" class="form-control" name="name" required
                                         data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ $data->txtChapter }}" />
-                                    @error('txtChapter')
+                                        value="{{ $data->name }}" />
+                                    @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -65,32 +61,6 @@
     </div>
 @endsection
 @section('script')
-    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            $('#vDescription').summernote({
-                backColor: 'red',
-                height: 150,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['color', ['color']],
-                ]
-            });
-        });
-        // $('#cboCategory').change(function () {
-        //     var cateId = $(this).val();
-        //     $.ajax({
-        //         url: '{!! route('document.by.category_id') !!}',
-        //         type: 'get',
-        //         global: false,
-        //         data: {cate_id: cateId},
-        //         success: function (data) {
-        //             $('#cboCategorySub').html(data);
-        //         }
-        //     });
-        // });
-    </script>
 @endsection

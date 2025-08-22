@@ -9,6 +9,7 @@ use App\Models\BeginCredit\BeginCredit;
 use App\Models\BeginCredit\BeginCreditMandate;
 use App\Models\BeginCredit\InitialBudget;
 use App\Models\BeginCredit\InitialBudgetMandate;
+use App\Models\BeginCredit\Ministry;
 use App\Models\BeginCredit\SubAccount;
 use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +28,7 @@ class BeginMandateController extends Controller
         $params = decode_params($id);
         $initialBudgetId = is_array($params) && isset($params['id']) ? $params['id'] : $params;
 
-        $initialBudget = InitialBudget::findOrFail($initialBudgetId);
+        $initialBudget = Ministry::findOrFail($initialBudgetId);
         $agency = Agency::all();
 
         foreach ($initialBudget as $item) {
@@ -54,7 +55,7 @@ class BeginMandateController extends Controller
     public function create($id)
     {
         $params = decode_params($id);
-        $initialBudget = InitialBudget::findOrFail($params);
+        $initialBudget = Ministry::findOrFail($params);
         $subAccount = SubAccount::all();
 
         return view('beginningcredit::beginCreditMandate.create')->with('subAccount', $subAccount)->with('params', $params)->with('initialBudget', $initialBudget);

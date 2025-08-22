@@ -24,8 +24,8 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
-                    <form id="pristine-valid-example" novalidate method="POST" action="{{ route('chapter.store') }}"
-                        autocomplete="off">
+                    <form id="pristine-valid-example" novalidate method="POST"
+                        action="{{ route('chapter.store', $params) }}" autocomplete="off">
                         @csrf
                         <input type="hidden" />
                         <div class="row">
@@ -34,16 +34,15 @@
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.chapter') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="chapterNumber" tabindex="2" />
+                                        type="text" class="form-control" name="no" tabindex="2" />
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.name') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="txtChapter"
-                                        value="{{ old('txtChapter') }}" tabindex="3" />
-                                    @error('txtChapter')
+                                        type="text" class="form-control" name="name" tabindex="3" />
+                                    @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>

@@ -6,16 +6,6 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-
-                {{-- @if (hasPermission('agency.edit'))
-                    <a href="{{ route('beginCredit.index', encode_params($module->id)) }}" class="dropdown-item">
-                        <i class="bx bx-show"></i> {{ __('buttons.show') }}
-                    </a>
-                @endif
-                @if (hasPermission('agency.edit') or hasPermission('agency.destroy'))
-                    <hr />
-                @endif --}}
-
                 @if (hasPermission('agency.edit'))
                     <a href="{{ route('agency.edit', encode_params($module->id)) }}" class="dropdown-item"><i
                             class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

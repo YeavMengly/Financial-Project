@@ -26,7 +26,6 @@ return new class extends Migration
             $table->decimal('decrease', 15, 2)->default(0);
             $table->decimal('editorial', 15, 2)->default(0);
             $table->text('txtDescription');
-
             $table->timestamps();
         });
     }

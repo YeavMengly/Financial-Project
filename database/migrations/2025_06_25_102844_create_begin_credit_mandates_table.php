@@ -17,17 +17,13 @@ return new class extends Migration
             $table->unsignedBigInteger('agencyNumber');
             $table->unsignedBigInteger('subDepart');
             $table->unsignedBigInteger('subAccountNumber');
-            // $table->foreign('subAccountNumber')->references('subAccountNumber')->on('sub_accounts')->onDelete('cascade');
 
-            // Other columns
             $table->string('program');
             $table->text('txtDescription');
             $table->decimal('fin_law', 15, 0)->default(0);
             $table->decimal('current_loan', 15, 0)->default(0);
 
-            // Foreign key to years
             $table->unsignedBigInteger('year');
-            // $table->foreign('date_year')->references('id')->on('years')->onDelete('cascade');
 
             $table->decimal('new_credit_status', 15, 0)->default(0);
             $table->decimal('early_balance', 15, 0)->default(0);
@@ -36,10 +32,6 @@ return new class extends Migration
             $table->decimal('credit', 15, 0)->default(0);
             $table->decimal('law_average', 15, 0)->default(0);
             $table->decimal('law_correction', 15, 0)->default(0);
-
-            // Composite unique constraint
-            // $table->unique(['subAccountNumber', 'program']);
-
             $table->timestamps();
         });
     }

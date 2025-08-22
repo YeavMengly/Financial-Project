@@ -147,13 +147,13 @@ class BudgetVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('CNA')->title(__('tables.th.sub.account'))->addClass('align-middle'),
-            Column::make('SNA')->title(__('tables.th.program'))->addClass('align-middle'),
-            Column::make('budget')->title(__('tables.th.budget'))->addClass('align-middle'),
-            Column::make('task_name')->title(__('tables.th.type'))->addClass('align-middle'),
-            Column::make('date')->title(__('tables.th.date'))->addClass('align-middle'),
+            Column::make('CNA')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('SNA')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
+            Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
+            Column::make('task_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
+            Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
-            Column::make('attachments')->title(__('tables.th.document.title'))->addClass('align-middle'),
+            Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

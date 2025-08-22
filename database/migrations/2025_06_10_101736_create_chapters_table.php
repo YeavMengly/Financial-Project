@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('chapters', function (Blueprint $table) {
             $table->id();
-            $table->string('chapterNumber');
-            $table->string('txtChapter');
+            $table->unsignedBigInteger('ministry_id');
+            $table->string('no');
+            $table->string('name');
             $table->timestamps();
         });
     }

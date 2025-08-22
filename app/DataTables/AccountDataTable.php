@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use App\Models\BeginCredit\Account;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -36,27 +37,35 @@ class AccountDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Account $model): QueryBuilder
+    public function query(Account $model, Request $request): QueryBuilder
     {
+        $params = $request->params;
+        $id = decode_params($params);
+
         $query = $model->newQuery()
-            ->leftJoin('chapters', 'accounts.chapterNumber', '=', 'chapters.chapterNumber')
+            ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
             ->select([
                 'accounts.id',
-                'accounts.chapterNumber as CNA',
-                'accounts.accountNumber as SNA',
-                'accounts.txtAccount',
+                'accounts.ministry_id',
+                'chapters.no as CNA',
+                'accounts.no as SNA',
+                'accounts.name',
                 'accounts.deleted_at',
             ])
-            ->orderBy('accounts.created_at', 'DESC');
+            ->orderBy('accounts.created_at', 'ASC');
+        // ->orderBy('accounts.no', 'ASC');
 
-        // Filter by accountNumber if selected
-        if (request()->filled('accountNumber')) {
-            $query->where('accounts.accountNumber', request('accountNumber'));
+        // Always filter by ministry ID
+        $query->where('accounts.ministry_id', $id);
+
+        // ✅ Apply search filter for `no` (by account ID)
+        if ($request->filled('no')) {
+            $query->where('accounts.id', $request->no);
         }
 
-        // Filter by txtAccount (partial match if needed)
-        if (request()->filled('txtAccount')) {
-            $query->where('accounts.txtAccount', 'like', '%' . request('txtAccount') . '%');
+        // ✅ Apply search filter for `name` (by exact name match)
+        if ($request->filled('name')) {
+            $query->where('accounts.name', 'like', '%' . $request->name . '%');
         }
 
         return $query;
@@ -86,11 +95,9 @@ class AccountDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
             Column::make('CNA')->title(__('tables.th.chapter'))->addClass('align-middle'),
             Column::make('SNA')->title(__('tables.th.account'))->addClass('align-middle'),
-            Column::make('txtAccount')->title(__('tables.th.txtAccount'))->addClass('align-middle'),
-
+            Column::make('name')->title(__('tables.th.name'))->addClass('align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

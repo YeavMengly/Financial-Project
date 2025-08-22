@@ -7,9 +7,6 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -19,9 +16,14 @@
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapter') }}</h4>
 
                 <div class="page-title-right">
-
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                        </ol>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -30,51 +32,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter">
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="chapter">{{ __('menus.chapter') }}</label>
-                            <select class="form-control" name="chapter" id="chapter">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($chapter as $ts)
-                                    <option value="{{ $ts->chapterNumber }}"
-                                        {{ request('chapter') == $ts->chapterNumber ? 'selected' : '' }}>
-                                        {{ $ts->chapterNumber }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="txtChapter">{{ __('menus.title') }}</label>
-                            <select class="form-control" name="txtChapter" id="txtChapter">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($chapter as $ts)
-                                    <option value="{{ $ts->txtChapter }}"
-                                        {{ request('txtChapter') == $ts->txtChapter ? 'selected' : '' }}>
-                                        {{ $ts->txtChapter }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
                     @if (hasPermission('chapter.create'))
                         <div class="col-sm">
                             <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light" href="{{ route('chapter.create') }}"><i
-                                        class="bx bx-plus me-1"></i>
+                                <a class="btn btn-light waves-effect waves-light"
+                                    href="{{ route('chapter.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -128,65 +90,4 @@
         }
     </script>
     {!! $dataTable->scripts() !!}
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            const element = document.getElementById('chapter');
-            let choicesInstance = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#chapter').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
-            });
-        });
-
-        $(document).ready(function() {
-            const element = document.getElementById('txtChapter');
-            let choicesInstance = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#txtChapter').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
-            });
-        });
-    </script>
 @endsection

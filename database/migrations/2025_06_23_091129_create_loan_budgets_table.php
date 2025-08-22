@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('subAccountNumber');
-            // Change from unsignedBigInteger to string
             $table->unsignedBigInteger('program');
 
             $table->decimal('internal_increase', 15, 2)->default(0);

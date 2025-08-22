@@ -28,7 +28,8 @@ return [
     'notes.task' => 'Task',
 
     'title' => 'ចំណងជើង',
-    'sub.title' => 'យោង',
+    'nick_name' => 'អក្សរឡាតាំង',
+    'refer' => 'យោង',
     'chapter' => 'ជំពូក',
     'account' => 'គណនី',
     'sub.account' => 'អនុគណនី',

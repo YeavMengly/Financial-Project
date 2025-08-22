@@ -18,12 +18,12 @@
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
                         {{-- Start initial budget --}}
-                        @if (hasPermission('initialBudget.index'))
-                            <li class="{{ Request::routeIs('initialBudget.*') ? 'mm-active' : '' }}">
-                                <a href="{{ route('initialBudget.index') }}"
-                                    class="{{ Request::routeIs('initialBudget.*') ? 'active' : '' }}">
+                        @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="{{ route('ministries.index') }}"
+                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
                                     <i data-feather="book"></i>
-                                    <span data-key="t-initialBudget">{{ __('menus.initial.budget') }}</span>
+                                    <span data-key="t-ministries">{{ __('menus.ministries') }}</span>
                                 </a>
                             </li>
                         @endif
@@ -46,113 +46,73 @@
                                 <span data-key="t-cluster">{{ __('menus.cluster') }}</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                @if (hasPermission('chapter.index'))
-                                    <li class="{{ Request::routeIs('chapter.*') ? 'mm-active' : '' }}">
+                                @if (hasPermission('initialChapter.index'))
+                                    <li class="{{ Request::routeIs('initialChapter.*') ? 'mm-active' : '' }}">
 
-                                        <a href="{{ route('chapter.index') }}"
-                                            class="{{ Request::routeIs('chapter.*') ? 'active' : '' }}">
+                                        <a href="{{ route('initialChapter.index') }}"
+                                            class="{{ Request::routeIs('initialChapter.*') ? 'active' : '' }}">
                                             <i data-feather="book"></i>
                                             <span data-key="t-dashboard">{{ __('menus.chapter') }}</span>
                                         </a>
                                     </li>
                                 @endif
 
-                                @if (hasPermission('account.index'))
-                                    <li class="{{ Request::routeIs('account.*') ? 'mm-active' : '' }}">
-                                        <a href="{{ route('account.index') }}"
-                                            class="{{ Request::routeIs('account.*') ? 'active' : '' }}">
+                                @if (hasPermission('initialAccount.index'))
+                                    <li class="{{ Request::routeIs('initialAccount.*') ? 'mm-active' : '' }}">
+                                        <a href="{{ route('initialAccount.index') }}"
+                                            class="{{ Request::routeIs('initialAccount.*') ? 'active' : '' }}">
                                             <i data-feather="database"></i>
                                             <span data-key="t-dashboard">{{ __('menus.account') }}</span>
                                         </a>
                                     </li>
                                 @endif
 
-                                @if (hasPermission('subAccount.index'))
-                                    <li class="{{ Request::routeIs('subAccount.*') ? 'mm-active' : '' }}">
-                                        <a href="{{ route('subAccount.index') }}"
-                                            class="{{ Request::routeIs('subAccount.*') ? 'active' : '' }}">
+                                @if (hasPermission('initialAccountSub.index'))
+                                    <li class="{{ Request::routeIs('initialAccountSub.*') ? 'mm-active' : '' }}">
+                                        <a href="{{ route('initialAccountSub.index') }}"
+                                            class="{{ Request::routeIs('initialAccountSub.*') ? 'active' : '' }}">
                                             <i data-feather="layers"></i>
                                             <span data-key="t-dashboard">{{ __('menus.sub.account') }}</span>
                                         </a>
                                     </li>
                                 @endif
 
-                                @if (hasPermission('depart.index'))
-                                    <li class="{{ Request::routeIs('depart.*') ? 'mm-active' : '' }}">
+                                @if (hasPermission('initialProgram.index'))
+                                    <li class="{{ Request::routeIs('initialProgram.*') ? 'mm-active' : '' }}">
+                                        <a href="{{ route('initialProgram.index') }}"
+                                            class="{{ Request::routeIs('initialProgram.*') ? 'active' : '' }}">
+                                            <i data-feather="layers" title="initialProgram"></i>
 
-                                        <a href="{{ route('depart.index') }}"
-                                            class="{{ Request::routeIs('depart.*') ? 'active' : '' }}">
-                                            <i data-feather="layers" title="Depart"></i>
-
-                                            <span data-key="t-dashboard">{{ __('menus.depart') }}</span>
+                                            <span data-key="t-dashboard">{{ __('menus.program') }}</span>
                                         </a>
                                     </li>
                                 @endif
 
-                                @if (hasPermission('subDepart.index'))
-                                    <li class="{{ Request::routeIs('subDepart.*') ? 'mm-active' : '' }}">
+                                @if (hasPermission('initialProgramSub.index'))
+                                    <li class="{{ Request::routeIs('initialProgramSub.*') ? 'mm-active' : '' }}">
+                                        <a href="{{ route('initialProgramSub.index') }}"
+                                            class="{{ Request::routeIs('initialProgramSub.*') ? 'active' : '' }}">
+                                            <i data-feather="layers" title="initialProgramSub"></i>
 
-                                        <a href="{{ route('subDepart.index') }}"
-                                            class="{{ Request::routeIs('subDepart.*') ? 'active' : '' }}">
-                                            <i data-feather="layers" title="subDepart"></i>
-
-                                            <span data-key="t-dashboard">{{ __('menus.sub.depart') }}</span>
+                                            <span data-key="t-dashboard">{{ __('menus.sub.program') }}</span>
                                         </a>
                                     </li>
                                 @endif
 
-                                @if (hasPermission('agency.index'))
-                                    <li class="{{ Request::routeIs('agency.*') ? 'mm-active' : '' }}">
+                                @if (hasPermission('initialAgency.index'))
+                                    <li class="{{ Request::routeIs('initialAgency.*') ? 'mm-active' : '' }}">
 
-                                        <a href="{{ route('agency.index') }}"
-                                            class="{{ Request::routeIs('agency.*') ? 'active' : '' }}">
+                                        <a href="{{ route('initialAgency.index') }}"
+                                            class="{{ Request::routeIs('initialAgency.*') ? 'active' : '' }}">
                                             <i data-feather="layers" title="Agency"></i>
 
                                             <span data-key="t-dashboard">{{ __('menus.agency') }}</span>
                                         </a>
                                     </li>
                                 @endif
+
                             </ul>
                         </li>
-
-                        {{-- <li>
-                            <a href="javascript: void(0);" class="has-arrow">
-                                <i data-feather="file-text"></i>
-                                <span data-key="t-agency">{{ __('menus.agency') }}</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                @if (hasPermission('chapter.index'))
-                                    <li class="{{ Request::routeIs('chapter.*') ? 'mm-active' : '' }}">
-
-                                        <a href="{{ route('chapter.index') }}"
-                                            class="{{ Request::routeIs('chapter.*') ? 'active' : '' }}">
-                                            <i data-feather="book"></i>
-                                            <span data-key="t-dashboard">{{ __('menus.agency') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
-
-                                @if (hasPermission('account.index'))
-                                    <li class="{{ Request::routeIs('account.*') ? 'mm-active' : '' }}">
-                                        <a href="{{ route('account.index') }}"
-                                            class="{{ Request::routeIs('account.*') ? 'active' : '' }}">
-                                            <i data-feather="database"></i>
-                                            <span data-key="t-dashboard">{{ __('menus.account') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
-
-                                @if (hasPermission('subAccount.index'))
-                                    <li class="{{ Request::routeIs('subAccount.*') ? 'mm-active' : '' }}">
-                                        <a href="{{ route('subAccount.index') }}"
-                                            class="{{ Request::routeIs('subAccount.*') ? 'active' : '' }}">
-                                            <i data-feather="layers"></i>
-                                            <span data-key="t-dashboard">{{ __('menus.sub.account') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
-                            </ul>
-                        </li> --}}
                     </ul>
                 </li>
 
@@ -173,26 +133,6 @@
                             </li>
                         @endif
 
-                        {{-- @if (hasPermission('budget-voucher.index'))
-                            <li class="{{ Request::routeIs('budget-voucher.*') ? 'mm-active' : '' }}">
-                                <a href="{{ route('budget-voucher.index') }}"
-                                    class="{{ Request::routeIs('budget-voucher.*') ? 'active' : '' }}">
-                                    <i data-feather="file-plus"></i>
-                                    <span
-                                        data-key="t-budget-control-voucher">{{ __('menus.budget.control.voucher') }}</span>
-                                </a>
-                            </li>
-                        @endif --}}
-
-                        {{-- @if (hasPermission('initialMandate.index'))
-                            <li class="{{ Request::routeIs('initialMandate.*') ? 'mm-active' : '' }}">
-                                <a href="{{ route('initialMandate.index') }}"
-                                    class="{{ Request::routeIs('initialMandate.*') ? 'active' : '' }}">
-                                    <i data-feather="briefcase"></i>
-                                    <span data-key="t-budget-control-mandate">{{ __('menus.initial.mandate') }}</span>
-                                </a>
-                            </li>
-                        @endif --}}
                         @if (hasPermission('initialMandate.index'))
                             <li class="{{ Request::routeIs('initialMandate.*') ? 'mm-active' : '' }}">
                                 <a href="{{ route('initialMandate.index') }}"
@@ -202,28 +142,6 @@
                                 </a>
                             </li>
                         @endif
-
-                        {{-- In sidebar.blade.php --}}
-                        @php
-                            $agencies = \App\Models\BeginCredit\Agency::all();
-                        @endphp
-
-                        @foreach ($agencies as $agency)
-                            @php
-                                $encodedId = encode_params($agency->id);
-                            @endphp
-
-                            <li
-                                class="{{ Request::routeIs('agency.beginCredits') && request()->route('params') == $encodedId ? 'mm-active' : '' }}">
-                                <a href="{{ route('agency.beginCredits', ['params' => $encodedId]) }}"
-                                    class="{{ Request::routeIs('agency.beginCredits') && request()->route('params') == $encodedId ? 'active' : '' }}">
-                                    <i data-feather="layers" title="Agency"></i>
-                                    <span>{{ $agency->agencyTitle }}</span>
-                                </a>
-                            </li>
-                        @endforeach
-
-
                     </ul>
                 </li>
                 {{-- ========= End Budget Plan ========= --}}
@@ -235,16 +153,6 @@
                         <span data-key="t-pages">{{ __('menus.budget.control') }}</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="false">
-                        {{-- @if (hasPermission('voucher.index'))
-                            <li class="{{ Request::routeIs('voucher.*') ? 'mm-active' : '' }}">
-                                <a href="{{ route('voucher.index') }}"
-                                    class="{{ Request::routeIs('voucher.*') ? 'active' : '' }}">
-                                    <i data-feather="file-plus"></i>
-                                    <span
-                                        data-key="t-budget.control.voucher">{{ __('menus.budget.control.voucher') }}</span>
-                                </a>
-                            </li>
-                        @endif --}}
 
                         @if (hasPermission('voucherLoan.index'))
                             <li class="{{ Request::routeIs('voucherLoan.*') ? 'mm-active' : '' }}">
@@ -350,9 +258,41 @@
                     </a>
 
                     <ul class="sub-menu" aria-expanded="false">
+
+                        @if (hasPermission('account.index'))
+                            <li class="{{ Request::routeIs('account.*') ? 'mm-active' : '' }}">
+                                <a href="" class="{{ Request::routeIs('account.*') ? 'active' : '' }}">
+                                    <i data-feather="briefcase"></i>
+                                    <span data-key="t-dashboard"> ឥណទានសរុប</span>
+                                </a>
+                            </li>
+                        @endif
+
+
+                        @if (hasPermission('account.index'))
+                            <li class="{{ Request::routeIs('account.*') ? 'mm-active' : '' }}">
+                                <a href="" class="{{ Request::routeIs('account.*') ? 'active' : '' }}">
+                                    <i data-feather="briefcase"></i>
+                                    <span data-key="t-dashboard"> របាយការណ៍អនុវត្ត</span>
+                                </a>
+                            </li>
+                        @endif
+
+
+
+                        @if (hasPermission('account.index'))
+                            <li class="{{ Request::routeIs('account.*') ? 'mm-active' : '' }}">
+                                <a href="" class="{{ Request::routeIs('account.*') ? 'active' : '' }}">
+                                    <i data-feather="briefcase"></i>
+                                    <span data-key="t-dashboard">{{ __('menus.check.control.summary') }}</span>
+                                </a>
+                            </li>
+                        @endif
+
                         @if (hasPermission('guarantee.index'))
                             <li class="{{ Request::routeIs('guarantee.*') ? 'mm-active' : '' }}">
-                                <a href="" class="{{ Request::routeIs('guarantee.*') ? 'active' : '' }}">
+                                <a href="{{ route('guarantee.index') }}"
+                                    class="{{ Request::routeIs('guarantee.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
                                     <span
                                         data-key="t-check.control.guarantee">{{ __('menus.check.control.guarantee') }}</span>
@@ -364,10 +304,12 @@
                             <li class="{{ Request::routeIs('account.*') ? 'mm-active' : '' }}">
                                 <a href="" class="{{ Request::routeIs('account.*') ? 'active' : '' }}">
                                     <i data-feather="briefcase"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.check.control.summary') }}</span>
+                                    <span data-key="t-dashboard"> តារាង​ច្បាប់ អាណត្តិ និងសលាកបត្រ</span>
                                 </a>
                             </li>
                         @endif
+
+
                     </ul>
                 </li>
 

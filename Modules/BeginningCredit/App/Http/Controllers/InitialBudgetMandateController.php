@@ -5,6 +5,7 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 use App\DataTables\AnnualOpen\InitialBudgetMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\InitialBudget;
+use App\Models\BeginCredit\Ministry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -18,7 +19,7 @@ class InitialBudgetMandateController extends Controller
      */
     public function index(InitialBudgetMandateDataTable $dataTable)
     {
-        $initialBudget = InitialBudget::select('year')->distinct()->orderByDesc('year')->get();
+        $initialBudget = Ministry::select('year')->distinct()->orderByDesc('year')->get();
 
         return $dataTable->render('beginningcredit::initialBudgetMandate.index', ['initialBudget' => $initialBudget]);
     }

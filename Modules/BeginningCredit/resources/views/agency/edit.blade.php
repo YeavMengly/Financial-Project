@@ -1,4 +1,8 @@
 @extends('layouts.master')
+
+@section('css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+@endsection
 @section('content')
     <!-- start page title -->
     <div class="row">
@@ -32,10 +36,31 @@
 
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
+                                    <label for="cboSubAccountNumber" class="form-label font-size-13 text-muted">
+                                        {{ __('forms.depart') }}
+                                    </label>
+                                    <select class="form-control" data-trigger id="cboProgram" name="cboProgram" required
+                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($program as $p)
+                                            <option value="{{ $p->id }}"
+                                                {{ $agency->program_id == $p->id ? 'selected' : '' }}>
+                                                {{ $p->no }}-
+                                                {{ $p->title }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('cboProgram')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
                                     <label>{{ __('forms.number') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="agencyNumber"
-                                        value="{{ $data->agencyNumber }}" tabindex="1" />
+                                        type="numeric" class="form-control" name="no" value="{{ $agency->no }}"
+                                        tabindex="1" />
                                 </div>
                             </div>
 
@@ -43,8 +68,17 @@
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.title') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="agencyTitle"
-                                        value="{{ $data->agencyTitle }}" tabindex="2" />
+                                        type="text" class="form-control" name="name" value="{{ $agency->name }}"
+                                        tabindex="2" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.nick_name') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        type="text" class="form-control" name="nick_name"
+                                        value="{{ $agency->nick_name }}" tabindex="2" />
                                 </div>
                             </div>
 
@@ -52,7 +86,6 @@
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
                             </div>
-
                         </div>
                     </form>
                 </div>
@@ -64,4 +97,17 @@
 @section('script')
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboDepartSelect = document.getElementById('cboProgram');
+            const cboDepartChoices = new Choices(cboDepartSelect, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
 @endsection

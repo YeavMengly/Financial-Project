@@ -1,17 +1,18 @@
 @extends('layouts.master')
 @section('css')
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapter') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.account') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.chapter') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.account') }}</a>
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>
@@ -25,65 +26,11 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
-                    {{-- <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('account.update', $params) }}" autocomplete="off">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.chapter') }}</label>
-                                    <select id="cboChapterNumber" class="form-select" name="cboChapterNumber" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">ជ្រើសរើស</option>
-                                        @foreach ($chapter as $chap)
-                                            <option value="{{ $chap->chapterNumber }}"
-                                                {{ old('cboChapterNumber', $account->chapterNumber) == $chap->chapterNumber ? 'selected' : '' }}>
-                                                {{ $chap->chapterNumber }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('cboChapterNumber')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.account') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="accountNumber"
-                                        value="{{ old('accountNumber', $account->accountNumber) }}" tabindex="2" />
-                                    @error('accountNumber')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.name') }}</label>
-                                    <input type="text" class="form-control" name="txtAccount" required
-                                        data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ old('txtAccount', $account->txtAccount) }}" />
-                                    @error('txtAccount')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-primary" type="submit" name="submit"
-                                    value="save">{{ __('buttons.save') }}</button>
-                            </div>
-                        </div>
-                    </form> --}}
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('account.update', $params) }}" autocomplete="off">
+                        action="{{ route('accounts.update', $params) }}" autocomplete="off">
                         @csrf
 
-                        <input type="hidden" />
-
                         <div class="row">
-                            {{-- Chapter Number Dropdown --}}
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.chapter') }}</label>
@@ -91,9 +38,9 @@
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">ជ្រើសរើស</option>
                                         @foreach ($chapter as $chap)
-                                            <option value="{{ $chap->chapterNumber }}"
-                                                {{ $account->chapterNumber == $chap->chapterNumber ? 'selected' : '' }}>
-                                                {{ $chap->chapterNumber }}
+                                            <option value="{{ $chap->id }}"
+                                                {{ $account->chapter_id == $chap->id ? 'selected' : '' }}>
+                                                {{ $chap->no }}-{{ $chap->name }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -103,33 +50,30 @@
                                 </div>
                             </div>
 
-                            {{-- Account Number --}}
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.account') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="accountNumber" tabindex="2"
-                                        value="{{ old('accountNumber', $account->accountNumber) }}" />
-                                    @error('accountNumber')
+                                        type="text" class="form-control" name="no" tabindex="2"
+                                        value="{{ old('no', $account->no) }}" />
+                                    @error('no')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
 
-                            {{-- Account Name --}}
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.name') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="txtAccount" tabindex="3"
-                                        value="{{ old('txtAccount', $account->txtAccount) }}" />
-                                    @error('txtAccount')
+                                        type="text" class="form-control" name="name" tabindex="3"
+                                        value="{{ old('no', $account->name) }}" />
+                                    @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
 
-                            {{-- Submit Button --}}
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
@@ -147,29 +91,19 @@
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
+    <!-- Choices.js (dropdowns) -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
-        $(document).ready(function() {
-            $('#vDescription').summernote({
-                backColor: 'red',
-                height: 150,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['color', ['color']],
-                ]
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboChapterNumberSelect = document.getElementById('cboChapterNumber');
+            const cboChapterNumberChoice = new Choices(cboChapterNumberSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
             });
         });
-        // $('#cboCategory').change(function () {
-        //     var cateId = $(this).val();
-        //     $.ajax({
-        //         url: '{!! route('document.by.category_id') !!}',
-        //         type: 'get',
-        //         global: false,
-        //         data: {cate_id: cateId},
-        //         success: function (data) {
-        //             $('#cboCategorySub').html(data);
-        //         }
-        //     });
-        // });
     </script>
 @endsection

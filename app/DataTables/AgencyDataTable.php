@@ -3,7 +3,9 @@
 namespace App\DataTables;
 
 use App\Models\BeginCredit\Agency;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Http\Request as HttpRequest;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -34,26 +36,28 @@ class AgencyDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Agency $model): QueryBuilder
+    public function query(Agency $model,  Request $request): QueryBuilder
     {
-        // return $model->newQuery();
+        $params = $request->params;
+        $id = decode_params($params);
 
         $query = $model->newQuery()
+            ->leftJoin('programs', 'agencies.program_id', '=', 'programs.id')
             ->select([
-                'id',
-                'agencyNumber',
-                'agencyTitle',
-                'deleted_at'
+                'agencies.id',
+                'agencies.ministry_id',
+                'agencies.program_id',
+                'agencies.no as name_no',
+                'agencies.name',
+                'agencies.nick_name',
+                'programs.no as no_program'
+
             ])
-            ->orderBy('created_at', 'ASC');
+            ->orderBy('agencies.created_at', 'ASC');
 
-        if (request()->filled('agencyNumber')) {
-            $query->where('agencyNumber', request('agencyNumber'));
-        }
+        $query->where('agencies.ministry_id', $id);
 
-        if (request()->filled('agencyTitle')) {
-            $query->where('agencyTitle', 'like', '%' . request('agencyTitle') . '%');
-        }
+        // $query->where('programs.ministry_id', $id);
 
         return $query;
     }
@@ -83,8 +87,10 @@ class AgencyDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('agencyNumber')->title(__('tables.th.number'))->addClass('align-middle'),
-            Column::make('agencyTitle')->title(__('tables.th.title'))->addClass('align-middle'),
+            Column::make('no_program')->title(__('tables.th.program'))->addClass('align-middle'),
+            Column::make('name_no')->title(__('tables.th.number'))->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.title'))->addClass('align-middle'),
+            Column::make('nick_name')->title(__('tables.th.nick_name'))->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
