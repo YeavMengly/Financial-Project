@@ -4,6 +4,7 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\ChapterDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\Ministry;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,38 +16,47 @@ class ChapterController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ChapterDataTable $dataTable)
+    public function index(ChapterDataTable $dataTable, $params)
     {
-        $chapter =  Chapter::all();
+        $id  = decode_params($params);
+        $data = Ministry::where('id', $id)->first();
 
-        // dd($chapter);
-
-        return $dataTable->render('beginningcredit::chapter.index', ['chapter' => $chapter]);
+        return $dataTable->render('beginningcredit::chapters.index', [
+            'params' => $params,
+            'data' => $data
+        ]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($params)
     {
-        return view('beginningcredit::chapter.create');
+        return view('beginningcredit::chapters.create')
+            ->with('params', $params);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $params)
     {
         $request->validate([
-            'chapterNumber' => 'required|unique:chapters,chapterNumber',
-            'txtChapter' => 'required|unique:chapters,txtChapter',
+            'no' => 'required',
+            'name' => 'required',
         ]);
 
+        $id = decode_params($params);
+
         DB::beginTransaction();
+
         try {
+            $ministry = Ministry::where('id', $id)->first();
+
             Chapter::create([
-                'chapterNumber' => $request->chapterNumber,
-                'txtChapter' => $request->txtChapter,
+                'ministry_id' => $ministry->id,
+                'no' => $request->no,
+                'name' => $request->name,
             ]);
 
             DB::commit(); // Commit the transaction
@@ -57,7 +67,7 @@ class ChapterController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('chapter.index');
+            return redirect()->route('chapters.index', $params);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -68,16 +78,8 @@ class ChapterController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('chapter.index');
+            return redirect()->route('chapters.index', $params);
         }
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('chapter.show');
     }
 
     /**
@@ -88,7 +90,9 @@ class ChapterController extends Controller
         $id = decode_params($params);
         $data = Chapter::where('id', $id)->first();
 
-        return view('beginningcredit::chapter.edit')->with('data', $data)->with('params', $params);
+        return view('beginningcredit::chapters.edit')
+            ->with('data', $data)
+            ->with('params', $params);
     }
 
     /**
@@ -97,16 +101,16 @@ class ChapterController extends Controller
     public function update(Request $request, $params)
     {
         $request->validate([
-            'chapterNumber' => 'required',
-            'txtChapter' => 'required',
+            'no' => 'required',
+            'name' => 'required',
         ]);
 
         $id  = decode_params($params);
         $chapter = Chapter::where('id', $id)->first();
 
         $chapter->update([
-            'chapterNumber' => $request->chapterNumber,
-            'txtChapter' => $request->txtChapter,
+            'no' => $request->no,
+            'name' => $request->name,
         ]);
 
         flash()
@@ -115,7 +119,7 @@ class ChapterController extends Controller
             ->success('success_msg', 'successful')
             ->flash();
 
-        return redirect()->route('chapter.index');
+        return redirect()->route('chapters.index', encode_params($chapter->ministry_id));
     }
 
     /**
@@ -124,13 +128,15 @@ class ChapterController extends Controller
     public function destroy($params)
     {
         $id = decode_params($params);
-        $chapterNumber = Chapter::where('id', $id)->first();
-        $chapterNumber->delete();
+        $chapter = Chapter::where('id', $id)->first();
+        $chapter->delete();
+
         flash()
             ->translate('en')
             ->option('timeout', 2000)
             ->error('delete_msg', 'delete')
             ->flash();
-        return redirect()->route('chapter.index');
+
+        return redirect()->route('chapters.index', encode_params($chapter->ministry_id));
     }
 }

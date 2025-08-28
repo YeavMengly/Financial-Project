@@ -4,6 +4,8 @@ namespace Modules\General\App\Http\Controllers\GuaranteeReport;
 
 use App\DataTables\General\GuaranteeDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\BeginCredit;
+use App\Models\BeginCredit\InitialBudget;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,9 +21,13 @@ class GuaranteeController extends Controller
     // }
     public function index(GuaranteeDataTable $dataTable)
     {
+        $initialBudget = BeginCredit::all();
 
-        return $dataTable->render('general::guarantee.index');
+        return $dataTable->render('general::guarantee.index', [
+            'initialBudget' => $initialBudget
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

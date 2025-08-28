@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\CategorySub;
 use App\Models\Document;
+use App\Models\SubDepart;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +29,7 @@ class DocumentController extends Controller
     public function getByCategoryId(Request $request)
     {
         echo '<option value="">ជ្រើសរើស អនុប្រភេទ</option>';
+        
         if ($request->cate_id != '') {
             $data = CategorySub::select('id', 'name')->where('cate_id', $request->cate_id)->get();
             foreach ($data as $d) {
@@ -35,6 +37,8 @@ class DocumentController extends Controller
             }
         }
     }
+
+    
 
     public function destroy($params)
     {

@@ -5,7 +5,7 @@ namespace Modules\BudgetPlan\App\Http\Controllers;
 use App\DataTables\Budget\InitialMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\BeginCreditMandate;
-use App\Models\BeginCredit\InitialBudget;
+use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\InitialMandate;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +21,7 @@ class InitialMandateController extends Controller
      */
     public function index(InitialMandateDataTable $dataTable)
     {
-        $initialVoucher = InitialBudget::all();
+        $initialVoucher = Ministry::all();
         return $dataTable->render('budgetplan::initialMandate.index', ['initialVoucher' => $initialVoucher]);
     }
 

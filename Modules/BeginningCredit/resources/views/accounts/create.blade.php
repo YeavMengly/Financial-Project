@@ -7,12 +7,12 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.account') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.account') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.accounts') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -21,14 +21,15 @@
             </div>
         </div>
     </div>
+
     <!-- end page title -->
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
-                    <form id="pristine-valid-example" novalidate method="POST" action="{{ route('account.store') }}"
-                        autocomplete="off">
+                    <form id="pristine-valid-example" novalidate method="POST"
+                        action="{{ route('accounts.store', $params) }}" autocomplete="off">
                         @csrf
                         <input type="hidden" />
                         <div class="row">
@@ -40,7 +41,8 @@
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">ជ្រើសរើស</option>
                                         @foreach ($chapter as $chap)
-                                            <option value="{{ $chap->chapterNumber }}">{{ $chap->chapterNumber }}</option>
+                                            <option value="{{ $chap->id }}">{{ $chap->no }}-{{ $chap->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                     @error('cboChapterNumber')
@@ -53,14 +55,14 @@
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.account') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="accountNumber" tabindex="2" />
+                                        type="text" class="form-control" name="no" tabindex="2" />
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.name') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="txtAccount" tabindex="3" />
+                                        type="text" class="form-control" name="name" tabindex="3" />
                                     @error('txtAccount')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -87,41 +89,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        // $(document).ready(function () {
-        //     $('#vDescription').summernote({
-        //         backColor: 'red',
-        //         height: 150,
-        //         toolbar: [
-        //             ['style', ['bold', 'italic', 'underline', 'clear']],
-        //             ['para', ['ul', 'ol', 'paragraph']],
-        //             ['color', ['color']],
-        //         ]
-        //     });
-        // });
-        $('#cboChapterNumber').change(function() {
-            var cateId = $(this).val();
-            $.ajax({
-                url: '{!! route('document.by.category_id') !!}',
-                type: 'get',
-                global: false,
-                data: {
-                    cate_id: cateId
-                },
-                success: function(data) {
-                    $('#cboCategorySub').html(data);
-                }
-            });
-        });
-    </script>
-
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chapterSelect = document.getElementById('cboChapterNumber');
             const chapterChoices = new Choices(chapterSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរកលេខជំពូក...', // Khmer search placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
         });

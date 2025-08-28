@@ -14,15 +14,22 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.account') }}</h4>
+
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
 
                 <div class="page-title-right">
-
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                        </ol>
+                    </div>
                 </div>
-
             </div>
         </div>
     </div>
+
     <!-- end page title -->
     <div class="row">
         <div class="col-12">
@@ -30,13 +37,12 @@
                 <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="accountNumber">{{ __('menus.account') }}</label>
-                            <select class="form-control" name="accountNumber" id="accountNumber">
+                            <label class="visually-hidden" for="no">{{ __('menus.account') }}</label>
+                            <select class="form-control" name="no" id="no">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($account as $ts)
-                                    <option value="{{ $ts->accountNumber }}"
-                                        {{ request('accountNumber') == $ts->accountNumber ? 'selected' : '' }}>
-                                        {{ $ts->accountNumber }}
+                                    <option value="{{ $ts->id }}" {{ request('no') == $ts->id ? 'selected' : '' }}>
+                                        {{ $ts->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -44,12 +50,12 @@
 
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="txtAccount">{{ __('menus.title') }}</label>
-                            <select class="form-control" name="txtAccount" id="txtAccount">
+                            <select class="form-control" name="name" id="name">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($account as $ts)
-                                    <option value="{{ $ts->txtAccount }}"
-                                        {{ request('txtAccount') == $ts->txtAccount ? 'selected' : '' }}>
-                                        {{ $ts->txtAccount }}
+                                    <option value="{{ $ts->name }}"
+                                        {{ request('name') == $ts->name ? 'selected' : '' }}>
+                                        {{ $ts->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -57,9 +63,11 @@
 
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
+                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            </a>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -68,11 +76,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('account.create'))
+                    @if (hasPermission('accounts.create'))
                         <div class="col-sm">
                             <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light" href="{{ route('account.create') }}"><i
-                                        class="bx bx-plus me-1"></i>
+                                <a class="btn btn-light waves-effect waves-light"
+                                    href="{{ route('accounts.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -130,61 +138,25 @@
     <!-- Choices.js (dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        $(document).ready(function() {
-            const element = document.getElementById('accountNumber');
-            let choicesInstance = new Choices(element, {
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountNumberSelect = document.getElementById('no');
+            const accountNumberChoice = new Choices(accountNumberSelect, {
                 searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#accountNumber').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
             });
         });
 
-        $(document).ready(function() {
-            const element = document.getElementById('txtAccount');
-            let choicesInstance = new Choices(element, {
+        document.addEventListener('DOMContentLoaded', function() {
+            const txtAccountSelect = document.getElementById('name');
+            const txtAccountChoice = new Choices(txtAccountSelect, {
                 searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#txtAccount').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
             });
         });
     </script>

@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('chapterNumber')->unique();
-            $table->string('accountNumber');
-            $table->string('txtAccount');
+            $table->unsignedInteger('ministry_id');
+            $table->unsignedInteger('chapter_id');
+            $table->string('no');
+            $table->string('name');
             $table->timestamps();
         });
     }

@@ -71,14 +71,14 @@ class BudgetMandateLoanDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
-            Column::make('subAccountNumber')->title(__('tables.th.sub.account'))->addClass('align-middle'),
-            Column::make('program')->title(__('tables.th.program'))->addClass('align-middle'),
-            Column::make('internal_increase')->title(__('tables.th.internal'))->addClass('align-middle'),
-            Column::make('unexpected_increase')->title(__('tables.th.unexpected'))->addClass('align-middle'),
-            Column::make('additional_increase')->title(__('tables.th.additional'))->addClass('align-middle'),
-            Column::make('decrease')->title(__('tables.th.decrease'))->addClass('align-middle'),
-            Column::make('editorial')->title(__('tables.th.editorial'))->addClass('align-middle'),
+            Column::make('agencyNumber')->title(__('tables.th.number'))->width(30)->addClass('align-middle'),
+            Column::make('subAccountNumber')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('program')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
+            Column::make('internal_increase')->title(__('tables.th.internal'))->width(80)->addClass('align-middle'),
+            Column::make('unexpected_increase')->title(__('tables.th.unexpected'))->width(30)->addClass('align-middle'),
+            Column::make('additional_increase')->title(__('tables.th.additional'))->width(30)->addClass('align-middle'),
+            Column::make('decrease')->title(__('tables.th.decrease'))->width(30)->addClass('align-middle'),
+            Column::make('editorial')->title(__('tables.th.editorial'))->width(30)->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

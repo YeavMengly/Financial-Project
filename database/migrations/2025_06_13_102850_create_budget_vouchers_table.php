@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('budget_vouchers', function (Blueprint $table) {
             $table->id();
 
-
             $table->unsignedBigInteger('agencyNumber');
             $table->unsignedBigInteger('subDepart');
             $table->unsignedBigInteger('year');
@@ -27,14 +26,9 @@ return new class extends Migration
 
             // Change from unsignedBigInteger to string
             $table->string('task_type');
-
             $table->text('txtDescription');
-
             $table->json('attachments')->nullable();
-
             $table->date('date');
-
-
             $table->timestamps();
         });
     }

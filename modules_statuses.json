@@ -10,5 +10,6 @@
     "LoanBudget": true,
     "BudgetPlan": true,
     "General": true,
-    "InitialBudget": true
+    "InitialBudget": true,
+    "InitialChapter": true
 }

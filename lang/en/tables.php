@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'th.ministries' => 'ស្ថាប័ន',
     'th.no' => 'ល.រ',
     'th.modules' => 'Module',
     'th.pages' => 'Pages',
@@ -17,14 +18,15 @@ return [
     'th.category' => 'ប្រភេទ',
     'th.description' => 'បរិយាយ',
     'th.category.sub' => 'អនុប្រភេទ',
+    'th.no' => 'លេខសម្គាល់',
     'th.year' => 'ឆ្នាំ',
     'th.document.title' => 'ចំណងជើង ឯកសារ',
     'th.document.total' => 'ចំនួនឯកសារ',
     'th.notes' => 'កំណត់ចំណាំ',
     'th.key' => 'Key',
-
     'th.title' => 'ចំណងជើង',
-    'th.sub.title' => 'យោង',
+    'th.nick_name' => 'អក្សរឡាតាំង',
+    'th.refer' => 'យោង',
     'th.chapter' => 'ជំពូក',
     'th.txtChapter' => 'នាមជំពូក',
     'th.account' => 'គណនី់',

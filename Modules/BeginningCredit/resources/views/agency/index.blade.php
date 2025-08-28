@@ -14,55 +14,23 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.agency') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.agency') }} </h4>
 
                 <div class="page-title-right">
-
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                        </ol>
+                    </div>
                 </div>
 
             </div>
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="agencyNumber">{{ __('menus.account') }}</label>
-                            <select class="form-control" name="agencyNumber" id="agencyNumber">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($agency as $agen)
-                                    <option value="{{ $agen->agencyNumber }}"
-                                        {{ request('agencyNumber') == $agen->agencyNumber ? 'selected' : '' }}>
-                                        {{ $agen->agencyNumber }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="agencyTitle">{{ __('menus.title') }}</label>
-                            <select class="form-control" name="agencyTitle" id="agencyTitle">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($agency as $agen)
-                                    <option value="{{ $agen->agencyTitle }}"
-                                        {{ request('agencyTitle') == $agen->agencyTitle ? 'selected' : '' }}>
-                                        {{ $agen->agencyTitle }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -70,8 +38,8 @@
                     @if (hasPermission('agency.create'))
                         <div class="col-sm">
                             <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light" href="{{ route('agency.create') }}"><i
-                                        class="bx bx-plus me-1"></i>
+                                <a class="btn btn-light waves-effect waves-light"
+                                    href="{{ route('agency.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -128,61 +96,83 @@
     <!-- Choices.js (dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        $(document).ready(function() {
-            const element = document.getElementById('agencyNumber');
-            let choicesInstance = new Choices(element, {
+        // $(document).ready(function() {
+        //     const element = document.getElementById('agencyNumber');
+        //     let choicesInstance = new Choices(element, {
+        //         searchEnabled: true,
+        //         itemSelectText: '',
+        //         shouldSort: false,
+        //     });
+
+        //     $('#agencyNumber').on('change', function() {
+        //         const selected = $(this).val();
+        //         let message = '';
+
+        //         switch (selected) {
+        //             case '1':
+        //                 message = 'You selected Choice 1';
+        //                 break;
+        //             case '2':
+        //                 message = 'You selected Choice 2';
+        //                 break;
+        //             case '3':
+        //                 message = 'You selected Choice 3';
+        //                 break;
+        //             default:
+        //                 message = '';
+        //         }
+        //         $('#resultDisplay').text(message);
+        //     });
+        // });
+
+        // $(document).ready(function() {
+        //     const element = document.getElementById('agencyTitle');
+        //     let choicesInstance = new Choices(element, {
+        //         searchEnabled: true,
+        //         itemSelectText: '',
+        //         shouldSort: false,
+        //     });
+
+        //     $('#agencyTitle').on('change', function() {
+        //         const selected = $(this).val();
+        //         let message = '';
+
+        //         switch (selected) {
+        //             case '1':
+        //                 message = 'You selected Choice 1';
+        //                 break;
+        //             case '2':
+        //                 message = 'You selected Choice 2';
+        //                 break;
+        //             case '3':
+        //                 message = 'You selected Choice 3';
+        //                 break;
+        //             default:
+        //                 message = '';
+        //         }
+        //         $('#resultDisplay').text(message);
+        //     });
+        // });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const program = document.getElementById('agencyNumber');
+            const programChoices = new Choices(program, {
                 searchEnabled: true,
                 itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#agencyNumber').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
             });
         });
 
-        $(document).ready(function() {
-            const element = document.getElementById('agencyTitle');
-            let choicesInstance = new Choices(element, {
+        document.addEventListener('DOMContentLoaded', function() {
+            const program = document.getElementById('agencyTitle');
+            const programChoices = new Choices(program, {
                 searchEnabled: true,
                 itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#agencyTitle').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
             });
         });
     </script>

@@ -5,9 +5,9 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 use App\DataTables\AccountDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Account;
+use App\Models\BeginCredit\Ministry;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\Action;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -16,36 +16,51 @@ class AccountController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(AccountDataTable $dataTable)
+    public function index(AccountDataTable $dataTable, $params)
     {
-        $account =  Account::all();
-        return $dataTable->render('beginningcredit::accounts.index', ['account' => $account]);
+        $id  = decode_params($params);
+        $data = Ministry::where('id', $id)->first();
+        $account =  Account::where('ministry_id', $id)->get();
+
+        return $dataTable->render(
+            'beginningcredit::accounts.index',
+            [
+                'data' => $data,
+                'params' => $params,
+                'account' => $account
+            ]
+        );
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($params)
     {
-        $chapter = Chapter::all();
-        return view('beginningcredit::accounts.create')->with('chapter', $chapter);
+        $id = decode_params($params);
+        $chapter = Chapter::where('ministry_id', $id)->get();
+
+        return view('beginningcredit::accounts.create')
+            ->with('params', $params)
+            ->with('chapter', $chapter);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $params)
     {
         $request->validate([
             'cboChapterNumber' => ['required'],
-            'accountNumber' => ['required'],
-            'txtAccount' => ['required'],
+            'no' => ['required'],
+            'name' => ['required'],
         ]);
 
+        $id = decode_params($params);
         DB::beginTransaction();
         try {
-            $existingRecord = Account::where('chapterNumber', $request->cboChapterNumber)
-                ->where('accountNumber', $request->accountNumber)
+            $existingRecord = Account::where('chapter_id', $request->cboChapterNumber)
+                ->where('no', $request->no)
                 ->first();
 
             if ($existingRecord) {
@@ -54,10 +69,13 @@ class AccountController extends Controller
                 ])->withInput();
             }
 
+            $ministry = Ministry::where('id', $id)->first();
+
             Account::create([
-                'chapterNumber' => $request->cboChapterNumber,
-                'accountNumber' => $request->accountNumber,
-                'txtAccount' => $request->txtAccount
+                'ministry_id' => $ministry->id,
+                'chapter_id' => $request->cboChapterNumber,
+                'no' => $request->no,
+                'name' => $request->name
             ]);
 
             DB::commit();
@@ -69,7 +87,7 @@ class AccountController extends Controller
                 ->flash();
 
             if ($request->submit == 'save') {
-                return redirect()->route('account.index');
+                return redirect()->route('accounts.index', $params);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -81,16 +99,8 @@ class AccountController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('account.index');
+            return redirect()->route('accounts.index', $params);
         }
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('beginningcredit::show');
     }
 
     /**
@@ -112,15 +122,18 @@ class AccountController extends Controller
     {
         $request->validate([
             'cboChapterNumber' => ['required'],
-            'accountNumber' => ['required'],
-            'txtAccount' => ['required'],
+            'no' => ['required'],
+            'name' => ['required'],
         ]);
 
-        $id = decode_params($params);
         DB::beginTransaction();
+
+        $id = decode_params($params);
+        $account = Account::where('id', $id)->first();
+
         try {
-            $existingRecord = Account::where('chapterNumber', $request->cboChapterNumber)
-                ->where('accountNumber', $request->accountNumber)
+            $existingRecord = Account::where('chapter_id', $request->cboChapterNumber)
+                ->where('no', $request->no)
                 ->where('id', '<>', $id)
                 ->first();
 
@@ -129,12 +142,11 @@ class AccountController extends Controller
                     'account.number' => __('messages.account.number')
                 ])->withInput();
             }
-            $account = Account::where('id', $id)->first();
 
             $account->update([
-                'chapterNumber' => $request->cboChapterNumber,
-                'accountNumber' => $request->accountNumber,
-                'txtAccount' => $request->txtAccount
+                'chapter_id' => $request->cboChapterNumber,
+                'no' => $request->no,
+                'name' => $request->name
             ]);
 
             DB::commit();
@@ -145,9 +157,7 @@ class AccountController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            // if ($request->submit == 'save') {
-            return redirect()->route('account.index');
-            // }
+            return redirect()->route('accounts.index', encode_params($account->ministry_id));
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -158,7 +168,7 @@ class AccountController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('account.index');
+            return redirect()->route('accounts.index', encode_params($account->ministry_id));
         }
     }
 
@@ -170,12 +180,13 @@ class AccountController extends Controller
         $id = decode_params($params);
         $account = Account::where('id', $id)->first();
         $account->delete();
+
         flash()
             ->translate('en')
             ->option('timeout', 2000)
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('account.index');
+        return redirect()->route('accounts.index', encode_params($account->ministry_id));
     }
 }

@@ -6,7 +6,7 @@ use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginCredit;
-use App\Models\BeginCredit\InitialBudget;
+use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\BudgetPlan\InitialVoucher;
 use App\Models\SubDepart;
@@ -26,15 +26,11 @@ class BudgetVoucherController extends Controller
         $params = decode_params($id);
         $initialVoucherId = is_array($params) && isset($params['id']) ? $params['id'] : $params;
 
-        $initialVoucher = InitialBudget::findOrFail($initialVoucherId);
+        $initialVoucher = Ministry::findOrFail($initialVoucherId);
 
         foreach ($initialVoucher as $item) {
             $item->id;
         }
-
-        // $year = $item->id;
-
-        // request()->merge(['year' => $year]);
 
         $taskType = TaskType::all();
         $agency = Agency::all();
@@ -56,7 +52,7 @@ class BudgetVoucherController extends Controller
     public function create($id)
     {
         $params = decode_params($id);
-        $initialVoucher = InitialBudget::findOrFail($params);
+        $initialVoucher = Ministry::findOrFail($params);
         $beginCredit = BeginCredit::where('year', $params)->with('agency')->get();
         $taskType = TaskType::all();
 
@@ -72,7 +68,7 @@ class BudgetVoucherController extends Controller
         $params = decode_params($id);
         $initialVoucherId = is_array($params) && isset($params['id']) ? $params['id'] : $params;
 
-        $initialVoucher = InitialBudget::findOrFail($initialVoucherId);
+        $initialVoucher = Ministry::findOrFail($initialVoucherId);
 
         foreach ($initialVoucher as $item) {
             $item->id;

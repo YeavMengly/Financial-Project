@@ -14,19 +14,25 @@ class Account extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'chapterNumber',
-        'accountNumber',
-        'txtAccount'
+
+        'ministry_id',
+        'chapter_id',
+        'no',
+        'name',
     ];
 
+    public function ministries()
+    {
+        return $this->belongsTo(Ministry::class);
+    }
     public function chapter()
     {
-        return $this->belongsTo(Chapter::class, 'chapterNumber', 'chapterNumber'); // Ensure 'code' is used for both keys
+        return $this->belongsTo(Chapter::class, 'chapter_id', 'no'); // Ensure 'code' is used for both keys
     }
 
     public function subAccount()
     {
-        return $this->hasMany(SubAccount::class, 'accountNumber', 'accountNumber');
+        return $this->hasMany(AccountSub::class, 'chapter_id', 'id');
     }
 
     public function getActivitylogOptions(): LogOptions

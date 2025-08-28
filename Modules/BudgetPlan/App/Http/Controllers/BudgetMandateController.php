@@ -6,7 +6,7 @@ use App\DataTables\Budget\BudgetMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginCreditMandate;
-use App\Models\BeginCredit\InitialBudget;
+use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\TaskType;
 use Illuminate\Http\Request;
@@ -24,7 +24,7 @@ class BudgetMandateController extends Controller
         $params = decode_params($id);
         $initialMandateId = is_array($params) && isset($params['id']) ? $params['id'] : $params;
 
-        $initialMandate = InitialBudget::findOrFail($initialMandateId);
+        $initialMandate = Ministry::findOrFail($initialMandateId);
 
         foreach ($initialMandate as $item) {
             $item->id;
@@ -51,7 +51,7 @@ class BudgetMandateController extends Controller
     public function create($id)
     {
         $params = decode_params($id);
-        $initialMandate = InitialBudget::findOrFail($params);
+        $initialMandate = Ministry::findOrFail($params);
 
         $beginCreditMandate = BeginCreditMandate::where('year', $params)->get();
         $taskType = TaskType::all();
@@ -66,7 +66,7 @@ class BudgetMandateController extends Controller
         $params = decode_params($id);
         $initialMandateId = is_array($params) && isset($params['id']) ? $params['id'] : $params;
 
-        $initialMandate = InitialBudget::findOrFail($initialMandateId);
+        $initialMandate = Ministry::findOrFail($initialMandateId);
 
         foreach ($initialMandate as $item) {
             $item->id;

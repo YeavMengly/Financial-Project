@@ -18,21 +18,13 @@ return new class extends Migration
             $table->unsignedBigInteger('subDepart');
             $table->unsignedBigInteger('year');
             $table->unsignedBigInteger('subAccountNumber');
-
-            // Change from unsignedBigInteger to string
             $table->unsignedBigInteger('program');
 
             $table->decimal('budget', 15, 2)->default(0);
-
-            // Change from unsignedBigInteger to string
             $table->string('task_type');
-
             $table->text('txtDescription');
-
             $table->json('attachments')->nullable();
-
             $table->date('date');
-
             $table->timestamps();
         });
     }

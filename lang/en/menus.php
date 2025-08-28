@@ -3,14 +3,16 @@
 return [
     'dashboard' => 'ទំព័រដើម',
     'document' => 'ឯកសារ',
+    'roles' => 'តួនាទី',
+    'categories' => 'ប្រភេទ',
 
-    'initial.budget' => 'កម្រងថវិកាដើមឆ្នាំ',
+    'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
     'beginning.credit' => 'កំណត់ឥណទានដើមឆ្នាំ',
 
     'cluster' => 'ចង្កោម',
-    'chapter' => 'ជំពូក',
-    'account' => 'គណនី',
+    'chapters' => 'ជំពូក',
+    'accounts' => 'គណនី',
     'sub.account' => 'អនុគណនី',
     'number' => 'លេខ',
     'name' => 'ឈ្មោះ',
@@ -20,6 +22,8 @@ return [
     'title' => 'ចំណងជើង',
 
     'program' => 'កម្មវិធី',
+    'programs' => 'កម្មវិធី',
+    'sub.program' => 'អនុកម្មវិធី',
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
 
@@ -32,8 +36,8 @@ return [
     'voucher' => 'សលាកបត្រ',
     'mandate' => 'អាណត្តិ',
 
-    'check.control.general'   => 'ពិនិត្យរបាយការណ័',
-    'check.control.guarantee' => 'របាយការណ៍ធានាចំណាយ',
+    'check.control.general'   => 'ពិនិត្យរបាយការណ៍',
+    'check.control.guarantee' => 'ធានាចំណាយ',
     'check.control.summary' => 'របាយការណ៍សង្ខេប',
 
     'library' => 'Media Library',
