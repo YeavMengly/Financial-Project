@@ -29,7 +29,7 @@ class ProgramDataTable extends DataTable
                 return $active;
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::programs.action', ['module' => $module]);
+                return view('beginningcredit::program.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

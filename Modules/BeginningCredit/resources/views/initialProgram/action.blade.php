@@ -7,7 +7,7 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('ministries.index'))
-                    <a href="{{ route('programs.index', encode_params($module->id)) }}"
+                    <a href="{{ route('program.index', encode_params($module->id)) }}"
                         class="dropdown-item">
                         <i class="bx bx-show"></i> {{ __('buttons.show') }}
                     </a>

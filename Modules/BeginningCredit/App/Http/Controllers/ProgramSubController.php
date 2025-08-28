@@ -20,16 +20,32 @@ class ProgramSubController extends Controller
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
+        $programSub =  ProgramSub::where('ministry_id', $id)->get();
 
-        // dd($data);
         return $dataTable->render(
-            'beginningcredit::programs.programSub.index',
+            'beginningcredit::program.programSub.index',
             [
                 'data' => $data,
                 'params' => $params,
-                // 'pid' => $pid,
+                'programSub' => $programSub,
             ]
         );
+    }
+
+    public function getByProgramId(Request $request)
+    {
+        // $agency = Agency::all();
+        $programSub = ProgramSub::all();
+
+
+
+        echo '<option value="">ជ្រើសរើស អនុកម្មវិធី</option>';
+        if ($request->program_id) {
+            $data = ProgramSub::select('id', 'no', 'decription')->where('program_id', $request->program_id)->get();
+            foreach ($data as $d) {
+                echo '<option value="' . $d->id . '">' . $d->no . '-' . $d->decription . '</option>';
+            }
+        }
     }
     /**
      * Show the form for creating a new resource.
@@ -39,7 +55,7 @@ class ProgramSubController extends Controller
         $id = decode_params($params);
         $data = Program::where('ministry_id', $id)->get();
 
-        return view('beginningcredit::programs.programSub.create')
+        return view('beginningcredit::program.programSub.create')
             ->with('data', $data)
             ->with('params', $params);
     }
@@ -124,7 +140,7 @@ class ProgramSubController extends Controller
         $program = Program::where('ministry_id', $ministry->id)->first();
         $data = ProgramSub::where('program_id', $program->id)->first();
 
-        return view('beginningcredit::programs.programSub.edit')
+        return view('beginningcredit::program.programSub.edit')
             ->with('data', $data)
             ->with('params', $params)
             ->with('program', $program);

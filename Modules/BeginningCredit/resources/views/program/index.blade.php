@@ -14,7 +14,8 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.sub.program') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.program') }}</h4>
+
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
@@ -32,51 +33,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="no">{{ __('menus.account') }}</label>
-                            <select class="form-control" name="no" id="no">
-                                <option value="">{{ __('forms.search...') }}</option>
-
-                                {{-- @foreach ($data as $dd)
-                                    <option value="{{ $dd->id }}" {{ request('no') == $dd->no ? 'selected' : '' }}>
-                                        {{ $dd->no }}
-                                    </option>
-                                @endforeach --}}
-                            </select>
-                        </div>
-
-                        {{-- <div class="col-sm-3">
-                            <label class="visually-hidden" for="decription">{{ __('menus.title') }}</label>
-                            <select class="form-control" name="decription" id="decription">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($programSub as $dp)
-                                    <option value="{{ $dp->id }}"
-                                        {{ request('decription') == $dp->decription ? 'selected' : '' }}>
-                                        {{ $dp->decription }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div> --}}
-
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    @if (hasPermission('programSub.create'))
+                    @if (hasPermission('program.create'))
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('programSub.create', $params) }}"><i class="bx bx-plus me-1"></i>
+                                    href="{{ route('program.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -84,7 +45,6 @@
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>
@@ -130,28 +90,4 @@
         }
     </script>
     {!! $dataTable->scripts() !!}
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const subDepartSelect = document.getElementById('no');
-            const cboDepartChoices = new Choices(subDepartSelect, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const txtSubDepartSelect = document.getElementById('decription');
-            const cboDepartChoices = new Choices(txtSubDepartSelect, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script>
 @endsection

@@ -28,7 +28,7 @@
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('programs.store', $params) }}" autocomplete="off">
+                        action="{{ route('program.store', $params) }}" autocomplete="off">
                         @csrf
                         <input type="hidden" />
                         <div class="row">

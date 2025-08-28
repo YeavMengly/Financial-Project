@@ -9,7 +9,7 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.chapter') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.chapters') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>

@@ -25,8 +25,7 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
-                    <form id="pristine-valid-example" novalidate method="POST"
-                        action="" autocomplete="off">
+                    <form id="pristine-valid-example" novalidate method="POST" action="" autocomplete="off">
                         @csrf
                         <div class="row">
                             <div class="col-md-12">

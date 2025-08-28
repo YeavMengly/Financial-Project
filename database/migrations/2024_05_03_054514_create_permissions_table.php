@@ -75,10 +75,10 @@ return new class extends Migration
 
             'programs'                  => [
                 'show'   => 'initialProgram.index',
-                'view'   => 'programs.index',
-                'create' => 'programs.create',
-                'edit'   => 'programs.edit',
-                'delete' => 'programs.destroy',
+                'view'   => 'program.index',
+                'create' => 'program.create',
+                'edit'   => 'program.edit',
+                'delete' => 'program.destroy',
             ],
 
             'sub.program'                  => [

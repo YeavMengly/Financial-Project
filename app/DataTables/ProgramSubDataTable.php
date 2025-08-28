@@ -30,7 +30,7 @@ class ProgramSubDataTable extends DataTable
             })
             ->rawColumns(['decription'])
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::programs.programSub.action', ['module' => $module]);
+                return view('beginningcredit::program.programSub.action', ['module' => $module]);
             })
             ->setRowId('id');
     }

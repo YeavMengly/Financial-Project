@@ -1,4 +1,4 @@
-@if (hasPermission('programs.edit') or hasPermission('programs.destroy'))
+@if (hasPermission('program.edit') or hasPermission('program.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
@@ -6,20 +6,20 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('programs.edit'))
-                    @if (hasPermission('programs.edit'))
-                        <a href="{{ route('programs.edit', encode_params($module->id)) }}" class="dropdown-item"><i
+                @if (hasPermission('program.edit'))
+                    @if (hasPermission('program.edit'))
+                        <a href="{{ route('program.edit', encode_params($module->id)) }}" class="dropdown-item"><i
                                 class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                     @endif
-                    @if (hasPermission('programs.destroy'))
+                    @if (hasPermission('program.destroy'))
                         <a href="#"
-                            onclick="confirm('{{ route('programs.destroy', encode_params($module->id)) }}', 1)"
+                            onclick="confirm('{{ route('program.destroy', encode_params($module->id)) }}', 1)"
                             class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
                     @endif
                 @else
-                    @if (hasPermission('programs.destroy'))
+                    @if (hasPermission('program.destroy'))
                         <a href="#"
-                            onclick="confirm('{{ route('programs.restore', encode_params($module->id)) }}', 2)"
+                            onclick="confirm('{{ route('program.restore', encode_params($module->id)) }}', 2)"
                             class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
                     @endif
                 @endif
