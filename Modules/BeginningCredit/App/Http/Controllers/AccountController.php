@@ -5,11 +5,9 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 use App\DataTables\AccountDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Account;
-use App\Models\BeginCredit\InitialBudget;
 use App\Models\BeginCredit\Ministry;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\Action;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -46,7 +44,6 @@ class AccountController extends Controller
             ->with('params', $params)
             ->with('chapter', $chapter);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -107,14 +104,6 @@ class AccountController extends Controller
     }
 
     /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('beginningcredit::show');
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit($params)
@@ -137,7 +126,6 @@ class AccountController extends Controller
             'name' => ['required'],
         ]);
 
-
         DB::beginTransaction();
 
         $id = decode_params($params);
@@ -154,6 +142,7 @@ class AccountController extends Controller
                     'account.number' => __('messages.account.number')
                 ])->withInput();
             }
+
             $account->update([
                 'chapter_id' => $request->cboChapterNumber,
                 'no' => $request->no,
@@ -190,10 +179,7 @@ class AccountController extends Controller
     {
         $id = decode_params($params);
         $account = Account::where('id', $id)->first();
-
-        if ($account) {
-            $account->delete();
-        }
+        $account->delete();
 
         flash()
             ->translate('en')

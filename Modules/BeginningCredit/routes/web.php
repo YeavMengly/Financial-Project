@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::group([], function () {
-//     Route::resource('beginningcredit', BeginningCreditController::class)->names('beginningcredit');
-// });
-
-
 Route::prefix('ministries')->middleware(['auth'])->group(function () {
 
     require_once __DIR__ . '/initialChapter.php';
@@ -27,12 +22,9 @@ Route::prefix('ministries')->middleware(['auth'])->group(function () {
 
     require_once __DIR__ . '/initialProgram.php';
     require_once __DIR__ . '/program.php';
-    require_once __DIR__ . '/code.php';
-    require_once __DIR__ . '/codeSub.php';
 
     require_once __DIR__ . '/initialProgramSub.php';
     require_once __DIR__ . '/programSub.php';
-
 
     require_once __DIR__ . '/beginVoucher.php';
     require_once __DIR__ . '/beginCreditMandate.php';
@@ -40,13 +32,8 @@ Route::prefix('ministries')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/Ministry.php';
     require_once __DIR__ . '/initialBudgetMandate.php';
 
-
-
-
-
     require_once __DIR__ . '/initialAgency.php';
     require_once __DIR__ . '/agency.php';
-
 
     require_once __DIR__ . '/initialAccountSub.php';
     require_once __DIR__ . '/accountSub.php';

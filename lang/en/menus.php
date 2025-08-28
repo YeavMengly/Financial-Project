@@ -3,14 +3,16 @@
 return [
     'dashboard' => 'ទំព័រដើម',
     'document' => 'ឯកសារ',
+    'roles' => 'តួនាទី',
+    'categories' => 'ប្រភេទ',
 
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
     'beginning.credit' => 'កំណត់ឥណទានដើមឆ្នាំ',
 
     'cluster' => 'ចង្កោម',
-    'chapter' => 'ជំពូក',
-    'account' => 'គណនី',
+    'chapters' => 'ជំពូក',
+    'accounts' => 'គណនី',
     'sub.account' => 'អនុគណនី',
     'number' => 'លេខ',
     'name' => 'ឈ្មោះ',
@@ -20,6 +22,7 @@ return [
     'title' => 'ចំណងជើង',
 
     'program' => 'កម្មវិធី',
+    'programs' => 'កម្មវិធី',
     'sub.program' => 'អនុកម្មវិធី',
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',

@@ -6,10 +6,7 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('initialProgram.edit'))
-                    <a href="{{ route('programSub.index', encode_params($module->id)) }}" class="dropdown-item">
-                        <i class="bx bx-show"></i> {{ __('buttons.show') }}
-                    </a>
+                @if (hasPermission('programs.edit'))
                     @if (hasPermission('programs.edit'))
                         <a href="{{ route('programs.edit', encode_params($module->id)) }}" class="dropdown-item"><i
                                 class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

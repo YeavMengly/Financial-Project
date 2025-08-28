@@ -16,7 +16,7 @@
                 @endif
             @else
                 @if (hasPermission('agency.destroy'))
-                    <a href="#" onclick="confirm('{{ route('agenczy.restore', encode_params($module->id)) }}', 2)"
+                    <a href="#" onclick="confirm('{{ route('agency.restore', encode_params($module->id)) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
                 @endif
             @endif

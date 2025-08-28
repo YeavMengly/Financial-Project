@@ -26,7 +26,7 @@ class ChapterDataTable extends DataTable
                 return $active;
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::chapter.action', ['module' => $module]);
+                return view('beginningcredit::chapters.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

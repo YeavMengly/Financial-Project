@@ -4,7 +4,6 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\ChapterDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\InitialBudget;
 use App\Models\BeginCredit\Ministry;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
@@ -22,7 +21,7 @@ class ChapterController extends Controller
         $id  = decode_params($params);
         $data = Ministry::where('id', $id)->first();
 
-        return $dataTable->render('beginningcredit::chapter.index', [
+        return $dataTable->render('beginningcredit::chapters.index', [
             'params' => $params,
             'data' => $data
         ]);
@@ -33,7 +32,7 @@ class ChapterController extends Controller
      */
     public function create($params)
     {
-        return view('beginningcredit::chapter.create')
+        return view('beginningcredit::chapters.create')
             ->with('params', $params);
     }
 
@@ -68,7 +67,7 @@ class ChapterController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('chapter.index', $params);
+            return redirect()->route('chapters.index', $params);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -79,16 +78,8 @@ class ChapterController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('chapter.index', $params);
+            return redirect()->route('chapters.index', $params);
         }
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('chapter.show');
     }
 
     /**
@@ -99,7 +90,7 @@ class ChapterController extends Controller
         $id = decode_params($params);
         $data = Chapter::where('id', $id)->first();
 
-        return view('beginningcredit::chapter.edit')
+        return view('beginningcredit::chapters.edit')
             ->with('data', $data)
             ->with('params', $params);
     }
@@ -128,7 +119,7 @@ class ChapterController extends Controller
             ->success('success_msg', 'successful')
             ->flash();
 
-        return redirect()->route('chapter.index', encode_params($chapter->ministry_id));
+        return redirect()->route('chapters.index', encode_params($chapter->ministry_id));
     }
 
     /**
@@ -146,6 +137,6 @@ class ChapterController extends Controller
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('chapter.index', encode_params($chapter->ministry_id));
+        return redirect()->route('chapters.index', encode_params($chapter->ministry_id));
     }
 }

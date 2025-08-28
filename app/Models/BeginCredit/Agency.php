@@ -2,15 +2,17 @@
 
 namespace App\Models\BeginCredit;
 
-use App\Models\Program;
 use App\Models\ProgramSub;
-use App\Models\SubDepart;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Agency extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, LogsActivity;
+
     protected $fillable = [
         'ministry_id',
         'program_id',
@@ -19,6 +21,25 @@ class Agency extends Model
         'nick_name'
     ];
 
+    /**
+     * Configure activity log options
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'ministry_id',
+                'program_id',
+                'no',
+                'name',
+                'nick_name',
+            ])
+            ->useLogName('agency') // log group name
+            ->logOnlyDirty()       // only log changed attributes
+            ->dontSubmitEmptyLogs(); // ignore empty logs
+    }
+
+    // 🔹 Relationships
     public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
@@ -34,17 +55,8 @@ class Agency extends Model
         return $this->hasMany(BeginCreditMandate::class);
     }
 
-    // public function subDepart()
-    // {
-    //     return $this->belongsTo(SubDepart::class);
-    // }
-
     public function programSub()
     {
         return $this->hasMany(ProgramSub::class, 'no_id', 'id');
     }
-
-    // public function program(){
-    //     return $this->hasMany(Program::class, 'program_id', 'id');
-    // }
 }

@@ -13,7 +13,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapter') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapters') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -32,11 +32,11 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('chapter.create'))
+                    @if (hasPermission('chapters.create'))
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('chapter.create', $params) }}"><i class="bx bx-plus me-1"></i>
+                                    href="{{ route('chapters.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>

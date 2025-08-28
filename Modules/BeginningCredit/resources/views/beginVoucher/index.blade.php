@@ -21,7 +21,7 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.initial.budget') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.ministries') }}</a>
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.credit') }}</li>
                         </ol>

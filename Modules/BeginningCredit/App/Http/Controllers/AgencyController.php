@@ -47,7 +47,6 @@ class AgencyController extends Controller
      */
     public function store(Request $request, $params)
     {
-        //
         $validateData = $request->validate([
             'cboProgram' => ['required'],
             'no' => ['required'],
@@ -92,14 +91,6 @@ class AgencyController extends Controller
 
             return redirect()->route('agency.index', $params);
         }
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('beginningcredit::show');
     }
 
     /**

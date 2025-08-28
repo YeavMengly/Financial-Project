@@ -16,7 +16,7 @@ class ProgramSubController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(ProgramSubDataTable $dataTable, $params)
+    public function index(ProgramSubDataTable $dataTable, $params,)
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
@@ -27,6 +27,7 @@ class ProgramSubController extends Controller
             [
                 'data' => $data,
                 'params' => $params,
+                // 'pid' => $pid,
             ]
         );
     }

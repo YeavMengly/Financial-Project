@@ -16,6 +16,8 @@ class MinistryController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+
     public function index(MinistryDataTable $dataTable)
     {
         return $dataTable->render('beginningcredit::ministries.index');
@@ -77,14 +79,6 @@ class MinistryController extends Controller
 
             return redirect()->route('ministries.index');
         }
-    }
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
-    {
-        return view('beginningcredit::show');
     }
 
     /**

@@ -22,7 +22,6 @@ class AccountSubController extends Controller
         $accountSub =  AccountSub::where('ministry_id', $id)->get();
 
         return $dataTable->render('beginningcredit::accounts.accountSub.index', [
-
             'data' => $data,
             'params' => $params,
             'accountSub' => $accountSub,
@@ -34,7 +33,9 @@ class AccountSubController extends Controller
         $id  = decode_params($params);
         $data = Account::where('ministry_id', $id)->get();
 
-        return view('beginningcredit::accounts.accountSub.create')->with('account', $data)->with('params', $params);
+        return view('beginningcredit::accounts.accountSub.create')
+        ->with('account', $data)
+        ->with('params', $params);
     }
 
     public function store(Request $request, $params)
@@ -97,7 +98,6 @@ class AccountSubController extends Controller
 
     public function edit($params)
     {
-
         $id = decode_params($params);
         $account = Account::all();
         $accountSub = AccountSub::where('id', $id)->first();

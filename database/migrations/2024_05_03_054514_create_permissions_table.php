@@ -1,4 +1,5 @@
 <?php
+
 use App\Models\User;
 use App\Models\Permission;
 use Illuminate\Database\Migrations\Migration;
@@ -27,6 +28,78 @@ return new class extends Migration
                 'edit'   => 'roles.edit',
                 'delete' => 'roles.destroy',
             ],
+            'ministries'                  => [
+                'view'   => 'ministries.index',
+                'create' => 'ministries.create',
+                'edit'   => 'ministries.edit',
+                'delete' => 'ministries.destroy',
+            ],
+
+            'begin_vouchers'                  => [
+                'view'   => 'beginVoucher.index',
+                'create' => 'beginVoucher.create',
+                'edit'   => 'beginVoucher.edit',
+                'delete' => 'beginVoucher.destroy',
+            ],
+
+            'categories'                  => [
+                'view'   => 'categories.index',
+                'create' => 'categories.create',
+                'edit'   => 'categories.edit',
+                'delete' => 'categories.destroy',
+            ],
+
+            'chapters'                  => [
+                'show'   => 'initialChapter.index',
+                'view'   => 'chapters.index',
+                'create' => 'chapters.create',
+                'edit'   => 'chapters.edit',
+                'delete' => 'chapters.destroy',
+            ],
+
+            'accounts'                  => [
+                'show'   => 'initialAccount.index',
+                'view'   => 'accounts.index',
+                'create' => 'accounts.create',
+                'edit'   => 'accounts.edit',
+                'delete' => 'accounts.destroy',
+            ],
+
+            'sub.account'                  => [
+                'show'   => 'initialAccountSub.index',
+                'view'   => 'accountSub.index',
+                'create' => 'accountSub.create',
+                'edit'   => 'accountSub.edit',
+                'delete' => 'accountSub.destroy',
+            ],
+
+            'programs'                  => [
+                'show'   => 'initialProgram.index',
+                'view'   => 'programs.index',
+                'create' => 'programs.create',
+                'edit'   => 'programs.edit',
+                'delete' => 'programs.destroy',
+            ],
+
+            'sub.program'                  => [
+                'show'   => 'initialProgramSub.index',
+                'view'   => 'programSub.index',
+                'create' => 'programSub.create',
+                'edit'   => 'programSub.edit',
+                'delete' => 'programSub.destroy',
+            ],
+
+            'agency'                  => [
+                'show'   => 'initialAgency.index',
+                'view'   => 'agency.index',
+                'create' => 'agency.create',
+                'edit'   => 'agency.edit',
+                'delete' => 'agency.destroy',
+            ],
+
+
+
+
         ];
 
         $admin_permission = [];
