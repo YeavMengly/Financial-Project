@@ -49,7 +49,7 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubAccountNumber" class="form-label font-size-13 text-muted">
+                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
                                         <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
@@ -69,53 +69,33 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubDepart" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.sub.depart') }}
+                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.sub.program') }}
                                         </label>
-                                        <select id="cboProgramSub" class="form-select" name="cboSub" required
+                                        <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">ជ្រើសរើស</option>
                                         </select>
-                                        @error('cboSub')
+                                        @error('cboProgramSub')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboSubDepart" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.sub.depart') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboSubDepart" name="cboSubDepart"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($programSub as $dp)
-                                                <option value="{{ $dp->id }}">
-                                                    {{ $dp->no }}- {{ $dp->decription }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div> --}}
-
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubAccountNumber" class="form-label font-size-13 text-muted">
+                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.sub.account') }}
                                         </label>
-                                        <select class="form-control" data-trigger id="cboSubAccountNumber"
-                                            name="cboSubAccountNumber" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                        <select class="form-control" data-trigger id="cboSubAccount" name="cboSubAccount"
+                                            required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($accountSub as $sa)
                                                 <option value="{{ $sa->id }}">
                                                     {{ $sa->no }}</option>
                                             @endforeach
                                         </select>
-                                        @error('cboSubAccountNumber')
+                                        @error('cboSubAccount')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -125,7 +105,7 @@
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.program.code') }}</label>
                                         <input type="text"
-                                            data-pristine-required-message="{{ __('messages.required') }}" name="program"
+                                            data-pristine-required-message="{{ __('messages.required') }}" name="no"
                                             required class="form-control" />
                                     </div>
                                 </div>
@@ -220,14 +200,14 @@
     </script>
     <script>
         $(document).ready(function() {
-            const element = document.getElementById('cboSubAccountNumber');
+            const element = document.getElementById('cboSubAccount');
             let choicesInstance = new Choices(element, {
                 searchEnabled: true,
                 itemSelectText: '',
                 shouldSort: false,
             });
 
-            $('#cboSubAccountNumber').on('change', function() {
+            $('#cboSubAccount').on('change', function() {
                 const selected = $(this).val();
                 let message = '';
 

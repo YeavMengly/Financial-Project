@@ -47,16 +47,11 @@ class Agency extends Model
 
     public function beginVoucher()
     {
-        return $this->hasMany(BeginVoucher::class);
+        return $this->hasMany(BeginVoucher::class, 'agency_id', 'id');
     }
 
-    public function beginCreditMandate()
+    public function beginMandate()
     {
-        return $this->hasMany(BeginCreditMandate::class);
-    }
-
-    public function programSub()
-    {
-        return $this->hasMany(ProgramSub::class, 'no_id', 'id');
+        return $this->hasMany(BeginMandate::class);
     }
 }

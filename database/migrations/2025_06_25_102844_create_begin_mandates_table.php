@@ -11,20 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('begin_credit_mandates', function (Blueprint $table) {
+        Schema::create('begin_mandates', function (Blueprint $table) {
             $table->id();
-            // Foreign key to sub_accounts
-            $table->unsignedBigInteger('agencyNumber');
-            $table->unsignedBigInteger('subDepart');
-            $table->unsignedBigInteger('subAccountNumber');
 
-            $table->string('program');
+            $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('agency_id');
+            $table->unsignedBigInteger('program_sub_id');
+            $table->unsignedBigInteger('account_sub_id');
+            $table->string('no');
             $table->text('txtDescription');
             $table->decimal('fin_law', 15, 0)->default(0);
             $table->decimal('current_loan', 15, 0)->default(0);
-
-            $table->unsignedBigInteger('year');
-
             $table->decimal('new_credit_status', 15, 0)->default(0);
             $table->decimal('early_balance', 15, 0)->default(0);
             $table->decimal('apply', 15, 0)->default(0);
@@ -32,6 +29,7 @@ return new class extends Migration
             $table->decimal('credit', 15, 0)->default(0);
             $table->decimal('law_average', 15, 0)->default(0);
             $table->decimal('law_correction', 15, 0)->default(0);
+
             $table->timestamps();
         });
     }

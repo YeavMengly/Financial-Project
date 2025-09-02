@@ -53,7 +53,7 @@
                             <select class="form-control" name="name" id="name">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($account as $ts)
-                                    <option value="{{ $ts->name }}"
+                                    <option value="{{ $ts->id }}"
                                         {{ request('name') == $ts->name ? 'selected' : '' }}>
                                         {{ $ts->name }}
                                     </option>

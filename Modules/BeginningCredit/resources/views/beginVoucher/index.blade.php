@@ -15,15 +15,15 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
-                    {{ __('menus.beginning.credit') }}
+                    {{ __('menus.begin.vouchers') }}
                 </h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.ministries') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $data->year }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ __('buttons.credit') }}</li>
+                            <li class="breadcrumb-item active">{{ $data->name }}</li>
                         </ol>
                     </div>
                 </div>
@@ -35,41 +35,40 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-
-                    {{-- <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                        <!-- Agency -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="agencyNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="agencyNumber" id="agencyNumber">
+                            <select class="form-control" name="agency" id="agency">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($data as $agc)
-                                    <option
-                                        value="{{ $agc->agencyNumber }}"{{ request('agencyNumber') == $agc->agencyNumber ? 'selected' : '' }}>
-                                        {{ $agc->agency->agencyNumber }}-{{ $agc->agency->agencyTitle }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($data as $ts)
-                                    <option value="{{ $ts->subAccountNumber }}"
-                                        {{ request('subAccountNumber') == $ts->subAccountNumber ? 'selected' : '' }}>
-                                        {{ $ts->subAccountNumber }}
+                                @foreach ($module as $mdl)
+                                    <option value="{{ $mdl->agency_id }}"
+                                        {{ request('agency') == $mdl->agency_id ? 'selected' : '' }}>
+                                        {{ $mdl->agency_name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
+                        <!-- Account Sub -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="program">{{ __('menus.sub.account') }}</label>
+                            <select class="form-control" name="accountSub" id="accountSub">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($module as $mdl)
+                                    <option value="{{ $mdl->account_sub_id }}"
+                                        {{ request('accountSub') == $mdl->account_sub_id ? 'selected' : '' }}>
+                                        {{ $mdl->account_sub_no }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Program -->
+                        <div class="col-sm-3">
                             <select class="form-control" name="program" id="program">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($data as $ts)
-                                    <option value="{{ $ts->program }}"
-                                        {{ request('program') == $ts->program ? 'selected' : '' }}>
-                                        {{ $ts->program }}
+                                @foreach ($module as $mdl)
+                                    <option value="{{ $mdl->id }}" {{ request('no') == $mdl->no ? 'selected' : '' }}>
+                                        {{ $mdl->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -77,19 +76,18 @@
 
                         <!-- Description -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="description">{{ __('menus.description') }}</label>
                             <input type="text" class="form-control" name="txtDescription"
                                 value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
                         </div>
 
+                        <!-- Buttons -->
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                             <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                             </a>
-
                         </div>
-                    </form> --}}
+                    </form>
                 </div>
             </div>
         </div>
@@ -164,7 +162,7 @@
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const agencyNumber = document.getElementById('agencyNumber');
+            const agencyNumber = document.getElementById('agency');
             const agencyNumberChoices = new Choices(agencyNumber, {
                 searchEnabled: true,
                 itemSelectText: '',
@@ -175,7 +173,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const subAccountNumber = document.getElementById('subAccountNumber');
+            const subAccountNumber = document.getElementById('accountSub');
             const subAccountNumberChoices = new Choices(subAccountNumber, {
                 searchEnabled: true,
                 itemSelectText: '',
@@ -200,19 +198,19 @@
             document.getElementById('filter').reset();
         });
 
-         <script>
-        $('#cboCategory').change(function () {
+        $('#cboCategory').change(function() {
             var cateId = $(this).val();
             $.ajax({
-                url: '{!! route("document.by.category_id") !!}',
+                url: '{!! route('document.by.category_id') !!}',
                 type: 'get',
                 global: false,
-                data: {cate_id: cateId},
-                success: function (data) {
+                data: {
+                    cate_id: cateId
+                },
+                success: function(data) {
                     $('#cboCategorySub').html(data);
                 }
             });
         });
-    </script>
     </script>
 @endsection

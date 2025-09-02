@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\BeginCredit\BeginCreditMandate;
+use App\Models\BeginCredit\BeginMandate;
 use App\Models\BeginCredit\InitialBudget;
 use App\Models\BeginCredit\InitialBudgetMandate;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
@@ -14,7 +14,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class BeginCreditMandateDataTable extends DataTable
+class BeginMandateDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -35,7 +35,7 @@ class BeginCreditMandateDataTable extends DataTable
             ->rawColumns(['txtDescription']) // Important: tell DataTables this column contains raw HTML
 
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::beginCreditMandate.action', ['module' => $module]);
+                return view('beginningcredit::beginMandate.action', ['module' => $module]);
             })
             ->setRowId('id');
     }
@@ -43,7 +43,7 @@ class BeginCreditMandateDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(BeginCreditMandate $model): QueryBuilder
+    public function query(BeginMandate $model): QueryBuilder
     {
         $initialBudgetId = request()->get('year');
 
@@ -110,7 +110,7 @@ class BeginCreditMandateDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('begincreditmandate-table')
+            ->setTableId('beginmandate-table')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
@@ -143,6 +143,6 @@ class BeginCreditMandateDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'BeginCreditMandate_' . date('YmdHis');
+        return 'BeginMandate_' . date('YmdHis');
     }
 }

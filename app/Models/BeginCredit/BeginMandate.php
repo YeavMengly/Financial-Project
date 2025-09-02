@@ -10,35 +10,35 @@ use Spatie\Activitylog\LogOptions;
 use Jenssegers\Agent\Agent;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class BeginCreditMandate extends Model
+class BeginMandate extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'agencyNumber',
-        'subDepart',
-        'subAccountNumber',
-        'program',
+        'ministry_id',
+        'agency_id',
+        'program_sub_id',
+        'account_sub_id',
+        'no',
         'txtDescription',
         'fin_law',
         'current_loan',
-        'year',
         'total_increase',
         'new_credit_status',
         'apply',
         'deadline_balance',
+        'early_balance',
         'credit',
         'law_average',
         'law_correction',
     ];
 
-
     /**
      * Relationship to SubAccount
      */
-    public function subAccount()
+    public function accountSub()
     {
-        return $this->belongsTo(SubAccount::class, 'subAccountNumber', 'subAccountNumber');
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
     public function loans()
@@ -53,7 +53,7 @@ class BeginCreditMandate extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agencyNumber', 'agencyNumber');
+        return $this->belongsTo(Agency::class, 'agency_id', 'id');
     }
 
     /**

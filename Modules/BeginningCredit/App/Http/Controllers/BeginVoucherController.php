@@ -24,18 +24,25 @@ class BeginVoucherController extends Controller
      */
     public function index(BeginVoucherDataTable $dataTable, $params)
     {
+        $id = decode_params($params);
+        $data = Ministry::where('id', $id)->first();
+
+        $module = BeginVoucher::query()
+            ->join('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
+            ->join('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id')
+            ->where('begin_vouchers.ministry_id', $id)
+            ->select('begin_vouchers.*', 'account_subs.no as account_sub_no', 'agencies.name as agency_name')
+            ->get();
+
         return $dataTable->render('beginningcredit::beginVoucher.index', [
+            'data' => $data,
             'params' => $params,
+            'module' => $module,
         ]);
     }
 
     public function getByProgramId(Request $request)
     {
-        $agency = Agency::all();
-        $programSub = ProgramSub::all();
-
-
-
         echo '<option value="">ជ្រើសរើស អនុកម្មវិធី</option>';
         if ($request->program_id) {
             $data = ProgramSub::select('id', 'no', 'decription')->where('program_id', $request->program_id)->get();
@@ -53,11 +60,6 @@ class BeginVoucherController extends Controller
         $id = decode_params($params);
         $ministry = Ministry::findOrFail($id);
         $agency = Agency::orderBy('no', 'ASC')->get();
-
-        // $programSub = ProgramSub::where('agency_id', $agency->id)->get();
-        // dd($programSub);
-
-        $program = Program::all();
         $accountSub = AccountSub::all();
 
         return view('beginningcredit::beginVoucher.create')
@@ -65,72 +67,38 @@ class BeginVoucherController extends Controller
             ->with('params', $params)
             ->with('ministry', $ministry)
             ->with('agency', $agency);
-        // ->with('programSub', $programSub);
     }
 
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $id)
+    public function store(Request $request, $params)
     {
-        $params = decode_params($id);
-        $ministry = Ministry::findOrFail($params);
-
-        foreach ($ministry as $item) {
-            $item->id;
-        }
-        $year =  $item->id;
-
         $validatedData = $request->validate([
-            'cboAgency' => 'required|exists:agencies,agencyNumber',
-            'cboSubDepart' => 'required|exists:sub_departs,subDepart',
-            'cboSubAccountNumber' => 'required',
-            'program' => 'required',
+            'cboAgency' => 'required',
+            'cboProgramSub' => 'required',
+            'cboSubAccount' => 'required',
+            'no' => 'required',
             'fin_law' => 'required|numeric|min:0',
             'current_loan' => 'required|numeric|min:0',
             'txtDescription' => 'required',
         ]);
-
+        $id = decode_params($params);
         DB::beginTransaction();
-
         try {
+            $ministry = Ministry::where('id', $id)->first();
 
-            if ($validatedData['current_loan'] < 0) {
-                return redirect()->back()->withErrors([
-                    'current_loan' => 'ចំនួនទុនបងវិញមិនអាចមានតម្លៃអវិជ្ជមាន។',
-                ])->withInput();
-            }
-
-            if ($validatedData['fin_law'] < $validatedData['current_loan']) {
-                return redirect()->back()->withErrors([
-                    'fin_law' => 'ច្បាប់ហិរញ្ញវត្ថុត្រូវតែធំជាងឬស្មើចំនួនទុនបងវិញ។',
-                ])->withInput();
-            }
-
-            // Optional fields default
             $validatedData['internal_increase'] = $validatedData['internal_increase'] ?? 0;
             $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
             $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
             $validatedData['decrease'] = $validatedData['decrease'] ?? 0;
             $validatedData['editorial'] = $validatedData['editorial'] ?? 0;
 
-            $total_increase = 0;
-            // $total_increase = $validatedData['internal_increase'] + $validatedData['unexpected_increase'] + $validatedData['additional_increase'];
+            $total_increase = $validatedData['internal_increase'] + $validatedData['unexpected_increase'] + $validatedData['additional_increase'];
             $new_credit_status = $validatedData['current_loan'] + $total_increase - $validatedData['decrease'] - $validatedData['editorial'];
 
-            // Check for duplicate
-            // $exists = BeginCredit::where('subAccountNumber', $validatedData['cboSubAccountNumber'])
-            //     ->where('program', $validatedData['program'])
-            //     ->exists();
-
-            // if ($exists) {
-            //     return redirect()->back()->withErrors([
-            //         'program' => 'Sub-account and program already exist.',
-            //     ])->withInput();
-            // }
-
-            $currentApplyTotal = BudgetVoucher::where('program', $validatedData['program'])->sum('budget');
+            $currentApplyTotal = BudgetVoucher::where('no', $validatedData['no'])->sum('budget');
             $early_balance = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
             $deadline_balance = $early_balance + $currentApplyTotal;
             $credit = $new_credit_status - $deadline_balance;
@@ -139,17 +107,18 @@ class BeginVoucherController extends Controller
             $law_correction = $new_credit_status ? max(-100, min(100, ($deadline_balance / $new_credit_status) * 100)) : 0;
 
             $beginCredit = BeginVoucher::create([
-                'agencyNumber' => $validatedData['cboAgency'],
-                'subDepart' => $validatedData['cboSubDepart'],
-                'subAccountNumber' => $validatedData['cboSubAccountNumber'],
-                'program' => $validatedData['program'],
+                'ministry_id' => $ministry->id,
+                'agency_id' => $validatedData['cboAgency'],
+                'program_sub_id' => $validatedData['cboProgramSub'],
+                'account_sub_id' => $validatedData['cboSubAccount'],
+                'no' => $validatedData['no'],
                 'txtDescription' => strip_tags($validatedData['txtDescription']),
                 'fin_law' => $validatedData['fin_law'],
                 'current_loan' => $validatedData['current_loan'],
-                'year' => $year,
                 'new_credit_status' => $new_credit_status,
                 'apply' => $currentApplyTotal,
                 'deadline_balance' => $deadline_balance,
+                'early_balance' =>  $early_balance,
                 'credit' => $credit,
                 'law_average' => $law_average,
                 'law_correction' => $law_correction,
@@ -158,12 +127,12 @@ class BeginVoucherController extends Controller
             $this->recalculateAndSaveBeginCredit($beginCredit);
 
             $totals = [
-                'sub_accounts' => [
-                    $validatedData['cboSubAccountNumber'] => [
-                        'agencyNumber'      => $validatedData['cboAgency'],          // ✅ Added
-                        'subDepart'         => $validatedData['cboSubDepart'],
-                        'program' => $validatedData['program'],
-                        'year' =>  $year,
+                'account_subs' => [
+                    $validatedData['cboSubAccount'] => [
+                        'agency_id'      => $validatedData['cboAgency'],          // ✅ Added
+                        'program_sub_id'         => $validatedData['cboProgramSub'],
+                        'no' => $validatedData['no'],
+                        'ministry_id' => $ministry->id,
                         'txtDescription' => strip_tags($validatedData['txtDescription']),
                         'fin_law' => $validatedData['fin_law'],
                         'current_loan' => $validatedData['current_loan'],
@@ -200,7 +169,7 @@ class BeginVoucherController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('beginVoucher.index', $id);
+            return redirect()->route('beginVoucher.index', $params);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -211,7 +180,7 @@ class BeginVoucherController extends Controller
                 ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('beginVoucher.index', $id);
+            return redirect()->route('beginVoucher.index',  $params);
         }
     }
 
@@ -293,8 +262,8 @@ class BeginVoucherController extends Controller
             $deadline_balance = $early_balance + $currentApplyTotal;
             $credit = $new_credit_status - $deadline_balance;
 
-            $law_average = $validatedData['fin_law'] ? max(-100, min(100, ($deadline_balance / $validatedData['fin_law']) * 100)) : 0;
-            $law_correction = $new_credit_status ? max(-100, min(100, ($deadline_balance / $new_credit_status) * 100)) : 0;
+            $law_average = $validatedData['fin_law'] ? ($deadline_balance / $validatedData['fin_law']) * 100 : 0;
+            $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
 
             $beginCredit->update([
                 'agencyNumber' => $validatedData['cboAgency'],
@@ -385,7 +354,7 @@ class BeginVoucherController extends Controller
     private function recalculateAndSaveBeginCredit(BeginVoucher $data)
     {
 
-        $newApplyTotal = BudgetVoucher::where('program', $data->program)
+        $newApplyTotal = BudgetVoucher::where('no', $data->no)
             ->latest('created_at') // Order by latest created record
             ->value('budget') ?? 0; // Get only the budget column
         $data->apply = $newApplyTotal;

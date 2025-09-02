@@ -136,15 +136,16 @@ class ProgramSubController extends Controller
     public function edit($params)
     {
         $id = decode_params($params);
-        $ministry  = Ministry::where('id', $id)->first();
-        $program = Program::where('ministry_id', $ministry->id)->first();
-        $data = ProgramSub::where('program_id', $program->id)->first();
+        $ministry = Ministry::where('id', $id)->first();
+        $programs = Program::where('ministry_id', $ministry->id)->get();
+        $programSub = ProgramSub::whereIn('program_id', $programs->pluck('id'))->first();
 
         return view('beginningcredit::program.programSub.edit')
-            ->with('data', $data)
+            ->with('data', $programSub)
             ->with('params', $params)
-            ->with('program', $program);
+            ->with('programs', $programs); // pass as collection
     }
+
 
     /**
      * Update the specified resource in storage.

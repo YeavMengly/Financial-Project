@@ -24,10 +24,4 @@ class Program extends Model
     {
         return $this->hasMany(ProgramSub::class, 'program_id', 'id');
     }
-
-    //  public function agency()
-    // {
-    //     return $this->belongsTo(Agency::class, 'program_id', 'id');
-    // }
-
 }

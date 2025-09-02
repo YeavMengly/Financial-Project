@@ -11,7 +11,6 @@ class Ministry extends Model
 {
     use HasFactory;
 
-    // In app/Models/InitialBudget.php
     protected $fillable = [
         'no',
         'year',
@@ -20,14 +19,14 @@ class Ministry extends Model
         'name'
     ];
 
-    public function beginCredit()
+    public function beginVoucher()
     {
-        return $this->hasMany(BeginVoucher::class, 'year', 'year');
+        return $this->hasMany(BeginVoucher::class, 'ministry_id', 'id');
     }
 
     public function agency()
     {
-        return $this->hasMany(Agency::class, 'year', 'year');
+        return $this->hasMany(Agency::class, 'ministry_id', 'id');
     }
 
     public function chapters()
@@ -37,7 +36,7 @@ class Ministry extends Model
 
     public function accounts()
     {
-        return $this->hasMany(Account::class);
+        return $this->hasMany(Account::class, 'ministry_id', 'id');
     }
 
     public function program()

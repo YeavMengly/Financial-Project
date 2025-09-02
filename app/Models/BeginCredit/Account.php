@@ -13,8 +13,8 @@ use Jenssegers\Agent\Agent;
 class Account extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
-
         'ministry_id',
         'chapter_id',
         'no',
@@ -27,7 +27,7 @@ class Account extends Model
     }
     public function chapter()
     {
-        return $this->belongsTo(Chapter::class, 'chapter_id', 'no'); // Ensure 'code' is used for both keys
+        return $this->belongsTo(Chapter::class, 'chapter_id', 'id');
     }
 
     public function subAccount()
@@ -38,7 +38,7 @@ class Account extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.accounts')) // Update key based on your lang file
+            ->useLogName(trans('menus.beginningcredit.accounts'))
             ->logOnly(['chapterNumber', 'accountNumber', 'txtAccount'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()

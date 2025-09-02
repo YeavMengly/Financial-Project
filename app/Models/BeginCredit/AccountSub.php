@@ -22,18 +22,18 @@ class AccountSub extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'accountNumber', 'accountNumber');
+        return $this->belongsTo(Account::class, 'account_id', 'id');
     }
 
-    public function beginCredit()
+    public function beginVoucher()
     {
-        return $this->hasMany(beginCredit::class, 'subAccountNumber', 'subAccountNumber');
+        return $this->hasMany(BeginVoucher::class, 'account_sub_id', 'id');
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.subaccounts')) // Adjust key according to your lang file
+            ->useLogName(trans('menus.beginningcredit.subaccounts')) 
             ->logOnly(['accountNumber', 'subAccountNumber', 'txtSubAccount'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()

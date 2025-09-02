@@ -19,7 +19,6 @@
                         </ol>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -43,9 +42,10 @@
                                     <select class="form-control" id="cboNo" name="cboNo" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($program as $dd)
-                                            <option value="">
-                                                {{ $data->no }} - {{ $data->decription }}
+                                        @foreach ($programs as $pid)
+                                            <option value="{{ $pid->id }}"
+                                                {{ $data->program_id == $pid->id ? 'selected' : '' }}>
+                                                {{ $pid->no }} - {{ $pid->title }}
                                             </option>
                                         @endforeach
                                     </select>

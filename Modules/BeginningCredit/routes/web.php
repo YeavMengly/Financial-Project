@@ -27,7 +27,7 @@ Route::prefix('ministries')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/programSub.php';
 
     require_once __DIR__ . '/beginVoucher.php';
-    require_once __DIR__ . '/beginCreditMandate.php';
+    require_once __DIR__ . '/beginMandate.php';
 
     require_once __DIR__ . '/Ministry.php';
     require_once __DIR__ . '/initialBudgetMandate.php';

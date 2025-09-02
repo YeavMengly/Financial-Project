@@ -8,8 +8,8 @@
             @if (is_null($module->deleted_at))
                 @if (hasPermission('program.edit'))
                     @if (hasPermission('program.edit'))
-                        <a href="{{ route('program.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                                class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                        <a href="{{ route('program.edit', encode_params($module->id)) }}"
+                            class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                     @endif
                     @if (hasPermission('program.destroy'))
                         <a href="#"

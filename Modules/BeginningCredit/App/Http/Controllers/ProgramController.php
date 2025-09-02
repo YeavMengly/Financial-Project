@@ -18,6 +18,7 @@ class ProgramController extends Controller
      */
     public function index(ProgramDataTable $dataTable, $params)
     {
+
         $id  = decode_params($params);
         $data = Ministry::where('id', $id)->first();
 
@@ -87,8 +88,7 @@ class ProgramController extends Controller
     public function edit($params)
     {
         $id = decode_params($params);
-        // $data = Program::where('id', $id)->first();
-          $data = Program::findOrFail($id);
+        $data = Program::where('id', $id)->first();
 
         return view('beginningcredit::program.edit')
             ->with('data', $data)

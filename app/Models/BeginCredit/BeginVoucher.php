@@ -40,7 +40,7 @@ class BeginVoucher extends Model
      */
     public function accountSub()
     {
-        return $this->belongsTo(AccountSub::class, 'no', 'no');
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
     /**
@@ -53,18 +53,12 @@ class BeginVoucher extends Model
 
     public function ministries()
     {
-        return $this->belongsTo(Ministry::class, 'year', 'year');
+        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'no', 'no');
+        return $this->belongsTo(Agency::class, 'agency_id', 'id');
     }
-
-
-    //  BelongTo BeginCredit
-    // public function initialVoucher(){
-    //     return $this->hasMany(InitialVoucher::class);
-    // }
 
     /**
      * Spatie Log Options
