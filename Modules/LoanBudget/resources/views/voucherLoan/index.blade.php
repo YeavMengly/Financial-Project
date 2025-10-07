@@ -38,7 +38,7 @@
                             <select class="form-control" name="task_type" id="task_type" required
                                 data-pristine-required-message="{{ __('messages.required') }}">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($voucherLoan as $ts)
+                                @foreach ($ministry as $ts)
                                     <option value="{{ $ts->year }}">{{ $ts->year }}</option>
                                 @endforeach
                             </select>
@@ -64,15 +64,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('initialVoucher.create'))
-                        <div class="col-sm">
-                            <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('initialVoucher.create') }}"><i class="bx bx-plus me-1"></i>
-                                    {{ __('buttons.create') }}</a>
-                            </div>
-                        </div>
-                    @endif
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>

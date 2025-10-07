@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\BeginCredit\Account;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
@@ -25,8 +26,11 @@ class AccountDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
+            })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::accounts.action', ['module' => $module]);
@@ -42,28 +46,23 @@ class AccountDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
+        $model = $model->newQuery();
+        $model->withTrashed();
         $query = $model->newQuery()
-            ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
+            // ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
             ->select([
                 'accounts.id',
                 'accounts.ministry_id',
-                'chapters.no as CNA',
+                'accounts.chapter_id as CNA',
                 'accounts.no as SNA',
                 'accounts.name',
                 'accounts.deleted_at',
             ])
             ->orderBy('accounts.created_at', 'ASC');
-        // ->orderBy('accounts.no', 'ASC');
-
-        // Always filter by ministry ID
         $query->where('accounts.ministry_id', $id);
-
-        // ✅ Apply search filter for `no` (by account ID)
         if ($request->filled('no')) {
             $query->where('accounts.id', $request->no);
         }
-
-        // ✅ Apply search filter for `name` (by exact name match)
         if ($request->filled('name')) {
             $query->where('accounts.name', 'like', '%' . $request->name . '%');
         }
@@ -98,6 +97,8 @@ class AccountDataTable extends DataTable
             Column::make('CNA')->title(__('tables.th.chapter'))->addClass('align-middle'),
             Column::make('SNA')->title(__('tables.th.account'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.name'))->addClass('align-middle'),
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

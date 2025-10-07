@@ -8,14 +8,14 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
 
-    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" /> --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.ministries') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.create.year') }}</h4>
 
                 <div class="page-title-right">
 
@@ -28,14 +28,14 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="year">{{ __('menus.account') }}</label>
                             <select class="form-control" name="year" id="year" required>
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($initialBudget as $ts)
-                                    <option value="{{ $ts->year }}"
-                                        {{ request('year') == $ts->year ? 'selected' : '' }}>{{ $ts->year }}</option>
+                                @foreach ($ministries as $ms)
+                                    <option value="{{ $ms->id }}" {{ request('year') == $ms->id ? 'selected' : '' }}>
+                                        {{ $ms->year }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -43,7 +43,7 @@
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                         </div>
-                    </form> --}}
+                    </form>
 
                 </div>
             </div>
@@ -56,8 +56,8 @@
                     @if (hasPermission('ministries.create'))
                         <div class="col-sm">
                             <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light" href="{{ route('ministries.create') }}"><i
-                                        class="bx bx-plus me-1"></i>
+                                <a class="btn btn-light waves-effect waves-light"
+                                    href="{{ route('ministries.create') }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -113,10 +113,10 @@
     {!! $dataTable->scripts() !!}
 
     <!-- Choices.js (dropdowns) -->
-    {{-- <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
     <!-- Custom logic for BeginCredit loading -->
-    {{-- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const taskTypeSelect = document.getElementById('year');
             const taskTypeChoices = new Choices(taskTypeSelect, {
@@ -127,5 +127,5 @@
                 shouldSort: false
             });
         });
-    </script> --}}
+    </script>
 @endsection

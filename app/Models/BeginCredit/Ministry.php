@@ -6,12 +6,15 @@ use App\Models\Chapter;
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Jenssegers\Agent\Agent;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Activity;
 
 class Ministry extends Model
 {
-    use HasFactory;
-
-    // In app/Models/InitialBudget.php
+    use HasFactory, SoftDeletes, LogsActivity;
     protected $fillable = [
         'no',
         'year',
@@ -20,14 +23,14 @@ class Ministry extends Model
         'name'
     ];
 
-    public function beginCredit()
+    public function beginVoucher()
     {
-        return $this->hasMany(BeginVoucher::class, 'year', 'year');
+        return $this->hasMany(BeginVoucher::class, 'ministry_id', 'id');
     }
 
     public function agency()
     {
-        return $this->hasMany(Agency::class, 'year', 'year');
+        return $this->hasMany(Agency::class, 'ministry_id', 'id');
     }
 
     public function chapters()
@@ -37,7 +40,7 @@ class Ministry extends Model
 
     public function accounts()
     {
-        return $this->hasMany(Account::class);
+        return $this->hasMany(Account::class, 'ministry_id', 'id');
     }
 
     public function program()
@@ -45,8 +48,27 @@ class Ministry extends Model
         return $this->hasMany(Program::class, 'ministry_id', 'id');
     }
 
-    public function codes()
+    public function getActivitylogOptions(): LogOptions
     {
-        return $this->hasMany(Code::class, 'ministry_id', 'id');
+        return LogOptions::defaults()
+            ->useLogName(trans('menus.beginningcredit.ministries'))
+            ->logOnly(['no', 'year', 'title', 'refer', 'name'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
+    }
+
+    public function tapActivity(Activity $activity)
+    {
+        $agent = new Agent();
+        $activity->default_field    = "{$this->name} ";
+        $activity->log_name         = trans('menus.beginningcredit.ministries');
+        $platform = $agent->platform();
+        $browser = $agent->browser();
+        $activity->ip_address = request()->ip();
+        $activity->platform = $platform;
+        $activity->device = $agent->device();
+        $activity->browser_version = $agent->version($browser);
+        $activity->browser = $browser;
     }
 }

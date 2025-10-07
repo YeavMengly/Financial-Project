@@ -3,6 +3,7 @@
 namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\AgencyDataTable;
+use App\DataTables\AnnualOpen\InitialAgencyDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\Ministry;
@@ -16,6 +17,12 @@ use Illuminate\Support\Facades\Log;
 
 class AgencyController extends Controller
 {
+
+    public function getIndex(InitialAgencyDataTable $dataTable)
+    {
+        return $dataTable->render('beginningcredit::initialAgency.index');
+    }
+
     /**
      * Display a listing of the resource.zz
      */
@@ -96,9 +103,9 @@ class AgencyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($params)
+    public function edit($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $program = Program::all();
         $agency = Agency::where('id', $id)->first();
 
@@ -108,7 +115,7 @@ class AgencyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $params)
+    public function update(Request $request, $params, $id)
     {
         $validateData = $request->validate([
             'cboProgram' => ['required'],
@@ -117,12 +124,10 @@ class AgencyController extends Controller
             'nick_name' => ['required'],
         ]);
 
-        $id = decode_params($params);
-
         DB::beginTransaction();
-        $agency = Agency::where('id', $id)->first();
 
         try {
+            $agency = Agency::findOrfail($id);
             $agency->update([
                 'program_id' => $validateData['cboProgram'],
                 'no' => $validateData['no'],
@@ -137,7 +142,7 @@ class AgencyController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('agency.index', encode_params($agency->ministry_id));
+            return redirect()->route('agency.index', $params);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -148,16 +153,16 @@ class AgencyController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('agency.index', encode_params($agency->ministry_id));
+            return redirect()->route('agency.index', $params);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($params)
+    public function destroy($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $agency = Agency::where('id', $id)->first();
         $agency->delete();
 
@@ -167,6 +172,21 @@ class AgencyController extends Controller
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('agency.index', encode_params($agency->ministry_id));
+        return redirect()->route('agency.index', $params);
+    }
+
+    public function restore($params, $id)
+    {
+        $pid = decode_params($id);
+
+        Agency::withTrashed()->whereKey($pid)->restore();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('agency.index', $params);
     }
 }

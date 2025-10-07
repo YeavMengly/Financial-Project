@@ -34,6 +34,14 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body">
                     @if (hasPermission('agency.create'))
                         <div class="col-sm">
@@ -96,64 +104,6 @@
     <!-- Choices.js (dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        // $(document).ready(function() {
-        //     const element = document.getElementById('agencyNumber');
-        //     let choicesInstance = new Choices(element, {
-        //         searchEnabled: true,
-        //         itemSelectText: '',
-        //         shouldSort: false,
-        //     });
-
-        //     $('#agencyNumber').on('change', function() {
-        //         const selected = $(this).val();
-        //         let message = '';
-
-        //         switch (selected) {
-        //             case '1':
-        //                 message = 'You selected Choice 1';
-        //                 break;
-        //             case '2':
-        //                 message = 'You selected Choice 2';
-        //                 break;
-        //             case '3':
-        //                 message = 'You selected Choice 3';
-        //                 break;
-        //             default:
-        //                 message = '';
-        //         }
-        //         $('#resultDisplay').text(message);
-        //     });
-        // });
-
-        // $(document).ready(function() {
-        //     const element = document.getElementById('agencyTitle');
-        //     let choicesInstance = new Choices(element, {
-        //         searchEnabled: true,
-        //         itemSelectText: '',
-        //         shouldSort: false,
-        //     });
-
-        //     $('#agencyTitle').on('change', function() {
-        //         const selected = $(this).val();
-        //         let message = '';
-
-        //         switch (selected) {
-        //             case '1':
-        //                 message = 'You selected Choice 1';
-        //                 break;
-        //             case '2':
-        //                 message = 'You selected Choice 2';
-        //                 break;
-        //             case '3':
-        //                 message = 'You selected Choice 3';
-        //                 break;
-        //             default:
-        //                 message = '';
-        //         }
-        //         $('#resultDisplay').text(message);
-        //     });
-        // });
-
         document.addEventListener('DOMContentLoaded', function() {
             const program = document.getElementById('agencyNumber');
             const programChoices = new Choices(program, {

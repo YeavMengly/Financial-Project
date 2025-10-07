@@ -2,21 +2,24 @@
 
 namespace App\Models\Loans;
 
+use App\Models\BeginCredit\AccountSub;
+use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginCredit;
 use App\Models\BudgetPlan\BudgetVoucher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use PDO;
 
 class BudgetVoucherLoan extends Model
 {
     use HasFactory;
 
+    protected $table = 'budget_voucher_loans';
     protected $fillable = [
-        'agencyNumber',
-        'subDepart',
-        'year',
-        'subAccountNumber',
-        'program',
+        'ministry_id',
+        'agency_id',
+        'account_sub_id',
+        'no',
         'internal_increase',
         'unexpected_increase',
         'additional_increase',
@@ -26,19 +29,14 @@ class BudgetVoucherLoan extends Model
         'txtDescription'
     ];
 
-    /**
-     * One Loan has many related BudgetVoucher entries
-     */
-    public function budgetVoucher()
+
+    public function accountSub()
     {
-        return $this->hasMany(BudgetVoucher::class, 'program', 'program');
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
-    /**
-     * Each BudgetVoucherLoan is linked to a BeginCredit record
-     */
-    public function beginCredit()
+    public function agency()
     {
-        return $this->belongsTo(BeginCredit::class, 'program', 'program');
+        return $this->belongsTo(Agency::class, 'agency_id', 'id');
     }
 }

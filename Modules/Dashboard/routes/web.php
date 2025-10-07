@@ -13,8 +13,9 @@ use Modules\Dashboard\App\Http\Controllers\DashboardController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::prefix('dashboard')->middleware(['auth'])->group(function () {
-    Route::controller(DashboardController::class)->group(function() {
+    Route::controller(DashboardController::class)->group(function () {
         Route::get("/", "index")->name("dashboard.index");
     });
 });

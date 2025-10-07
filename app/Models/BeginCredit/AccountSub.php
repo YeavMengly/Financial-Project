@@ -2,8 +2,13 @@
 
 namespace App\Models\BeginCredit;
 
+use App\Models\BudgetPlan\BudgetMandate;
+use App\Models\BudgetPlan\BudgetVoucher;
+use App\Models\Loans\BudgetMandateLoan;
+use App\Models\Loans\BudgetVoucherLoan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -11,7 +16,7 @@ use Jenssegers\Agent\Agent;
 
 class AccountSub extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'ministry_id',
@@ -22,18 +27,28 @@ class AccountSub extends Model
 
     public function account()
     {
-        return $this->belongsTo(Account::class, 'accountNumber', 'accountNumber');
+        return $this->belongsTo(Account::class, 'account_id', 'id');
     }
 
-    public function beginCredit()
+    public function beginMandate()
     {
-        return $this->hasMany(beginCredit::class, 'subAccountNumber', 'subAccountNumber');
+        return $this->hasMany(BeginMandate::class, 'account_sub_id', 'id');
+    }
+
+    public function budgetMandate()
+    {
+        return $this->hasMany(BudgetMandate::class, 'account_sub_id', 'id');
+    }
+
+    public function mandateLoan()
+    {
+        return $this->hasMany(BudgetMandateLoan::class, 'account_sub_id', 'id');
     }
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.subaccounts')) // Adjust key according to your lang file
+            ->useLogName(trans('menus.beginningcredit.subaccounts'))
             ->logOnly(['accountNumber', 'subAccountNumber', 'txtSubAccount'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()

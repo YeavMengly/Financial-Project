@@ -3,6 +3,7 @@
 namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\AccountDataTable;
+use App\DataTables\AnnualOpen\InitialAccountDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Account;
 use App\Models\BeginCredit\Ministry;
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class AccountController extends Controller
 {
+    public function getIndex(InitialAccountDataTable $dataTable)
+    {
+        return $dataTable->render('beginningcredit::initialAccount.index');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -106,19 +112,19 @@ class AccountController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($params)
+    public function edit($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $chapter = Chapter::all();
-        $account = Account::where('id', $id)->first();
+        $module = Account::where('id', $id)->first();
 
-        return view('beginningcredit::accounts.edit')->with('account', $account)->with('chapter', $chapter)->with('params', $params);
+        return view('beginningcredit::accounts.edit')->with('module', $module)->with('chapter', $chapter)->with('params', $params);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $params)
+    public function update(Request $request, $params, $id)
     {
         $request->validate([
             'cboChapterNumber' => ['required'],
@@ -127,10 +133,7 @@ class AccountController extends Controller
         ]);
 
         DB::beginTransaction();
-
-        $id = decode_params($params);
         $account = Account::where('id', $id)->first();
-
         try {
             $existingRecord = Account::where('chapter_id', $request->cboChapterNumber)
                 ->where('no', $request->no)
@@ -142,7 +145,6 @@ class AccountController extends Controller
                     'account.number' => __('messages.account.number')
                 ])->withInput();
             }
-
             $account->update([
                 'chapter_id' => $request->cboChapterNumber,
                 'no' => $request->no,
@@ -157,7 +159,7 @@ class AccountController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('accounts.index', encode_params($account->ministry_id));
+            return redirect()->route('accounts.index', $params);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -168,16 +170,16 @@ class AccountController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('accounts.index', encode_params($account->ministry_id));
+            return redirect()->route('accounts.index', $params);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($params)
+    public function destroy($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $account = Account::where('id', $id)->first();
         $account->delete();
 
@@ -188,5 +190,19 @@ class AccountController extends Controller
             ->flash();
 
         return redirect()->route('accounts.index', encode_params($account->ministry_id));
+    }
+    public function restore($params, $id)
+    {
+        $aid = decode_params($id);
+
+        Account::withTrashed()->whereKey($aid)->restore();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('accounts.index', $params);
     }
 }

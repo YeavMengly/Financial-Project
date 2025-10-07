@@ -25,13 +25,13 @@ class CategoryDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">'.__("buttons.active").'</span>' : '<span class="badge bg-danger">'.__("buttons.deleted").'</span>';
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
             })
-            ->addColumn("dateTime", function($module) {
+            ->addColumn("dateTime", function ($module) {
                 return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
-            ->addColumn('action', function($module) {
+            ->addColumn('action', function ($module) {
                 return view('setting::category.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete']);
@@ -54,14 +54,14 @@ class CategoryDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('category-table')
-                    ->parameters([
-                        'language' => [
-                            "url" => asset("assets/lang/language.json")
-                        ]
-                    ])
-                    ->columns($this->getColumns())
-                    ->orderBy(2, 'ASC');
+            ->setTableId('category-table')
+            ->parameters([
+                'language' => [
+                    "url" => asset("assets/lang/language.json")
+                ]
+            ])
+            ->columns($this->getColumns())
+            ->orderBy(2, 'ASC');
     }
 
     /**

@@ -7,16 +7,18 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('chapters.edit'))
-                    <a href="{{ route('chapters.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                    <a href="{{ route('chapters.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
                 @if (hasPermission('chapters.destroy'))
-                    <a href="#" onclick="confirm('{{ route('chapters.destroy', encode_params($module->id)) }}', 1)"
+                    <a href="#"
+                        onclick="confirm('{{ route('chapters.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
                 @endif
             @else
                 @if (hasPermission('chapters.destroy'))
-                    <a href="#" onclick="confirm('{{ route('chapters.restore', encode_params($module->id)) }}', 2)"
+                    <a href="#"
+                        onclick="confirm('{{ route('chapters.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
                 @endif
             @endif

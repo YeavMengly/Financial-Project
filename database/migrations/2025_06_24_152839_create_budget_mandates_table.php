@@ -13,13 +13,10 @@ return new class extends Migration
     {
         Schema::create('budget_mandates', function (Blueprint $table) {
             $table->id();
-
-            $table->unsignedBigInteger('agencyNumber');
-            $table->unsignedBigInteger('subDepart');
-            $table->unsignedBigInteger('year');
-            $table->unsignedBigInteger('subAccountNumber');
-            $table->unsignedBigInteger('program');
-
+            $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('agency_id');
+            $table->unsignedBigInteger('account_sub_id');
+            $table->unsignedBigInteger('no');
             $table->decimal('budget', 15, 2)->default(0);
             $table->string('task_type');
             $table->text('txtDescription');

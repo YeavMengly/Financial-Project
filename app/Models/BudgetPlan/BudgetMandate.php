@@ -2,6 +2,8 @@
 
 namespace App\Models\BudgetPlan;
 
+use App\Models\BeginCredit\AccountSub;
+use App\Models\BeginCredit\Ministry;
 use App\Models\Loans\BudgetMandateLoan;
 use App\Models\TaskType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,11 +14,10 @@ class BudgetMandate extends Model
     use HasFactory;
 
     protected $fillable = [
-        'agencyNumber',
-        'subDepart',
-        'year',
-        'subAccountNumber',
-        'program',
+        'ministry_id',
+        'agency_id',
+        'account_sub_id',
+        'no',
         'txtDescription',
         'budget',
         'task_type',
@@ -24,18 +25,22 @@ class BudgetMandate extends Model
         'date'
     ];
 
+    protected $casts = [
+        'attachments' => 'array',
+        'date'        => 'date',
+    ];
+
     public function taskType()
     {
         return $this->belongsTo(TaskType::class, 'task_type', 'task');
     }
 
-    public function loanMandate()
+    public function ministries()
     {
-        return $this->belongsTo(BudgetMandateLoan::class, 'program', 'program');
+        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
-
-    public function initialMandate()
+    public function accountSub()
     {
-        return $this->belongsTo(InitialMandate::class, 'year', 'year');
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 }

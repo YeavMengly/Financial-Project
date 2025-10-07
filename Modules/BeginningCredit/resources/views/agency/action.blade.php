@@ -7,16 +7,18 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('agency.edit'))
-                    <a href="{{ route('agency.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                    <a href="{{ route('agency.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
                 @if (hasPermission('agency.destroy'))
-                    <a href="#" onclick="confirm('{{ route('agency.destroy', encode_params($module->id)) }}', 1)"
+                    <a href="#"
+                        onclick="confirm('{{ route('agency.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
                 @endif
             @else
                 @if (hasPermission('agency.destroy'))
-                    <a href="#" onclick="confirm('{{ route('agency.restore', encode_params($module->id)) }}', 2)"
+                    <a href="#"
+                        onclick="confirm('{{ route('agency.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
                 @endif
             @endif

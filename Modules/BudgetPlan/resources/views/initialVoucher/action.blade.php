@@ -7,22 +7,10 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('initialVoucher.edit'))
-                    <a href="{{ route('budget-voucher.index', encode_params($module->id)) }}" class="dropdown-item">
+                    <a href="{{ route('budgetVoucher.index', encode_params($module->id)) }}" class="dropdown-item">
                         <i class="bx bx-show"></i> {{ __('buttons.show') }}
                     </a>
                 @endif
-                @if (hasPermission('initialVoucher.edit') or hasPermission('initialVoucher.destroy'))
-                    <hr />
-                @endif
-                {{-- @if (hasPermission('initialVoucher.edit'))
-                    <a href="{{ route('initialVoucher.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
-                @endif --}}
-                {{-- @if (hasPermission('initialVoucher.destroy'))
-                    <a href="#"
-                        onclick="confirm('{{ route('initialVoucher.destroy', encode_params($module->id)) }}', 1)"
-                        class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
-                @endif --}}
             @else
                 @if (hasPermission('initialVoucher.destroy'))
                     <a href="#"

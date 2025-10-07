@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.agency') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"></h4>
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
@@ -21,6 +21,8 @@
         </div>
     </div>
     <!-- end page title -->
+
+
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
@@ -35,7 +37,7 @@
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="cboSubAccountNumber" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.depart') }}
+                                        {{ __('forms.program') }}
                                     </label>
                                     <select class="form-control" data-trigger id="cboProgram" name="cboProgram" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
@@ -81,6 +83,9 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('agency.index', $params) }}">{{ __('buttons.back') }}</a>
+
                             </div>
 
                         </div>

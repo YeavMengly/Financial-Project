@@ -5,6 +5,7 @@ namespace App\DataTables\Budget;
 use App\Models\BeginCredit\InitialBudget;
 use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -24,6 +25,12 @@ class BudgetMandateDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('agency', function ($row) {
+                return $row->agency_no . ' - ' . $row->agency_name;
+            })
+            ->editColumn('budget', function ($row) {
+                return number_format($row->budget ?? 0);
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
@@ -32,7 +39,7 @@ class BudgetMandateDataTable extends DataTable
                 return $row->task_name ?? '-';
             })
             ->addColumn('action', function ($module) {
-                return view('budgetplan::mandate.action', ['module' => $module]);
+                return view('budgetplan::budgetMandate.action', ['module' => $module]);
             })
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
@@ -61,62 +68,31 @@ class BudgetMandateDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(BudgetMandate $model): QueryBuilder
+    public function query(BudgetMandate $model, Request $request): QueryBuilder
     {
-        $initialVoucherId = request()->get('year');
-        $year = null;
-
-        if ($initialVoucherId) {
-            $initialBudget = InitialBudget::find($initialVoucherId);
-            if ($initialBudget) {
-                $year = $initialBudget->id;
-            }
-        }
+        $params = $request->params;
+        $id = decode_params($params);
 
         $query = $model->newQuery()
-            ->leftJoin('task_types', 'budget_mandates.task_type', '=', 'task_types.task')
+            ->leftJoin('account_subs', 'budget_mandates.account_sub_id', '=', 'account_subs.no')
+            ->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id')
+            ->leftJoin('task_types', 'budget_mandates.task_type', '=', 'task_types.id')
             ->select([
                 'budget_mandates.id',
-                'budget_mandates.subAccountNumber as CNA',
-                'budget_mandates.program as SNA',
-                'budget_mandates.budget',
-                'budget_mandates.task_type',
-                'task_types.task AS task_name',
+                'budget_mandates.ministry_id',
+                'agencies.no AS agency_no',
+                'agencies.name AS agency_name',
+                'account_subs.no as account_sub_no',
+                'budget_mandates.no',
                 'budget_mandates.txtDescription',
+                'budget_mandates.budget',
+                'task_types.name AS t_name',
                 'budget_mandates.attachments',
                 'budget_mandates.date',
-                'budget_mandates.year'
-            ]);
+            ])
+            ->where('budget_mandates.ministry_id', $id);
 
-        if ($year) {
-            $query->where('budget_mandates.year', $year);
-        }
-
-        if (request()->filled('subAccountNumber')) {
-            $query->where('budget_mandates.subAccountNumber', request('subAccountNumber'));
-        }
-
-        if (request()->filled('program')) {
-            $query->where('budget_mandates.program', request('program'));
-        }
-
-        if (request()->filled('task_type')) {
-            $query->where('budget_mandates.task_type', request('task_type'));
-        }
-
-        if (request()->filled('description')) {
-            $query->where('budget_mandates.txtDescription', 'like', '%' . request('description') . '%');
-        }
-
-        if (request()->filled('start_date') && request()->filled('end_date')) {
-            $query->whereBetween('budget_mandates.date', [request('start_date'), request('end_date')]);
-        } elseif (request()->filled('start_date')) {
-            $query->whereDate('budget_mandates.date', '>=', request('start_date'));
-        } elseif (request()->filled('end_date')) {
-            $query->whereDate('budget_mandates.date', '<=', request('end_date'));
-        }
-
-        return $query->orderBy('budget_mandates.created_at', 'DESC');
+        return $query;
     }
 
     /**
@@ -140,30 +116,19 @@ class BudgetMandateDataTable extends DataTable
      */
     public function getColumns(): array
     {
-        // return [
-        //     Column::computed('DT_RowIndex', __('tables.th.no'))
-        //         ->width(30)->addClass('text-center align-middle')->orderable(false),
-
-        //     Column::make('CNA')->title(__('tables.th.sub.account'))->addClass('align-middle'),
-        //     Column::make('SNA')->title(__('tables.th.program'))->addClass('align-middle'),
-        //     Column::make('budget')->title(__('tables.th.budget'))->addClass('align-middle'),
-        //     Column::make('task_name')->title(__('tables.th.type'))->addClass('align-middle'),
-        //     Column::make('date')->title(__('tables.th.date'))->addClass('align-middle'),
-        //     Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
-        //     Column::make('attachments')->title(__('tables.th.document.title'))->addClass('align-middle'),
-
-        //     Column::computed('action', __('tables.th.action'))
-        //         ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
-        // ];
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('CNA')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
-            Column::make('SNA')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
+            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+
+            Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
+
+            Column::make('t_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            Column::make('task_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
+
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 

@@ -14,13 +14,7 @@ use Modules\LoanBudget\App\Http\Controllers\LoanBudgetController;
 |
 */
 
-// Route::group([], function () {
-//     Route::resource('loanbudget', LoanBudgetController::class)->names('loanbudget');
-// });
-
 Route::prefix('loanbudget')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/voucher.php';
     require_once __DIR__ . '/mandate.php';
-    require_once __DIR__ . '/voucherLoan.php';
-    require_once __DIR__ . '/mandateLoan.php';
 });

@@ -21,9 +21,8 @@ class InitialVoucherController extends Controller
      */
     public function index(InitialVoucherDataTable $dataTable)
     {
-        $initialVoucher = InitialBudget::all();
 
-        return $dataTable->render('budgetplan::initialVoucher.index', ['initialVoucher' => $initialVoucher]);
+        return $dataTable->render('budgetplan::initialVoucher.index');
     }
 
     /**
@@ -31,9 +30,9 @@ class InitialVoucherController extends Controller
      */
     public function create()
     {
-        $data = InitialBudget::orderBy('year', 'desc')
-            ->get();;
-        return view('budgetplan::initialVoucher.create')->with('data', $data);
+        // $data = InitialBudget::orderBy('year', 'desc')
+        //     ->get();;
+        // return view('budgetplan::initialVoucher.create')->with('data', $data);
     }
 
     /**

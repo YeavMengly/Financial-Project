@@ -7,18 +7,21 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('voucher.edit'))
-                    <a href="{{ route('voucher.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                    <a href="{{ route('voucher.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
                 @if (hasPermission('voucher.destroy'))
-                    <a href="#" onclick="confirm('{{ route('voucher.destroy', encode_params($module->id)) }}', 1)"
-                        class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
+                    <a href="#"
+                        onclick="confirm('{{ route('voucher.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
+                        class="dropdown-item">
+                        <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
+                    </a>
                 @endif
-            @else
+                {{-- @else
                 @if (hasPermission('voucher.destroy'))
                     <a href="#" onclick="confirm('{{ route('voucher.restore', encode_params($module->id)) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
-                @endif
+                @endif --}}
             @endif
         </ul>
     </div>

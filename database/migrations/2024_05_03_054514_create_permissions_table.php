@@ -23,10 +23,10 @@ return new class extends Migration
 
         $attributes = [
             'roles'                  => [
-                'view'   => 'roles.index',
-                'create' => 'roles.create',
-                'edit'   => 'roles.edit',
-                'delete' => 'roles.destroy',
+                'view'   => 'role.index',
+                'create' => 'role.create',
+                'edit'   => 'role.edit',
+                'delete' => 'role.destroy',
             ],
             'ministries'                  => [
                 'view'   => 'ministries.index',
@@ -35,7 +35,7 @@ return new class extends Migration
                 'delete' => 'ministries.destroy',
             ],
 
-            'begin_vouchers'                  => [
+            'begin.vouchers'                  => [
                 'view'   => 'beginVoucher.index',
                 'create' => 'beginVoucher.create',
                 'edit'   => 'beginVoucher.edit',
@@ -43,10 +43,10 @@ return new class extends Migration
             ],
 
             'categories'                  => [
-                'view'   => 'categories.index',
-                'create' => 'categories.create',
-                'edit'   => 'categories.edit',
-                'delete' => 'categories.destroy',
+                'view'   => 'category.index',
+                'create' => 'category.create',
+                'edit'   => 'category.edit',
+                'delete' => 'category.destroy',
             ],
 
             'chapters'                  => [
@@ -73,15 +73,15 @@ return new class extends Migration
                 'delete' => 'accountSub.destroy',
             ],
 
-            'programs'                  => [
+            'program'                  => [
                 'show'   => 'initialProgram.index',
-                'view'   => 'programs.index',
-                'create' => 'programs.create',
-                'edit'   => 'programs.edit',
-                'delete' => 'programs.destroy',
+                'view'   => 'program.index',
+                'create' => 'program.create',
+                'edit'   => 'program.edit',
+                'delete' => 'program.destroy',
             ],
 
-            'sub.program'                  => [
+            'program.sub'                  => [
                 'show'   => 'initialProgramSub.index',
                 'view'   => 'programSub.index',
                 'create' => 'programSub.create',

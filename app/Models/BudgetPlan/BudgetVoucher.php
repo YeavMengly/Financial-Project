@@ -2,8 +2,8 @@
 
 namespace App\Models\BudgetPlan;
 
-use App\Models\BeginCredit\InitialBudget;
-use App\Models\Loans\BudgetVoucherLoan;
+use App\Models\BeginCredit\AccountSub;
+use App\Models\BeginCredit\Ministry;
 use App\Models\TaskType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,11 +13,10 @@ class BudgetVoucher extends Model
     use HasFactory;
 
     protected $fillable = [
-        'agencyNumber',
-        'subDepart',
-        'year',
-        'subAccountNumber',
-        'program',
+        'ministry_id',
+        'agency_id',
+        'account_sub_id',
+        'no',
         'txtDescription',
         'budget',
         'task_type',
@@ -25,18 +24,22 @@ class BudgetVoucher extends Model
         'date'
     ];
 
+    protected $casts = [
+        'attachments' => 'array',
+        'date'        => 'date',
+    ];
+
     public function taskType()
     {
-        return $this->belongsTo(TaskType::class, 'task_type', 'task');
+        return $this->belongsTo(TaskType::class, 'task_type', 'id');
     }
 
-    public function loanVoucher()
+    public function ministries()
     {
-        return $this->belongsTo(BudgetVoucherLoan::class, 'program', 'program');
+        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
-
-    public function initialBudget()
+    public function accountSub()
     {
-        return $this->belongsTo(InitialBudget::class, 'year', 'year');
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 }

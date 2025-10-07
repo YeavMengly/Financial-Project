@@ -4,16 +4,13 @@ use Illuminate\Support\Facades\Route;
 use Modules\LoanBudget\App\Http\Controllers\LoanBudgetVoucherController;
 
 Route::middleware('PermissionCheck')->controller(LoanBudgetVoucherController::class)->group(function () {
-    Route::get('/initial-voucher/{params}/voucher', 'index')->name('voucher.index');
-    Route::get('/initial-voucher/{params}/voucher/create', 'create')->name('voucher.create');
-    Route::get('/initial-voucher/{params}/voucher/destroy', 'destroy')->name('voucher.destroy');
-
-    //  Error
-    Route::get('/initial-voucher/{params}/voucher/edit', 'edit')->name('voucher.edit');
+    Route::get('voucher/', 'getIndex')->name('voucherLoan.index');
+    Route::get('voucher/{params}', 'index')->name('voucher.index');
+    Route::get('voucher/{params}/create', 'create')->name('voucher.create');
+    Route::get('voucher/{params}/edit/{id}', 'edit')->name('voucher.edit');
+    Route::get('voucher/{params}/destroy/{id}', 'destroy')->name('voucher.destroy');
 });
 Route::controller(LoanBudgetVoucherController::class)->group(function () {
-    Route::post('/initial-voucher/{params}/voucher/store', 'store')->name('voucher.store');
-
-    // Erorr 
-    Route::post('/initial-voucher/voucher/update/{params}', 'update')->name('voucher.update');
+    Route::post('voucher/{params}/store', 'store')->name('voucher.store');
+    Route::post('voucher/{params}/update/{id}', 'update')->name('voucher.update');
 });

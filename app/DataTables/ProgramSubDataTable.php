@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use Illuminate\Http\Request;
 use App\Models\ProgramSub;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -22,15 +23,18 @@ class ProgramSubDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
+            })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->editColumn('decription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->decription) . '</div>';
             })
             ->rawColumns(['decription'])
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::programs.programSub.action', ['module' => $module]);
+                return view('beginningcredit::program.sub.action', ['module' => $module]);
             })
             ->setRowId('id');
     }
@@ -43,18 +47,27 @@ class ProgramSubDataTable extends DataTable
     {
         // return $model->newQuery();
         $params = $request->params;
+        $pId = $request->pId;
         $id = decode_params($params);
+        $pId = decode_params($pId);
 
+        $model = $model->newQuery();
+        $model->withTrashed();
         $query = $model->newQuery()
+            ->leftJoin('programs', 'program_subs.program_id', '=', 'programs.id')
             ->select([
+                'program_subs.id',
                 'program_subs.ministry_id',
-                'program_subs.program_id',
+                'programs.no as program_id',
                 'program_subs.no',
                 'program_subs.decription',
+                'program_subs.created_at',
+                'program_subs.deleted_at',
             ])
             ->orderBy('program_subs.no', 'ASC');
 
         $query->where('program_subs.ministry_id', $id);
+        $query->where('program_subs.program_id', $pId);
 
         return $query;
     }
@@ -83,10 +96,12 @@ class ProgramSubDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('program_id')->title(__('tables.th.depart'))->width(60)->addClass('align-middle'),
+            // Column::make('program_id')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
 
-            Column::make('no')->title(__('tables.th.sub.depart'))->width(60)->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.sub.program'))->width(60)->addClass('align-middle'),
             Column::make('decription')->title(__('tables.th.title'))->addClass('align-middle'),
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

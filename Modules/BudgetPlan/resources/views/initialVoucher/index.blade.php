@@ -34,10 +34,10 @@
                             <label class="visually-hidden" for="year">{{ __('menus.account') }}</label>
                             <select class="form-control" name="year" id="year" required>
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($initialVoucher as $ts)
+                                {{-- @foreach ($initialVoucher as $ts)
                                     <option value="{{ $ts->year }}"
                                         {{ request('year') == $ts->year ? 'selected' : '' }}>{{ $ts->year }}</option>
-                                @endforeach
+                                @endforeach --}}
                             </select>
                         </div>
 
@@ -62,7 +62,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('initialVoucher.create'))
+                    {{-- @if (hasPermission('initialVoucher.create'))
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
@@ -70,7 +70,7 @@
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
-                    @endif
+                    @endif --}}
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>

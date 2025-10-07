@@ -10,11 +10,11 @@ class BudgetMandateLoan extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'agencyNumber',
-        'subDepart',
-        'year',
-        'subAccountNumber',
-        'program',
+        'agency_id',
+        'program_sub_id',
+        'ministry_id',
+        'account_sub_id',
+        'no',
         'internal_increase',
         'unexpected_increase',
         'additional_increase',
@@ -23,9 +23,4 @@ class BudgetMandateLoan extends Model
         'editorial',
         'txtDescription'
     ];
-
-    public function budgetMandate()
-    {
-        return $this->hasMany(BudgetMandate::class, 'program', 'program');
-    }
 }

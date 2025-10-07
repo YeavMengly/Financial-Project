@@ -1,14 +1,15 @@
 <?php
 
 return [
+    
     'dashboard' => 'ទំព័រដើម',
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
-
+    'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
-    'beginning.credit' => 'កំណត់ឥណទានដើមឆ្នាំ',
+    'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
 
     'cluster' => 'ចង្កោម',
     'chapters' => 'ជំពូក',
@@ -16,14 +17,11 @@ return [
     'sub.account' => 'អនុគណនី',
     'number' => 'លេខ',
     'name' => 'ឈ្មោះ',
-    'depart' => 'កម្មវិធី',
-    'sub.depart' => 'អនុកម្មវិធី',
     'agency' => 'អង្គភាព',
     'title' => 'ចំណងជើង',
 
     'program' => 'កម្មវិធី',
-    'programs' => 'កម្មវិធី',
-    'sub.program' => 'អនុកម្មវិធី',
+    'program.sub' => 'អនុកម្មវិធី',
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
 
@@ -57,5 +55,6 @@ return [
 
     'duel' => 'ប្រេងឥន្ធនៈ',
     'material' => 'សម្ផារផ្គត់ផ្គង់',
-    'year' => 'ឆ្នាំ'
+    'year' => 'ឆ្នាំ',
+    'create.year' => 'កំណត់ឆ្នាំ'
 ];

@@ -3,7 +3,7 @@
 namespace Modules\Dashboard\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -13,14 +13,18 @@ class DashboardController extends Controller
     public function index()
     {
         $report = DB::table("categories")
-                ->select(
-                    "categories.id",
-                    "categories.name",
-                    "categories.order"
-                )
-                ->orderBy('categories.order', 'ASC')
-                ->get();
-        return view('dashboard::index')->with("report", $report);
-    }
+            ->select(
+                "categories.id",
+                "categories.name",
+                "categories.order"
+            )
+            ->orderBy('categories.order', 'ASC')
+            ->get();
 
+        // $chapter = DB::table("chapters")
+        //     ->get();
+        return view('dashboard::index')
+            ->with("report", $report);
+            // ->with("chapter", $chapter);
+    }
 }

@@ -7,8 +7,6 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -25,6 +23,13 @@
         </div>
     </div>
     <!-- end page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-12">
@@ -80,21 +85,4 @@
         }
     </script>
     {!! $dataTable->scripts() !!}
-
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
-    <!-- Custom logic for BeginCredit loading -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('year');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-    </script>
 @endsection

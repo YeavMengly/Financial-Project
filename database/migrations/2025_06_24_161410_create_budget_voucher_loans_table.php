@@ -14,12 +14,10 @@ return new class extends Migration
         Schema::create('budget_voucher_loans', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('agencyNumber');
-            $table->unsignedBigInteger('subDepart');
-            $table->unsignedBigInteger('year');
-            $table->unsignedBigInteger('subAccountNumber');
-            $table->unsignedBigInteger('program');
-
+            $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('agency_id');
+            $table->unsignedBigInteger('account_sub_id');
+            $table->unsignedBigInteger('no');
             $table->decimal('internal_increase', 15, 2)->default(0);
             $table->decimal('unexpected_increase', 15, 2)->default(0);
             $table->decimal('additional_increase', 15, 2)->default(0);

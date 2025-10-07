@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Services\DataTable;
 
 class BeginVoucherDataTable extends DataTable
@@ -39,69 +40,49 @@ class BeginVoucherDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-
-
-    public function query(BeginVoucher $model): QueryBuilder
+    public function query(BeginVoucher $model, Request $request): QueryBuilder
     {
-        // $year = request()->get('year');
+        $params = $request->params;
+        $id = decode_params($params);
 
+        $query = $model->newQuery()
+            ->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
+            ->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id')
+            ->select([
+                'begin_vouchers.id',
+                'begin_vouchers.agency_id',
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as program_no',
+                'begin_vouchers.txtDescription',
+                'begin_vouchers.fin_law',
+                'begin_vouchers.current_loan',
+                'begin_vouchers.ministry_id',
+                'agencies.name as agency_name',
+                'account_subs.no as account_sub_no',
+            ])
+            ->where('begin_vouchers.ministry_id', $id)
+            ->when(
+                $request->filled('agency'),
+                fn($q) =>
+                $q->where('begin_vouchers.agency_id', $request->agency)
+            )
+            ->when(
+                $request->filled('accountSub'),
+                fn($q) =>
+                $q->where('begin_vouchers.account_sub_id', $request->accountSub)
+            )
+            ->when(
+                $request->filled('no'),
+                fn($q) =>
+                $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
+            )
+            ->when(
+                $request->filled('txtDescription'),
+                fn($q) =>
+                $q->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%")
+            );
 
-        // /**
-        //  * ================       Step 1:  Find year from InitialBudget using the ID        ================
-        //  */
-
-        // if ($initialBudgetId) {
-        //     $initialBudget = InitialBudget::where('id', $initialBudgetId);
-        //     if ($initialBudget) {
-        //         $year = $initialBudget->id;
-        //     }
-        // }
-
-        /**
-         * ================       Step 2:  Build query        ================
-         */
-
-        // $query = $model->newQuery()
-        //     ->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
-        //     ->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id')
-        //     ->select([
-        //         'begin_credits.id',
-        //         'begin_credits.agencyNumber',
-        //         'begin_credits.subAccountNumber as CNA',
-        //         'begin_credits.program',
-        //         'begin_credits.txtDescription',
-        //         'begin_credits.fin_law',
-        //         'begin_credits.current_loan',
-        //         'begin_credits.deleted_at',
-        //         'begin_credits.year',
-        //         'agencies.name'
-            // ]);
-        /**
-         * ================       Step 3:  Build query        ================
-         */
-
-        // if ($year) {
-        //     $query->where('begin_credits.year', $year);
-        // }
-
-        // if (request()->filled('agencyNumber')) {
-        //     $query->where('begin_credits.agencyNumber', request('agencyNumber'));
-        // }
-
-        // if (request()->filled('subAccountNumber')) {
-        //     $query->where('begin_credits.subAccountNumber', request('subAccountNumber'));
-        // }
-
-        // if (request()->filled('program')) {
-        //     $query->where('begin_credits.program', request('program'));
-        // }
-
-        // if (request()->filled('txtDescription')) {
-        //     $query->where('begin_credits.txtDescription', 'like', '%' . request('txtDescription') . '%');
-        // }
-
-        // return $query->orderBy('begin_credits.created_at', 'DESC');
-        return $model->newQuery();
+        return $query->orderBy('begin_vouchers.created_at', 'DESC');
     }
 
     /**
@@ -128,10 +109,9 @@ class BeginVoucherDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            // Column::make('agencyNumber')->title(__('tables.th.number'))->width(30)->addClass('align-middle'),
-            // Column::make('agencyTitle')->title(__('tables.th.depart'))->width(30)->addClass('align-middle'),
-            // Column::make('CNA')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
-            Column::make('program')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
+            Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
+            Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('fin_law')->title(__('tables.th.financeLaw'))->width(120)->addClass('align-middle'),
             Column::make('current_loan')->title(__('tables.th.currentCredit'))->width(120)->addClass('align-middle'),

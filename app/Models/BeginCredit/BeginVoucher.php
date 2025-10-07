@@ -3,6 +3,7 @@
 namespace App\Models\BeginCredit;
 
 use App\Models\Loans\BudgetVoucherLoan;
+use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Agent\Agent;
@@ -18,7 +19,10 @@ class BeginVoucher extends Model
     protected $fillable = [
         'ministry_id',
         'agency_id',
+        'program_id',
         'program_sub_id',
+        'chapter_id',
+        'account_id',
         'account_sub_id',
         'no',
         'txtDescription',
@@ -40,31 +44,22 @@ class BeginVoucher extends Model
      */
     public function accountSub()
     {
-        return $this->belongsTo(AccountSub::class, 'no', 'no');
-    }
-
-    /**
-     * Relationship to BudgetVoucherLoan
-     */
-    public function loans()
-    {
-        return $this->hasOne(BudgetVoucherLoan::class, 'program', 'program');
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
     public function ministries()
     {
-        return $this->belongsTo(Ministry::class, 'year', 'year');
+        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'no', 'no');
+        return $this->belongsTo(Agency::class, 'agency_id', 'id');
     }
 
-
-    //  BelongTo BeginCredit
-    // public function initialVoucher(){
-    //     return $this->hasMany(InitialVoucher::class);
-    // }
+    public function loans()
+    {
+        return $this->belongsTo(BudgetVoucherLoan::class, 'account_sub_id', 'id');
+    }
 
     /**
      * Spatie Log Options
@@ -74,10 +69,12 @@ class BeginVoucher extends Model
         return LogOptions::defaults()
             ->useLogName(trans('menus.beginning.credit'))
             ->logOnly([
-                'agencyNumber',
-                'subDepart',
-                'subAccountNumber',
-                'program',
+                'ministry_id',
+                'agency_id',
+                'program_id',
+                'program_sub_id',
+                'account_sub_id',
+                'no',
                 'txtDescription',
                 'fin_law',
                 'current_loan',

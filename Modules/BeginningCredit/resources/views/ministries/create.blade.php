@@ -8,12 +8,12 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.ministries') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"></h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.ministries') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.create.year') }}</a>
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
@@ -67,7 +67,7 @@
 
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
-                                    <label>{{ __('forms.name') }}</label>
+                                    <label>{{ __('forms.ministries') }}</label>
                                     <textarea id="vName" data-pristine-required-message="{{ __('messages.required') }}" rows="5"
                                         class="form-control" name="name" required></textarea>
                                     @error('name')
@@ -79,6 +79,9 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('ministries.index') }}">{{ __('buttons.back') }}</a>
+
                             </div>
 
                         </div>

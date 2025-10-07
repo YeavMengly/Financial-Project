@@ -21,8 +21,8 @@ class InitialMandateController extends Controller
      */
     public function index(InitialMandateDataTable $dataTable)
     {
-        $initialVoucher = Ministry::all();
-        return $dataTable->render('budgetplan::initialMandate.index', ['initialVoucher' => $initialVoucher]);
+        // $initialVoucher = Ministry::all();
+        return $dataTable->render('budgetplan::initialMandate.index');
     }
 
     /**

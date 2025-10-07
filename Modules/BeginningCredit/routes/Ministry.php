@@ -13,14 +13,14 @@ use Modules\BeginningCredit\App\Http\Controllers\MinistryController;
 
 // Routes with permission check middleware
 Route::middleware('PermissionCheck')->controller(MinistryController::class)->group(function () {
-    Route::get('/', 'index')->name('ministries.index'); // GET: initial-budget/
-    Route::get('/create', 'create')->name('ministries.create'); // GET: initial-budget/create
-    Route::get('/edit/{params}', 'edit')->name('ministries.edit'); // GET: initial-budget/edit/{id}
-    Route::get('/destroy/{params}', 'destroy')->name('ministries.destroy'); // GET: initial-budget/destroy/{id}
-    Route::get('/show/{params}', 'show')->name('ministries.show'); // GET: initial-budget/show/{id}
+    Route::get('/', 'index')->name('ministries.index');
+    Route::get('/create', 'create')->name('ministries.create');
+    Route::get('/edit/{params}', 'edit')->name('ministries.edit');
+    Route::get('/destroy/{params}', 'destroy')->name('ministries.destroy');
 });
-// Routes without permission check (e.g. for POST actions)
+
 Route::controller(MinistryController::class)->group(function () {
-    Route::post('/store', 'store')->name('ministries.store'); // POST: initial-budget/store
-    Route::post('/update/{params}', 'update')->name('ministries.update'); // POST: initial-budget/update/{id}
+    Route::post('/store', 'store')->name('ministries.store');
+    Route::post('/update/{params}', 'update')->name('ministries.update');
+    Route::get('/restore/{id}', 'restore')->name('ministries.restore');
 });

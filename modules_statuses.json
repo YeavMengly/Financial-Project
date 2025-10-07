@@ -11,5 +11,6 @@
     "BudgetPlan": true,
     "General": true,
     "InitialBudget": true,
-    "InitialChapter": true
+    "InitialChapter": true,
+    "InitialBudgetVoucher": true
 }

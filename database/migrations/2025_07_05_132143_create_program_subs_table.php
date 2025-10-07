@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('program_subs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('program_id');
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('program_id');
             $table->string('no');
             $table->text('decription');
             $table->timestamps();
+             $table->softDeletes();
         });
     }
 
