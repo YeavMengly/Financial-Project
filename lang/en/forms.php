@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'ministries' => 'ស្ថាប័ន',
     'username' => 'អ្នកប្រើប្រាស់',
     'password' => 'ពាក្យសម្ងាត់',
     'password.confirm' => 'បញ្ជាក់ ពាក្យសម្ងាត់',
@@ -35,7 +36,8 @@ return [
     'sub.account' => 'អនុគណនី',
     'number' => 'លេខ',
     'program' => 'កម្មវិធី',
-    'sub.program' => 'អនុកម្មវិធី',
+    'program.sub' => 'អនុកម្មវិធី',
+    'cluster.act' => 'ចង្កោមសកម្មភាព',
     'agency' => 'អង្គភាព',
     'program.code' => 'កូដកម្មវិធី',
     'fin.law' => 'ច្បាប់ហិរញ្ញវត្ថុ',

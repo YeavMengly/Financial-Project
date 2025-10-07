@@ -1,4 +1,4 @@
-@if (hasPermission('beginCreditMandate.edit') or hasPermission('beginCreditMandate.destroy'))
+@if (hasPermission('beginMandate.edit') or hasPermission('beginMandate.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
@@ -6,21 +6,16 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('beginCreditMandate.edit'))
-                    <a href="{{ route('beginCreditMandate.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                @if (hasPermission('beginMandate.edit'))
+                    <a href="{{ route('beginMandate.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-
-                @if (hasPermission('beginCreditMandate.destroy'))
+                @if (hasPermission('beginMandate.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('beginCreditMandate.destroy', encode_params($module->id)) }}', 1)"
-                        class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
-                @endif
-            @else
-                @if (hasPermission('beginCreditMandate.destroy'))
-                    <a href="#"
-                        onclick="confirm('{{ route('beginCreditMandate.restore', encode_params($module->id)) }}', 2)"
-                        class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
+                        onclick="confirm('{{ route('beginMandate.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
+                        class="dropdown-item">
+                        <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
+                    </a>
                 @endif
             @endif
         </ul>

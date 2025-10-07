@@ -20,6 +20,4 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('budgetplan')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/voucher.php';
     require_once __DIR__ . '/mandate.php';
-    require_once __DIR__ . '/initialVoucher.php';
-    require_once __DIR__ . '/initialMandate.php';
 });

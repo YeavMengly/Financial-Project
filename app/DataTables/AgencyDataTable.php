@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\BeginCredit\Agency;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request as HttpRequest;
@@ -24,8 +25,11 @@ class AgencyDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
+            })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::agency.action', ['module' => $module]);
@@ -40,8 +44,9 @@ class AgencyDataTable extends DataTable
     {
         $params = $request->params;
         $id = decode_params($params);
-
-        $query = $model->newQuery()
+        $model = $model->newQuery();
+        $model->withTrashed();
+        $model->newQuery()
             ->leftJoin('programs', 'agencies.program_id', '=', 'programs.id')
             ->select([
                 'agencies.id',
@@ -50,16 +55,15 @@ class AgencyDataTable extends DataTable
                 'agencies.no as name_no',
                 'agencies.name',
                 'agencies.nick_name',
-                'programs.no as no_program'
+                'programs.no as no_program',
+                'agencies.created_at',
+                'agencies.deleted_at'
 
-            ])
+            ])->where('agencies.ministry_id', $id)
             ->orderBy('agencies.created_at', 'ASC');
+        $model->where('agencies.ministry_id', $id);
 
-        $query->where('agencies.ministry_id', $id);
-
-        // $query->where('programs.ministry_id', $id);
-
-        return $query;
+        return $model->orderBy('agencies.id', 'ASC');
     }
 
     /**
@@ -86,12 +90,12 @@ class AgencyDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
             Column::make('no_program')->title(__('tables.th.program'))->addClass('align-middle'),
-            Column::make('name_no')->title(__('tables.th.number'))->addClass('align-middle'),
+            Column::make('name_no')->title(__('tables.th.agency'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('nick_name')->title(__('tables.th.nick_name'))->addClass('align-middle'),
-
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

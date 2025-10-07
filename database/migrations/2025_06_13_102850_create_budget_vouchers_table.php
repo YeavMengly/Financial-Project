@@ -13,9 +13,8 @@ return new class extends Migration
     {
         Schema::create('budget_vouchers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('agency_id');
-            $table->unsignedBigInteger('program_sub_id');
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('agency_id');
             $table->unsignedBigInteger('account_sub_id');
             $table->unsignedBigInteger('no');
             $table->decimal('budget', 15, 2)->default(0);

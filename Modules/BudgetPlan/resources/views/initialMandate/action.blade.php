@@ -7,22 +7,10 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('initialMandate.edit'))
-                    <a href="{{ route('budget-mandate.index', encode_params($module->id)) }}" class="dropdown-item">
+                    <a href="{{ route('budgetMandate.index', encode_params($module->id)) }}" class="dropdown-item">
                         <i class="bx bx-show"></i> {{ __('buttons.show') }}
                     </a>
                 @endif
-                @if (hasPermission('initialMandate.edit') or hasPermission('initialMandate.destroy'))
-                    <hr />
-                @endif
-                {{-- @if (hasPermission('initialMandate.edit'))
-                    <a href="{{ route('initialMandate.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
-                @endif --}}
-                {{-- @if (hasPermission('initialMandate.destroy'))
-                    <a href="#"
-                        onclick="confirm('{{ route('initialMandate.destroy', encode_params($module->id)) }}', 1)"
-                        class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
-                @endif --}}
             @else
                 @if (hasPermission('initialMandate.destroy'))
                     <a href="#"

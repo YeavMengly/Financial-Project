@@ -4,17 +4,15 @@ use Illuminate\Support\Facades\Route;
 use Modules\BeginningCredit\App\Http\Controllers\BeginMandateController;
 
 Route::middleware('PermissionCheck')->controller(BeginMandateController::class)->group(function () {
-    // Route::get('/beginCredit', 'index')->name('beginCredit.index');
-    Route::get('/beginCreditMandate/create', 'create')->name('beginCreditMandate.create');
-    Route::get('/beginCreditMandate/edit/{params}', 'edit')->name('beginCreditMandate.edit');
-    Route::get('/beginCreditMandate/destroy/{params}', 'destroy')->name('beginCreditMandate.destroy');
-
-    Route::get('/general', '')->name('general.index');
-
-    Route::get('initial-budget-mandate/{params}/beginCreditMandate', 'index')->name('beginCreditMandate.index');
-    Route::get('initial-budget-mandate/{params}/beginCreditMandate/create', 'create')->name('beginCreditMandate.create');
+    Route::get('begin/mandate/', 'getIndex')->name('initialBudgetMandate.index');
+    Route::get('begin/mandate/{params}/', 'index')->name('beginMandate.index');
+    Route::get('begin/mandate/{params}/create', 'create')->name('beginMandate.create');
+    Route::get('begin/mandate/{params}/edit/{id}', 'edit')->name('beginMandate.edit');
+    Route::get('begin/mandate/{params}/destroy/{id}', 'destroy')->name('beginMandate.destroy');
 });
+
 Route::controller(BeginMandateController::class)->group(function () {
-    Route::post('initial-budget-mandate/{params}/beginCreditMandate/store', 'store')->name('beginCreditMandate.store');
-    Route::post('/beginCreditMandate/update/{params}', 'update')->name('beginCreditMandate.update');
+    Route::post('begin/mandate{params}/store', 'store')->name('beginMandate.store');
+    Route::post('begin/mandate/{params}/update/{id}', 'update')->name('beginMandate.update');
+    Route::get('/get-by-programid', 'getByProgramId')->name('beginMandate.by.program_id');
 });

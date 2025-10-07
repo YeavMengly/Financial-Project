@@ -7,8 +7,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
-
+                <h4 class="mb-sm-0 font-size-18"></h4>
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
@@ -21,13 +20,16 @@
             </div>
         </div>
     </div>
+
+
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('accounts.update', $params) }}" autocomplete="off">
+                        action="{{ route('accounts.update', ['params' => $params, 'id' => $module->id]) }}"
+                        autocomplete="off">
                         @csrf
 
                         <div class="row">
@@ -38,8 +40,8 @@
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">ជ្រើសរើស</option>
                                         @foreach ($chapter as $chap)
-                                            <option value="{{ $chap->id }}"
-                                                {{ $account->chapter_id == $chap->id ? 'selected' : '' }}>
+                                            <option value="{{ $chap->no }}"
+                                                {{ $module->chapter_id == $chap->no ? 'selected' : '' }}>
                                                 {{ $chap->no }}-{{ $chap->name }}
                                             </option>
                                         @endforeach
@@ -55,7 +57,7 @@
                                     <label>{{ __('forms.account') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         type="text" class="form-control" name="no" tabindex="2"
-                                        value="{{ old('no', $account->no) }}" />
+                                        value="{{ old('no', $module->no) }}" />
                                     @error('no')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -67,7 +69,7 @@
                                     <label>{{ __('forms.name') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         type="text" class="form-control" name="name" tabindex="3"
-                                        value="{{ old('no', $account->name) }}" />
+                                        value="{{ old('name', $module->name) }}" />
                                     @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -77,6 +79,9 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('accounts.index', $params) }}">{{ __('buttons.back') }}</a>
+
                             </div>
                         </div>
                     </form>
@@ -99,9 +104,9 @@
             const cboChapterNumberSelect = document.getElementById('cboChapterNumber');
             const cboChapterNumberChoice = new Choices(cboChapterNumberSelect, {
                 searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
         });

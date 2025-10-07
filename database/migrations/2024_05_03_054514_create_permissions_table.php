@@ -73,7 +73,7 @@ return new class extends Migration
                 'delete' => 'accountSub.destroy',
             ],
 
-            'programs'                  => [
+            'program'                  => [
                 'show'   => 'initialProgram.index',
                 'view'   => 'program.index',
                 'create' => 'program.create',
@@ -81,7 +81,7 @@ return new class extends Migration
                 'delete' => 'program.destroy',
             ],
 
-            'sub.program'                  => [
+            'program.sub'                  => [
                 'show'   => 'initialProgramSub.index',
                 'view'   => 'programSub.index',
                 'create' => 'programSub.create',

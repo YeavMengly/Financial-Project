@@ -20,6 +20,7 @@
         "opcodesio/log-viewer": "^3.10",
         "php-flasher/flasher-laravel": "^1.15",
         "php-open-source-saver/jwt-auth": "^2.1",
+        "phpoffice/phpspreadsheet": "^1.30",
         "spatie/laravel-activitylog": "^4.7.3",
         "yajra/laravel-datatables": "^10.0"
     },

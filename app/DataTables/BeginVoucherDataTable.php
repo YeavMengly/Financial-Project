@@ -40,8 +40,6 @@ class BeginVoucherDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-
-
     public function query(BeginVoucher $model, Request $request): QueryBuilder
     {
         $params = $request->params;
@@ -53,39 +51,39 @@ class BeginVoucherDataTable extends DataTable
             ->select([
                 'begin_vouchers.id',
                 'begin_vouchers.agency_id',
-                'account_subs.no as account_sub_no',
+                'begin_vouchers.account_sub_id',
                 'begin_vouchers.no as program_no',
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
                 'begin_vouchers.current_loan',
                 'begin_vouchers.ministry_id',
                 'agencies.name as agency_name',
+                'account_subs.no as account_sub_no',
             ])
-            ->where('account_subs.ministry_id', $id);
+            ->where('begin_vouchers.ministry_id', $id)
+            ->when(
+                $request->filled('agency'),
+                fn($q) =>
+                $q->where('begin_vouchers.agency_id', $request->agency)
+            )
+            ->when(
+                $request->filled('accountSub'),
+                fn($q) =>
+                $q->where('begin_vouchers.account_sub_id', $request->accountSub)
+            )
+            ->when(
+                $request->filled('no'),
+                fn($q) =>
+                $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
+            )
+            ->when(
+                $request->filled('txtDescription'),
+                fn($q) =>
+                $q->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%")
+            );
 
-        // 🔎 Filter by agency
-        if ($request->filled('agency')) {
-            $query->where('begin_vouchers.agency_id', $request->agency);
-        }
-
-        // 🔎 Filter by account sub
-        if ($request->filled('accountSub')) {
-            $query->where('begin_vouchers.account_sub_id', $request->accountSub);
-        }
-
-        // 🔎 Filter by program (voucher no)
-        if ($request->filled('program')) {
-            $query->where('begin_vouchers.no', $request->program);
-        }
-
-        // 🔎 Filter by description (LIKE for partial search)
-        if ($request->filled('txtDescription')) {
-            $query->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%");
-        }
-
-        return $query;
+        return $query->orderBy('begin_vouchers.created_at', 'DESC');
     }
-
 
     /**
      * Optional method if you want to use the html builder.
@@ -112,7 +110,7 @@ class BeginVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
-            Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('fin_law')->title(__('tables.th.financeLaw'))->width(120)->addClass('align-middle'),

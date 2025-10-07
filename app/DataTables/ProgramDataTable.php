@@ -3,14 +3,12 @@
 namespace App\DataTables;
 
 use App\Models\Program;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class ProgramDataTable extends DataTable
@@ -25,8 +23,11 @@ class ProgramDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
+            })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::program.action', ['module' => $module]);
@@ -37,20 +38,16 @@ class ProgramDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(Program $model, Request $request): QueryBuilder
+    public function query(Program $model,  Request $request): QueryBuilder
     {
         $params = $request->params;
         $id = decode_params($params);
-        $query = $model->newQuery()
-            ->select([
-                'programs.ministry_id',
-                'programs.no',
-                'programs.title',
-            ])
-            ->orderBy('programs.no', 'ASC');
-        $query->where('programs.ministry_id', $id);
 
-        return $query;
+        $model = $model->newQuery();
+        $model->withTrashed();
+        $model->select(['programs.id', 'programs.ministry_id', 'programs.no', 'programs.title',  'programs.created_at', 'programs.deleted_at'])->where('programs.ministry_id', $id);
+
+        return $model->orderBy('programs.id', 'ASC');
     }
 
     /**
@@ -77,10 +74,10 @@ class ProgramDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
-            Column::make('no')->title(__('tables.th.depart'))->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.program'))->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
-
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

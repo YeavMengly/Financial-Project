@@ -16,13 +16,15 @@
             </div>
         </div>
     </div>
+    
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('chapters.update', $params) }}" autocomplete="off">
+                        action="{{ route('chapters.update', ['params' => $params, 'id' => $module->id]) }}"
+                        autocomplete="off">
                         @csrf
                         <div class="row">
                             <div class="col-md-12">
@@ -30,7 +32,7 @@
                                     <label>{{ __('forms.chapter') }}</label>
                                     <input type="text" class="form-control" name="no" required
                                         data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ $data->no }}" />
+                                        value="{{ $module->no }}" />
                                     @error('no')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -42,7 +44,7 @@
                                     <label>{{ __('forms.name') }}</label>
                                     <input type="text" class="form-control" name="name" required
                                         data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ $data->name }}" />
+                                        value="{{ $module->name }}" />
                                     @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -51,6 +53,8 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('chapters.index', $params) }}">{{ __('buttons.back') }}</a>
                             </div>
                         </div>
                     </form>

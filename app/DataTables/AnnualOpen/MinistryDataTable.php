@@ -3,6 +3,7 @@
 namespace App\DataTables\AnnualOpen;
 
 use App\Models\BeginCredit\Ministry;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -20,10 +21,12 @@ class MinistryDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            ->editColumn('soft_delete', function ($model) {
-                return is_null($model->deleted_at)
-                    ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
-                    : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+            ->editColumn('soft_delete', function ($soft_delete) {
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
+                return $active;
+            })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::ministries.action', ['module' => $module]);
@@ -36,16 +39,20 @@ class MinistryDataTable extends DataTable
      */
     public function query(Ministry $model): QueryBuilder
     {
-        $query = $model->newQuery()->select([
+        $model = $model->newQuery();
+        $model->withTrashed();
+        $model->select([
             'ministries.id',
             'ministries.no',
             'ministries.year',
             'ministries.title',
             'ministries.refer',
-            'ministries.name'
+            'ministries.name',
+            'ministries.created_at',
+            'ministries.deleted_at'
         ]);
 
-        return $query->orderBy('ministries.id', 'ASC');
+        return $model->orderBy('ministries.id', 'DESC');
     }
 
     /**
@@ -74,11 +81,13 @@ class MinistryDataTable extends DataTable
                 'DT_RowIndex',
                 __('tables.th.no')
             )->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('no')->title(__('tables.th.no'))->width(80)->addClass('align-middle'),
+            // Column::make('no')->title(__('tables.th.no'))->width(80)->addClass('align-middle'),
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.ministries'))->addClass('align-middle'),
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed(
                 'action',
                 __('tables.th.action')

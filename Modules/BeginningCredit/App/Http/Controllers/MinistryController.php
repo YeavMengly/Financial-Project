@@ -16,11 +16,13 @@ class MinistryController extends Controller
     /**
      * Display a listing of the resource.
      */
-
-
     public function index(MinistryDataTable $dataTable)
     {
-        return $dataTable->render('beginningcredit::ministries.index');
+        $ministries = Ministry::all();
+
+        return $dataTable->render('beginningcredit::ministries.index', [
+            'ministries' => $ministries
+        ]);
     }
     /**
      * Show the form for creating a new resource.
@@ -111,6 +113,7 @@ class MinistryController extends Controller
 
         try {
             $ministries = Ministry::where('id', $id)->first();
+
             $validateData['name'] = strip_tags($validateData['name']);
             $ministries->update($validateData);
 
@@ -148,6 +151,7 @@ class MinistryController extends Controller
         DB::beginTransaction();
 
         try {
+
             $ministries = Ministry::where('id', $id)->firstOrFail();
             $ministries->delete();
 
@@ -172,5 +176,20 @@ class MinistryController extends Controller
 
             return redirect()->route('ministries.index');
         }
+    }
+
+    public function restore($id)
+    {
+        $pid = decode_params($id);
+
+        Ministry::withTrashed()->whereKey($pid)->restore();
+        
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('ministries.index');
     }
 }

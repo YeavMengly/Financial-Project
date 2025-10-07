@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.sub.account') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"></h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -23,6 +23,7 @@
         </div>
     </div>
     <!-- end page title -->
+ 
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
@@ -41,7 +42,8 @@
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">ជ្រើសរើស</option>
                                         @foreach ($account as $acc)
-                                            <option value="{{ $acc->id }}">{{ $acc->no }}-{{ $acc->name }}</option>
+                                            <option value="{{ $acc->no }}">{{ $acc->no }}-{{ $acc->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                     @error('no')
@@ -72,8 +74,9 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('accountSub.index', $params) }}">{{ __('buttons.back') }}</a>
                             </div>
-
                         </div>
                     </form>
                 </div>

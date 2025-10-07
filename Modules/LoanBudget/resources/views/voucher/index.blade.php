@@ -17,8 +17,15 @@
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.voucher') }}</h4>
 
                 <div class="page-title-right">
-
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $ministry->name }}</li>
+                        </ol>
+                    </div>
                 </div>
+
 
             </div>
         </div>
@@ -28,62 +35,41 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter">
+                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="cbochapterNum">ជំពូក</label>
-                            <input type="text" class="form-control" name="chapterNum" required
-                                data-pristine-required-message="{{ __('messages.required') }}" placeholder="ជំពូក" />
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboTxtChapter">នាមជំពូក</label>
-                            <input type="text" class="form-control" name="txtChapter" required
-                                data-pristine-required-message="{{ __('messages.required') }}" placeholder="នាមជំពូក" />
+                            <label class="visually-hidden" for="cboAgency">{{ __('menus.sub.account') }}</label>
+                            <select class="form-control" name="cboAgency" id="cboAgency">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($agency as $item)
+                                    <option value="{{ $item->id }}">
+                                        {{ $item->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                        </div>
-                    </form> --}}
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
-                        <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($budgetVoucher as $ts)
-                                    <option value="{{ $ts->subAccountNumber }}"
-                                        {{ request('subAccountNumber') == $ts->subAccountNumber ? 'selected' : '' }}>
-                                        {{ $ts->subAccountNumber }}
+                                @foreach ($accountSub as $item)
+                                    <option value="{{ $item->no }}">
+                                        {{ $item->no }}-
+                                        {{ $item->name }}
                                     </option>
-                                @endforeach --}}
+                                @endforeach
                             </select>
                         </div>
 
-                        <!-- Program -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="program">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="program" id="program">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($budgetVoucher as $ts)
-                                    <option value="{{ $ts->program }}"
-                                        {{ request('program') == $ts->program ? 'selected' : '' }}>
-                                        {{ $ts->program }}
+                                @foreach ($voucherLoan as $item)
+                                    <option value="{{ $item->id }}">
+                                        {{ $item->no }}
                                     </option>
-                                @endforeach --}}
-                            </select>
-                        </div>
-
-                        <!-- Task Type -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="task_type">{{ __('menus.task') }}</label>
-                            <select class="form-control" name="task_type" id="task_type">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($taskType as $ts)
-                                    <option value="{{ $ts->task }}"
-                                        {{ request('task_type') == $ts->task ? 'selected' : '' }}>
-                                        {{ $ts->task }}
-                                    </option>
-                                @endforeach --}}
+                                @endforeach
                             </select>
                         </div>
 
@@ -109,6 +95,9 @@
 
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                            <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
+                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            </a>
                         </div>
                     </form>
 
@@ -124,8 +113,7 @@
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('voucher.create', encode_params($params)) }}"><i
-                                        class="bx bx-plus me-1"></i>
+                                    href="{{ route('voucher.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -187,7 +175,7 @@
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('agencyNumber');
+            const taskTypeSelect = document.getElementById('cboAgency');
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"

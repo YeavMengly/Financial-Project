@@ -1,11 +1,12 @@
 <?php
 
 return [
+    
     'dashboard' => 'ទំព័រដើម',
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
-
+    'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
@@ -20,7 +21,7 @@ return [
     'title' => 'ចំណងជើង',
 
     'program' => 'កម្មវិធី',
-    'sub.program' => 'អនុកម្មវិធី',
+    'program.sub' => 'អនុកម្មវិធី',
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
 
@@ -54,5 +55,6 @@ return [
 
     'duel' => 'ប្រេងឥន្ធនៈ',
     'material' => 'សម្ផារផ្គត់ផ្គង់',
-    'year' => 'ឆ្នាំ'
+    'year' => 'ឆ្នាំ',
+    'create.year' => 'កំណត់ឆ្នាំ'
 ];

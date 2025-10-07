@@ -3,9 +3,8 @@
 namespace App\DataTables;
 
 use App\Models\BeginCredit\BeginMandate;
-use App\Models\BeginCredit\InitialBudget;
-use App\Models\BeginCredit\InitialBudgetMandate;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -43,65 +42,48 @@ class BeginMandateDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(BeginMandate $model): QueryBuilder
+    public function query(BeginMandate $model, Request $request): QueryBuilder
     {
-        $initialBudgetId = request()->get('year');
-
-        /**
-         * ================       Step 1:  Find year from InitialBudget using the ID        ================
-         */
-
-        if ($initialBudgetId) {
-            $initialBudget = InitialBudget::find($initialBudgetId);
-            if ($initialBudget) {
-                $year = $initialBudget->id;
-            }
-        }
-
-        /**
-         * ================       Step 2:  Build query        ================
-         */
+        $params = $request->params;
+        $id = decode_params($params);
 
         $query = $model->newQuery()
-            ->leftJoin('sub_accounts', 'begin_credit_mandates.subAccountNumber', '=', 'sub_accounts.subAccountNumber')
+            ->leftJoin('account_subs', 'begin_mandates.account_sub_id', '=', 'account_subs.id')
+            ->leftJoin('agencies', 'begin_mandates.agency_id', '=', 'agencies.id')
             ->select([
-                'begin_credit_mandates.id',
-                'begin_credit_mandates.agencyNumber',
-                'begin_credit_mandates.subAccountNumber as CNA',
-                'begin_credit_mandates.program',
-                'begin_credit_mandates.txtDescription',
-                'begin_credit_mandates.fin_law',
-                'begin_credit_mandates.current_loan',
-                'begin_credit_mandates.deleted_at',
-                'begin_credit_mandates.year',
-            ]);
+                'begin_mandates.id',
+                'begin_mandates.agency_id',
+                'account_subs.no as account_sub_no',
+                'begin_mandates.no as program_no',
+                'begin_mandates.txtDescription',
+                'begin_mandates.fin_law',
+                'begin_mandates.current_loan',
+                'begin_mandates.ministry_id',
+                'agencies.name as agency_name',
+            ])
+            ->where('begin_mandates.ministry_id', $id);
 
-        /**
-         * ================       Step 3:  Build query        ================
-         */
-
-        if ($year) {
-            $query->where('begin_credit_mandates.year', $year);
+        // 🔎 Filter by agency
+        if ($request->filled('agency')) {
+            $query->where('begin_mandates.agency_id', $request->agency);
         }
 
-        if (request()->filled('agencyNumber')) {
-            $query->where('begin_credit_mandates.agencyNumber', request('agencyNumber'));
+        // 🔎 Filter by account sub
+        if ($request->filled('accountSub')) {
+            $query->where('begin_mandates.account_sub_id', $request->accountSub);
         }
 
-        if (request()->filled('subAccountNumber')) {
-            $query->where('begin_credit_mandates.subAccountNumber', request('subAccountNumber'));
+        // 🔎 Filter by program (voucher no)
+        if ($request->filled('program')) {
+            $query->where('begin_mandates.no', $request->program);
         }
 
-        if (request()->filled('program')) {
-            $query->where('begin_credit_mandates.program', request('program'));
+        // 🔎 Filter by description (LIKE for partial search)
+        if ($request->filled('txtDescription')) {
+            $query->where('begin_mandates.txtDescription', 'like', "%{$request->txtDescription}%");
         }
 
-        if (request()->filled('txtDescription')) {
-            $query->where('begin_credit_mandates.txtDescription', 'like', '%' . request('txtDescription') . '%');
-        }
-
-
-        return $query->orderBy('begin_credit_mandates.created_at', 'DESC');
+        return $query;
     }
 
     /**
@@ -128,11 +110,12 @@ class BeginMandateDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('CNA')->title(__('tables.th.sub.account'))->addClass('align-middle'),
-            Column::make('program')->title(__('tables.th.program'))->addClass('align-middle'),
+            Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
+            Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
-            Column::make('fin_law')->title(__('tables.th.financeLaw'))->addClass('align-middle'),
-            Column::make('current_loan')->title(__('tables.th.currentCredit'))->addClass('align-middle'),
+            Column::make('fin_law')->title(__('tables.th.financeLaw'))->width(120)->addClass('align-middle'),
+            Column::make('current_loan')->title(__('tables.th.currentCredit'))->width(120)->addClass('align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

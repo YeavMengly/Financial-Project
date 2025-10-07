@@ -11,9 +11,9 @@
                         <i class="bx bx-show"></i> {{ __('buttons.show') }}
                     </a>
                 @endif
-                @if (hasPermission('voucherLoan.edit') or hasPermission('voucherLoan.destroy'))
+                {{-- @if (hasPermission('voucherLoan.edit') or hasPermission('voucherLoan.destroy'))
                     <hr />
-                @endif
+                @endif --}}
                 {{-- @if (hasPermission('voucherLoan.edit'))
                     <a href="{{ route('voucherLoan.edit', encode_params($module->id)) }}" class="dropdown-item"><i
                             class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

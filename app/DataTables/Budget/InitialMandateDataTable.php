@@ -3,6 +3,7 @@
 namespace App\DataTables\Budget;
 
 use App\Models\BeginCredit\InitialBudget;
+use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\InitialMandate;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -24,13 +25,10 @@ class InitialMandateDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            ->editColumn('soft_delete', function ($model) {
-                return is_null($model->deleted_at)
+            ->editColumn('soft_delete', function ($module) {
+                return is_null($module->deleted_at)
                     ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
-            })
-            ->editColumn('program', function ($model) {
-                return optional($model->beginCredit)->program ?? $model->program;
             })
             ->addColumn('action', function ($model) {
                 return view('budgetplan::initialMandate.action', ['module' => $model]);
@@ -41,15 +39,19 @@ class InitialMandateDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(InitialBudget $model): QueryBuilder
+    public function query(Ministry $model): QueryBuilder
     {
-        // return $model->newQuery();
-        $query = $model->newQuery();
 
-        if (request()->has('year') && request('year') !== null) {
-            $query->where('year', request('year'));
-        }
-        return $query;
+        $query = $model->newQuery()->select([
+            'ministries.id',
+            'ministries.no',
+            'ministries.year',
+            'ministries.title',
+            'ministries.refer',
+            'ministries.name'
+        ]);
+
+        return $query->orderBy('ministries.id', 'ASC');
     }
 
     /**
@@ -80,8 +82,8 @@ class InitialMandateDataTable extends DataTable
             )->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
-            Column::make('sub_title')->title(__('tables.th.sub.title'))->addClass('align-middle'),
-            Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::computed(
                 'action',
                 __('tables.th.action')

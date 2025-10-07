@@ -17,7 +17,10 @@ class BeginMandate extends Model
     protected $fillable = [
         'ministry_id',
         'agency_id',
+        'program_id',
         'program_sub_id',
+        'chapter_id',
+        'account_id',
         'account_sub_id',
         'no',
         'txtDescription',
@@ -32,7 +35,6 @@ class BeginMandate extends Model
         'law_average',
         'law_correction',
     ];
-
     /**
      * Relationship to SubAccount
      */
@@ -41,19 +43,18 @@ class BeginMandate extends Model
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
-    public function loans()
+    public function ministries()
     {
-        return $this->hasOne(BudgetMandateLoan::class, 'program', 'program');
+        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
-
-    public function initialBudgetMandate()
-    {
-        return $this->belongsTo(InitialBudgetMandate::class, 'year', 'year');
-    }
-
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id', 'id');
+    }
+
+    public function loans()
+    {
+        return $this->belongsTo(BudgetMandateLoan::class, 'account_sub_id', 'id');
     }
 
     /**
@@ -62,10 +63,14 @@ class BeginMandate extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.initial.mandate'))
+            ->useLogName(trans('menus.beginning.credit'))
             ->logOnly([
-                'subAccountNumber',
-                'program',
+                'ministry_id',
+                'agency_id',
+                'program_id',
+                'program_sub_id',
+                'account_sub_id',
+                'no',
                 'txtDescription',
                 'fin_law',
                 'current_loan',
@@ -91,7 +96,7 @@ class BeginMandate extends Model
         $browser = $agent->browser();
 
         $activity->default_field = "{$this->subAccountNumber}";
-        $activity->log_name = trans('menus.initial.mandate');
+        $activity->log_name = trans('menus.beginning.credit');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();
         $activity->device = $agent->device();

@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('begin_mandates', function (Blueprint $table) {
             $table->id();
-
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('agency_id');
+            $table->unsignedBigInteger('program_id');
             $table->unsignedBigInteger('program_sub_id');
+            $table->unsignedBigInteger('chapter_id');
+            $table->unsignedBigInteger('account_id');
             $table->unsignedBigInteger('account_sub_id');
             $table->string('no');
             $table->text('txtDescription');
@@ -29,7 +31,6 @@ return new class extends Migration
             $table->decimal('credit', 15, 0)->default(0);
             $table->decimal('law_average', 15, 0)->default(0);
             $table->decimal('law_correction', 15, 0)->default(0);
-
             $table->timestamps();
         });
     }

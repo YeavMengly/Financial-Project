@@ -1,26 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// routes
 use Modules\BudgetPlan\App\Http\Controllers\BudgetVoucherController;
 
-Route::middleware('PermissionCheck')->controller(BudgetVoucherController::class)->group(function () {
+Route::middleware('PermissionCheck')
+    ->controller(BudgetVoucherController::class)
+    ->group(function () {
+        Route::get('voucher/', 'getIndex')->name('initialVoucher.index');
+        Route::get('voucher/{params}', 'index')->name('budgetVoucher.index');
+        Route::get('voucher/{params}/create', 'create')->name('budgetVoucher.create');
+        Route::get('voucher/{params}/edit/{id}', 'edit')->name('budgetVoucher.edit');
+        Route::get('voucher/{params}/destroy/{id}', 'destroy')->name('budgetVoucher.destroy');
 
-    Route::get('/initial-voucher/{params}/voucher', 'index')->name('budget-voucher.index');
-    Route::get('/initial-voucher/{params}/voucher/create', 'create')->name('budget-voucher.create');
-    Route::get('/voucher/destroy/{params}', 'destroy')->name('budget-voucher.destroy');
-
-    // Error
-    Route::get('/initial-voucher/{params}/voucher/edit', 'edit')->name('budget-voucher.edit');
-});
+        Route::get('voucher/{params}/early-balance', 'getEarlyBalance')
+            ->name('budgetVoucher.getEarlyBalance');
+    });
 
 Route::controller(BudgetVoucherController::class)->group(function () {
-    Route::post('initial-voucher/{params}/voucher/store', 'store')->name('budget-voucher.store');
-    Route::get('/voucher/restore/{params}', 'restore')->name('budget-voucher.restore');
-    Route::get('/voucher/create/{subAccountId}/{programCode}/early-balance', 'getEarlyBalance')
-        ->name('budget-voucher.getEarlyBalance');
-    Route::get('/voucher/edit/{subAccountId}/{programCode}/early-balance', 'getEarlyBalance')
-        ->name('budget-voucher.getEarlyBalance');
-
-    // Error
-    Route::post('/voucher/update/{params}', 'update')->name('budget-voucher.update');
+    Route::post('voucher/{params}/store', 'store')->name('budgetVoucher.store');
+    Route::post('voucher/{params}/update/{id}', 'update')->name('budgetVoucher.update');
 });

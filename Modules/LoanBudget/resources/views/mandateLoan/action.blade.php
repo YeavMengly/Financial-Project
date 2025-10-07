@@ -11,9 +11,9 @@
                         <i class="bx bx-show"></i> {{ __('buttons.show') }}
                     </a>
                 @endif
-                @if (hasPermission('mandateLoan.edit') or hasPermission('mandateLoan.destroy'))
+                {{-- @if (hasPermission('mandateLoan.edit') or hasPermission('mandateLoan.destroy'))
                     <hr />
-                @endif
+                @endif --}}
                 {{-- @if (hasPermission('mandateLoan.edit'))
                     <a href="{{ route('mandateLoan.edit', encode_params($module->id)) }}" class="dropdown-item"><i
                             class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

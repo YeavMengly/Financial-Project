@@ -32,6 +32,13 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
                 <div class="card-body">
                     @if (hasPermission('program.create'))
                         <div class="col-sm">

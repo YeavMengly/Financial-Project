@@ -4,7 +4,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapters') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"></h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -19,6 +19,7 @@
         </div>
     </div>
     <!-- end page title -->
+
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
@@ -52,6 +53,9 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('chapters.index', $params) }}">{{ __('buttons.back') }}</a>
+
                             </div>
 
                         </div>

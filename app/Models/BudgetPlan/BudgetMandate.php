@@ -2,6 +2,7 @@
 
 namespace App\Models\BudgetPlan;
 
+use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\Ministry;
 use App\Models\Loans\BudgetMandateLoan;
 use App\Models\TaskType;
@@ -15,7 +16,6 @@ class BudgetMandate extends Model
     protected $fillable = [
         'ministry_id',
         'agency_id',
-        'program_sub_id',
         'account_sub_id',
         'no',
         'txtDescription',
@@ -23,6 +23,11 @@ class BudgetMandate extends Model
         'task_type',
         'attachments',
         'date'
+    ];
+
+    protected $casts = [
+        'attachments' => 'array',
+        'date'        => 'date',
     ];
 
     public function taskType()
@@ -33,5 +38,9 @@ class BudgetMandate extends Model
     public function ministries()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
+    }
+    public function accountSub()
+    {
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 }

@@ -14,12 +14,12 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.initial.budget') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.credit') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.initial.budget') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.initial.mandate') }}</a>
                             </li>
                             {{-- <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li> --}}
                         </ol>
@@ -38,9 +38,9 @@
                             <label class="visually-hidden" for="year">{{ __('menus.account') }}</label>
                             <select class="form-control" name="year" id="year" required>
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($initialBudget as $ts)
-                                    <option value="{{ $ts->year }}"
-                                        {{ request('year') == $ts->year ? 'selected' : '' }}>{{ $ts->year }}</option>
+                                @foreach ($module as $md)
+                                    <option value="{{ $md->id }}" {{ request('year') == $md->id ? 'selected' : '' }}>
+                                        {{ $md->year }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -57,19 +57,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('initialBudgetMandate.create'))
-                        <div class="col-sm">
-                            <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('initialBudgetMandate.create') }}"><i class="bx bx-plus me-1"></i>
-                                    {{ __('buttons.create') }}</a>
-                            </div>
-                        </div>
-                    @endif
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>

@@ -3,9 +3,12 @@
 namespace Modules\LoanBudget\App\Http\Controllers;
 
 use App\DataTables\BudgetLoans\BudgetMandateLoanDataTable;
+use App\DataTables\BudgetLoans\InitialMandateLoanDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\BeginCreditMandate;
+use App\Models\BeginCredit\BeginMandate;
 use App\Models\BeginCredit\InitialBudget;
+use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\Loans\BudgetMandateLoan;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +19,12 @@ use Illuminate\Support\Facades\Log;
 
 class LoanBudgetMandateController extends Controller
 {
+    public function getIndex(InitialMandateLoanDataTable $dataTable)
+    {
+         $ministry = Ministry::all();
+        return $dataTable->render('loanbudget::mandateLoan.index', ['mandateLoan' => $ministry]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -46,7 +55,7 @@ class LoanBudgetMandateController extends Controller
     {
         $params = decode_params($id);
         $initialVoucher = InitialBudget::findOrFail($params);
-        $beginMandate = BeginCreditMandate::where('year', $params)->with('agency')->get();
+        $beginMandate = BeginMandate::where('year', $params)->with('agency')->get();
 
         return view('loanbudget::mandate.create')->with('beginMandate', $beginMandate)->with('initialVoucher', $initialVoucher)->with('params', $params);
     }

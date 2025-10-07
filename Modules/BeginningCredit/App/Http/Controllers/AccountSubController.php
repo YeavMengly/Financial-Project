@@ -4,6 +4,7 @@
 namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\AccountSubDataTable;
+use App\DataTables\AnnualOpen\InititalAccountSubDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Account;
 use App\Models\BeginCredit\AccountSub;
@@ -14,6 +15,11 @@ use Illuminate\Support\Facades\Log;
 
 class AccountSubController extends Controller
 {
+
+    public function getIndex(InititalAccountSubDataTable $dataTable)
+    {
+        return $dataTable->render('beginningcredit::initialAccountSub.index');
+    }
 
     public function index(AccountSubDataTable $dataTable, $params)
     {
@@ -34,8 +40,8 @@ class AccountSubController extends Controller
         $data = Account::where('ministry_id', $id)->get();
 
         return view('beginningcredit::accounts.accountSub.create')
-        ->with('account', $data)
-        ->with('params', $params);
+            ->with('account', $data)
+            ->with('params', $params);
     }
 
     public function store(Request $request, $params)
@@ -96,16 +102,16 @@ class AccountSubController extends Controller
         }
     }
 
-    public function edit($params)
+    public function edit($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $account = Account::all();
-        $accountSub = AccountSub::where('id', $id)->first();
+        $module = AccountSub::where('id', $id)->first();
 
-        return view('beginningcredit::accounts.accountSub.edit')->with('accountSub', $accountSub)->with('account', $account)->with('params', $params);
+        return view('beginningcredit::accounts.accountSub.edit')->with('module', $module)->with('account', $account)->with('params', $params);
     }
 
-    public function update(Request $request, $params)
+    public function update(Request $request, $params, $id)
     {
         $request->validate([
             'cboAccountNumber' => ['required'],
@@ -113,7 +119,6 @@ class AccountSubController extends Controller
             'name' => ['required'],
         ]);
 
-        $id = decode_params($params);
         DB::beginTransaction();
         $accountSub = AccountSub::where('id', $id)->first();
 
@@ -147,7 +152,7 @@ class AccountSubController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('accountSub.index', encode_params($accountSub->ministry_id));
+            return redirect()->route('accountSub.index', $params);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -158,13 +163,13 @@ class AccountSubController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('accountSub.index', encode_params($accountSub->ministry_id));
+            return redirect()->route('accountSub.index', $params);
         }
     }
 
-    public function destroy($params)
+    public function destroy($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $accountSub = AccountSub::where('id', $id)->first();
         $accountSub->delete();
 
@@ -174,6 +179,20 @@ class AccountSubController extends Controller
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('accountSub.index', encode_params($accountSub->ministry_id));
+        return redirect()->route('accountSub.index', $params);
+    }
+    public function restore($params, $id)
+    {
+        $asid = decode_params($id);
+
+        AccountSub::withTrashed()->whereKey($asid)->restore();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('accountSub.index', $params);
     }
 }

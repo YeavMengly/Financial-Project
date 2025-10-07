@@ -2,6 +2,7 @@
 
 namespace Modules\BeginningCredit\App\Http\Controllers;
 
+use App\DataTables\AnnualOpen\InitialBudgetMandateDataTable;
 use App\DataTables\BeginMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\AccountSub;
@@ -10,19 +11,57 @@ use App\Models\BeginCredit\BeginCreditMandate;
 use App\Models\BeginCredit\BeginMandate;
 use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetMandate;
+use App\Models\Program;
+use App\Models\ProgramSub;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BeginMandateController extends Controller
 {
+
+    public function getIndex(InitialBudgetMandateDataTable $dataTable)
+    {
+        $module = Ministry::all();
+
+        return $dataTable->render('beginningcredit::initialBudgetMandate.index', ['module' => $module]);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(BeginMandateDataTable $dataTable, $params)
     {
+        $id = decode_params($params);
+        $ministry = Ministry::where('id', $id)->first();
+
+        $module = BeginMandate::query()
+            ->join('account_subs', 'begin_mandates.account_sub_id', '=', 'account_subs.id')
+            ->join('agencies', 'begin_mandates.agency_id', '=', 'agencies.id')
+            ->where('begin_mandates.ministry_id', $id)
+            ->select('begin_mandates.*', 'account_subs.no as account_sub_no', 'agencies.name as agency_name')
+            ->get();
+
         return $dataTable->render('beginningcredit::beginMandate.index', [
+            'ministry' => $ministry,
             'params' => $params,
+            'module' => $module,
         ]);
+    }
+
+    public function getByProgramId(Request $request)
+    {
+        if ($request->program_id) {
+            $data       = ProgramSub::select('id', 'program_id', 'no', 'decription')
+                ->where('program_id', $request->program_id)
+                ->get();
+            $selectedId = $request->selected_id ?? null;
+
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                echo "<option value='{$d->id}' {$selected}>{$d->no}-{$d->decription}</option>";
+            }
+        }
     }
 
     /**
@@ -31,58 +70,127 @@ class BeginMandateController extends Controller
     public function create($params)
     {
         $id = decode_params($params);
-        $ministry = Ministry::findOrFail($id);
-        $subAccount = AccountSub::all();
+        $ministry  = Ministry::where('id', $id)->first();
+        $agency    = Agency::where('ministry_id', $ministry->id)->get();
+        $program   = Program::where('ministry_id', $ministry->id)->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         return view('beginningcredit::beginMandate.create')
-            ->with('subAccount', $subAccount)
+            ->with('ministry', $ministry)
+            ->with('accountSub', $accountSub)
+            ->with('ministry', $ministry)
             ->with('params', $params)
-            ->with('ministry', $ministry);
+            ->with('agency', $agency)
+            ->with('program', $program);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(array $report)
+    public function store(Request $request, $params)
     {
+        $validatedData = $request->validate([
+            'cboProgram'     => 'required',
+            'cboProgramSub'  => 'required',
+            'cboAgency'      => 'required',
+            'cboSubAccount'  => 'required',
+            'no'             => 'required',
+            'fin_law'        => 'required|integer|min:1',
+            'current_loan'   => 'required|integer|min:1',
+            'txtDescription' => 'required|string|max:9999',
+        ]);
+
+        $id = decode_params($params);
+        DB::beginTransaction();
         try {
+            $ministry   = Ministry::where('id', $id)->first();
+            $program    = Program::where('id', $validatedData['cboProgram'])->first();
 
-            DB::transaction(function () use ($report) {
-                foreach ($report['account_subs'] as $subAccount => $data) {
-                    Log::info('Processing Sub Account Key: ' . $subAccount);
-                    Log::info('Data: ' . json_encode($data));
-                    try {
-                        $beginMandate = BeginMandate::updateOrCreate(
-                            [
-                                'account_sub_id' => $subAccount,
-                                'no' => $data['no'],
-                                'ministry_id' => $data['ministry_id'],
-                            ],
-                            [
-                                'agency_id'      => $data['agency_id'],     // ✅ Add this
-                                'program_sub_id'         => $data['program_sub_id'],
-                                'txtDescription' => $data['txtDescription'],
-                                'fin_law' => number_format($data['fin_law'], 2, '.', ''),
-                                'current_loan' => number_format($data['current_loan'], 2, '.', ''),
-                                'new_credit_status' => number_format($data['new_credit_status'], 2, '.', ''),
-                                'apply' => number_format($data['apply'] ?? 0, 2, '.', ''), // Default to 0 if null
-                                'deadline_balance' => number_format($data['deadline_balance'], 2, '.', ''),
-                                'credit' => number_format($data['credit'], 2, '.', ''),
-                                'law_average' => number_format($data['law_average'], 2, '.', ''),
-                                'law_correction' => number_format($data['law_correction'], 2, '.', ''),
-                            ]
-                        );
+            // dd($program->no);
+            $programSub = ProgramSub::where('program_id', $program->id)
+                ->where('id', $validatedData['cboProgramSub'])
+                ->first();
 
-                        $this->recalculateAndSaveReport($beginMandate);
-                    } catch (\Exception $e) {
-                        Log::error("Error storing data mandate for sub_account_key: {$subAccount}, Error: " . $e->getMessage());
-                        throw $e; // Re-throw to ensure rollback if needed
-                    }
-                }
-            });
+            $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
+            $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
+            $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
+            $validatedData['decrease']            = $validatedData['decrease']            ?? 0;
+            $validatedData['editorial']           = $validatedData['editorial']           ?? 0;
+
+            // សរុប =​ កើន + មិនបានគ្រោងទុក + បំពេញបន្ថែម
+            $total_increase   = $validatedData['internal_increase'] +
+                $validatedData['unexpected_increase'] +
+                $validatedData['additional_increase'];
+
+            // ឥណទានថ្មី = ឥណទានបច្ចុប្បន្ន +​ សរុប​ - ថយ - វិចារណកម្ម
+            $new_credit_status = $validatedData['current_loan'] +
+                $total_increase -
+                $validatedData['decrease'] -
+                $validatedData['editorial'];
+
+            $valueNo = $ministry->no . $program->no . $programSub->no . '0' . $validatedData['no'];
+
+            $currentApplyTotal = BudgetMandate::where('no', $valueNo)
+                ->where('account_sub_id', $validatedData['cboSubAccount'])
+                ->where('agency_id', $validatedData['cboAgency'])
+                ->sum('budget');
+
+            $early_balance     = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
+            $deadline_balance  = $early_balance + $currentApplyTotal;
+            $credit            = $new_credit_status - $deadline_balance;
+
+            $law_average   = $validatedData['fin_law']
+                ?  ($deadline_balance / $validatedData['fin_law']) * 100
+                : 0;
+
+            $law_correction = $new_credit_status
+                ? ($deadline_balance / $new_credit_status) * 100
+                : 0;
+
+            $beginCredit = BeginMandate::create([
+                'ministry_id'       => $ministry->id,
+                'agency_id'         => $validatedData['cboAgency'],
+                'program_id'        => $validatedData['cboProgram'],
+                'program_sub_id'    => $validatedData['cboProgramSub'],
+                'chapter_id'        => substr($validatedData['cboSubAccount'], 0, 2),
+                'account_id'        => substr($validatedData['cboSubAccount'], 0, 4),
+                'account_sub_id'    => $validatedData['cboSubAccount'],
+                'no'                => $valueNo,
+                'txtDescription'    => strip_tags($validatedData['txtDescription']),
+                'fin_law'           => $validatedData['fin_law'],
+                'current_loan'      => $validatedData['current_loan'],
+                'new_credit_status' => $new_credit_status,
+                'apply'             => $currentApplyTotal,
+                'deadline_balance'  => $deadline_balance,
+                'early_balance'     => $early_balance,
+                'credit'            => $credit,
+                'law_average'       => $law_average,
+                'law_correction'    => $law_correction,
+            ]);
+
+            $this->ResavedData($beginCredit);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            return redirect()->route('beginMandate.index', $params);
         } catch (\Exception $e) {
-            Log::error('Transaction failed: ' . $e->getMessage());
-            throw $e; // Optionally re-throw to propagate the error
+
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('beginMandate.index', $params);
         }
     }
 
@@ -97,87 +205,180 @@ class BeginMandateController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($params, $id)
     {
-        return view('beginningcredit::edit');
+        $id       = decode_params($id);
+        $ministry = Ministry::where('id', decode_params($params))->first();
+
+        $module = BeginMandate::where('id', $id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        $program     = Program::where('ministry_id', $ministry->id)->get();
+        $programId   = Program::findOrFail($module->program_id);
+        $programSub  = ProgramSub::where('ministry_id', $ministry->id)
+            ->where('program_id', $module->program_id)->get();
+        $agency      = Agency::where('ministry_id', $ministry->id)->get();
+        $accountSub  = AccountSub::where('ministry_id', $ministry->id)->get();
+
+        return view('beginningcredit::beginMandate.edit')
+            ->with('params', $params)
+            ->with('agency', $agency)
+            ->with('program', $program)
+            ->with('programId', $programId)
+            ->with('programSub', $programSub)
+            ->with('accountSub', $accountSub)
+            ->with('module', $module);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(array $report)
+    public function update(Request $request, $params, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'cboProgram'     => 'required',
+            'cboProgramSub'  => 'required',
+            'cboAgency'      => 'required',
+            'cboSubAccount'  => 'required',
+            'no'             => 'required',
+            'fin_law'        => 'required|integer|min:1',
+            'current_loan'   => 'required|integer|min:1',
+            'txtDescription' => 'required|string|max:9999',
+        ]);
+
+        DB::beginTransaction();
         try {
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $program    = Program::findOrFail($validatedData['cboProgram']);
+            $programSub = ProgramSub::where('program_id', $program->id)
+                ->where('id', $validatedData['cboProgramSub'])
+                ->firstOrFail();
 
-            DB::transaction(function () use ($report) {
-                foreach ($report['account_subs'] as $subAccount => $data) {
-                    Log::info('Processing Sub Account Key: ' . $subAccount);
-                    Log::info('Data: ' . json_encode($data));
-                    try {
-                        $beginMandate = BeginMandate::updateOrCreate(
-                            [
-                                'account_sub_id' => $subAccount,
-                                'no' => $data['no'],
-                                'ministry_id' => $data['ministry_id'],
-                            ],
-                            [
-                                'agency_id'      => $data['agency_id'],     // ✅ Add this
-                                'program_sub_id'         => $data['program_sub_id'],
-                                'txtDescription' => $data['txtDescription'],
-                                'fin_law' => number_format($data['fin_law'], 2, '.', ''),
-                                'current_loan' => number_format($data['current_loan'], 2, '.', ''),
-                                'new_credit_status' => number_format($data['new_credit_status'], 2, '.', ''),
-                                'apply' => number_format($data['apply'] ?? 0, 2, '.', ''), // Default to 0 if null
-                                'deadline_balance' => number_format($data['deadline_balance'], 2, '.', ''),
-                                'credit' => number_format($data['credit'], 2, '.', ''),
-                                'law_average' => number_format($data['law_average'], 2, '.', ''),
-                                'law_correction' => number_format($data['law_correction'], 2, '.', ''),
-                            ]
-                        );
 
-                        $this->recalculateAndSaveReport($beginMandate);
-                    } catch (\Exception $e) {
-                        Log::error("Error storing data mandate for sub_account_key: {$subAccount}, Error: " . $e->getMessage());
-                        throw $e; // Re-throw to ensure rollback if needed
-                    }
-                }
-            });
+            $beginCredit = BeginMandate::where('id', $id)
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
+            $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
+            $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
+            $validatedData['decrease']            = $validatedData['decrease']            ?? 0;
+            $validatedData['editorial']           = $validatedData['editorial']           ?? 0;
+
+            // សរុប =​ កើន + មិនបានគ្រោងទុក + បំពេញបន្ថែម
+            $total_increase   = $validatedData['internal_increase'] +
+                $validatedData['unexpected_increase'] +
+                $validatedData['additional_increase'];
+
+            // ឥណទានថ្មី = ឥណទានបច្ចុប្បន្ន +​ សរុប​ - ថយ - វិចារណកម្ម
+            $new_credit_status = $validatedData['current_loan'] +
+                $total_increase -
+                $validatedData['decrease'] -
+                $validatedData['editorial'];
+
+            $valueNo = $ministry->no . $program->no . $programSub->no . '0' . $validatedData['no'];
+
+            $currentApplyTotal = BudgetMandate::where('no', $validatedData['no'])
+                ->where('account_sub_id', $validatedData['cboSubAccount'])
+                ->where('agency_id', $validatedData['cboAgency'])
+                ->sum('budget');
+
+            $early_balance     = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
+            $deadline_balance  = $early_balance + $currentApplyTotal;
+            $credit            = $new_credit_status - $deadline_balance;
+
+            $law_average   = $validatedData['fin_law']
+                ?  ($deadline_balance / $validatedData['fin_law']) * 100
+                : 0;
+
+            $law_correction = $new_credit_status
+                ? ($deadline_balance / $new_credit_status) * 100
+                : 0;
+
+            $beginCredit->update([
+                'agency_id'        => $validatedData['cboAgency'],
+                'program_id'       => $validatedData['cboProgram'],
+                'program_sub_id'   => $validatedData['cboProgramSub'],
+                'chapter_id'       => substr($validatedData['cboSubAccount'], 0, 2),
+                'account_id'       => substr($validatedData['cboSubAccount'], 0, 4),
+                'account_sub_id'   => $validatedData['cboSubAccount'],
+                'no'               => $valueNo,
+                'txtDescription'   => strip_tags($validatedData['txtDescription']),
+                'fin_law'          => $validatedData['fin_law'],
+                'current_loan'     => $validatedData['current_loan'],
+                'new_credit_status' => $new_credit_status,
+                'apply'            => $currentApplyTotal,
+                'deadline_balance' => $deadline_balance,
+                'early_balance'    => $early_balance,
+                'credit'           => $credit,
+                'law_average'      => $law_average,
+                'law_correction'   => $law_correction,
+            ]);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success(
+                    'success_msg',
+                    'successful'
+                )
+                ->flash();
+
+            return redirect()->route('beginMandate.index', $params);
         } catch (\Exception $e) {
-            Log::error('Transaction failed: ' . $e->getMessage());
-            throw $e; // Optionally re-throw to propagate the error
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការធ្វើបច្ចុប្បន្នភាព: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('beginMandate.index', $params);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($params)
+    public function destroy($params, $id)
     {
-        $id = decode_params($params);
-        $beginCredit = BeginMandate::where('id', $id)->first();
+        $id = decode_params($id);
+        $beginCredit = BeginMandate::where('id', $id)
+            ->first();
         $beginCredit->delete();
+
         flash()
             ->translate('en')
             ->option('timeout', 2000)
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('beginMandate.index', ['params' => $params]);
+        return redirect()->route('beginMandate.index', $params);
     }
 
-    private function recalculateAndSaveReport(BeginMandate $data)
+    private function ResavedData(BeginMandate $data)
     {
         $newApplyTotal = BudgetMandate::where('no', $data->no)
+            ->where('account_sub_id', $data->account_sub_id)
+            ->where('agency_id', $data->agency_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
-        $data->apply = $newApplyTotal;
-        $credit = $data->new_credit_status - $data->deadline_balance;
-        $data->credit = $credit;
+
+        $data->apply            = $newApplyTotal;
         $data->deadline_balance = $data->early_balance + $data->apply;
-        $data->credit = $data->new_credit_status - $data->deadline_balance;
-        $data->law_average = $data->deadline_balance > 0 ? ($data->deadline_balance / $data->fin_law) * 100 : 0;
-        $data->law_correction =  $data->deadline_balance > 0 ? ($data->deadline_balance /  $data->new_credit_status) * 100 : 0;
+        $data->credit           = $data->new_credit_status - $data->deadline_balance;
+
+        $data->law_average      = $data->deadline_balance > 0
+            ? ($data->deadline_balance / $data->fin_law) * 100 : 0;
+
+        $data->law_correction   = $data->deadline_balance > 0
+            ? ($data->deadline_balance / $data->new_credit_status) * 100 : 0;
+
         $data->save();
     }
 }

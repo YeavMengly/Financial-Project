@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('ministries', function (Blueprint $table) {
             $table->id();
-
             $table->integer('no');
             $table->string('year')->unique();
             $table->string('title');
             $table->string('refer');
             $table->string('name');
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

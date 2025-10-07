@@ -4,6 +4,7 @@ namespace App\DataTables;
 
 use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\SubAccount;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
@@ -23,14 +24,14 @@ class AccountSubDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        // return (new EloquentDataTable($query))
-        //     ->addColumn('action', 'subaccount.action')
-        //     ->setRowId('id');
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
+            })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::accounts.accountSub.action', ['module' => $module]);
@@ -47,19 +48,20 @@ class AccountSubDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
-            ->leftJoin('accounts', 'account_subs.account_id', '=', 'accounts.id')
 
+        $model = $model->newQuery();
+        $model->withTrashed();
+        $query = $model->newQuery()
+            // ->leftJoin('accounts', 'account_subs.account_id', '=', 'accounts.id')
             ->select([
                 'account_subs.id',
                 'account_subs.ministry_id',
-                // 'account_subs.account_id as CNA',
-                'accounts.no as CNA',
+                'account_subs.account_id as CNA',
                 'account_subs.no as SNA',
                 'account_subs.name',
                 'account_subs.deleted_at',
             ])
-            ->orderBy('account_subs.created_at', 'DESC');
+            ->orderBy('account_subs.created_at', 'ASC');
 
         $query->where('account_subs.ministry_id', $id);
         if ($request->filled('no')) {
@@ -99,11 +101,11 @@ class AccountSubDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
             Column::make('CNA')->title(__('tables.th.account'))->addClass('align-middle'),
             Column::make('SNA')->title(__('tables.th.sub.account'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.name'))->addClass('align-middle'),
-
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

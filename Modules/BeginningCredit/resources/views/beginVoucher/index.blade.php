@@ -15,15 +15,17 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
-                    {{ __('menus.begin.vouchers') }}
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"> {{ __('menus.credit') }}</li>
+                        <li class="breadcrumb-item">{{ __('menus.initial.voucher') }}</li>
+                    </ol>
                 </h4>
-
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $data->year }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item active">{{ $ministry->name }}</li>
                         </ol>
                     </div>
                 </div>
@@ -35,52 +37,41 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
-                        <!-- Agency -->
+                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
                         <div class="col-sm-3">
                             <select class="form-control" name="agency" id="agency">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($module as $mdl)
-                                    <option value="{{ $mdl->agency_id }}"
-                                        {{ request('agency') == $mdl->agency_id ? 'selected' : '' }}>
-                                        {{ $mdl->agency_name }}
+                                @foreach ($agency as $ag)
+                                    <option value="{{ $ag->id }}"
+                                        {{ request('agency') == $ag->id ? 'selected' : '' }}>
+                                        {{ $ag->no }} - {{ $ag->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <!-- Account Sub -->
                         <div class="col-sm-3">
                             <select class="form-control" name="accountSub" id="accountSub">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($module as $mdl)
-                                    <option value="{{ $mdl->account_sub_id }}"
-                                        {{ request('accountSub') == $mdl->account_sub_id ? 'selected' : '' }}>
-                                        {{ $mdl->account_sub_no }}
+                                @foreach ($accountSub as $as)
+                                    <option value="{{ $as->no }}"
+                                        {{ request('accountSub') == $as->id ? 'selected' : '' }}>
+                                        {{ $as->no }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <!-- Program -->
                         <div class="col-sm-3">
-                            <select class="form-control" name="program" id="program">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($module as $mdl)
-                                    <option value="{{ $mdl->id }}" {{ request('no') == $mdl->no ? 'selected' : '' }}>
-                                        {{ $mdl->no }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="text" class="form-control" name="no" value="{{ request('no') }}"
+                                placeholder="{{ __('menus.cluster') }}" />
                         </div>
 
-                        <!-- Description -->
                         <div class="col-sm-3">
                             <input type="text" class="form-control" name="txtDescription"
                                 value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
                         </div>
 
-                        <!-- Buttons -->
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                             <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
@@ -88,6 +79,7 @@
                             </a>
                         </div>
                     </form>
+
                 </div>
             </div>
         </div>
@@ -156,10 +148,7 @@
     </script>
     {!! $dataTable->scripts() !!}
 
-    <!-- Choices.js (dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
-    <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const agencyNumber = document.getElementById('agency');

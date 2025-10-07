@@ -2,11 +2,12 @@
 
 namespace App\Models\BeginCredit;
 
-use App\Models\ProgramSub;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Jenssegers\Agent\Agent;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Agency extends Model
@@ -21,6 +22,17 @@ class Agency extends Model
         'nick_name'
     ];
 
+    // 🔹 Relationships
+    public function ministry()
+    {
+        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
+    }
+
+    public function beginVoucher()
+    {
+        return $this->hasMany(BeginVoucher::class, 'agency_id', 'id');
+    }
+
     /**
      * Configure activity log options
      */
@@ -34,24 +46,22 @@ class Agency extends Model
                 'name',
                 'nick_name',
             ])
-            ->useLogName('agency') // log group name
-            ->logOnlyDirty()       // only log changed attributes
-            ->dontSubmitEmptyLogs(); // ignore empty logs
+            ->useLogName('agency')
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 
-    // 🔹 Relationships
-    public function ministry()
+    public function tapActivity(Activity $activity)
     {
-        return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
-    }
-
-    public function beginVoucher()
-    {
-        return $this->hasMany(BeginVoucher::class, 'agency_id', 'id');
-    }
-
-    public function beginMandate()
-    {
-        return $this->hasMany(BeginMandate::class);
+        $agent = new Agent();
+        $activity->default_field    = "{$this->name} ";
+        $activity->log_name         = trans('agency');
+        $platform = $agent->platform();
+        $browser = $agent->browser();
+        $activity->ip_address = request()->ip();
+        $activity->platform = $platform;
+        $activity->device = $agent->device();
+        $activity->browser_version = $agent->version($browser);
+        $activity->browser = $browser;
     }
 }

@@ -2,13 +2,15 @@
 
 namespace App\DataTables\Budget;
 
-use App\Models\BeginCredit\InitialBudget;
 use App\Models\BudgetPlan\BudgetVoucher;
-use App\Models\BudgetPlan\InitialVoucher;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
+use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
+use Illuminate\Http\Request;
+use Yajra\DataTables\Html\Editor\Editor;
+use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class BudgetVoucherDataTable extends DataTable
@@ -22,6 +24,12 @@ class BudgetVoucherDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('agency', function ($row) {
+                return $row->agency_no . ' - ' . $row->agency_name;
+            })
+            ->editColumn('budget', function ($row) {
+                return number_format($row->budget ?? 0);
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
@@ -30,7 +38,7 @@ class BudgetVoucherDataTable extends DataTable
                 return $row->task_name ?? '-';
             })
             ->addColumn('action', function ($module) {
-                return view('budgetplan::voucher.action', ['module' => $module]);
+                return view('budgetplan::budgetVoucher.action', ['module' => $module]);
             })
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
@@ -59,67 +67,31 @@ class BudgetVoucherDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(BudgetVoucher $model): QueryBuilder
+    public function query(BudgetVoucher $model, Request $request): QueryBuilder
     {
-        $year = null;
-
-        if ($id = request('year')) {
-            $initial = InitialBudget::find($id);
-            if ($initial) {
-                $year = $initial->id;
-            }
-        }
+        $params = $request->params;
+        $id = decode_params($params);
 
         $query = $model->newQuery()
-            ->leftJoin('task_types', 'budget_vouchers.task_type', '=', 'task_types.task')
+            ->leftJoin('account_subs', 'budget_vouchers.account_sub_id', '=', 'account_subs.no')
+            ->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id')
+            ->leftJoin('task_types', 'budget_vouchers.task_type', '=', 'task_types.id')
             ->select([
                 'budget_vouchers.id',
-                'budget_vouchers.subAccountNumber as CNA',
-                'budget_vouchers.program as SNA',
-                'budget_vouchers.budget',
-                'budget_vouchers.task_type',
-                'task_types.task AS task_name',
+                'budget_vouchers.ministry_id',
+                'agencies.no AS agency_no',
+                'agencies.name AS agency_name',
+                'account_subs.no as account_sub_no',
+                'budget_vouchers.no',
                 'budget_vouchers.txtDescription',
+                'budget_vouchers.budget',
+                'task_types.name AS t_name',
                 'budget_vouchers.attachments',
                 'budget_vouchers.date',
-                'budget_vouchers.year',
-            ]);
+            ])
+            ->where('budget_vouchers.ministry_id', $id);
 
-        // Year filter
-        if ($year) {
-            $query->where('budget_vouchers.year', $year);
-        }
-
-        // subAccountNumber
-        if (request()->filled('subAccountNumber')) {
-            $query->where('budget_vouchers.subAccountNumber', request('subAccountNumber'));
-        }
-
-        // program
-        if (request()->filled('program')) {
-            $query->where('budget_vouchers.program', request('program'));
-        }
-
-        // task_type (compared by string task name)
-        if (request()->filled('task_type')) {
-            $query->where('budget_vouchers.task_type', request('task_type'));
-        }
-
-        // description
-        if (request()->filled('description')) {
-            $query->where('budget_vouchers.txtDescription', 'like', '%' . request('description') . '%');
-        }
-
-        // date range
-        if (request()->filled('start_date') && request()->filled('end_date')) {
-            $query->whereBetween('budget_vouchers.date', [request('start_date'), request('end_date')]);
-        } elseif (request()->filled('start_date')) {
-            $query->whereDate('budget_vouchers.date', '>=', request('start_date'));
-        } elseif (request()->filled('end_date')) {
-            $query->whereDate('budget_vouchers.date', '<=', request('end_date'));
-        }
-
-        return $query->orderByDesc('budget_vouchers.created_at');
+        return $query;
     }
 
     /**
@@ -147,11 +119,15 @@ class BudgetVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('CNA')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
-            Column::make('SNA')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
+            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+
+            Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
+
+            Column::make('t_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            Column::make('task_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
+
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 
@@ -159,6 +135,7 @@ class BudgetVoucherDataTable extends DataTable
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];
     }
+
 
     /**
      * Get the filename for export.

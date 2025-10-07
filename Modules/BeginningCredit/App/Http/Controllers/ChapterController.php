@@ -2,6 +2,7 @@
 
 namespace Modules\BeginningCredit\App\Http\Controllers;
 
+use App\DataTables\AnnualOpen\InitialChapterDataTable;
 use App\DataTables\ChapterDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Ministry;
@@ -13,17 +14,26 @@ use Illuminate\Support\Facades\DB;
 
 class ChapterController extends Controller
 {
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function getIndex(InitialChapterDataTable $dataTable)
+    {
+        return $dataTable->render('beginningcredit::initialChapter.index');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(ChapterDataTable $dataTable, $params)
     {
         $id  = decode_params($params);
-        $data = Ministry::where('id', $id)->first();
+        $module = Ministry::where('id', $id)->first();
 
         return $dataTable->render('beginningcredit::chapters.index', [
             'params' => $params,
-            'data' => $data
+            'module' => $module
         ]);
     }
 
@@ -85,29 +95,27 @@ class ChapterController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($params)
+    public function edit($params, $id)
     {
-        $id = decode_params($params);
-        $data = Chapter::where('id', $id)->first();
+        $id = decode_params($id);
+        $module = Chapter::where('id', $id)->first();
 
         return view('beginningcredit::chapters.edit')
-            ->with('data', $data)
+            ->with('module', $module)
             ->with('params', $params);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $params)
+    public function update(Request $request, $params, $id)
     {
         $request->validate([
             'no' => 'required',
             'name' => 'required',
         ]);
 
-        $id  = decode_params($params);
         $chapter = Chapter::where('id', $id)->first();
-
         $chapter->update([
             'no' => $request->no,
             'name' => $request->name,
@@ -119,15 +127,15 @@ class ChapterController extends Controller
             ->success('success_msg', 'successful')
             ->flash();
 
-        return redirect()->route('chapters.index', encode_params($chapter->ministry_id));
+        return redirect()->route('chapters.index', $params);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($params)
+    public function destroy($params, $id)
     {
-        $id = decode_params($params);
+        $id = decode_params($id);
         $chapter = Chapter::where('id', $id)->first();
         $chapter->delete();
 
@@ -137,6 +145,21 @@ class ChapterController extends Controller
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('chapters.index', encode_params($chapter->ministry_id));
+        return redirect()->route('chapters.index', $params);
+    }
+
+    public function restore($params, $id)
+    {
+        $pid = decode_params($id);
+
+        Chapter::withTrashed()->whereKey($pid)->restore();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('chapters.index', $params);
     }
 }

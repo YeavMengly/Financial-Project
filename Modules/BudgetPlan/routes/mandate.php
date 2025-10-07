@@ -1,25 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// routes
 use Modules\BudgetPlan\App\Http\Controllers\BudgetMandateController;
 
-Route::middleware('PermissionCheck')->controller(BudgetMandateController::class)->group(function () {
-    Route::get('/initial-mandate/{params}/mandate', 'index')->name('budget-mandate.index');
-    Route::get('/initial-mandate/{params}/mandate/create', 'create')->name('budget-mandate.create');
-    Route::get('/mandate/destroy/{params}', 'destroy')->name('budget-mandate.destroy');
+Route::middleware('PermissionCheck')
+    ->controller(BudgetMandateController::class)
+    ->group(function () {
+        Route::get('mandate/', 'getIndex')->name('initialMandate.index');
+        Route::get('mandate/{params}', 'index')->name('budgetMandate.index');
+        Route::get('mandate/{params}/create', 'create')->name('budgetMandate.create');
+        Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');
+        Route::get('mandate/{params}/destroy/{id}', 'destroy')->name('budgetMandate.destroy');
 
-    // Error
-    Route::get('/initial-mandate/{params}/mandate/edit', 'edit')->name('budget-mandate.edit');
-});
+        // JSON numbers endpoint
+        Route::get('Mandate/{params}/early-balance', 'getEarlyBalance')
+            ->name('budgetMandate.getEarlyBalance');
+    });
 
 Route::controller(BudgetMandateController::class)->group(function () {
-    Route::post('initial-voucher/{params}/mandate/store', 'store')->name('budget-mandate.store');
-    Route::get('/mandate/restore/{params}', 'restore')->name('budget-mandate.restore');
-    Route::get('/mandate/create/{subAccountId}/{programCode}/early-balance', 'getEarlyBalance')
-        ->name('budget-mandate.getEarlyBalance');
-    Route::get('/mandate/edit/{subAccountId}/{programCode}/early-balance', 'getEarlyBalance')
-        ->name('budget-mandate.getEarlyBalance');
-
-    // Error
-    Route::post('/mandate/update/{params}', 'update')->name('budget-mandate.update');
+    Route::post('mandate/{params}/store', 'store')->name('budgetMandate.store');
+    Route::post('mandate/{params}/update/{id}', 'update')->name('budgetMandate.update');
 });
