@@ -31,7 +31,7 @@ class InitialChapterDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::initialChapter.action', ['module' => $module]);
+                return view('beginningcredit::chapters.initialChapter.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

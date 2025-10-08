@@ -62,9 +62,6 @@ class VoucherDataTable extends DataTable
      */
     public function query(BudgetVoucher $model,  Request $request): QueryBuilder
     {
-        // $params = $request->params;
-        // $id = decode_params($params);
-
         return $model->newQuery();
     }
 

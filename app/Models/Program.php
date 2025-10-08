@@ -14,20 +14,45 @@ use Spatie\Activitylog\Models\Activity;
 class Program extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
+
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'ministry_id',
         'no',
         'title'
     ];
-    public function ministries()
+
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the ministry this program belongs to.
+     */
+    public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
+
+    /**
+     * Get the programSub under this program.
+     */
     public function programSub()
     {
         return $this->hasMany(ProgramSub::class, 'program_id', 'id');
     }
 
+    /* -----------------------------------------------------------------
+     |  Activity Log Configuration
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Configure the activity log options.
+     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -38,6 +63,9 @@ class Program extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
     }
 
+    /**
+     * Customize the activity log fields.
+     */
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();

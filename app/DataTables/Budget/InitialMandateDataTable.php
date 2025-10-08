@@ -80,10 +80,12 @@ class InitialMandateDataTable extends DataTable
                 'DT_RowIndex',
                 __('tables.th.no')
             )->width(30)->addClass('text-center align-middle')->orderable(false),
+            
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
+
             Column::computed(
                 'action',
                 __('tables.th.action')

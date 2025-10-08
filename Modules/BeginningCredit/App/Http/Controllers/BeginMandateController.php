@@ -24,7 +24,7 @@ class BeginMandateController extends Controller
     {
         $module = Ministry::all();
 
-        return $dataTable->render('beginningcredit::initialBudgetMandate.index', ['module' => $module]);
+        return $dataTable->render('beginningcredit::beginMandate.initialBudgetMandate.index', ['module' => $module]);
     }
 
     /**

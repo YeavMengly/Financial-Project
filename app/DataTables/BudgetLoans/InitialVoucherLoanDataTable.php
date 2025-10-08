@@ -2,16 +2,12 @@
 
 namespace App\DataTables\BudgetLoans;
 
-use App\Models\BeginCredit\InitialBudget;
+
 use App\Models\BeginCredit\Ministry;
-use App\Models\InitialVoucherLoan;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class InitialVoucherLoanDataTable extends DataTable
@@ -80,10 +76,12 @@ class InitialVoucherLoanDataTable extends DataTable
                 'DT_RowIndex',
                 __('tables.th.no')
             )->width(30)->addClass('text-center align-middle')->orderable(false),
+
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
+            
             Column::computed(
                 'action',
                 __('tables.th.action')

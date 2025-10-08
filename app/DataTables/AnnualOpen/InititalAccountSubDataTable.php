@@ -30,7 +30,7 @@ class InititalAccountSubDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::initialAccountSub.action', ['module' => $module]);
+                return view('beginningcredit::accounts.accountSub.initialAccountSub.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

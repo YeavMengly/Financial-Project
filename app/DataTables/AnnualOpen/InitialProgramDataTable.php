@@ -28,7 +28,7 @@ class InitialProgramDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::initialProgram.action', ['module' => $module]);
+                return view('beginningcredit::program.initialProgram.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

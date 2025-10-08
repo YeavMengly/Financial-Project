@@ -13,6 +13,9 @@ class BudgetMandate extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'ministry_id',
         'agency_id',
@@ -30,15 +33,30 @@ class BudgetMandate extends Model
         'date'        => 'date',
     ];
 
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the taskType this budgetMandate belongs to.
+     */
     public function taskType()
     {
         return $this->belongsTo(TaskType::class, 'task_type', 'task');
     }
 
-    public function ministries()
+    /**
+     * Get the ministry this budgetMandate belongs to.
+     */
+    public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
+
+    /**
+     * Get the accountSub this budgetMandate belongs to.
+     */
     public function accountSub()
     {
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');

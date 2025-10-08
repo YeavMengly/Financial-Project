@@ -5,6 +5,7 @@ namespace App\Models\BeginCredit;
 use App\Models\Loans\BudgetMandateLoan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\LogOptions;
 use Jenssegers\Agent\Agent;
@@ -12,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class BeginMandate extends Model
 {
-    use HasFactory;
+       use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'ministry_id',
@@ -35,30 +36,50 @@ class BeginMandate extends Model
         'law_average',
         'law_correction',
     ];
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
     /**
-     * Relationship to SubAccount
+     * Get the accountSub this beginMandate belongs to.
      */
     public function accountSub()
     {
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
-    public function ministries()
+    /**
+     * Get the ministry this beginMandate belongs to.
+     */
+    public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
+
+    /**
+     * Get the agency this beginMandate belongs to.
+     */
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id', 'id');
     }
 
-    public function loans()
-    {
-        return $this->belongsTo(BudgetMandateLoan::class, 'account_sub_id', 'id');
-    }
+    /**
+     * Get the loans this beginMandate belongs to.
+     */
+    // public function loans()
+    // {
+    //     return $this->belongsTo(BudgetMandateLoan::class, 'account_sub_id', 'id');
+    // }
+
+    /* -----------------------------------------------------------------
+     |  Activity Log Configuration
+     | -----------------------------------------------------------------
+     */
 
     /**
-     * Spatie Log Options
+     * Configure the activity log options.
      */
     public function getActivitylogOptions(): LogOptions
     {
@@ -88,7 +109,7 @@ class BeginMandate extends Model
     }
 
     /**
-     * Additional metadata for activity logs
+     * Customize the activity log fields.
      */
     public function tapActivity(Activity $activity)
     {

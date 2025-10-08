@@ -35,13 +35,6 @@ return new class extends Migration
                 'delete' => 'ministries.destroy',
             ],
 
-            'begin.vouchers'                  => [
-                'view'   => 'beginVoucher.index',
-                'create' => 'beginVoucher.create',
-                'edit'   => 'beginVoucher.edit',
-                'delete' => 'beginVoucher.destroy',
-            ],
-
             'categories'                  => [
                 'view'   => 'category.index',
                 'create' => 'category.create',
@@ -97,9 +90,59 @@ return new class extends Migration
                 'delete' => 'agency.destroy',
             ],
 
+            //  For Stock Budget
 
+            'begin.vouchers'                  => [
+                'show'   => 'initialBudgetVoucher.index',
+                'view'   => 'beginVoucher.index',
+                'create' => 'beginVoucher.create',
+                'edit'   => 'beginVoucher.edit',
+                'delete' => 'beginVoucher.destroy',
+            ],
 
+            'begin.mandates'                  => [
+                'show'   => 'initialBudgetMandate.index',
+                'view'   => 'beginMandate.index',
+                'create' => 'beginMandate.create',
+                'edit'   => 'beginMandate.edit',
+                'delete' => 'beginMandate.destroy',
+            ],
 
+            // For Budget Payments
+
+            'payment.voucher'                  => [
+                'show'   => 'initialVoucher.index',
+                'view'   => 'budgetVoucher.index',
+                'create' => 'budgetVoucher.create',
+                'edit'   => 'budgetVoucher.edit',
+                'delete' => 'budgetVoucher.destroy',
+            ],
+
+            'payment.mandate'                  => [
+                'show'   => 'initialMandate.index',
+                'view'   => 'budgetMandate.index',
+                'create' => 'budgetMandate.create',
+                'edit'   => 'budgetMandate.edit',
+                'delete' => 'budgetMandate.destroy',
+            ],
+
+            // For Budget Transfer
+
+            'transfer.voucher'                  => [
+                'show'   => 'voucherLoan.index',
+                'view'   => 'voucher.index',
+                'create' => 'voucher.create',
+                'edit'   => 'voucher.edit',
+                'delete' => 'voucher.destroy',
+            ],
+
+            'transfer.mandate'                  => [
+                'show'   => 'mandateLoan.index',
+                'view'   => 'mandate.index',
+                'create' => 'mandate.create',
+                'edit'   => 'mandate.edit',
+                'delete' => 'mandate.destroy',
+            ],
         ];
 
         $admin_permission = [];

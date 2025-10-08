@@ -30,7 +30,7 @@ class InitialBudgetVoucherDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($model) {
-                return view('beginningcredit::initialBudgetVoucher.action', ['module' => $model]);
+                return view('beginningcredit::beginVoucher.initialBudgetVoucher.action', ['module' => $model]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

@@ -208,32 +208,6 @@
 
                     </div>
                 </div>
-                {{-- <div class="card-body">
-                    <table class="table table-bordered text-center align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>{{ __('tables.th.fin_law') }}</th>
-                                <th>{{ __('tables.th.credit_movement') }}</th>
-                                <th>{{ __('tables.th.new_credit_status') }}</th>
-                                <th>{{ __('tables.th.credit') }}</th>
-                                <th>{{ __('tables.th.deadline_balance') }}</th>
-                                <th>{{ __('tables.th.applying') }}</th>
-                                <th>{{ __('tables.th.remaining_credit') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><span id="fin_law">0</span></td>
-                                <td><span id="credit_movement">0</span></td>
-                                <td><span id="new_credit_status">0</span></td>
-                                <td><span id="credit">0</span></td>
-                                <td><span id="deadline_balance">0</span></td>
-                                <td><span id="applying">0</span></td>
-                                <td><span id="remaining_credit">0</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div> --}}
             </div>
         </div>
     </div>

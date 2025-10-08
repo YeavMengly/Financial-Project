@@ -10,7 +10,7 @@
                         <span data-key="t-dashboard">{{ __('menus.dashboard') }}</span>
                     </a>
                 </li>
-                {{-- Editing --}}
+
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="credit-card"></i>
@@ -27,9 +27,7 @@
                                 </a>
                             </li>
                         @endif
-                        {{-- End initial budget --}}
 
-                        {{-- Start initial budget Mandate --}}
                         @if (hasPermission('ministries.index'))
                             <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
                                 <a href="{{ route('initialBudgetMandate.index') }}"
@@ -39,13 +37,9 @@
                                 </a>
                             </li>
                         @endif
-                        {{-- End initial budget Mandate --}}
                     </ul>
                 </li>
 
-
-
-                {{-- ========= Start Budget Plan ========= --}}
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="sliders"></i>
@@ -73,9 +67,7 @@
                         @endif
                     </ul>
                 </li>
-                {{-- ========= End Budget Plan ========= --}}
 
-                {{-- ========= Start Budget Control ========= --}}
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="pie-chart"></i>
@@ -94,7 +86,7 @@
                             </li>
                         @endif
 
-                        {{-- @if (hasPermission('ministries.index'))
+                        @if (hasPermission('ministries.index'))
                             <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
                                 <a href="{{ route('mandateLoan.index') }}"
                                     class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
@@ -102,7 +94,7 @@
                                     <span data-key="t-dashboard">{{ __('menus.initial.mandate') }}</span>
                                 </a>
                             </li>
-                        @endif --}}
+                        @endif
                     </ul>
                 </li>
                 {{-- ========= End Budget Control ========= --}}
@@ -123,12 +115,7 @@
                         <i data-feather="zap"></i>
                         <span data-key="t-pages">{{ __('menus.check.control.general') }}</span>
                     </a>
-
-
                 </li>
-
-
-
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
@@ -146,7 +133,6 @@
                                 </a>
                             </li>
                         @endif
-
 
                         @if (hasPermission('ministries.index'))
                             <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
@@ -199,7 +185,6 @@
                         @endif
                     </ul>
                 </li>
-
 
                 @if (auth()->user()->role_id == 1)
                     <li class="menu-title" data-key="t-setting">{{ __('menus.setting') }}</li>

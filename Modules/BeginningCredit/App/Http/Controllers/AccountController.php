@@ -16,7 +16,7 @@ class AccountController extends Controller
 {
     public function getIndex(InitialAccountDataTable $dataTable)
     {
-        return $dataTable->render('beginningcredit::initialAccount.index');
+        return $dataTable->render('beginningcredit::accounts.initialAccount.index');
     }
 
     /**
@@ -191,6 +191,10 @@ class AccountController extends Controller
 
         return redirect()->route('accounts.index', encode_params($account->ministry_id));
     }
+
+     /**
+     * Restore the specified resource from storage.
+     */
     public function restore($params, $id)
     {
         $aid = decode_params($id);

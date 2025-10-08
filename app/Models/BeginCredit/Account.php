@@ -66,10 +66,10 @@ class Account extends Model
     {
         return LogOptions::defaults()
             ->useLogName(trans('menus.beginningcredit.accounts'))
-            ->logOnly(['chapter_id', 'no', 'name'])
+            ->logOnly(['ministry_id', 'chapter_id', 'no', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName) => __("Event: :event", ['event' => $eventName]));
+            ->setDescriptionForEvent(fn(string $eventName) => __("Event: :event", ['event' => $eventName]));
     }
 
     /**

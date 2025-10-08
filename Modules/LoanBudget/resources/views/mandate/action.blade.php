@@ -14,11 +14,6 @@
                     <a href="#" onclick="confirm('{{ route('mandate.destroy', encode_params($module->id)) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
                 @endif
-            @else
-                @if (hasPermission('mandate.destroy'))
-                    <a href="#" onclick="confirm('{{ route('mandate.restore', encode_params($module->id)) }}', 2)"
-                        class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
-                @endif
             @endif
         </ul>
     </div>

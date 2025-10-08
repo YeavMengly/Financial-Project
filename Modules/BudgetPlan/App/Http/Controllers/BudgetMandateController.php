@@ -7,7 +7,6 @@ use App\DataTables\Budget\InitialMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\Agency;
-use App\Models\BeginCredit\BeginCreditMandate;
 use App\Models\BeginCredit\BeginMandate;
 use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetMandate;
@@ -22,9 +21,9 @@ class BudgetMandateController extends Controller
 {
     public function getIndex(InitialMandateDataTable $dataTable)
     {
-        // $initialVoucher = Ministry::all();
         return $dataTable->render('budgetplan::initialMandate.index');
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -56,7 +55,6 @@ class BudgetMandateController extends Controller
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $taskType = TaskType::all();
-
         $beginMandate = BeginMandate::select(
             'begin_mandates.id',
             'begin_mandates.no as mandate_no',
@@ -165,10 +163,9 @@ class BudgetMandateController extends Controller
                         ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')
                         ->flash();
 
-                    return back(); // redirect back so it shows in the view
+                    return back();
                 }
 
-                // store attachments
                 $stored = [];
                 if ($request->hasFile('attachments')) {
                     foreach ($request->file('attachments') as $file) {
@@ -185,7 +182,7 @@ class BudgetMandateController extends Controller
                     'no'             => $validated['no'],
                     'txtDescription' => strip_tags($validated['txtDescription']),
                     'budget'         => $applyValue,
-                    'task_type'      => $validated['task_type'], // make sure this matches your column name
+                    'task_type'      => $validated['task_type'],
                     'attachments'    => json_encode($stored),
                     'date'           => $validated['date'],
                 ]);
@@ -200,7 +197,6 @@ class BudgetMandateController extends Controller
                 $beginMandate->apply = $lastVoucher?->budget ?? 0;
                 $beginMandate->save();
             });
-
 
             flash()
                 ->translate('en')
@@ -283,7 +279,7 @@ class BudgetMandateController extends Controller
         try {
             $ministry = Ministry::where('id', decode_params($params))->first();
             $mandate = BudgetMandate::where('id', $id)
-                ->where('ministry_id', $ministry->id)->first(); // ✅ correct
+                ->where('ministry_id', $ministry->id)->first();
 
             $beginCredit = BeginMandate::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
@@ -292,17 +288,23 @@ class BudgetMandateController extends Controller
                 ->first();
 
             if (!$beginCredit) {
-                throw new \Exception('មិនមាន អនុគណនី ឬកូដកម្មវិធី។');
+                flash()->translate('en')->option('timeout', 2000)
+                    ->error('មិនមានទិន្ន័យ', 'បញ្ហា')->flash();
+                return back()->withInput();
             }
 
             $applyValue = $validated['budget'];
             $remainingCredit = $beginCredit->credit - $applyValue;
 
             if ($remainingCredit < 0) {
-                throw new \Exception('ឥណទានមិនអាចតិចជាងសូន្យ។');
-            }
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')
+                    ->flash();
 
-            // Handle attachments
+                return back();
+            }
             $storedFilePaths = json_decode($voucher->attachments ?? '[]', true);
 
             if ($request->hasFile('attachments')) {
@@ -402,45 +404,6 @@ class BudgetMandateController extends Controller
         return redirect()->route('budgetMandate.index', $params);
     }
 
-    // public function getEarlyBalance(Request $request, $params)
-    // {
-    //     $ministryId = decode_params($params);
-
-    //     $request->validate([
-    //         'account_sub_id' => 'required',
-    //         'no'             => 'required'
-    //     ]);
-
-    //     $beginMandate = BeginMandate::with('loans')
-    //         ->where('ministry_id', $ministryId)
-    //         ->where('account_sub_id', $request->account_sub_id)
-    //         ->where('no', $request->no)
-    //         ->first();
-
-    //     if (!$beginMandate) {
-    //         return response()->json([
-    //             'fin_law'            => 0,
-    //             'credit_movement'    => 0,
-    //             'new_credit_status'  => 0,
-    //             'credit'             => 0,
-    //             'deadline_balance'   => 0,
-    //             'exists'             => false,
-    //         ]);
-    //     }
-
-    //     $loan = $beginMandate->loans;
-    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
-
-    //     return response()->json([
-    //         'fin_law'            => (float) ($beginMandate->fin_law ?? 0),
-    //         'credit_movement'    => (float) $credit_movement,
-    //         'new_credit_status'  => (float) ($beginMandate->new_credit_status ?? 0),
-    //         'credit'             => (float) ($beginMandate->credit ?? 0),
-    //         'deadline_balance'   => (float) ($beginMandate->deadline_balance ?? 0),
-    //         'exists'             => true,
-    //     ]);
-    // }
-
     private function recalculateAndSaveReport(BeginMandate $beginMandate)
     {
         $newApplyTotal = BudgetMandate::where('no', $beginMandate->no)
@@ -448,7 +411,7 @@ class BudgetMandateController extends Controller
             ->where('agency_id', $beginMandate->agency_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
-            // dd($newApplyTotal);
+        // dd($newApplyTotal);
 
 
         $beginMandate->early_balance = $this->calculateEarlyBalance($beginMandate);

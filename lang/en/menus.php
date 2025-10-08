@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     'dashboard' => 'ទំព័រដើម',
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
@@ -10,6 +10,7 @@ return [
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
+    'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
 
     'cluster' => 'ចង្កោម',
     'chapters' => 'ជំពូក',
@@ -33,6 +34,15 @@ return [
     'budget.control.mandate' => 'អាណត្តិ',
     'voucher' => 'សលាកបត្រ',
     'mandate' => 'អាណត្តិ',
+
+    'begin.vouchers' => 'កំណត់ឥណទានសលាកបត្រដើមឆ្នាំ',
+    'begin.mandates' => 'កំណត់ឥណទានអាណត្តិដើមឆ្នាំ',
+
+    'payment.voucher' => 'ចុះបញ្ជីសលាកបត្រ',
+    'payment.mandate' => 'ចុះបញ្ជីអាណត្តិ',
+
+    'transfer.voucher' => 'និយ័តថវិកាសលាកបត្រ',
+    'transfer.mandate' => 'និយ័តថវិកាអាណត្តិ',
 
     'check.control.general'   => 'ពិនិត្យរបាយការណ៍',
     'check.control.guarantee' => 'ធានាចំណាយ',

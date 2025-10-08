@@ -15,6 +15,10 @@ use Spatie\Activitylog\Models\Activity;
 class Ministry extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
+
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'no',
         'year',
@@ -23,31 +27,59 @@ class Ministry extends Model
         'name'
     ];
 
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the beginVoucher under this ministry.
+     */
     public function beginVoucher()
     {
         return $this->hasMany(BeginVoucher::class, 'ministry_id', 'id');
     }
 
+    /**
+     * Get the agency under this ministry.
+     */
     public function agency()
     {
         return $this->hasMany(Agency::class, 'ministry_id', 'id');
     }
 
+    /**
+     * Get the chapters under this ministry.
+     */
     public function chapters()
     {
         return $this->hasMany(Chapter::class, 'ministry_id', 'id');
     }
 
+    /**
+     * Get the accounts under this ministry.
+     */
     public function accounts()
     {
         return $this->hasMany(Account::class, 'ministry_id', 'id');
     }
 
+    /**
+     * Get the program under this ministry.
+     */
     public function program()
     {
         return $this->hasMany(Program::class, 'ministry_id', 'id');
     }
 
+    /* -----------------------------------------------------------------
+     |  Activity Log Configuration
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Configure the activity log options.
+     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -58,6 +90,9 @@ class Ministry extends Model
             ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
     }
 
+    /**
+     * Customize the activity log fields.
+     */
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();

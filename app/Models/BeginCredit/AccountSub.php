@@ -18,6 +18,10 @@ class AccountSub extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
 
+
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'ministry_id',
         'account_id',
@@ -25,36 +29,65 @@ class AccountSub extends Model
         'name'
     ];
 
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the account this accountSub belongs to.
+     */
+
     public function account()
     {
         return $this->belongsTo(Account::class, 'account_id', 'id');
     }
 
+    /**
+     * Get the beginMandate this accountSub belongs to.
+     */
     public function beginMandate()
     {
         return $this->hasMany(BeginMandate::class, 'account_sub_id', 'id');
     }
 
+    /**
+     * Get the budgetMandate this accountSub belongs to.
+     */
     public function budgetMandate()
     {
         return $this->hasMany(BudgetMandate::class, 'account_sub_id', 'id');
     }
 
+    /**
+     * Get the mandateLoan this accountSub belongs to.
+     */
     public function mandateLoan()
     {
         return $this->hasMany(BudgetMandateLoan::class, 'account_sub_id', 'id');
     }
 
+    /* -----------------------------------------------------------------
+     |  Activity Log Configuration
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Configure the activity log options.
+     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->useLogName(trans('menus.beginningcredit.subaccounts'))
-            ->logOnly(['accountNumber', 'subAccountNumber', 'txtSubAccount'])
+            ->logOnly(['ministry_id', 'account_id', 'no', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
     }
 
+    /**
+     * Customize the activity log fields.
+     */
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();

@@ -29,14 +29,10 @@ class ProgramSubDataTable extends DataTable
             ->addColumn("dateTime", function ($module) {
                 return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
-            ->editColumn('decription', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->decription) . '</div>';
-            })
-            ->rawColumns(['decription'])
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::program.sub.action', ['module' => $module]);
             })
-            ->setRowId('id');
+            ->rawColumns(['soft_delete', 'action']);
     }
 
     /**
@@ -96,7 +92,6 @@ class ProgramSubDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            // Column::make('program_id')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
 
             Column::make('no')->title(__('tables.th.sub.program'))->width(60)->addClass('align-middle'),
             Column::make('decription')->title(__('tables.th.title'))->addClass('align-middle'),

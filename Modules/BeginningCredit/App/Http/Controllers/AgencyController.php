@@ -20,7 +20,7 @@ class AgencyController extends Controller
 
     public function getIndex(InitialAgencyDataTable $dataTable)
     {
-        return $dataTable->render('beginningcredit::initialAgency.index');
+        return $dataTable->render('beginningcredit::agency.initialAgency.index');
     }
 
     /**

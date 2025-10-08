@@ -20,7 +20,7 @@ class ChapterController extends Controller
      */
     public function getIndex(InitialChapterDataTable $dataTable)
     {
-        return $dataTable->render('beginningcredit::initialChapter.index');
+        return $dataTable->render('beginningcredit::chapters.initialChapter.index');
     }
 
     /**

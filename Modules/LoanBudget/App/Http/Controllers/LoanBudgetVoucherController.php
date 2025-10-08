@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 
 class LoanBudgetVoucherController extends Controller
 {
-     public function getIndex(InitialVoucherLoanDataTable $dataTable)
+    public function getIndex(InitialVoucherLoanDataTable $dataTable)
     {
         $ministry = Ministry::all();
 
@@ -86,7 +86,6 @@ class LoanBudgetVoucherController extends Controller
             'txtDescription'      => 'required',
         ]);
 
-        // default zeros
         foreach (['internal_increase', 'unexpected_increase', 'additional_increase', 'decrease', 'editorial'] as $k) {
             $validatedData[$k] = $validatedData[$k] ?? 0;
         }
@@ -107,8 +106,6 @@ class LoanBudgetVoucherController extends Controller
                     ->error('មិនមានទិន្ន័យ', 'បញ្ហា')->flash();
                 return back()->withInput();
             }
-
-            // 1) Create the new detail row
             $total_increase = $validatedData['internal_increase']
                 + $validatedData['unexpected_increase']
                 + $validatedData['additional_increase'];
@@ -127,8 +124,7 @@ class LoanBudgetVoucherController extends Controller
                 'txtDescription'     => strip_tags($validatedData['txtDescription']),
             ]);
 
-            // 2) Aggregate cumulative values for the same keys (now includes the row just inserted)
-            $agg = \App\Models\Loans\BudgetVoucherLoan::query()
+            $agg = BudgetVoucherLoan::query()
                 ->where('ministry_id', $ministry->id)
                 ->where('agency_id', $validatedData['cboAgency'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
@@ -146,7 +142,6 @@ class LoanBudgetVoucherController extends Controller
                 + (float)$agg->unexpected_increase_sum
                 + (float)$agg->additional_increase_sum;
 
-            // 3) Current apply total from BudgetVoucher (unchanged logic)
             $currentApplyTotal = BudgetVoucher::where('no', $validatedData['no'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->where('agency_id', $validatedData['cboAgency'])
@@ -154,9 +149,8 @@ class LoanBudgetVoucherController extends Controller
                 ->sum('budget');
 
             $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
-            $deadline_balance = $early_balance + $currentApplyTotal; // kept per your code
+            $deadline_balance = $early_balance + $currentApplyTotal;
 
-            // 4) Recalculate status using cumulative sums
             $new_credit_status = $beginVoucher->current_loan
                 + $totalIncreaseSum
                 - ((float)$agg->decrease_sum + (float)$agg->editorial_sum);
@@ -165,9 +159,8 @@ class LoanBudgetVoucherController extends Controller
             $law_average   = $beginVoucher->fin_law ? ($deadline_balance / $beginVoucher->fin_law) * 100 : 0;
             $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
 
-            // 5) Update BeginVoucher
             $beginVoucher->update([
-                'current_loan'     => $beginVoucher->current_loan, // unchanged
+                'current_loan'     => $beginVoucher->current_loan,
                 'new_credit_status' => $new_credit_status,
                 'apply'            => $currentApplyTotal,
                 'deadline_balance' => $deadline_balance,
@@ -365,7 +358,7 @@ class LoanBudgetVoucherController extends Controller
                     ->sum('budget');
 
                 $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
-                $deadline_balance = $early_balance + $currentApplyTotal; // kept per your store()
+                $deadline_balance = $early_balance + $currentApplyTotal;
 
                 $new_credit_status = $beginVoucher->current_loan
                     + $totalIncreaseSum

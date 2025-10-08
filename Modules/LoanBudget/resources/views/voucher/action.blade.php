@@ -17,11 +17,6 @@
                         <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
                     </a>
                 @endif
-                {{-- @else
-                @if (hasPermission('voucher.destroy'))
-                    <a href="#" onclick="confirm('{{ route('voucher.restore', encode_params($module->id)) }}', 2)"
-                        class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
-                @endif --}}
             @endif
         </ul>
     </div>
