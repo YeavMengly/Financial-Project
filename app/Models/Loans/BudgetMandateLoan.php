@@ -2,6 +2,8 @@
 
 namespace App\Models\Loans;
 
+use App\Models\BeginCredit\AccountSub;
+use App\Models\BeginCredit\Agency;
 use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,10 +11,13 @@ use Illuminate\Database\Eloquent\Model;
 class BudgetMandateLoan extends Model
 {
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
-        'agency_id',
-        'program_sub_id',
         'ministry_id',
+        'agency_id',
         'account_sub_id',
         'no',
         'internal_increase',
@@ -23,4 +28,25 @@ class BudgetMandateLoan extends Model
         'editorial',
         'txtDescription'
     ];
+
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the accountSub under this budgetMandateLoan.
+     */
+    public function accountSub()
+    {
+        return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
+    }
+
+    /**
+     * Get the agency under this budgetMandateLoan.
+     */
+    public function agency()
+    {
+        return $this->belongsTo(Agency::class, 'agency_id', 'id');
+    }
 }

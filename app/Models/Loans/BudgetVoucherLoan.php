@@ -14,7 +14,10 @@ class BudgetVoucherLoan extends Model
 {
     use HasFactory;
 
-    protected $table = 'budget_voucher_loans';
+    /**
+     * The attributes that are mass assignable.
+     */
+    // protected $table = 'budget_voucher_loans';
     protected $fillable = [
         'ministry_id',
         'agency_id',
@@ -29,12 +32,22 @@ class BudgetVoucherLoan extends Model
         'txtDescription'
     ];
 
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
 
+    /**
+     * Get the accountSub under this budgetVoucherLoan.
+     */
     public function accountSub()
     {
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
+    /**
+     * Get the agency under this budgetVoucherLoan.
+     */
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id', 'id');

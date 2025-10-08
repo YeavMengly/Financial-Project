@@ -27,7 +27,7 @@ class InitialBudgetMandateDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($model) {
-                return view('beginningcredit::initialBudgetMandate.action', ['module' => $model]);
+                return view('beginningcredit::beginMandate.initialBudgetMandate.action', ['module' => $model]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }
@@ -37,13 +37,6 @@ class InitialBudgetMandateDataTable extends DataTable
      */
     public function query(Ministry $model): QueryBuilder
     {
-        // $query = $model->newQuery();
-
-        // if (request()->has('year') && request('year') !== null) {
-        //     $query->where('year', request('year'));
-        // }
-        // return $query;
-
         $query = $model->newQuery()->select([
             'ministries.id',
             'ministries.no',

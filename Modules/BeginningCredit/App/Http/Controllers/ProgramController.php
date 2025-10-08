@@ -19,7 +19,7 @@ class ProgramController extends Controller
 
     public function getIndex(InitialProgramDataTable $dataTable)
     {
-        return $dataTable->render('beginningcredit::initialProgram.index');
+        return $dataTable->render('beginningcredit::program.initialProgram.index');
     }
 
     /**
@@ -328,7 +328,6 @@ class ProgramController extends Controller
 
     public function restore($params, $id)
     {
-        // $params = decode_params($params);
         $pid = decode_params($id);
 
         Program::withTrashed()->whereKey($pid)->restore();

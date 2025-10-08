@@ -14,6 +14,9 @@ class Agency extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'ministry_id',
         'program_id',
@@ -22,16 +25,31 @@ class Agency extends Model
         'nick_name'
     ];
 
-    // 🔹 Relationships
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the ministry this agency belongs to.
+     */
     public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
 
+    /**
+     * Get the beginVoucher this agency belongs to.
+     */
     public function beginVoucher()
     {
         return $this->hasMany(BeginVoucher::class, 'agency_id', 'id');
     }
+
+    /* -----------------------------------------------------------------
+     |  Activity Log Configuration
+     | -----------------------------------------------------------------
+     */
 
     /**
      * Configure activity log options
@@ -51,6 +69,9 @@ class Agency extends Model
             ->dontSubmitEmptyLogs();
     }
 
+    /**
+     * Customize the activity log fields.
+     */
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();

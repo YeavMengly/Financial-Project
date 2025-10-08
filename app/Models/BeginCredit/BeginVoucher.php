@@ -6,6 +6,7 @@ use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Jenssegers\Agent\Agent;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -13,9 +14,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class BeginVoucher extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity;
 
-
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'ministry_id',
         'agency_id',
@@ -39,27 +42,42 @@ class BeginVoucher extends Model
     ];
     protected $dates = ['deleted_at'];
 
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
     /**
-     * Relationship to SubAccount (if applicable)
+     * Get the accountSub this beginVoucher belongs to.
      */
     public function accountSub()
     {
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
-    public function ministries()
+    /**
+     * Get the ministry this beginVoucher belongs to.
+     */
+    public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
+
+    /**
+     * Get the agency this beginVoucher belongs to.
+     */
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id', 'id');
     }
 
-    public function loans()
-    {
-        return $this->belongsTo(BudgetVoucherLoan::class, 'account_sub_id', 'id');
-    }
+    /**
+     * Get the loans this beginVoucher belongs to.
+     */
+    // public function loans()
+    // {
+    //     return $this->belongsTo(BudgetVoucherLoan::class, 'account_sub_id', 'id');
+    // }
 
     /**
      * Spatie Log Options

@@ -23,7 +23,7 @@ class BeginVoucherController extends Controller
     {
         $module = Ministry::all();
 
-        return $dataTable->render('beginningcredit::initialBudgetVoucher.index', ['module' => $module]);
+        return $dataTable->render('beginningcredit::beginVoucher.initialBudgetVoucher.index', ['module' => $module]);
     }
     /**
      * Display a listing of the resource.
@@ -62,20 +62,6 @@ class BeginVoucherController extends Controller
         }
     }
 
-    // public function editByProgramId(Request $request)
-    // {
-    //     if ($request->program_id) {
-    //         $data       = ProgramSub::select('id', 'program_id', 'no', 'decription')
-    //             ->where('program_id', $request->program_id)
-    //             ->get();
-    //         $selectedId = $request->selected_id ?? null;
-
-    //         foreach ($data as $d) {
-    //             $selected = $selectedId == $d->id ? 'selected' : '';
-    //             echo "<option value='{$d->id}' {$selected}>{$d->no}-{$d->decription}</option>";
-    //         }
-    //     }
-    // }
     public function editByProgramId(Request $request)
     {
         if ($request->program_id) {

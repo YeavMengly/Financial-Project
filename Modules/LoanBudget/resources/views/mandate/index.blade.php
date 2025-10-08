@@ -28,23 +28,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter">
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cbochapterNum">ជំពូក</label>
-                            <input type="text" class="form-control" name="chapterNum" required
-                                data-pristine-required-message="{{ __('messages.required') }}" placeholder="ជំពូក" />
-                        </div>
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboTxtChapter">នាមជំពូក</label>
-                            <input type="text" class="form-control" name="txtChapter" required
-                                data-pristine-required-message="{{ __('messages.required') }}" placeholder="នាមជំពូក" />
-                        </div>
-
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                        </div>
-                    </form> --}}
-
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
@@ -121,7 +104,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('chapternumber.create'))
+                    @if (hasPermission('mandate.create'))
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"

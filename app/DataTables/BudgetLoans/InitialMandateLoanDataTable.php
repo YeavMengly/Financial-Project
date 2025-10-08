@@ -2,15 +2,11 @@
 
 namespace App\DataTables\BudgetLoans;
 
-use App\Models\BeginCredit\InitialBudget;
-use App\Models\InitialMandateLoan;
+use App\Models\BeginCredit\Ministry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class InitialMandateLoanDataTable extends DataTable
@@ -22,18 +18,12 @@ class InitialMandateLoanDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        // return (new EloquentDataTable($query))
-        //     ->addColumn('action', 'initialmandateloan.action')
-        //     ->setRowId('id');
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($model) {
                 return is_null($model->deleted_at)
                     ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
-            })
-            ->editColumn('program', function ($model) {
-                return optional($model->beginCredit)->program ?? $model->program;
             })
             ->addColumn('action', function ($model) {
                 return view('loanbudget::mandateLoan.action', ['module' => $model]);
@@ -44,11 +34,20 @@ class InitialMandateLoanDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(InitialBudget $model): QueryBuilder
+    public function query(Ministry $model): QueryBuilder
     {
-        return $model->newQuery();
-    }
 
+        $query = $model->newQuery()->select([
+            'ministries.id',
+            'ministries.no',
+            'ministries.year',
+            'ministries.title',
+            'ministries.refer',
+            'ministries.name'
+        ]);
+
+        return $query->orderBy('ministries.id', 'ASC');
+    }
     /**
      * Optional method if you want to use the html builder.
      */
@@ -75,14 +74,17 @@ class InitialMandateLoanDataTable extends DataTable
                 'DT_RowIndex',
                 __('tables.th.no')
             )->width(30)->addClass('text-center align-middle')->orderable(false),
+
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
-            Column::make('sub_title')->title(__('tables.th.sub.title'))->addClass('align-middle'),
-            Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
+            
             Column::computed(
                 'action',
                 __('tables.th.action')
             )->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
+
         ];
     }
 

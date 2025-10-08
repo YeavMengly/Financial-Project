@@ -120,14 +120,11 @@ class BudgetVoucherDataTable extends DataTable
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
-
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
-
             Column::make('t_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
-
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 

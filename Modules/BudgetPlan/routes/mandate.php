@@ -13,7 +13,6 @@ Route::middleware('PermissionCheck')
         Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');
         Route::get('mandate/{params}/destroy/{id}', 'destroy')->name('budgetMandate.destroy');
 
-        // JSON numbers endpoint
         Route::get('Mandate/{params}/early-balance', 'getEarlyBalance')
             ->name('budgetMandate.getEarlyBalance');
     });

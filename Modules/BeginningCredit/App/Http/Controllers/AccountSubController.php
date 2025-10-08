@@ -18,9 +18,12 @@ class AccountSubController extends Controller
 
     public function getIndex(InititalAccountSubDataTable $dataTable)
     {
-        return $dataTable->render('beginningcredit::initialAccountSub.index');
+        return $dataTable->render('beginningcredit::accounts.accountSub.initialAccountSub.index');
     }
 
+    /**
+     * Display a listing of the resource 
+     */
     public function index(AccountSubDataTable $dataTable, $params)
     {
         $id  = decode_params($params);
@@ -34,6 +37,9 @@ class AccountSubController extends Controller
         ]);
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create($params)
     {
         $id  = decode_params($params);
@@ -44,6 +50,9 @@ class AccountSubController extends Controller
             ->with('params', $params);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request, $params)
     {
         $request->validate([
@@ -102,6 +111,9 @@ class AccountSubController extends Controller
         }
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit($params, $id)
     {
         $id = decode_params($id);
@@ -111,6 +123,9 @@ class AccountSubController extends Controller
         return view('beginningcredit::accounts.accountSub.edit')->with('module', $module)->with('account', $account)->with('params', $params);
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $params, $id)
     {
         $request->validate([
@@ -167,6 +182,9 @@ class AccountSubController extends Controller
         }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy($params, $id)
     {
         $id = decode_params($id);
@@ -181,6 +199,10 @@ class AccountSubController extends Controller
 
         return redirect()->route('accountSub.index', $params);
     }
+
+    /**
+     * Restore the specified resource from storage.
+     */
     public function restore($params, $id)
     {
         $asid = decode_params($id);

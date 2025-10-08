@@ -49,7 +49,6 @@ class AccountDataTable extends DataTable
         $model = $model->newQuery();
         $model->withTrashed();
         $query = $model->newQuery()
-            // ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
             ->select([
                 'accounts.id',
                 'accounts.ministry_id',
@@ -94,11 +93,13 @@ class AccountDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
+
             Column::make('CNA')->title(__('tables.th.chapter'))->addClass('align-middle'),
             Column::make('SNA')->title(__('tables.th.account'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.name'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
+            
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

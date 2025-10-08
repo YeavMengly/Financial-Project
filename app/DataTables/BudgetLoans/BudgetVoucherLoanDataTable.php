@@ -78,7 +78,6 @@ class BudgetVoucherLoanDataTable extends DataTable
             ])
             ->where('budget_voucher_loans.ministry_id', $id);
 
-        // 🔍 Apply filters from the form
         if ($request->filled('cboAgency')) {
             $query->where('budget_voucher_loans.agency_id', $request->cboAgency);
         }
@@ -133,6 +132,7 @@ class BudgetVoucherLoanDataTable extends DataTable
                 ->width(30)
                 ->addClass('text-center align-middle')
                 ->orderable(false),
+
             Column::make('agency')->title(__('tables.th.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),

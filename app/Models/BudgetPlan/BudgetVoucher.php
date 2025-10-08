@@ -12,6 +12,9 @@ class BudgetVoucher extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     */
     protected $fillable = [
         'ministry_id',
         'agency_id',
@@ -29,15 +32,30 @@ class BudgetVoucher extends Model
         'date'        => 'date',
     ];
 
+    /* -----------------------------------------------------------------
+     |  Relationships
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Get the taskType this budgetVoucher belongs to.
+     */
     public function taskType()
     {
         return $this->belongsTo(TaskType::class, 'task_type', 'id');
     }
 
-    public function ministries()
+    /**
+     * Get the ministry this budgetVoucher belongs to.
+     */
+    public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
+
+    /**
+     * Get the accountSub this budgetVoucher belongs to.
+     */
     public function accountSub()
     {
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');

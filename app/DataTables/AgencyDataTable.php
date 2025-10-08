@@ -90,12 +90,14 @@ class AgencyDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
+                
             Column::make('no_program')->title(__('tables.th.program'))->addClass('align-middle'),
             Column::make('name_no')->title(__('tables.th.agency'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('nick_name')->title(__('tables.th.nick_name'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
+
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

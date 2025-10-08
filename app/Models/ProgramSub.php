@@ -24,31 +24,52 @@ class ProgramSub extends Model
         'decription'
 
     ];
-    public function ministries()
+    /**
+     * Get the ministry this programSub belongs to.
+     */
+    public function ministry()
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
 
+    /**
+     * Get the agency this programSub belongs to.
+     */
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'program_id', 'id');
     }
 
+    /**
+     * Get the program this programSub belongs to.
+     */
     public function program()
     {
         return $this->belongsTo(Program::class, 'program_id', 'id');
     }
 
+
+    /* -----------------------------------------------------------------
+     |  Activity Log Configuration
+     | -----------------------------------------------------------------
+     */
+
+    /**
+     * Configure the activity log options.
+     */
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->useLogName(trans('menus.beginningcredit.programSub'))
-            ->logOnly(['ministry_id', 'no', 'decription'])
+            ->logOnly(['ministry_id', 'program_id', 'no', 'decription'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
     }
 
+    /**
+     * Customize the activity log fields.
+     */
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();
