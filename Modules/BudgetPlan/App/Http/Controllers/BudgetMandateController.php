@@ -4,6 +4,7 @@ namespace Modules\BudgetPlan\App\Http\Controllers;
 
 use App\DataTables\Budget\BudgetMandateDataTable;
 use App\DataTables\Budget\InitialMandateDataTable;
+use App\Exports\BeginMandateExport;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\Agency;
@@ -55,16 +56,24 @@ class BudgetMandateController extends Controller
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $taskType = TaskType::all();
-        $beginMandate = BeginMandate::select(
-            'begin_mandates.id',
-            'begin_mandates.no as mandate_no',
-            'begin_mandates.account_sub_id',
-            'begin_mandates.no',
-            'account_subs.no as sub_no',
-            'account_subs.name as sub_name'
-        )
-            ->join('account_subs', 'begin_mandates.account_sub_id', '=', 'account_subs.no')
+
+        $beginMandate = BeginMandate::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_mandates.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
             ->where('begin_mandates.ministry_id', $ministry->id)
+            ->select(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no as mandate_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_mandates.account_sub_id')
             ->get();
 
         return view('budgetplan::budgetMandate.create')
@@ -238,15 +247,23 @@ class BudgetMandateController extends Controller
             ->where('ministry_id', $ministry->id)
             ->first();
 
-        $beginMandate = BeginMandate::select(
-            'begin_mandates.id',
-            'begin_mandates.no',
-            'begin_mandates.account_sub_id',
-            'account_subs.no as sub_no',
-            'account_subs.name as sub_name'
-        )
-            ->join('account_subs', 'begin_mandates.account_sub_id', '=', 'account_subs.no')
+       $beginMandate = BeginMandate::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_mandates.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
             ->where('begin_mandates.ministry_id', $ministry->id)
+            ->select(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_mandates.account_sub_id')
             ->get();
 
         return view('budgetplan::budgetMandate.edit')
@@ -335,7 +352,7 @@ class BudgetMandateController extends Controller
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastMandater?->budget ?? 0;
             $beginCredit->save();
-            // });
+
             DB::commit();
             flash()
                 ->translate('en')
@@ -411,8 +428,6 @@ class BudgetMandateController extends Controller
             ->where('agency_id', $beginMandate->agency_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
-        // dd($newApplyTotal);
-
 
         $beginMandate->early_balance = $this->calculateEarlyBalance($beginMandate);
 
@@ -443,5 +458,82 @@ class BudgetMandateController extends Controller
             ->sum('budget');
 
         return $totalEarlyBalance ?: 0;
+    }
+
+     public function export(Request $request, $params)
+    {
+        try {
+            $ministryId = decode_params($params);
+
+            $query = BeginMandate::query()
+                ->leftJoin('budget_mandate_loans', 'begin_mandates.account_sub_id', '=', 'budget_mandate_loans.account_sub_id')
+                ->where('begin_mandates.ministry_id', $ministryId)
+                ->select(
+                    'begin_mandates.*',
+                    'budget_mandate_loans.internal_increase as loan_internal_increase',
+                    'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
+                    'budget_mandate_loans.additional_increase as loan_additional_increase',
+                    'budget_mandate_loans.total_increase as loan_total_increase',
+                    'budget_mandate_loans.decrease as loan_decrease',
+                    'budget_mandate_loans.editorial as loan_editorial'
+                );
+
+
+            // === Filters (PREFIX table name!) ===
+            if ($request->filled('agency')) {
+                $query->where('begin_mandates.agency_id', $request->agency);
+            }
+
+            if ($request->filled('account')) {
+                $query->where('begin_mandates.account_id', $request->account);
+            }
+
+            if ($request->filled('accountSub')) {
+                $query->where('begin_mandates.account_sub_id', $request->accountSub);
+            }
+
+            if ($request->filled('no')) {
+                $query->where('begin_mandates.no', 'like', "%{$request->no}%");
+            }
+
+            if ($request->filled('txtDescription')) {
+                $query->where('begin_mandates.txtDescription', 'like', "%{$request->txtDescription}%");
+            }
+
+            $query->orderBy('begin_mandates.created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported BeginMandate Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('budgetMandate.index', $params);
+            }
+
+            $export = new BeginMandateExport($data, $ministryId);
+
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetMandate.index', $params);
+        }
     }
 }

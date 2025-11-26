@@ -1,14 +1,8 @@
 @extends('layouts.master')
 @section('css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- preloader css -->
-    <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -127,9 +121,10 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="example-datetime-local-input">{{ __('forms.select_date') }}</label>
-                                        <input type="date" name="date" id="example-datetime-local-input" required
-                                            class="form-control" value="{{ old('date', $module->date) }}"
+                                        <label for="date" class="form-label">{{ __('forms.select_date') }}</label>
+                                        <input type="text" id="datepicker-basic" name="date" class="form-control"
+                                            value="{{ old('date', $module->date) }}"
+                                            placeholder="{{ __('forms.select_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('date')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -166,7 +161,7 @@
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
                                 <a class="btn btn-dark"
-                                    href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('budgetMandate.index', $params) }}">{{ __('buttons.back') }}</a>
 
                             </div>
                         </form>
@@ -208,7 +203,19 @@
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
+        <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script>
+        const dateInput = document.getElementById('datepicker-basic');
+        if (dateInput) {
+            flatpickr(dateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: dateInput.value || null
+            });
+        }
+    </script>
     <script>
         /** ===============================
          *  Utilities

@@ -97,8 +97,21 @@
                             <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}" />
                         </div>
 
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
+                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            </a>
+                            {{-- Export --}}
+
+                            <a href="{{ route(
+                                'budgetMandate.export',
+                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                            ) }}"
+                                class="btn btn-success d-flex align-items-center px-3">
+                                <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
+                            </a>
+
                         </div>
                     </form>
                 </div>

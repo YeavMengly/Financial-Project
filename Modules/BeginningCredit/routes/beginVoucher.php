@@ -16,4 +16,6 @@ Route::controller(BeginVoucherController::class)->group(function () {
     Route::post('begin/voucher/{params}/update/{id}', 'update')->name('beginVoucher.update');
     Route::get('/get-by-programid', 'getByProgramId')->name('beginVoucher.by.program_id');
     Route::get('/edit-by-programid', 'editByProgramId')->name('beginVoucher.by.program_id');
+
+    Route::get('begin/voucher/{params}/export', 'export')->name('beginVoucher.export');
 });

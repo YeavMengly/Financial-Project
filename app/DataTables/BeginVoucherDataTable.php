@@ -23,6 +23,12 @@ class BeginVoucherDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('fin_law', function ($row) {
+                return number_format($row->fin_law ?? 0);
+            })
+            ->editColumn('current_loan', function ($row) {
+                return number_format($row->current_loan ?? 0);
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
@@ -52,6 +58,7 @@ class BeginVoucherDataTable extends DataTable
                 'begin_vouchers.id',
                 'begin_vouchers.agency_id',
                 'begin_vouchers.account_sub_id',
+                'begin_vouchers.account_id',
                 'begin_vouchers.no as program_no',
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
@@ -65,6 +72,11 @@ class BeginVoucherDataTable extends DataTable
                 $request->filled('agency'),
                 fn($q) =>
                 $q->where('begin_vouchers.agency_id', $request->agency)
+            )
+            ->when(
+                $request->filled('account'),
+                fn($q) =>
+                $q->where('begin_vouchers.account_id', $request->account)
             )
             ->when(
                 $request->filled('accountSub'),
@@ -109,7 +121,7 @@ class BeginVoucherDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-                
+
             Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),

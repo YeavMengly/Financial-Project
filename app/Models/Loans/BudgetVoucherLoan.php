@@ -5,10 +5,10 @@ namespace App\Models\Loans;
 use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginCredit;
+use App\Models\BeginCredit\BeginVoucher;
 use App\Models\BudgetPlan\BudgetVoucher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use PDO;
 
 class BudgetVoucherLoan extends Model
 {
@@ -45,9 +45,11 @@ class BudgetVoucherLoan extends Model
         return $this->belongsTo(AccountSub::class, 'account_sub_id', 'id');
     }
 
-    /**
-     * Get the agency under this budgetVoucherLoan.
-     */
+    public function beginVoucher()
+    {
+        return $this->belongsTo(BeginVoucher::class, 'account_sub_id', 'id');
+    }
+
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id', 'id');

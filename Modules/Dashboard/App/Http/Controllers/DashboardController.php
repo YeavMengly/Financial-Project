@@ -19,12 +19,24 @@ class DashboardController extends Controller
                 "categories.order"
             )
             ->orderBy('categories.order', 'ASC')
+
             ->get();
 
-        // $chapter = DB::table("chapters")
-        //     ->get();
+        $chapter = DB::table('begin_vouchers')
+            ->select(
+                'ministry_id',
+                DB::raw('SUM(fin_law) as total_fin_law'),
+                DB::raw('SUM(current_loan) as total_current_loan'),
+            )
+            ->groupBy('ministry_id')
+            ->get();
+
+        // dd($chapter);
+
         return view('dashboard::index')
+        ->with("chapter", $chapter)
             ->with("report", $report);
-            // ->with("chapter", $chapter);
+
+        // ->with("chapter", $chapter);
     }
 }

@@ -32,7 +32,7 @@
             </div>
         </div>
     </div>
-    <!-- end page title -->
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -45,6 +45,18 @@
                                     <option value="{{ $ag->id }}"
                                         {{ request('agency') == $ag->id ? 'selected' : '' }}>
                                         {{ $ag->no }} - {{ $ag->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <select class="form-control" name="account" id="account">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($account as $as)
+                                    <option value="{{ $as->no }}"
+                                        {{ request('account') == $as->id ? 'selected' : '' }}>
+                                        {{ $as->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -72,14 +84,29 @@
                                 value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
                         </div>
 
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
+
+                            {{-- Search --}}
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
+                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
+                            </button>
+
+                            {{-- Reset --}}
+                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
+
+                            {{-- Export --}}
+                            <a href="{{ route(
+                                'beginVoucher.export',
+                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                            ) }}"
+                                class="btn btn-success d-flex align-items-center px-3">
+                                <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
+                            </a>
+
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -151,8 +178,8 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const agencyNumber = document.getElementById('agency');
-            const agencyNumberChoices = new Choices(agencyNumber, {
+            const agency = document.getElementById('agency');
+            const agencyChoices = new Choices(agency, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',
@@ -162,8 +189,19 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const subAccountNumber = document.getElementById('accountSub');
-            const subAccountNumberChoices = new Choices(subAccountNumber, {
+            const account = document.getElementById('account');
+            const accountChoices = new Choices(account, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountSub = document.getElementById('accountSub');
+            const accountSubChoices = new Choices(accountSub, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',

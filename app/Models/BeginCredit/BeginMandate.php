@@ -13,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class BeginMandate extends Model
 {
-       use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
         'ministry_id',
@@ -68,10 +68,10 @@ class BeginMandate extends Model
     /**
      * Get the loans this beginMandate belongs to.
      */
-    // public function loans()
-    // {
-    //     return $this->belongsTo(BudgetMandateLoan::class, 'account_sub_id', 'id');
-    // }
+    public function loans()
+    {
+        return $this->hasOne(BudgetMandateLoan::class, 'account_sub_id', 'id');
+    }
 
     /* -----------------------------------------------------------------
      |  Activity Log Configuration

@@ -29,9 +29,10 @@ return new class extends Migration
             $table->decimal('apply', 15, 0)->default(0);
             $table->decimal('deadline_balance', 15, 0)->default(0);
             $table->decimal('credit', 15, 0)->default(0);
-            $table->decimal('law_average', 15, 0)->default(0);
-            $table->decimal('law_correction', 15, 0)->default(0);
+            $table->decimal('law_average', 15, 2)->default(0);
+            $table->decimal('law_correction', 15, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

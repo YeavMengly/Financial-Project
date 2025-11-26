@@ -113,8 +113,30 @@
                 <li>
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="zap"></i>
-                        <span data-key="t-pages">{{ __('menus.check.control.general') }}</span>
+                        <span data-key="t-reprots">{{ __('menus.check.control.general') }}</span>
                     </a>
+
+                    <ul class="sub-menu" aria-expanded="false">
+
+                        @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="" class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                                    <i data-feather="file"></i>
+                                    <span data-key="t-report-program">{{ __('menus.report.program') }}</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="{{ route('mandateLoan.index') }}"
+                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                                    <i data-feather="briefcase"></i>
+                                    <span data-key="t-dashboard">{{ __('menus.initial.mandate') }}</span>
+                                </a>
+                            </li>
+                        @endif --}}
+                    </ul>
                 </li>
 
                 <li>
@@ -183,6 +205,67 @@
                                 </a>
                             </li>
                         @endif
+                    </ul>
+                </li>
+                <li class="menu-title" data-key="t-inventory">{{ __('menus.inventory') }}</li>
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow">
+                        <i data-feather="file-text"></i>
+                        <span data-key="t-duel">{{ __('menus.duel') }}</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+
+                        @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="{{ route('initialDuelEntry.index') }}"
+                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                                    <i data-feather="crosshair"></i>
+
+                                    <span data-key="t-duel">{{ __('menus.duel.entry') }}</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="{{ route('initialDuelRelease.index') }}"
+                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                                    <i data-feather="package"></i>
+                                    <span data-key="t-duel">{{ __('menus.duel.release') }}</span>
+                                </a>
+                            </li>
+                        @endif --}}
+                    </ul>
+                </li>
+
+
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow">
+                        <i data-feather="file-text"></i>
+                        <span data-key="t-inventory">{{ __('menus.material') }}</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="false">
+
+                        @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="{{ route('initialMaterialEntry.index') }}"
+                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                                    <i data-feather="git-merge"></i>
+                                    <span data-key="t-duel">{{ __('menus.material.entry') }}</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        {{-- @if (hasPermission('ministries.index'))
+                            <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                                <a href="{{ route('initialMaterialRelease.index') }}"
+                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                                    <i data-feather="package"></i>
+                                    <span data-key="t-material">{{ __('menus.material.release') }}</span>
+                                </a>
+                            </li>
+                        @endif --}}
                     </ul>
                 </li>
 

@@ -4,7 +4,9 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\AnnualOpen\InitialBudgetVoucherDataTable;
 use App\DataTables\BeginVoucherDataTable;
+use App\Exports\ReportBook;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\Account;
 use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginVoucher;
@@ -34,11 +36,14 @@ class BeginVoucherController extends Controller
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
         $agency = Agency::where('ministry_id', $ministry->id)->get();
+
+        $account = Account::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         return $dataTable->render('beginningcredit::beginVoucher.index', [
             'ministry'   => $ministry,
             'params' => $params,
+            'account' => $account,
             'agency' => $agency,
             'accountSub' => $accountSub,
         ]);
@@ -123,12 +128,16 @@ class BeginVoucherController extends Controller
         $id = decode_params($params);
         DB::beginTransaction();
         try {
+
+            //   dd($validatedData['cboProgram']);
             $ministry   = Ministry::where('id', $id)->first();
             $program    = Program::where('id', $validatedData['cboProgram'])->first();
-
+            //   dd($program);
             $programSub = ProgramSub::where('program_id', $program->id)
                 ->where('id', $validatedData['cboProgramSub'])
                 ->first();
+
+            // dd($programSub->no);
 
             $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
             $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
@@ -147,8 +156,9 @@ class BeginVoucherController extends Controller
                 $validatedData['decrease'] -
                 $validatedData['editorial'];
 
-            $valueNo = $ministry->no . $program->no . $programSub->no . '0' . $validatedData['no'];
+            $valueNo = $ministry->no . $validatedData['cboProgram'] .  $programSub->no . '0' . $validatedData['no'];
 
+            // dd($valueNo);
             $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->where('agency_id', $validatedData['cboAgency'])
@@ -401,5 +411,75 @@ class BeginVoucherController extends Controller
             ? ($data->deadline_balance / $data->new_credit_status) * 100 : 0;
 
         $data->save();
+    }
+
+    // Export Data to Excel
+    public function export(Request $request, $params)
+    {
+        try {
+            $ministryId = decode_params($params);
+
+            // Base query: full BeginVoucher models
+            $query = BeginVoucher::query()
+                ->where('ministry_id', $ministryId);
+
+            // Apply the same filters as in DataTable::query()
+            if ($request->filled('agency')) {
+                $query->where('agency_id', $request->agency);
+            }
+
+            if ($request->filled('account')) {
+                $query->where('account_id', $request->account);
+            }
+
+            if ($request->filled('accountSub')) {
+                $query->where('account_sub_id', $request->accountSub);
+            }
+
+            if ($request->filled('no')) {
+                $query->where('no', 'like', "%{$request->no}%");
+            }
+
+            if ($request->filled('txtDescription')) {
+                $query->where('txtDescription', 'like', "%{$request->txtDescription}%");
+            }
+
+            $query->orderBy('created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported BeginVoucher Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('beginVoucher.index', $params);
+            }
+
+            // Pass filtered data + ministry id into export
+            $export = new ReportBook($data, $ministryId);
+
+            // you can pass $request if you want to use date filters/text in header
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('beginVoucher.index', $params);
+        }
     }
 }

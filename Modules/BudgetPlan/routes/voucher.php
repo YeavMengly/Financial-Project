@@ -20,4 +20,6 @@ Route::middleware('PermissionCheck')
 Route::controller(BudgetVoucherController::class)->group(function () {
     Route::post('voucher/{params}/store', 'store')->name('budgetVoucher.store');
     Route::post('voucher/{params}/update/{id}', 'update')->name('budgetVoucher.update');
+
+    Route::get('voucher/{params}/export', 'export')->name('budgetVoucher.export');
 });

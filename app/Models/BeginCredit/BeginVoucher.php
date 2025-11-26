@@ -74,10 +74,11 @@ class BeginVoucher extends Model
     /**
      * Get the loans this beginVoucher belongs to.
      */
-    // public function loans()
-    // {
-    //     return $this->belongsTo(BudgetVoucherLoan::class, 'account_sub_id', 'id');
-    // }
+    public function loans()
+    {
+        // return $this->belongsTo(BudgetVoucherLoan::class, 'account_sub_id', 'id');
+        return $this->hasOne(BudgetVoucherLoan::class, 'account_sub_id', 'id');
+    }
 
     /**
      * Spatie Log Options

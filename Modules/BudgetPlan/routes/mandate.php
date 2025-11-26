@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// routes
 use Modules\BudgetPlan\App\Http\Controllers\BudgetMandateController;
 
 Route::middleware('PermissionCheck')
@@ -20,4 +19,6 @@ Route::middleware('PermissionCheck')
 Route::controller(BudgetMandateController::class)->group(function () {
     Route::post('mandate/{params}/store', 'store')->name('budgetMandate.store');
     Route::post('mandate/{params}/update/{id}', 'update')->name('budgetMandate.update');
+
+    Route::get('mandate/{params}/export', 'export')->name('budgetMandate.export');
 });

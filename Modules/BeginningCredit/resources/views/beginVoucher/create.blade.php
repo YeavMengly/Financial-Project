@@ -72,6 +72,17 @@
                                     </div>
                                 </div>
 
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="no"
+                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                            class="form-control" name="no" tabindex="2" />
+                                    </div>
+                                </div>
+
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
@@ -112,16 +123,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
-                                            class="form-control" name="no" tabindex="2" />
-                                    </div>
-                                </div>
+
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">

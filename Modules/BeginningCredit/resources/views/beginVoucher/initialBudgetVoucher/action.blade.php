@@ -6,6 +6,14 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+                {{-- @if (hasPermission('beginCredit.create'))
+                    <a href="" class="dropdown-item">
+                        <i class="bx bx-download"></i> {{ __('buttons.download') }}
+                    </a>
+                @endif
+                @if (hasPermission('ministries.index') and (hasPermission('ministries.edit') or hasPermission('ministries.destroy')))
+                    <hr />
+                @endif --}}
                 @if (hasPermission('ministries.edit'))
                     <a href="{{ route('beginVoucher.index', encode_params($module->id)) }}" class="dropdown-item">
                         <i class="bx bx-show"></i> {{ __('buttons.show') }}

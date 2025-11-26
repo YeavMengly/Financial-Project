@@ -79,7 +79,16 @@
                                     </div>
                                 </div>
 
-
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="no"
+                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
+                                        <input type="text" name="no" class="form-control" required
+                                            value="{{ old('no', substr($module->no, 6, 1)) }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                    </div>
+                                </div>
+                                
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
@@ -122,15 +131,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input type="text" name="no" class="form-control" required
-                                            value="{{ old('no', substr($module->no, 6, 1)) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                    </div>
-                                </div>
+
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">

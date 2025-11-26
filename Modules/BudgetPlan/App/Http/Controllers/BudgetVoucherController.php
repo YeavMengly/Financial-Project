@@ -4,12 +4,14 @@ namespace Modules\BudgetPlan\App\Http\Controllers;
 
 use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
+use App\Exports\BeginExport;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\AccountSub;
 use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginVoucher;
 use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
+use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Program;
 use App\Models\TaskType;
 use Illuminate\Http\Request;
@@ -56,17 +58,26 @@ class BudgetVoucherController extends Controller
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $taskType = TaskType::all();
 
-        $beginVoucher = BeginVoucher::select(
-            'begin_vouchers.id',
-            'begin_vouchers.no as voucher_no',
-            'begin_vouchers.account_sub_id',
-            'begin_vouchers.no',
-            'account_subs.no as sub_no',
-            'account_subs.name as sub_name'
-        )
-            ->join('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.no')
+        $beginVoucher = BeginVoucher::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
             ->where('begin_vouchers.ministry_id', $ministry->id)
+            ->select(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_vouchers.account_sub_id')
             ->get();
+
+
 
         return view('budgetplan::budgetVoucher.create')
             ->with('accountSub', $accountSub)
@@ -231,21 +242,32 @@ class BudgetVoucherController extends Controller
     {
         $id = decode_params($id);
         $ministry = Ministry::where('id', decode_params($params))->first();
+
         $agency   = Agency::where('ministry_id', $ministry->id)->get();
         $taskType = TaskType::all();
+
         $module = BudgetVoucher::where('id', $id)
             ->where('ministry_id', $ministry->id)
             ->first();
 
-        $beginVoucher = BeginVoucher::select(
-            'begin_vouchers.id',
-            'begin_vouchers.no',
-            'begin_vouchers.account_sub_id',
-            'account_subs.no as sub_no',
-            'account_subs.name as sub_name'
-        )
-            ->join('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.no')
+
+        $beginVoucher = BeginVoucher::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
             ->where('begin_vouchers.ministry_id', $ministry->id)
+            ->select(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_vouchers.account_sub_id')
             ->get();
 
         return view('budgetplan::budgetVoucher.edit')
@@ -279,6 +301,7 @@ class BudgetVoucherController extends Controller
             $ministry = Ministry::where('id', decode_params($params))->first();
             $voucher = BudgetVoucher::where('id', $id)
                 ->where('ministry_id', $ministry->id)->first();
+
             $beginCredit = BeginVoucher::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('agency_id', $validated['cboAgency'])
@@ -419,13 +442,14 @@ class BudgetVoucherController extends Controller
             ->value('budget') ?? 0;
 
         $beginVoucher->early_balance = $this->calculateEarlyBalance($beginVoucher);
+
         $beginVoucher->apply = $newApplyTotal;
         $credit = $beginVoucher->new_credit_status - $beginVoucher->deadline_balance;
         $beginVoucher->credit = $credit;
         $beginVoucher->deadline_balance = $beginVoucher->early_balance + $beginVoucher->apply;
         $beginVoucher->credit = $beginVoucher->new_credit_status - $beginVoucher->deadline_balance;
-        $beginVoucher->law_average = $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance / $beginVoucher->fin_law) * 100 : 0;
-        $beginVoucher->law_correction =  $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance /  $beginVoucher->new_credit_status) * 100 : 0;
+        $beginVoucher->law_average = $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance / $beginVoucher->fin_law * 100)  : 0;
+        $beginVoucher->law_correction =  $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance /  $beginVoucher->new_credit_status * 100)  : 0;
         $beginVoucher->save();
     }
 
@@ -444,5 +468,191 @@ class BudgetVoucherController extends Controller
             ->sum('budget');
 
         return $totalEarlyBalance ?: 0;
+    }
+
+
+    // public function export(Request $request, $params)
+    // {
+    //     try {
+    //         $ministryId = decode_params($params);
+
+    //         // $loan = BudgetVoucherLoan::where('ministry_id', $ministryId)->get();
+
+    //         // // Base query: full BeginVoucher models
+    //         // $query = BeginVoucher::where('account_sub_id', $loan->account_sub_id)
+    //         //     ->where('ministry_id', $ministryId);
+    //         $query = BeginVoucher::query()
+    //             ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
+    //             ->where('begin_vouchers.ministry_id', $ministryId)
+    //             ->select(
+    //                 'begin_vouchers.*',
+    //                 'budget_voucher_loans.internal_increase',
+    //                 'budget_voucher_loans.unexpected_increase',
+    //                 'budget_voucher_loans.additional_increase',
+    //                 'budget_voucher_loans.total_increase',
+    //                 'budget_voucher_loans.decrease',
+    //                 'budget_voucher_loans.editorial'
+    //             );
+
+    //         // Apply filters...
+    //         $data = $query->get();
+
+    //         dd($data);
+
+
+
+    //         // Apply the same filters as in DataTable::query()
+    //         if ($request->filled('agency')) {
+    //             $query->where('agency_id', $request->agency);
+    //         }
+
+    //         if ($request->filled('account')) {
+    //             $query->where('account_id', $request->account);
+    //         }
+
+    //         if ($request->filled('accountSub')) {
+    //             $query->where('account_sub_id', $request->accountSub);
+    //         }
+
+    //         if ($request->filled('no')) {
+    //             $query->where('no', 'like', "%{$request->no}%");
+    //         }
+
+    //         if ($request->filled('txtDescription')) {
+    //             $query->where('txtDescription', 'like', "%{$request->txtDescription}%");
+    //         }
+
+    //         $query->orderBy('created_at', 'DESC');
+
+    //         $data = $query->get();
+
+    //         Log::info('Exported BeginVoucher Count', [
+    //             'ministry_id' => $ministryId,
+    //             'count'       => $data->count(),
+    //         ]);
+
+    //         if ($data->isEmpty()) {
+    //             flash()
+    //                 ->translate('en')
+    //                 ->option('timeout', 2000)
+    //                 ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+    //                 ->flash();
+
+    //             return redirect()->route('budgetVoucher.index', $params);
+    //         }
+
+    //         // Pass filtered data + ministry id into export
+    //         $export = new BeginExport($data, $ministryId);
+
+    //         // you can pass $request if you want to use date filters/text in header
+    //         return $export->export($request);
+    //     } catch (\Throwable $e) {
+    //         Log::error('Export Error: ' . $e->getMessage(), [
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 2000)
+    //             ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+    //             ->flash();
+
+    //         return redirect()->route('budgetVoucher.index', $params);
+    //     }
+    // }
+    public function export(Request $request, $params)
+    {
+        try {
+            $ministryId = decode_params($params);
+
+            // Base JOIN query
+            $query = BeginVoucher::query()
+                ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
+                ->where('begin_vouchers.ministry_id', $ministryId)
+                ->select(
+                    'begin_vouchers.*',
+
+                    // alias loan columns to avoid confusion
+                    'budget_voucher_loans.internal_increase as loan_internal_increase',
+                    'budget_voucher_loans.unexpected_increase as loan_unexpected_increase',
+                    'budget_voucher_loans.additional_increase as loan_additional_increase',
+                    'budget_voucher_loans.total_increase as loan_total_increase',
+                    'budget_voucher_loans.decrease as loan_decrease',
+                    'budget_voucher_loans.editorial as loan_editorial'
+                );
+
+            // === Filters (PREFIX table name!) ===
+            if ($request->filled('agency')) {
+                $query->where('begin_vouchers.agency_id', $request->agency);
+            }
+
+            if ($request->filled('account')) {
+                $query->where('begin_vouchers.account_id', $request->account);
+            }
+
+            if ($request->filled('accountSub')) {
+                $query->where('begin_vouchers.account_sub_id', $request->accountSub);
+            }
+
+            if ($request->filled('no')) {
+                $query->where('begin_vouchers.no', 'like', "%{$request->no}%");
+            }
+
+            if ($request->filled('txtDescription')) {
+                $query->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%");
+            }
+
+            // === DATE RANGE FILTER ===
+            // === DATE RANGE FILTER ===
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_vouchers.created_at', '>=', $request->start_date)
+                    ->whereDate('budget_vouchers.created_at', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_vouchers.created_at', '>=', $request->start_date);
+                }
+
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_vouchers.created_at', '<=', $request->end_date);
+                }
+            }
+
+
+            $query->orderBy('begin_vouchers.created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported BeginVoucher Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('budgetVoucher.index', $params);
+            }
+
+            // Pass filtered data + ministry id into export
+            $export = new BeginExport($data, $ministryId);
+
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetVoucher.index', $params);
+        }
     }
 }
