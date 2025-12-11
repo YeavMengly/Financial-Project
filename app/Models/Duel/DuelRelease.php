@@ -13,7 +13,7 @@ class DuelRelease extends Model
         'item_name',
         'receipt_number',
         'stock_number',
-        'agency_name',
+        'agency',
         'user_request',
         'unit',
         'quantity_total',

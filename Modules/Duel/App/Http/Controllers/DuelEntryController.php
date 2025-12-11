@@ -4,6 +4,7 @@ namespace Modules\Duel\App\Http\Controllers;
 
 use App\DataTables\Duel\DuelEntryDataTable;
 use App\DataTables\Duel\InitialDuelEntryDataTable;
+use App\Exports\Duel\DuelEntriesExport;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\Ministry;
 use App\Models\Duel\DuelEntry;
@@ -27,14 +28,17 @@ class DuelEntryController extends Controller
     {
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
-
         $duelType = DuelType::all();
         $unitType = UnitType::where('name', 'លីត្រ')->get();
+        $duelEntry = DuelEntry::where('id', $id)
+            ->where('ministry_id', $ministry->id)->get();
+
         return $dataTable->render('duel::duelEntry.index', [
             'params' => $params,
             'ministry' => $ministry,
             'duelType' => $duelType,
             'unitType' => $unitType,
+            'duelEntry' => $duelEntry
         ]);
     }
 
@@ -73,6 +77,7 @@ class DuelEntryController extends Controller
             'note'          => 'nullable|string|max:10000',
             'date_entry'    => 'required|date',
             'refer'         => 'nullable|string|max:10000',
+            'source'        => 'nullable|string|max:255',
             'file'          => 'nullable|array',
             'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
@@ -111,6 +116,7 @@ class DuelEntryController extends Controller
                 'note'         => strip_tags($validated['note'] ?? ''),
                 'refer'        => strip_tags($validated['refer']),
                 'date_entry'   => $dateEntry,
+                'source'   => $validated['source'],
                 'file'         => json_encode($paths),
             ]);
 
@@ -184,6 +190,7 @@ class DuelEntryController extends Controller
             'note'          => 'nullable|string|max:10000',
             'date_entry'    => 'required|date',
             'refer'         => 'nullable|string|max:10000',
+            'source'        => 'nullable|string|max:255',
             'file'          => 'nullable|array',
             'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
@@ -224,6 +231,7 @@ class DuelEntryController extends Controller
                     'note'         => strip_tags($validated['note'] ?? ''),
                     'refer'        => strip_tags($validated['refer']),
                     'date_entry'   => $dateEntry,
+                    'source'   => $validated['source'],
                     'file'         => json_encode($paths),
                 ]);
 
@@ -270,5 +278,52 @@ class DuelEntryController extends Controller
             ->flash();
 
         return redirect()->route('duelEntry.index', $params);
+    }
+
+    public function export(Request $request, $params)
+    {
+        try {
+            $ministryId = decode_params($params);
+            $query = DuelEntry::query()
+                ->where('duel_entries.ministry_id', $ministryId)
+                ->select(
+                    'duel_entries.*',
+                );
+            $data = $query->get();
+
+            $query->orderBy('created_at', 'ASC');
+
+            $data = $query->get();
+
+            Log::info('Exported DuelExport Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចូលទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('duelEntry.index', $params);
+            }
+            $export = new DuelEntriesExport($data, $ministryId);
+
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចូលទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('duelEntry.index', $params);
+        }
     }
 }

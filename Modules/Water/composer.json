@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/water",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Water\\": "",
+            "Modules\\Water\\App\\": "app/",
+            "Modules\\Water\\Database\\Factories\\": "database/factories/",
+            "Modules\\Water\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Water\\Tests\\": "tests/"
+        }
+    }
+}

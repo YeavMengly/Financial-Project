@@ -1,6 +1,19 @@
 @extends('layouts.master')
 
 @section('css')
+    {{-- Plugin CSS (only if used on this page) --}}
+    <link href="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet"
+        type="text/css" />
+
+    <link href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"
+        type="text/css" />
+    <link href="{{ asset('assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}" rel="stylesheet"
+        type="text/css" />
+    <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
+        type="text/css" />
+    <link rel="stylesheet"
+        href="{{ asset('https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css') }}" />
     <style>
         /* Stylish table wrapper */
         .styled-table {
@@ -48,6 +61,7 @@
     </style>
 @endsection
 
+
 @section('content')
     <!-- start page title -->
     <div class="row">
@@ -56,269 +70,678 @@
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.dashboard') }}</h4>
 
                 <div class="page-title-right">
-
+                    <ol class="breadcrumb m-0">
+                        {{-- <li class="breadcrumb-item"><a href="javascript: void(0);">  {{ $item->year }}</a>
+                        </li> --}}
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.dashboard') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('menus.dashboard') }}</li>
+                    </ol>
                 </div>
-
             </div>
         </div>
     </div>
-    <!-- end page title -->
+
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-body">
+                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
+                        <div class="col-sm-3">
+                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                {{ __('forms.year') }}
+                            </label>
 
-                <table class="styled-table">
-                    <thead>
-                        <tr>
-                            <th>{{ __('tables.th.sub.account') }}</th>
-                            <th>{{ __('tables.th.clusters') }}</th>
-                            <th>{{ __('tables.th.fin_law') }}</th>
-                            <th>{{ __('tables.th.current_loan') }}</th>
-                            <th>{{ __('tables.th.new_credit_status') }}</th>
-                            <th>{{ __('tables.th.early_balance') }}</th>
-                            <th>{{ __('tables.th.apply') }}</th>
-                            <th>{{ __('tables.th.deadline_balance') }}</th>
-                            <th>{{ __('tables.th.credit') }}</th>
-                            <th>{{ __('tables.th.law_average') }}</th>
-                            <th>{{ __('tables.th.law_correction') }}</th>
-
-                        </tr>
-                    </thead>
-                    {{-- <thead class="header-border">
-                        <tr>
-                        
-                            <th rowspan="3">ជំពូក</th>
-                            <th rowspan="3">គណនី</th>
-                            <th rowspan="3">អនុគណនី</th>
-                            <th rowspan="3">កូដកម្មវិធី</th>
-                            <th rowspan="3" style="text-align: start; width: 350px;">ចំណាត់ថ្នាក់</th>
-                            <th rowspan="3">ច្បាប់ហិ.វ</th>
-                            <th rowspan="3">ឥណទានបច្ចុប្បន្ន</th>
-                            <th colspan="5">ចលនាឥណទាន</th>
-                            <th rowspan="3">វិចារណកម្ម</th>
-                            <th rowspan="3">ស្ថានភាពឥណទានថ្មី</th>
-                            <th rowspan="3">ស.ម.ដើមគ្រា</th>
-                            <th rowspan="3">អនុវត្ត</th>
-                            <th rowspan="3">ស.ម.ចុងគ្រា</th>
-                            <th rowspan="3">ឥ.សល់</th>
-                            <th colspan="2" rowspan="2">%ប្រៀបធៀប</th>
-                        </tr>
-                        <tr>
-                            <th colspan="4">កើន</th>
-                            <th rowspan="2">ថយ</th>
-                        </tr>
-                        <tr>
-                            <th>កើនផ្ទៃក្នុង</th>
-                            <th class="rotate-text">មិនបានគ្រោងទុក</th>
-                            <th>បំពេញបន្ថែម</th>
-                            <th>សរុប</th>
-                            <th>%ច្បាប់</th>
-                            <th>%ច្បាប់កែតម្រូវ</th>
-                        </tr>
-                    </thead> --}}
-
-                    @php
-                        $report = DB::table('begin_vouchers')->get();
-                        $total_fin_law = $report->sum('fin_law');
-                        $total_apply = $report->sum('apply');
-                    @endphp
-
-                    <tbody>
-                        @foreach ($report as $row)
-                            <tr>
-                                <td>{{ $row->account_sub_id }}</td>
-                                <td>{{ $row->no }}</td>
-                                <td>{{ number_format($row->fin_law) }}</td>
-                                <td>{{ number_format($row->current_loan) }}</td>
-                                <td>{{ number_format($row->new_credit_status) }}</td>
-                                <td>{{ number_format($row->early_balance) }}</td>
-                                <td>{{ number_format($row->apply) }}</td>
-                                <td>{{ number_format($row->deadline_balance) }}</td>
-                                <td>{{ number_format($row->credit) }}</td>
-                                <td>{{ number_format($row->law_average, 2) }}</td>
-                                <td>{{ number_format($row->law_correction, 2) }}</td>
-                            </tr>
-                        @endforeach
-
-                        {{-- Total Row --}}
-                        <tr style="background:#d4edda; font-weight:bold; border-top:2px solid #28a745;">
-                            <td colspan="2" class="text-end" style="padding-right:20px;">
-                                សរុប (Total)
-                            </td>
-
-                            <td style="color:#155724;">
-                                {{ number_format($total_fin_law) }}
-                            </td>
-
-                            <td style="color:#155724;">
-                                {{ number_format($total_apply) }}
-                            </td>
-
-                            <td colspan="7"></td>
-                        </tr>
-                    </tbody>
-
-                </table>
-
-
-
-                {{-- <div class="card-body">
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered dt-responsive  nowrap w-100">
-                            <thead>
-                                <tr>
-                                    <th>{{ __('tables.th.no') }}</th>
-                                    <th>{{ __('tables.th.order') }}</th>
-                                    <th>{{ __('tables.th.category') }}</th>
-                                    <th>{{ __('tables.th.document.total') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $index=1; @endphp
-                                @foreach ($report as $row)
-                                    <tr>
-                                        <td>{{ $index++ }}</td>
-                                        <td>{{ $row->order }}</td>
-                                        <td>{{ $row->name }}</td>
-                                        <td>
-                                            @php
-                                                $total_doc = DB::table('documents')
-                                                    ->where('cate_id', $row->id)
-                                                    ->count();
-                                                echo $total_doc;
-                                            @endphp
-                                        </td>
-                                    </tr>
+                            <select class="form-control" name="year" id="year">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($ministries as $item)
+                                    <option value="{{ $item->year }}"
+                                        {{ $selectedYear == $item->year ? 'selected' : '' }}>
+                                        {{ $item->year }}
+                                    </option>
                                 @endforeach
-                            </tbody>
-                        </table>
-
-                        <table class="table table-bordered dt-responsive  nowrap w-100">
-                            <thead>
-                                <tr>
-                             
-                                    <th>{{ __('tables.th.financeLaw') }}</th>
-                                    <th>{{ __('tables.th.currentCredit') }}</th>
-                                   
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php $index=1; @endphp
-                                @foreach ($chapter as $row)
-                                    <tr>
-                                   
-                                        <td>{{ $row->total_fin_law }}</td>
-                                        <td>{{ $row->total_current_loan }}</td>
-                                        <td>
-                                        
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div> --}}
-
-                {{-- <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.chapter') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('chapters')->count() }}
-                                    </p>
-                                </div>
-                            </div>
+                            </select>
                         </div>
 
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.account') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('accounts')->count() }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="col-sm-3 d-flex align-items-center gap-2" style="margin-top: 36px;">
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
+                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
+                            </button>
 
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.sub.account') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('account_subs')->count() }}
-                                    </p>
-                                </div>
-                            </div>
+                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
+                            </a>
                         </div>
-
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.program') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('programs')->count() }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.sub.program') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('program_subs')->count() }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.clusters') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('agencies')->count() }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4 col-lg-2 mb-3">
-                            <div class="card text-center shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ __('tables.th.agency') }}</h5>
-                                    <p class="card-text fs-4 fw-bold">
-                                        {{ DB::table('agencies')->count() }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> --}}
-
-                {{-- <div class="col-md-4 col-lg-3 mb-3">
-                    <div class="card text-center shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ __('tables.th.users') }}</h5>
-                            <p class="card-text fs-4 fw-bold">
-                                {{ DB::table('users')->where('id', '!=', 1)->count() }}
-                            </p>
-
-                            <hr>
-                            <ul class="list-unstyled small">
-                                @foreach (DB::table('users')->limit(5)->pluck('fullname') as $name)
-                                    <li>{{ $name }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                </div> --}}
-
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-left">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item active">{{ __('menus.initial.voucher') }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.financeLaw') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $totalBeginVoucher }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_fin_law }}">
+                                    {{ number_format($total_fin_law) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_fin_law) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.total.increase') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $loanCount }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_total_increase }}">
+                                    {{ number_format($total_total_increase) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_total_increase) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.deadline_balance') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $totalBeginVoucher }} {{-- filtered by year --}}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_deadline_balance }}">
+                                    {{ number_format($total_deadline_balance) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart3" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap">
+                        <span class="badge bg-danger-subtle text-danger">
+                            {{ number_format($total_deadline_balance) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-6 d-flex">
+                            <div class="col-12">
+                                <span class="text-muted lh-4 d-block text-truncate">
+                                    {{ __('tables.th.law_average') }}
+                                </span>
+                                <span class="mb-3">
+                                    <span class="counter-value" data-target="{{ $law_average_percent }}">
+                                        {{ number_format($law_average_percent, 2) }} %
+                                    </span>
+                                </span>
+                                <div class="card-body">
+                                    <span class="mb-3">
+                                        <div id="mini-chart4" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <span class="text-muted lh-4 d-block text-truncate">
+                                    {{ __('tables.th.law_correction') }}
+                                </span>
+                                <span class="mb-3">
+                                    <span class="counter-value" data-target="{{ $law_correction_percent }}">
+                                        {{ number_format($law_correction_percent, 2) }} %
+                                    </span>
+                                </span>
+                                <div class="card-body">
+                                    <span class="mb-3">
+                                        <div id="mini-chart5" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-6 text-nowrap d-flex">
+                        <div class="col-12">
+                            <span class="badge bg-success-subtle text-success">
+                                {{ number_format($law_average_percent, 2) }} %
+                            </span>
+                        </div>
+                        <div class="col-12">
+                            <span class="badge bg-success-subtle text-success">
+                                {{ number_format($law_correction_percent, 2) }} %
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end row-->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <div class="page-title-left">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item active">{{ __('menus.initial.mandate') }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-2 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                ប្រេងសាំង
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $totalFuel }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $qtyFuel }}">
+                                    {{ number_format($qtyFuel) }} <span>លីត្រ</span>
+                                </span>
+                            </span>
+                        </div>
+                        {{-- <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div> --}}
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col-->
+
+        <div class="col-xl-2 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                ប្រេងម៉ាស៊ូត
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $totalDiesel }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $qtyDiesel }}">
+                                    {{ number_format($qtyDiesel) }} <span>លីត្រ</span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col-->
+
+        <div class="col-xl-2 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                ប្រេងម៉ាស៊ីន
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $totalOil }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $qtyOil }}">
+                                    {{ number_format($qtyOil) }} <span>លីត្រ</span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col-->
+
+        <div class="col-xl-2 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                សម្ភារ
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $materialCount }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_quantity }}">
+                                    {{ number_format($total_quantity) }} <span>{{ __('menus.type') }}</span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col-->
+    </div><!-- end row-->
+
+    {{-- <div class="row">
+        <div class="col-xl-3 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-6">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">My Wallet</span>
+                            <h4 class="mb-3">
+                                $<span class="counter-value" data-target="865.2">0</span>k
+                            </h4>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">+$20.9k</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col -->
+
+        <div class="col-xl-3 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-6">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Number of Trades</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value" data-target="6258">0</span>
+                            </h4>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col-->
+
+        <div class="col-xl-3 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-6">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Invested Amount</span>
+                            <h4 class="mb-3">
+                                $<span class="counter-value" data-target="4.32">0</span>M
+                            </h4>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart3" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">+ $2.8k</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col -->
+
+        <div class="col-xl-3 col-md-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-6">
+                            <span class="text-muted mb-3 lh-1 d-block text-truncate">Profit Ration</span>
+                            <h4 class="mb-3">
+                                <span class="counter-value" data-target="12.57">0</span>%
+                            </h4>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart4" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">+2.95%</span>
+                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    </div>
+                </div><!-- end card body -->
+            </div><!-- end card -->
+        </div><!-- end col -->
+    </div><!-- end row--> --}}
+@endsection
+
+@section('script')
+    {{-- Plugin JS just for this page --}}
+    <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+
+    {{-- DataTables --}}
+    <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('year');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartDataFinLaw = @json($chartDataFinLaw);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart1"),
+                series: [{
+                    name: "ច្បាប់ហរិញ្ញវត្ថុ",
+                    data: chartDataFinLaw
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart1"), options);
+            chart.render();
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartTotalIncrease = @json($chartTotalIncrease);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart2"),
+                series: [{
+                    name: "ចលនាកើន",
+                    data: chartTotalIncrease
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart2"), options);
+            chart.render();
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartDataDeadLine = @json($chartDataDeadLine);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart3"),
+                series: [{
+                    name: "សមតុល្យចុងគ្រា",
+                    data: chartDataDeadLine
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart3"), options);
+            chart.render();
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartAvg = @json($chartAvg);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart4"),
+                series: [{
+                    name: "ច្បាប់មធ្យម",
+                    data: chartAvg
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart4"), options);
+            chart.render();
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartAvgCorrect = @json($chartAvgCorrect);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart5"),
+                series: [{
+                    name: "កែសម្រួលច្បាប់",
+                    data: chartAvgCorrect
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart5"), options);
+            chart.render();
+
+        });
+    </script>
 @endsection

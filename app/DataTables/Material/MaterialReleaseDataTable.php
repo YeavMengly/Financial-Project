@@ -4,6 +4,7 @@ namespace App\DataTables\Material;
 
 use App\Models\Material\MaterialRelease;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -22,16 +23,81 @@ class MaterialReleaseDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'materialrelease.action')
-            ->setRowId('id');
+            ->addIndexColumn()
+            // ->editColumn('price', function ($row) {
+            //     return number_format($row->price ?? 0);
+            // })
+            // ->editColumn('total_price', function ($row) {
+            //     return number_format($row->total_price ?? 0);
+            // })
+            ->editColumn('soft_delete', function ($soft_delete) {
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                return $active;
+            })
+            ->addColumn('action', function ($module) {
+                return view('material::materialEntry.action', ['module' => $module]);
+            })
+            // ->editColumn('note', function ($row) {
+            //     return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->note) . '</div>';
+            // })
+            ->editColumn('refer', function ($row) {
+                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->refer) . '</div>';
+            })
+            ->editColumn('file', function ($row) {
+                if (!$row->attachments) {
+                    return '<span class="text-muted">-</span>';
+                }
+                $files = json_decode($row->file, true);
+                if (is_array($files)) {
+                    $html = '<ul class="list-unstyled m-0">';
+                    foreach ($files as $file) {
+                        $url = asset('storage/uploads/' . $file);
+                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
+                    }
+                    $html .= '</ul>';
+                    return $html;
+                } else {
+                    $url = asset('storage/uploads/' . $row->file);
+                    return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
+                }
+            })
+            ->rawColumns(['note', 'refer', 'file']);
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(MaterialRelease $model): QueryBuilder
+    public function query(MaterialRelease $model, Request $request): QueryBuilder
     {
-        return $model->newQuery();
+        $params = $request->params;
+        $id = decode_params($params);
+
+        $query = $model->newQuery()
+            ->select([
+                'material_releases.id',
+                'material_releases.ministry_id',
+                // 'material_releases.company_name',
+                // 'material_releases.stock_number',
+                // 'material_releases.stock_name',
+                // 'material_releases.user_entry',
+                'material_releases.p_code',
+                'material_releases.p_name',
+                'material_releases.p_year',
+                'material_releases.title',
+                'material_releases.unit',
+                'material_releases.quantity_total',
+                'material_releases.quantity_request',
+                'material_releases.total',
+                'material_releases.source',
+                'material_releases.refer',
+                'material_releases.date_release',
+                'material_releases.file',
+                'material_releases.created_at',
+                'material_releases.updated_at',
+            ])
+            ->where('material_releases.ministry_id', $id);
+
+        return $query;
     }
 
     /**
@@ -40,20 +106,14 @@ class MaterialReleaseDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('materialrelease-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    //->dom('Bfrtip')
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->buttons([
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    ]);
+            ->setTableId('materialrelease-table')
+            ->columns($this->getColumns())
+            ->parameters([
+                'language' => [
+                    'url' => asset('assets/lang/language.json'),
+                ],
+            ])
+            ->orderBy(2, 'ASC');
     }
 
     /**
@@ -62,15 +122,28 @@ class MaterialReleaseDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
-            Column::make('id'),
-            Column::make('add your columns'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::computed('DT_RowIndex', __('tables.th.no'))
+                ->width(30)->addClass('text-center align-middle')->orderable(false),
+
+            // Column::make('company_name')->title(__('tables.th.company.name'))->width(90)->addClass('align-middle'),
+            // Column::make('stock_number')->title(__('tables.th.stock.number'))->width(30)->addClass('align-middle'),
+            // Column::make('stock_name')->title(__('tables.th.stock.name'))->width(30)->addClass('align-middle'),
+            // Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
+            Column::make('p_code')->title(__('tables.th.pro.code'))->width(60)->addClass('align-middle'),
+            Column::make('p_name')->title(__('tables.th.pro.name'))->width(80)->addClass('align-middle'),
+            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
+            Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
+            Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
+            Column::make('quantity_total')->title(__('tables.th.quantity.total'))->width(80)->addClass('align-middle'),
+            Column::make('quantity_request')->title(__('tables.th.quantity.req'))->width(80)->addClass('align-middle'),
+            Column::make('total')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
+            Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
+            Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
+            Column::make('date_release')->title(__('tables.th.date.release'))->width(200)->addClass('align-middle'),
+            Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
+
+            Column::computed('action', __('tables.th.action'))
+                ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];
     }
 

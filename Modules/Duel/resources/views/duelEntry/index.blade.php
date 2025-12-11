@@ -38,44 +38,83 @@
             <div class="card">
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
+
                         <div class="col-sm-3">
+                            <label for="companyName" class="form-label font-size-13 text-muted">
+                                {{ __('forms.company.name') }}
+                            </label>
+                            <select class="form-control" name="company_name" id="companyName">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($duelEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('company_name') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->company_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                {{ __('forms.user.entry') }}
+                            </label>
+                            <select class="form-control" name="user_entry" id="userEntry">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($duelEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('user_entry') == $item->user_entry ? 'selected' : '' }}>
+                                        {{ $item->user_entry }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label for="unit" class="form-label font-size-13 text-muted">
+                                {{ __('forms.unit') }}
+                            </label>
+                            <select class="form-control" name="unit" id="unit">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($duelEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('unit') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->unit }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label for="stock_number" class="form-label font-size-13 text-muted">
+                                {{ __('forms.stock.number') }}
+                            </label>
                             <input type="text" class="form-control" name="stock_number"
-                                value="{{ request('stock_number') }}" placeholder="{{ __('menus.stock.number') }}" />
+                                value="{{ request('stock_number') }}" />
                         </div>
 
-                        <div class="col-sm-3">
-                            <select class="form-control" name="duelType" id="duelType">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($duelType as $item)
-                                    <option value="{{ $item->id }}">
-                                        {{ $item->name_km }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
 
-                        <div class="col-sm-3">
-                            <select class="form-control" name="unitType" id="unitType">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($unitType as $item)
-                                    <option value="{{ $item->id }}">
-                                        {{ $item->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                            {{-- Search --}}
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
+                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
+                            </button>
 
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="txtDescription"
-                                value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
-
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            {{-- Reset --}}
+                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
+
+                            {{-- Export --}}
+                            <a href="{{ route(
+                                'duelEntry.export',
+                                array_merge(['params' => $params],),
+                            ) }}"
+                                class="btn btn-success d-flex align-items-center px-3">
+                                <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
+                            </a>
+
                         </div>
+
                     </form>
                 </div>
             </div>
@@ -148,8 +187,8 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const duelType = document.getElementById('duelType');
-            const duelTypeChoices = new Choices(duelType, {
+            const companyName = document.getElementById('companyName');
+            const companyNameChoices = new Choices(companyName, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',
@@ -159,14 +198,29 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const unitType = document.getElementById('unitType');
-            const unitTypeChoices = new Choices(unitType, {
+            const userEntry = document.getElementById('userEntry');
+            const userEntryChoices = new Choices(userEntry, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const unit = document.getElementById('unit');
+            const unitChoices = new Choices(unit, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.getElementById('btnReset').addEventListener('click', function() {
+            document.getElementById('filter').reset();
         });
     </script>
 @endsection

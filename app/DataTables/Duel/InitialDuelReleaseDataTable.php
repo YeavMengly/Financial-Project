@@ -1,7 +1,8 @@
 <?php
 
-namespace App\DataTables;
+namespace App\DataTables\Duel;
 
+use App\Models\BeginCredit\Ministry;
 use App\Models\InitialDuelRelease;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -22,14 +23,22 @@ class InitialDuelReleaseDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'initialduelrelease.action')
-            ->setRowId('id');
+            ->addIndexColumn()
+            ->editColumn('soft_delete', function ($module) {
+                return is_null($module->deleted_at)
+                    ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
+                    : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+            })
+            ->addColumn('action', function ($model) {
+                return view('duel::duelRelease.initialDuelRelease.action', ['module' => $model]);
+            })
+            ->rawColumns(['soft_delete', 'action']);
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(InitialDuelRelease $model): QueryBuilder
+    public function query(Ministry $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -40,20 +49,14 @@ class InitialDuelReleaseDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('initialduelrelease-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    //->dom('Bfrtip')
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->buttons([
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload')
-                    ]);
+            ->setTableId('initialduelrelease-table')
+            ->columns($this->getColumns())
+            ->parameters([
+                'language' => [
+                    'url' => asset('assets/lang/language.json'),
+                ],
+            ])
+            ->orderBy(2, 'ASC');
     }
 
     /**
@@ -62,15 +65,20 @@ class InitialDuelReleaseDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
-            Column::make('id'),
-            Column::make('add your columns'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::computed(
+                'DT_RowIndex',
+                __('tables.th.no')
+            )->width(30)->addClass('text-center align-middle')->orderable(false),
+
+            Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
+
+            Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
+
+            Column::computed(
+                'action',
+                __('tables.th.action')
+            )->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
+
         ];
     }
 

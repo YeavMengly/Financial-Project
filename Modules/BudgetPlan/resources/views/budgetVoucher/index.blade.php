@@ -124,7 +124,7 @@
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
+                            <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                             </a>
                             {{-- Export --}}

@@ -12,6 +12,7 @@ use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\BeginVoucher;
 use App\Models\BeginCredit\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
+use App\Models\Chapter;
 use App\Models\Program;
 use App\Models\ProgramSub;
 use Illuminate\Http\Request;
@@ -36,13 +37,15 @@ class BeginVoucherController extends Controller
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
         $agency = Agency::where('ministry_id', $ministry->id)->get();
-
+        $chapter = Chapter::where('ministry_id', $ministry->id)
+            ->get();
         $account = Account::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         return $dataTable->render('beginningcredit::beginVoucher.index', [
             'ministry'   => $ministry,
             'params' => $params,
+            'chapter' => $chapter,
             'account' => $account,
             'agency' => $agency,
             'accountSub' => $accountSub,
@@ -207,7 +210,11 @@ class BeginVoucherController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('beginVoucher.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('beginVoucher.index', $params);
+            }
+
+            return redirect()->route('beginVoucher.create', $params);
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -480,6 +487,15 @@ class BeginVoucherController extends Controller
                 ->flash();
 
             return redirect()->route('beginVoucher.index', $params);
+        }
+    }
+
+    private function preventIfMinistryDeleted($ministryId)
+    {
+        $ministry = \App\Models\BeginCredit\Ministry::withTrashed()->findOrFail($ministryId);
+
+        if (!is_null($ministry->deleted_at)) {
+            abort(403, 'This ministry is deleted. You can only view records.');
         }
     }
 }

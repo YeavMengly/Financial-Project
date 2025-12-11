@@ -6,7 +6,6 @@ use App\Models\BeginCredit\Agency;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Illuminate\Http\Request as HttpRequest;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;

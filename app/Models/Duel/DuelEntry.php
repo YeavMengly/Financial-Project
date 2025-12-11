@@ -25,5 +25,6 @@ class DuelEntry extends Model
         'refer',
         'date_entry',
         'file',
+        'source'
     ];
 }

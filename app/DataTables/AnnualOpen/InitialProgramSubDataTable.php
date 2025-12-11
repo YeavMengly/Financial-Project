@@ -49,7 +49,7 @@ class InitialProgramSubDataTable extends DataTable
             'ministries.name'
         ]);
 
-        return $query->orderBy('ministries.id', 'ASC');
+        return $query->orderBy('ministries.id', 'DESC');
     }
 
     /**

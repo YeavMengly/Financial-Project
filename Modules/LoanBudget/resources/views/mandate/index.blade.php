@@ -91,11 +91,13 @@
                             <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}" />
                         </div>
 
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                            <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
+                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            </a>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>

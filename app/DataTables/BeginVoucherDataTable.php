@@ -74,6 +74,11 @@ class BeginVoucherDataTable extends DataTable
                 $q->where('begin_vouchers.agency_id', $request->agency)
             )
             ->when(
+                $request->filled('chapter'),
+                fn($q) =>
+                $q->where('begin_vouchers.chapter_id', $request->chapter)
+            )
+            ->when(
                 $request->filled('account'),
                 fn($q) =>
                 $q->where('begin_vouchers.account_id', $request->account)

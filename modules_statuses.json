@@ -14,5 +14,7 @@
     "InitialChapter": true,
     "InitialBudgetVoucher": true,
     "Material": true,
-    "Duel": true
+    "Duel": true,
+    "Water": true,
+    "Electric": true
 }

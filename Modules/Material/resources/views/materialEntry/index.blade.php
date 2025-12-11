@@ -37,49 +37,112 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
+                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
+
                         <div class="col-sm-3">
-                            <select class="form-control" name="agency" id="agency">
+                            <label for="companyName" class="form-label font-size-13 text-muted">
+                                {{ __('forms.company.name') }}
+                            </label>
+                            <select class="form-control" name="company_name" id="companyName">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($agency as $ag)
-                                    <option value="{{ $ag->id }}"
-                                        {{ request('agency') == $ag->id ? 'selected' : '' }}>
-                                        {{ $ag->no }} - {{ $ag->name }}
+                                @foreach ($materialEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('company_name') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->company_name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="col-sm-3">
-                            <select class="form-control" name="accountSub" id="accountSub">
+                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                {{ __('forms.user.entry') }}
+                            </label>
+                            <select class="form-control" name="user_entry" id="userEntry">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($accountSub as $as)
-                                    <option value="{{ $as->no }}"
-                                        {{ request('accountSub') == $as->id ? 'selected' : '' }}>
-                                        {{ $as->no }}
+                                @foreach ($materialEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('user_entry') == $item->user_entry ? 'selected' : '' }}>
+                                        {{ $item->user_entry }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" name="no" value="{{ request('no') }}"
-                                placeholder="{{ __('menus.cluster') }}" />
+                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                {{ __('forms.source') }}
+                            </label>
+                            <select class="form-control" name="source" id="source">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($materialEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('source') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->source }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" name="txtDescription"
-                                value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
+                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                {{ __('forms.pro.name') }}
+                            </label>
+                            <select class="form-control" name="p_name" id="Pname">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($materialEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('p_name') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->p_name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            <label for="unit" class="form-label font-size-13 text-muted">
+                                {{ __('forms.unit') }}
+                            </label>
+                            <select class="form-control" name="unit" id="unit">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($materialEntry as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('unit') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->unit }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label for="stock_number" class="form-label font-size-13 text-muted">
+                                {{ __('forms.stock.number') }}
+                            </label>
+                            <input type="text" class="form-control" name="stock_number"
+                                value="{{ request('stock_number') }}" />
+                        </div>
+
+                        <div class="col-sm-3 d-flex align-items-center gap-2" style="margin-top: 34px;">
+
+                            {{-- Search --}}
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
+                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
+                            </button>
+
+                            {{-- Reset --}}
+                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
-                        </div>
-                    </form> --}}
 
+                            {{-- Export --}}
+                            <a href="{{ route('materialEntry.export', array_merge(['params' => $params])) }}"
+                                class="btn btn-success d-flex align-items-center px-3">
+                                <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
+                            </a>
+
+                        </div>
+
+                    </form>
                 </div>
             </div>
         </div>
@@ -151,8 +214,8 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const agencyNumber = document.getElementById('agency');
-            const agencyNumberChoices = new Choices(agencyNumber, {
+            const companyName = document.getElementById('companyName');
+            const companyNameChoices = new Choices(companyName, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',
@@ -162,8 +225,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const subAccountNumber = document.getElementById('accountSub');
-            const subAccountNumberChoices = new Choices(subAccountNumber, {
+            const userEntry = document.getElementById('userEntry');
+            const userEntryChoices = new Choices(userEntry, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',
@@ -173,8 +236,30 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const program = document.getElementById('program');
-            const programChoices = new Choices(program, {
+            const source = document.getElementById('source');
+            const sourceChoices = new Choices(source, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const Pname = document.getElementById('Pname');
+            const PnameChoices = new Choices(Pname, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const unit = document.getElementById('unit');
+            const unitChoices = new Choices(unit, {
                 searchEnabled: true,
                 itemSelectText: '',
                 placeholderValue: 'ជ្រើសរើស',

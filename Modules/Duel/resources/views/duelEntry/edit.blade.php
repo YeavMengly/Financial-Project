@@ -56,8 +56,8 @@
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="stock_number">{{ __('forms.stock.number') }}</label>
-                                        <input type="text" min="0" name="stock_number"
-                                            value="{{ $module->stock_number }}" required class="form-control"
+                                        <input type="text" name="stock_number" value="{{ $module->stock_number }}"
+                                            required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('stock_number')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -99,7 +99,7 @@
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($duelType as $item)
                                                 <option value="{{ $item->id }}"
-                                                    {{ $item->name_km == $module->name_km ? 'selected' : '' }}>
+                                                    {{ $item->name_km == $module->item_name ? 'selected' : '' }}>
                                                     {{ $item->name_km }}
                                                 </option>
                                             @endforeach
@@ -187,6 +187,18 @@
                                             accept=".pdf,.doc,.docx" multiple />
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
                                         @error('file')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="source">{{ __('forms.source') }}</label>
+                                        <input type="text" name="source" value="{{ $module->source }}"
+                                            class="form-control"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        @error('source')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>

@@ -4,7 +4,9 @@ namespace Modules\Material\App\Http\Controllers;
 
 use App\DataTables\Material\InitialMaterialEntryDataTable;
 use App\DataTables\Material\MaterialEntryDataTable;
+use App\Exports\Material\MaterialEntriesExport;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\Agency;
 use App\Models\BeginCredit\Ministry;
 use App\Models\Material\MaterialEntry;
 use App\Models\UnitType;
@@ -27,10 +29,14 @@ class MaterialEntryController extends Controller
     {
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
+        $agency = Agency::where('ministry_id', $ministry->id)->get();
+        $materialEntry = MaterialEntry::where('ministry_id', $ministry->id)->get();
 
         return $dataTable->render('material::materialEntry.index', [
             'params' => $params,
             'ministry' => $ministry,
+            'agency' => $agency,
+            'materialEntry' => $materialEntry
         ]);
     }
 
@@ -169,5 +175,94 @@ class MaterialEntryController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function export(Request $request, $params)
+    {
+
+        try {
+            $ministryId = decode_params($params);
+
+            // $loan = BudgetVoucherLoan::where('ministry_id', $ministryId)->get();
+
+            // // Base query: full BeginVoucher models
+            // $query = BeginVoucher::where('account_sub_id', $loan->account_sub_id)
+            //     ->where('ministry_id', $ministryId);
+            $query = MaterialEntry::query()
+                // ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
+                ->where('material_entries.ministry_id', $ministryId)
+                ->select(
+                    'material_entries.*',
+                    // 'budget_voucher_loans.internal_increase',
+                    // 'budget_voucher_loans.unexpected_increase',
+                    // 'budget_voucher_loans.additional_increase',
+                    // 'budget_voucher_loans.total_increase',
+                    // 'budget_voucher_loans.decrease',
+                    // 'budget_voucher_loans.editorial'
+                );
+
+            // Apply filters...
+            $data = $query->get();
+
+
+
+            // Apply the same filters as in DataTable::query()
+            // if ($request->filled('agency')) {
+            //     $query->where('agency_id', $request->agency);
+            // }
+
+            // if ($request->filled('account')) {
+            //     $query->where('account_id', $request->account);
+            // }
+
+            // if ($request->filled('accountSub')) {
+            //     $query->where('account_sub_id', $request->accountSub);
+            // }
+
+            // if ($request->filled('no')) {
+            //     $query->where('no', 'like', "%{$request->no}%");
+            // }
+
+            // if ($request->filled('txtDescription')) {
+            //     $query->where('txtDescription', 'like', "%{$request->txtDescription}%");
+            // }
+
+            $query->orderBy('created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported MaterialExport Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចូលទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('materialEntry.index', $params);
+            }
+
+            // Pass filtered data + ministry id into export
+            $export = new MaterialEntriesExport($data, $ministryId);
+
+            // you can pass $request if you want to use date filters/text in header
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចូលទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('materialEntry.index', $params);
+        }
     }
 }

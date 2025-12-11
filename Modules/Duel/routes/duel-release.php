@@ -13,4 +13,6 @@ Route::middleware('PermissionCheck')->controller(DuelReleaseController::class)->
 Route::controller(DuelReleaseController::class)->group(function () {
     Route::post('duel/release/{params}/store', 'store')->name('duelRelease.store');
     Route::post('duel/release/{params}/update/{id}', 'update')->name('duelRelease.update');
+    Route::get('duel/release/by-stock_number/{params}', 'getByStockID')->name('duelRelease.by.stock_number');
+    Route::get('duel/release/{params}/export', 'export')->name('duelRelease.export');
 });

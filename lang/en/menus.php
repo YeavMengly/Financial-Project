@@ -11,7 +11,7 @@ return [
     'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
-
+    'content' => 'មាតិកា',
     'cluster' => 'ចង្កោម',
     'chapters' => 'ជំពូក',
     'accounts' => 'គណនី',
@@ -61,7 +61,12 @@ return [
     'api.key' => 'API Key',
 
     'electric' => 'អគ្គិសនី',
+    'electric.entry' => 'អគ្គិសនីនាំចូល',
+    'electric.entity' => 'អង្គភាពអគ្គិសនី',
     'water' => 'រដ្ឋករទឹក',
+    'water.entry' => 'រដ្ឋករទឹកនាំចូល',
+    'water.entity' => 'អង្គភាពរដ្ឋករទឹក',
+    'entity' => 'អង្គភាព',
 
     'inventory' => 'សារពើភ័ណ្ឌ',
     'duel' => 'ប្រេងឥន្ធនៈ',

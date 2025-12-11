@@ -27,6 +27,7 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->text('refer')->nullable();
             $table->date('date_entry');
+            $table->string('source')->nullable();
             $table->string('file')->nullable();
             $table->timestamps();
             $table->softDeletes();

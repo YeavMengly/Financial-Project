@@ -51,11 +51,23 @@
                         </div>
 
                         <div class="col-sm-3">
+                            <select class="form-control" name="chapter" id="chapter">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($chapter as $ch)
+                                    <option value="{{ $ch->no }}"
+                                        {{ request('chapter') == $ch->no ? 'selected' : '' }}>
+                                        {{ $ch->no }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
                             <select class="form-control" name="account" id="account">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($account as $as)
                                     <option value="{{ $as->no }}"
-                                        {{ request('account') == $as->id ? 'selected' : '' }}>
+                                        {{ request('account') == $as->no ? 'selected' : '' }}>
                                         {{ $as->no }}
                                     </option>
                                 @endforeach
@@ -67,7 +79,7 @@
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($accountSub as $as)
                                     <option value="{{ $as->no }}"
-                                        {{ request('accountSub') == $as->id ? 'selected' : '' }}>
+                                        {{ request('accountSub') == $as->no ? 'selected' : '' }}>
                                         {{ $as->no }}
                                     </option>
                                 @endforeach
@@ -187,6 +199,18 @@
                 shouldSort: false
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const chapter = document.getElementById('chapter');
+            const chapterChoices = new Choices(chapter, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
 
         document.addEventListener('DOMContentLoaded', function() {
             const account = document.getElementById('account');

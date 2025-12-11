@@ -14,7 +14,7 @@ use Modules\Material\App\Http\Controllers\MaterialController;
 |
 */
 
-Route::prefix('material')->middleware(['auth'])->group(function () {
+Route::prefix('inventory')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/material-entry.php';
     require_once __DIR__ . '/material-release.php';
 });

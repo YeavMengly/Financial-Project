@@ -13,4 +13,5 @@ Route::middleware('PermissionCheck')->controller(MaterialReleaseController::clas
 Route::controller(MaterialReleaseController::class)->group(function () {
     Route::post('material/release/{params}/store', 'store')->name('materialRelease.store');
     Route::post('material/release/{params}/update/{id}', 'update')->name('materialRelease.update');
+    Route::get('material/{params}/export', 'export')->name('materialRelease.export');
 });

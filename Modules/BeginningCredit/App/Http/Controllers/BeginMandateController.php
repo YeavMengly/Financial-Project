@@ -178,7 +178,11 @@ class BeginMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('beginMandate.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('beginMandate.index', $params);
+            }
+
+            return redirect()->route('beginMandate.create', $params);
         } catch (\Exception $e) {
 
             DB::rollBack();
