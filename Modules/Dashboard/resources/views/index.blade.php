@@ -214,7 +214,7 @@
                             </span>
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{ $totalBeginVoucher }} {{-- filtered by year --}}
+                                    {{ $totalBeginVoucher }}
                                 </button>
                             </div>
                         </div>

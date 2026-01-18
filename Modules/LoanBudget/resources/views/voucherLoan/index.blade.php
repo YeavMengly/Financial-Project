@@ -48,9 +48,9 @@
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                             @if (hasPermission('budget-voucher.create'))
                                 {{-- <div class="mb-4"> --}}
-                                <a class="btn btn-light waves-effect waves-light" href=""><i
+                                {{-- <a class="btn btn-light waves-effect waves-light" href=""><i
                                         class="bx bx-download me-1"></i>
-                                    {{ __('buttons.download') }}</a>
+                                    {{ __('buttons.download') }}</a> --}}
                                 {{-- </div> --}}
                             @endif
                         </div>

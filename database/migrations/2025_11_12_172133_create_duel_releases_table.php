@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('agency')->nullable();
             $table->string('user_request')->nullable();
             $table->string('unit')->nullable();
+            $table->string('title')->nullable();
             $table->integer('quantity_total');
             $table->integer('quantity_request');
             $table->decimal('duel_total', 15, 0);

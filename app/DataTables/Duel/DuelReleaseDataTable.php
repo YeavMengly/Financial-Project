@@ -43,12 +43,6 @@ class DuelReleaseDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('duel::duelRelease.action', ['module' => $module]);
             })
-            ->editColumn('note', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->note) . '</div>';
-            })
-            ->editColumn('refer', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->refer) . '</div>';
-            })
             ->editColumn('file', function ($row) {
                 if (!$row->attachments) {
                     return '<span class="text-muted">-</span>';
@@ -95,6 +89,7 @@ class DuelReleaseDataTable extends DataTable
                 'duel_releases.duel_total',
                 'duel_releases.note',
                 'duel_releases.refer',
+                'duel_releases.title',
                 'duel_releases.date_release',
                 'duel_releases.file',
                 'duel_releases.created_at',
@@ -142,8 +137,8 @@ class DuelReleaseDataTable extends DataTable
             Column::make('duel_total')->title(__('tables.th.quantity.remain'))->width(80)->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->width(200)->addClass('align-middle'),
             Column::make('note')->title(__('tables.th.note'))->width(200)->addClass('align-middle'),
+            Column::make('title')->title(__('tables.th.title'))->width(200)->addClass('align-middle'),
             Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
-
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

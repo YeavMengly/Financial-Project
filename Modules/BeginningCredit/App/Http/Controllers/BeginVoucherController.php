@@ -132,16 +132,11 @@ class BeginVoucherController extends Controller
         DB::beginTransaction();
         try {
 
-            //   dd($validatedData['cboProgram']);
             $ministry   = Ministry::where('id', $id)->first();
             $program    = Program::where('id', $validatedData['cboProgram'])->first();
-            //   dd($program);
             $programSub = ProgramSub::where('program_id', $program->id)
                 ->where('id', $validatedData['cboProgramSub'])
                 ->first();
-
-            // dd($programSub->no);
-
             $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
             $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
             $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
@@ -161,7 +156,6 @@ class BeginVoucherController extends Controller
 
             $valueNo = $ministry->no . $validatedData['cboProgram'] .  $programSub->no . '0' . $validatedData['no'];
 
-            // dd($valueNo);
             $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->where('agency_id', $validatedData['cboAgency'])

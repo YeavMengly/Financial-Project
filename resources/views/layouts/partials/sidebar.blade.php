@@ -151,14 +151,14 @@
                                 </a>
                             </li>
                         @endif
-                         @if (hasPermission('ministries.index'))
+                        {{-- @if (hasPermission('ministries.index'))
                             <li>
                                 <a href="#" class="">
                                     <i data-feather="file"></i>
                                     <span data-key="t-report-program">{{ __('menus.report') }}</span>
                                 </a>
                             </li>
-                        @endif
+                        @endif --}}
                     </ul>
                 </li>
 

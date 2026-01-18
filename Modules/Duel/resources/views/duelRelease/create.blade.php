@@ -46,11 +46,10 @@
                                         <select class="form-control" data-trigger id="dropStockNumber" name="stock_number"
                                             required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($duelEntry as $item)
-                                                <option value="{{ $item->stock_number }}">
-                                                    {{ $item->stock_number }}
-                                                </option>
+                                            @foreach ($duelEntry as $stock)
+                                                <option value="{{ $stock }}">{{ $stock }}</option>
                                             @endforeach
+                                        </select>
                                         </select>
                                         @error('stock_number')
                                             <div class="pristine-error text-help">{{ $message }}</div>

@@ -28,12 +28,13 @@ class MaterialReleaseController extends Controller
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $materialRelease = MaterialRelease::where('ministry_id', $ministry->id)->get();
 
-        return $dataTable->render('material::materialRelease.index', [
-            'params' => $params,
-            'ministry' => $ministry,
-            'agency' => $agency,
-            'materialRelease' => $materialRelease
-        ]);
+        // return $dataTable->render('material::materialRelease.index', [
+        //     'params' => $params,
+        //     'ministry' => $ministry,
+        //     'agency' => $agency,
+        //     'materialRelease' => $materialRelease
+        // ]);
+        return view('maintenance.maintenance');
     }
 
     /**

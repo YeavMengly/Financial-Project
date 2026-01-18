@@ -16,6 +16,7 @@ class DuelRelease extends Model
         'agency',
         'user_request',
         'unit',
+        'title',
         'quantity_total',
         'quantity_request',
         'duel_total',

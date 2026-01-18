@@ -97,40 +97,66 @@ class DuelReleaseExport
         /*
         |--------------------------------------------------------
         | Detail table
-        |   Start at row 18
+        |   Start at row 11 (matches your template)
         |   Columns:
         |     A → ល.រ (index)
-        |     B → item_name
-        |     C → unit
-        |     D → quantity
-        |     E → price
-        |     F → duel_total
-        |     G → source
-        |     H → note/blank
+        |     B → date_release
+        |     C → receipt_number
+        |     D → refer
+        |     E–G → EA  (បរិមាណដើម, ចេញ, សមតុល្យ)
+        |     H–J → DO
+        |     K–M → MO
         |--------------------------------------------------------
         */
-        $row       = 11;
-        $totalDuel = 0;
+        $row = 11;
+
+        // totals per type (if you want to show them later)
+        $totalEA = 0;
+        $totalDO = 0;
+        $totalMO = 0;
 
         foreach ($release as $index => $item) {
-            $sheet->setCellValue("A{$row}", $index + 1);
-            $sheet->setCellValue("B{$row}", $item->date_release);
-            $sheet->setCellValue("C{$row}", $item->receipt_number);
-            $sheet->setCellValue("D{$row}", $item->refer);
-            $sheet->setCellValue("E{$row}", $item->quantity_total);
-            $sheet->setCellValue("F{$row}", $item->quantity_request);
-            $sheet->setCellValue("G{$row}", $item->duel_total);
-            $sheet->setCellValue("H{$row}", null);
-            $sheet->setCellValue("I{$row}", null);
-            $sheet->setCellValue("J{$row}", null);
-            $sheet->setCellValue("K{$row}", null);
-            $sheet->setCellValue("L{$row}", null);
-            $sheet->setCellValue("M{$row}", null);
-            $sheet->setCellValue("N{$row}", null);
 
-            $totalDuel += (float) $item->duel_total;
+            // 1) Common columns
+            $sheet->setCellValue("A{$row}", $index + 1);                 // ល.រ
+            $sheet->setCellValue("B{$row}", $item->date_release);        // កាលបរិច្ឆេទ
+            $sheet->setCellValue("C{$row}", $item->receipt_number);      // លេខលិខិត
+            $sheet->setCellValue("D{$row}", $item->refer);               // លេខយោង / កំណត់ចំណាំ
 
-            $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+            // 2) Decide which block to fill: EA, DO, or MO
+            //    👉 Adjust this to your actual column / relationship
+            //    e.g. $typeCode = $item->duelType->code; or $item->type; etc.
+            $typeCode = strtoupper($item->type ?? 'EA'); // <-- CHANGE 'type' to your real field
+
+            // map type → columns
+            $map = [
+                'EA' => ['E', 'F', 'G'],
+                'DO' => ['H', 'I', 'J'],
+                'MO' => ['K', 'L', 'M'],
+            ];
+
+            // default to EA if unknown
+            $cols = $map[$typeCode] ?? $map['EA'];
+
+            [$colTotal, $colReq, $colRemain] = $cols;
+
+            // 3) Put the numbers in the correct 3 columns
+            $sheet->setCellValue("{$colTotal}{$row}", $item->quantity_total);
+            $sheet->setCellValue("{$colReq}{$row}",   $item->quantity_request);
+            $sheet->setCellValue("{$colRemain}{$row}", $item->duel_total);
+
+            // 4) Sum per type (optional – used in footer)
+            $sumValue = (float) $item->duel_total;
+            if ($typeCode === 'EA') {
+                $totalEA += $sumValue;
+            } elseif ($typeCode === 'DO') {
+                $totalDO += $sumValue;
+            } elseif ($typeCode === 'MO') {
+                $totalMO += $sumValue;
+            }
+
+            // 5) Apply border + alignment for the whole detail row
+            $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
                 'font' => [
                     'size' => 9,
                 ],
@@ -156,11 +182,16 @@ class DuelReleaseExport
         |   F → numeric total
         |--------------------------------------------------------
         */
+        // Totals row
         $sheet->mergeCells("A{$row}:D{$row}");
         $sheet->setCellValue("A{$row}", 'សរុប');
-        $sheet->setCellValue("F{$row}", $totalDuel);
 
-        $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+        // Example: show grand total of EA in col G, DO in col J, MO in col M
+        $sheet->setCellValue("G{$row}", $totalEA);
+        $sheet->setCellValue("J{$row}", $totalDO);
+        $sheet->setCellValue("M{$row}", $totalMO);
+
+        $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 9,
@@ -176,6 +207,7 @@ class DuelReleaseExport
                 ],
             ],
         ]);
+
 
 
         /*
