@@ -41,6 +41,8 @@ return [
     'th.rank' => 'ចំណាត់ថ្នាក់',
     'th.financeLaw' => 'ច្បាប់ហិរញ្ញវត្ថុ',
     'th.currentCredit' => 'ឥណទានបច្ចុប្បន្ន',
+    'th.name.kh' => 'ឈ្មោះ (ខ្មែរ)',
+    'th.name.en' => 'ឈ្មោះ (អង់គ្លេស)',
 
     'th.budget' => 'ថវិកា',
     'th.type' => 'ប្រភេទ',

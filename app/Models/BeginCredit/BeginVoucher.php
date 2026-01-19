@@ -2,6 +2,7 @@
 
 namespace App\Models\BeginCredit;
 
+use App\Models\Content\Agency;
 use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

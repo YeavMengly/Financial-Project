@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Dashboard\App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,10 +13,6 @@ use Modules\Dashboard\App\Http\Controllers\DashboardController;
 |
 */
 
-Route::prefix('dashboard')->middleware(['auth'])->group(function () {
-    Route::controller(DashboardController::class)->group(function () {
-        Route::get("/", "index")->name("dashboard.index");
-        // ✅ program subs for popup (AJAX)
-        Route::get('/programs/{programId}/subs', 'subs')->name('dashboard.program.subs');
-    });
+Route::prefix('content')->middleware(['auth'])->group(function () {
+    require_once __DIR__ . '/expenseType.php';
 });

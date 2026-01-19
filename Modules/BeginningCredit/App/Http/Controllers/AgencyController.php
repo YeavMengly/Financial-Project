@@ -45,6 +45,9 @@ class AgencyController extends Controller
         $id = decode_params($params);
         $data = Program::where('ministry_id', $id)->get();
 
+
+        // dd($data);
+
         return view('beginningcredit::agency.create')->with('params', $params)
             ->with('data', $data);
     }
@@ -106,7 +109,7 @@ class AgencyController extends Controller
     public function edit($params, $id)
     {
         $id = decode_params($id);
-        $program = Program::all();
+        $program = Program::where('ministry_id', decode_params($params))->get();
         $agency = Agency::where('id', $id)->first();
 
         return view('beginningcredit::agency.edit')->with('params', $params)->with('agency', $agency)->with('program', $program);

@@ -25,6 +25,7 @@ return [
     'program.sub' => 'អនុកម្មវិធី',
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
+    'expense.type' => 'ប្រភេទចំណាយ',
 
     'budget.control' => 'និយ័តថវិកា',
     'budget.plan' => 'ចុះបញ្ជី',

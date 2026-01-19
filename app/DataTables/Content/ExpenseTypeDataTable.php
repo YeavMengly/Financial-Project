@@ -1,18 +1,19 @@
 <?php
 
-namespace App\DataTables;
+namespace App\DataTables\Content;
 
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\ExpenseType;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Editor\Editor;
+use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class AgencyDataTable extends DataTable
+class ExpenseTypeDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -23,46 +24,52 @@ class AgencyDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('status', function ($row) {
+                if ($row->status) {
+                    return '<span class="badge bg-success">Active</span>';
+                }
+                return '<span class="badge bg-danger">Inactive</span>';
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
             })
-            ->addColumn("dateTime", function ($module) {
-                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
+            ->addColumn("dateTime", function ($row) {
+                return Carbon::parse($row->created_at)->format('Y-m-d  h:i:s A');
             })
-            ->addColumn('action', function ($module) {
-                return view('content::content.agency.action', ['module' => $module]);
+            ->addColumn('action', function ($row) {
+                return view('content::content.expenseType.action', [
+                    'module' => $row,
+                ]);
             })
-            ->rawColumns(['soft_delete', 'action']);
+            ->rawColumns(['status', 'soft_delete', 'action']);
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(Agency $model,  Request $request): QueryBuilder
+    public function query(ExpenseType $model): QueryBuilder
     {
-        $params = $request->params;
-        $id = decode_params($params);
         $model = $model->newQuery();
         $model->withTrashed();
         $model->newQuery()
-            ->leftJoin('programs', 'agencies.program_id', '=', 'programs.id')
             ->select([
-                'agencies.id',
-                'agencies.ministry_id',
-                'agencies.program_id',
-                'agencies.no as name_no',
-                'agencies.name',
-                'agencies.nick_name',
-                'programs.no as no_program',
-                'agencies.created_at',
-                'agencies.deleted_at'
+                'expense_types.id',
+                'expense_types.name_kh',
+                'expense_types.name_en',
+                'expense_types.status',
+                'expense_types.created_at',
+                'expense_types.deleted_at'
+            ])
+            ->orderBy('created_at', 'ASC');
+        return $model->orderBy('expense_types.id', 'ASC');
 
-            ])->where('agencies.ministry_id', $id)
-            ->orderBy('agencies.created_at', 'ASC');
-        $model->where('agencies.ministry_id', $id);
+        /**
+         * ================       Step 2:  Filter by chapter number if provided        ================
+         */
+        $model->where('chapters.ministry_id', $id);
 
-        return $model->orderBy('agencies.id', 'ASC');
+        return $model->orderBy('chapters.id', 'ASC');
     }
 
     /**
@@ -71,7 +78,7 @@ class AgencyDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('agency-table')
+            ->setTableId('expensetype-table')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
@@ -89,16 +96,20 @@ class AgencyDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-                
-            Column::make('no_program')->title(__('tables.th.program'))->addClass('align-middle'),
-            Column::make('name_no')->title(__('tables.th.agency'))->addClass('align-middle'),
-            Column::make('name')->title(__('tables.th.title'))->addClass('align-middle'),
-            Column::make('nick_name')->title(__('tables.th.nick_name'))->addClass('align-middle'),
+
+            Column::make('name_kh')->title(__('tables.th.name.kh'))->addClass('align-middle'),
+            Column::make('name_en')->title(__('tables.th.name.en'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('status')
+                ->title(__('tables.th.status'))
+                ->width(100)
+                ->addClass('text-center align-middle'),
+
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
+
         ];
     }
 
@@ -107,6 +118,6 @@ class AgencyDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Agency_' . date('YmdHis');
+        return 'ExpenseType_' . date('YmdHis');
     }
 }

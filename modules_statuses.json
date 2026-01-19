@@ -16,5 +16,6 @@
     "Material": true,
     "Duel": true,
     "Water": true,
-    "Electric": true
+    "Electric": true,
+    "Content": true
 }

@@ -320,102 +320,89 @@
                 <li class="menu-title" data-key="t-content">{{ __('menus.content') }}</li>
 
                 {{-- ========== Cluster ========== --}}
-                @php
-                    $clusterActive =
-                        Request::routeIs('ministries.*') ||
-                        Request::routeIs('initialChapter.*') ||
-                        Request::routeIs('chapter.*') ||
-                        Request::routeIs('initialAccount.*') ||
-                        Request::routeIs('accounts.*') ||
-                        Request::routeIs('initialAccountSub.*') ||
-                        Request::routeIs('accountSub.*') ||
-                        Request::routeIs('initialProgram.*') ||
-                        Request::routeIs('program.*') ||
-                        Request::routeIs('program.sub.*') ||
-                        Request::routeIs('initialAgency.*') ||
-                        Request::routeIs('agency.*');
-                @endphp
-                <li class="{{ $clusterActive ? 'mm-active' : '' }}">
-                    <a href="javascript: void(0);" class="has-arrow">
-                        <i data-feather="file-text"></i>
-                        <span data-key="t-cluster">{{ __('menus.cluster') }}</span>
-                    </a>
-                    <ul class="sub-menu {{ $clusterActive ? 'mm-show' : '' }}"
-                        aria-expanded="{{ $clusterActive ? 'true' : 'false' }}">
+                {{-- <li class="menu-title">{{ __('menus.cluster') }}</li> --}}
 
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('ministries.index') }}"
-                                    class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
-                                    <i data-feather="book"></i>
-                                    <span data-key="t-ministries">{{ __('menus.create.year') }}</span>
-                                </a>
-                            </li>
-                        @endif
+                @if (hasPermission('ministries.index'))
+                    <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
+                        <a href="{{ route('ministries.index') }}"
+                            class="{{ Request::routeIs('ministries.*') ? 'active' : '' }}">
+                            <i data-feather="book"></i>
+                            <span>{{ __('menus.create.year') }}</span>
+                        </a>
+                    </li>
+                @endif
 
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialChapter.index') }}"
-                                    class="{{ Request::routeIs('initialChapter.*') ? 'active' : '' }}">
-                                    <i data-feather="book"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.chapters') }}</span>
-                                </a>
-                            </li>
-                        @endif
+                @if (hasPermission('ministries.index'))
+                    <li class="{{ Request::routeIs('initialChapter.*') ? 'mm-active' : '' }}">
+                        <a href="{{ route('initialChapter.index') }}"
+                            class="{{ Request::routeIs('initialChapter.*') ? 'active' : '' }}">
+                            <i data-feather="book"></i>
+                            <span>{{ __('menus.chapters') }}</span>
+                        </a>
+                    </li>
+                @endif
 
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialAccount.index') }}"
-                                    class="{{ Request::routeIs('initialAccount.*') ? 'active' : '' }}">
-                                    <i data-feather="database"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.accounts') }}</span>
-                                </a>
-                            </li>
-                        @endif
+                @if (hasPermission('ministries.index'))
+                    <li class="{{ Request::routeIs('initialAccount.*') ? 'mm-active' : '' }}">
+                        <a href="{{ route('initialAccount.index') }}"
+                            class="{{ Request::routeIs('initialAccount.*') ? 'active' : '' }}">
+                            <i data-feather="database"></i>
+                            <span>{{ __('menus.accounts') }}</span>
+                        </a>
+                    </li>
+                @endif
 
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialAccountSub.index') }}"
-                                    class="{{ Request::routeIs('initialAccountSub.*') ? 'active' : '' }}">
-                                    <i data-feather="layers"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.sub.account') }}</span>
-                                </a>
-                            </li>
-                        @endif
+                @if (hasPermission('ministries.index'))
+                    <li class="{{ Request::routeIs('initialAccountSub.*') ? 'mm-active' : '' }}">
+                        <a href="{{ route('initialAccountSub.index') }}"
+                            class="{{ Request::routeIs('initialAccountSub.*') ? 'active' : '' }}">
+                            <i data-feather="layers"></i>
+                            <span>{{ __('menus.sub.account') }}</span>
+                        </a>
+                    </li>
+                @endif
 
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialProgram.index') }}"
-                                    class="{{ Request::routeIs('initialProgram.*') ? 'active' : '' }}">
-                                    <i data-feather="layers" title="initialProgram"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.program') }}</span>
-                                </a>
-                            </li>
-                        @endif
+                @if (hasPermission('ministries.index'))
+                    <li class="{{ Request::routeIs('initialProgram.*') ? 'mm-active' : '' }}">
+                        <a href="{{ route('initialProgram.index') }}"
+                            class="{{ Request::routeIs('initialProgram.*') ? 'active' : '' }}">
+                            <i data-feather="layers"></i>
+                            <span>{{ __('menus.program') }}</span>
+                        </a>
+                    </li>
+                @endif
 
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialAgency.index') }}"
-                                    class="{{ Request::routeIs('initialAgency.*') ? 'active' : '' }}">
-                                    <i data-feather="layers" title="Agency"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.agency') }}</span>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-                </li>
+                @if (hasPermission('ministries.index'))
+                    <li class="{{ Request::routeIs('initialAgency.*') ? 'mm-active' : '' }}">
+                        <a href="{{ route('initialAgency.index') }}"
+                            class="{{ Request::routeIs('initialAgency.*') ? 'active' : '' }}">
+                            <i data-feather="layers"></i>
+                            <span>{{ __('menus.agency') }}</span>
+                        </a>
+                    </li>
+                @endif
+
+                @if (hasPermission('ministries.index'))
+                    <li>
+                        <a href="{{ route('expenseType.index') }}"
+                            class="{{ Request::routeIs('expenseType.*') ? 'active' : '' }}">
+                            <i data-feather="layers" title="expense_ty"></i>
+                            <span data-key="t-dashboard">{{ __('menus.expense.type') }}</span>
+                        </a>
+                    </li>
+                @endif
 
                 {{-- ========== Setting ========== --}}
                 @if (auth()->user()->role_id == 1)
                     <li class="menu-title" data-key="t-setting">{{ __('menus.setting') }}</li>
 
-                    <li class="{{ Request::routeIs('system.*') ? 'mm-active' : '' }}">
+                    {{-- <li class="{{ Request::routeIs('system.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('system.index') }}"
                             class="{{ Request::routeIs('system.*') ? 'active' : '' }}">
                             <i data-feather="database"></i>
                             <span data-key="t-roles">{{ __('menus.setting.log') }}</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     {{-- <li class="{{ Request::routeIs('keys.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('keys.index') }}"
