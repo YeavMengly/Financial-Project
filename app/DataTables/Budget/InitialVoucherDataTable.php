@@ -3,7 +3,7 @@
 namespace App\DataTables\Budget;
 
 use App\Models\BeginCredit\InitialBudget;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\InitialVoucher;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -85,7 +85,7 @@ class InitialVoucherDataTable extends DataTable
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
-            
+
             Column::computed(
                 'action',
                 __('tables.th.action')

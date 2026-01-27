@@ -6,15 +6,15 @@ use App\DataTables\AnnualOpen\InitialBudgetVoucherDataTable;
 use App\DataTables\BeginVoucherDataTable;
 use App\Exports\ReportBook;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Account;
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\Account;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
-use App\Models\Chapter;
-use App\Models\Program;
-use App\Models\ProgramSub;
+use App\Models\Content\Chapter;
+use App\Models\Content\Program;
+use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -55,21 +55,41 @@ class BeginVoucherController extends Controller
     /**
      * AJAX: Fetch program sub-options by program ID.
      */
-    public function getByProgramId(Request $request)
-    {
-        if ($request->program_id) {
-            $data       = ProgramSub::select('id', 'program_id', 'no', 'decription')
-                ->where('program_id', $request->program_id)
-                ->get();
-            $selectedId = $request->selected_id ?? null;
+    // public function getByProgramId(Request $request)
+    // {
+    //     if ($request->program_id) {
+    //         $data       = ProgramSub::select('id', 'program_id', 'no', 'decription')
+    //             ->where('program_id', $request->program_id)
+    //             ->get();
+    //         $selectedId = $request->selected_id ?? null;
 
-            foreach ($data as $d) {
-                $selected = $selectedId == $d->id ? 'selected' : '';
-                echo "<option value='{$d->id}' {$selected}>{$d->no}-{$d->decription}</option>";
-            }
-        }
-    }
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             echo "<option value='{$d->id}' {$selected}>{$d->no}-{$d->decription}</option>";
+    //         }
+    //     }
+    // }
 
+    // public function editByProgramId(Request $request)
+    // {
+    //     if ($request->program_id) {
+    //         $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
+    //             ->where('program_id', $request->program_id)
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
     public function editByProgramId(Request $request)
     {
         if ($request->program_id) {
@@ -83,6 +103,27 @@ class BeginVoucherController extends Controller
             foreach ($data as $d) {
                 $selected = $selectedId == $d->id ? 'selected' : '';
                 $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByAgency(Request $request)
+    {
+        if ($request->program_id) {
+            $data = Agency::select('id', 'program_id', 'no', 'name')
+                ->where('program_id', $request->program_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
             }
 
             return response($html);
@@ -154,7 +195,7 @@ class BeginVoucherController extends Controller
                 $validatedData['decrease'] -
                 $validatedData['editorial'];
 
-            $valueNo = $ministry->no . $validatedData['cboProgram'] .  $programSub->no . '0' . $validatedData['no'];
+            $valueNo = $ministry->no . $program->no .  $programSub->no . '0' . $validatedData['no'];
 
             $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
@@ -486,7 +527,7 @@ class BeginVoucherController extends Controller
 
     private function preventIfMinistryDeleted($ministryId)
     {
-        $ministry = \App\Models\BeginCredit\Ministry::withTrashed()->findOrFail($ministryId);
+        $ministry = Ministry::withTrashed()->findOrFail($ministryId);
 
         if (!is_null($ministry->deleted_at)) {
             abort(403, 'This ministry is deleted. You can only view records.');

@@ -37,7 +37,7 @@ return [
     'number' => 'លេខ',
     'program' => 'កម្មវិធី',
     'program.sub' => 'អនុកម្មវិធី',
-    'cluster.act' => 'ចង្កោមសកម្មភាព',
+    'cluster' => 'ចង្កោម',
     'year' => 'ឆ្នាំ',
     'cover' => 'កម្រង',
     'agency' => 'អង្គភាព',

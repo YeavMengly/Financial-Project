@@ -2,11 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\BeginCredit\Account;
-use App\Models\BeginCredit\AccountSub;
+use App\Models\Content\Account;
+use App\Models\Content\AccountSub;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\BeginCredit\Ministry;
-use App\Models\Chapter;
+use App\Models\Content\Ministry;
+use App\Models\Content\Chapter;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;

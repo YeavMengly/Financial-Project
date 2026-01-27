@@ -344,14 +344,17 @@
 
     </div>
 
-    <div class="row g-3">
+    {{-- <div class="row g-3">
         @foreach ($programs as $program)
             @php
                 $t = $programTotals[$program->no] ?? null;
-                // Temporary demo numbers (replace with real totals later)
-                $finLaw = $t->fin_law ?? 0; // if not in programs table, keep 0
-                $apply = $t->apply ?? 0; // if not in programs table, keep 0
-                $remain = max($finLaw - $apply, 0);
+                $finLaw = $t->fin_law ?? 0;
+                $apply = $t->apply ?? 0;
+                $deadlineBalance = $t->deadline_balance ?? 0;
+                $remain = max($finLaw - $deadlineBalance, 0);
+                $applyPercent = $finLaw > 0 ? ($apply / $finLaw) * 100 : 0;
+                $total_records = $t->total_records ?? 0;
+
             @endphp
 
             <div class="col-xl-3 col-md-6">
@@ -361,14 +364,12 @@
 
                     <div class="card-body">
 
-                        {{-- Title --}}
                         <div class="mb-3">
                             <span class="text-muted d-block text-truncate">
                                 កម្មវិធី {{ $program->no ?? '' }} - {{ $program->name_kh ?? ($program->name ?? '') }}
                             </span>
                         </div>
 
-                        {{-- 3 Columns --}}
                         <div class="row text-center">
                             <div class="col-4 border-end">
                                 <span class="text-muted font-size-12 d-block">ច្បាប់ហរិញ្ញវត្ថុ</span>
@@ -399,8 +400,50 @@
                 </div>
             </div>
         @endforeach
+    </div> --}}
+    <div class="row">
+        @foreach ($programs as $program)
+            <div class="col-xl-3 col-md-6">
+                <div class="card card-h-100 program-card" role="button" data-program-id="{{ $program->id }}"
+                    data-program-title="km {{ $program->no }}">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted d-block text-truncate">
+                                {{ __('menus.program') }} {{ $program->no }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $program->total_records }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-4 border-end">
+                                <span class="text-muted font-size-12 d-block">ច្បាប់ហរិញ្ញវត្ថុ</span>
+                                <h6 class="mb-0 text-primary">{{ number_format($program->fin_law) }}</h6>
+                                <small class="text-muted">រៀល</small>
+                            </div>
+                            <div class="col-4 border-end">
+                                <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
+                                <h6 class="mb-0 text-success">{{ number_format($program->remain) }}</h6>
+                                <small class="text-muted">រៀល</small>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted font-size-12 d-block">នៅសល់</span>
+                                <h6 class="mb-0 text-danger">{{ number_format($program->credit) }}</h6>
+                                <small class="text-muted">រៀល</small>
+                            </div>
+                        </div>
+                        <div class="text-nowrap mt-3 text-center">
+                            <small class="text-muted d-block">
+                                អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
-
 
     <div class="row">
         <div class="col-12">
@@ -414,80 +457,138 @@
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xl-2 col-md-6">
-            <!-- card -->
+    {{-- <div class="row">
+        @php
+            $qtyFuelRemain = max(($qtyFuel ?? 0) - ($qtyFuelRelease ?? 0), 0);
+        @endphp
+
+        <div class="col-xl-3 col-md-6">
             <div class="card card-h-100">
-                <!-- card body -->
                 <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="text-muted lh-4 d-block text-truncate">ប្រេងសាំង</span>
+                        <div class="ms-auto d-flex align-items-center gap-2">
+                            <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
+                                @foreach (request()->except('item_name') as $k => $v)
+                                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                                @endforeach
+
+                                <select name="item_name" class="form-select form-select-sm"
+                                    onchange="this.form.submit()">
+                                    @foreach ($itemOptions as $opt)
+                                        <option value="{{ $opt }}"
+                                            {{ ($itemName ?? '') === $opt ? 'selected' : '' }}>
+                                            {{ $opt }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
+                        </div>
+                    </div>
                     <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                ប្រេងសាំង
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{ $totalFuel }}
-                                </button>
+                        <div class="col-7">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-success-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.entry') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyFuel ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-danger-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.release') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyFuelRelease ?? 0, 2) }} <span
+                                                class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="p-2 rounded bg-primary-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.remain') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyFuelRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="col-6">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="{{ $qtyFuel }}">
-                                    {{ number_format($qtyFuel) }} <span>លីត្រ</span>
-                                </span>
-                            </span>
+                        <div class="col-5">
+                            <div id="fuelDonutChart" class="apex-charts"></div>
                         </div>
-                        {{-- <div class="col-6">
-                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
-                        </div> --}}
                     </div>
-                    <div class="text-nowrap">
-                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
-                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    <div class="text-nowrap mt-3">
+                        <span class="badge bg-info-subtle text-info">Entry vs Release</span>
+                        <span class="ms-1 text-muted font-size-13">{{ $year ?? '' }}</span>
                     </div>
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col-->
+                </div>
+            </div>
+        </div>
 
-        <div class="col-xl-2 col-md-6">
-            <!-- card -->
+        @php
+            $qtyDieselRemain = max(($qtyDiesel ?? 0) - ($qtyDieselRelease ?? 0), 0);
+        @endphp
+
+        <div class="col-xl-3 col-md-6">
             <div class="card card-h-100">
-                <!-- card body -->
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                ប្រេងម៉ាស៊ូត
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{ $totalDiesel }}
-                                </button>
+                    <div class="d-flex flex-wrap align-items-center mb-3 w-100">
+                        <span class="text-muted lh-4 d-block text-truncate">ប្រេងម៉ាស៊ូត</span>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-soft-primary btn-sm">
+                                {{ $totalDiesel }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row align-items-center g-2">
+                        <div class="col-7">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-success-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.entry') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyDiesel ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-danger-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.release') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyDieselRelease ?? 0, 2) }} <span
+                                                class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-2 rounded bg-primary-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.remain') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyDieselRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="col-6">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="{{ $qtyDiesel }}">
-                                    {{ number_format($qtyDiesel) }} <span>លីត្រ</span>
-                                </span>
-                            </span>
+                        <div class="col-5">
+                            <div id="dieselDonutChart" class="apex-charts"></div>
                         </div>
                     </div>
-                    <div class="text-nowrap">
-                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
-                        <span class="ms-1 text-muted font-size-13">Since last week</span>
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-info-subtle text-info">Entry vs Release</span>
+                        <span class="ms-1 text-muted font-size-13">{{ $year ?? '' }}</span>
                     </div>
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col-->
+                </div>
+            </div>
+        </div>
+
 
         <div class="col-xl-2 col-md-6">
-            <!-- card -->
             <div class="card card-h-100">
-                <!-- card body -->
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="d-flex flex-wrap align-items-center mb-4 w-100">
@@ -501,10 +602,18 @@
                             </div>
                         </div>
 
-                        <div class="col-6">
+                        <div class="col-4">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $qtyOil }}">
                                     {{ number_format($qtyOil) }} <span>លីត្រ</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-4">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $qtyOilRelease }}">
+                                    {{ number_format($qtyOilRelease) }} <span>លីត្រ</span>
                                 </span>
                             </span>
                         </div>
@@ -513,9 +622,9 @@
                         <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
                         <span class="ms-1 text-muted font-size-13">Since last week</span>
                     </div>
-                </div><!-- end card body -->
-            </div><!-- end card -->
-        </div><!-- end col-->
+                </div>
+            </div>
+        </div>
 
         <div class="col-xl-2 col-md-6">
             <!-- card -->
@@ -548,8 +657,8 @@
                     </div>
                 </div><!-- end card body -->
             </div><!-- end card -->
-        </div><!-- end col-->
-    </div><!-- end row-->
+        </div>
+    </div> --}}
 
     <div class="modal fade" id="programSubModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -632,7 +741,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="clusterModal" tabindex="-1">
+    {{-- <div class="modal fade" id="clusterModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
 
@@ -671,8 +780,7 @@
 
             </div>
         </div>
-    </div>
-
+    </div> --}}
 @endsection
 
 @section('script')
@@ -1032,7 +1140,7 @@
                         <td>${item.kh}</td>
                         <td>${item.en}</td>
                         <td>${item.financial}</td>
-                     
+
                         <td>
                             <span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-danger'}">
                                 ${item.status}
@@ -1125,6 +1233,117 @@
                         });
                 });
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const entry = Number(@json((float) ($qtyFuel ?? 0)));
+            const release = Number(@json((float) ($qtyFuelRelease ?? 0)));
+            const remain = Math.max(entry - release, 0);
+
+            const series = (entry === 0 && release === 0 && remain === 0) ? [1, 1, 1] : [entry, release, remain];
+
+            new ApexCharts(document.querySelector("#fuelDonutChart"), {
+                chart: {
+                    type: "donut",
+                    height: 160
+                },
+                series: series,
+                labels: ["បញ្ចូល", "បញ្ចេញ", "នៅសល់"],
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    width: 0
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: "72%",
+                            labels: {
+                                show: true,
+                                name: {
+                                    show: false
+                                },
+                                value: {
+                                    show: false
+                                },
+                                total: {
+                                    show: true,
+                                    label: "Remain",
+                                    formatter: function() {
+                                        return remain.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: (val) => Number(val).toFixed(0) + " លីត្រ"
+                    }
+                }
+            }).render();
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const entry = Number(@json((float) ($qtyDiesel ?? 0)));
+            const release = Number(@json((float) ($qtyDieselRelease ?? 0)));
+            const remain = Math.max(entry - release, 0);
+
+            const series = (entry === 0 && release === 0 && remain === 0) ? [1, 1, 1] : [entry, release, remain];
+
+            new ApexCharts(document.querySelector("#dieselDonutChart"), {
+                chart: {
+                    type: "donut",
+                    height: 160
+                },
+                series: series,
+                labels: ["បញ្ចូល", "បញ្ចេញ", "នៅសល់"],
+                legend: {
+                    show: false
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    width: 0
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: "72%",
+                            labels: {
+                                show: true,
+                                name: {
+                                    show: false
+                                },
+                                value: {
+                                    show: false
+                                },
+                                total: {
+                                    show: true,
+                                    label: "Remain",
+                                    formatter: () => remain.toFixed(0)
+                                }
+                            }
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: (val) => Number(val).toFixed(0) + " លីត្រ"
+                    }
+                }
+            }).render();
         });
     </script>
 @endsection

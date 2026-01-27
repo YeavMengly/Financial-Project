@@ -2,7 +2,7 @@
 
 namespace App\DataTables\AnnualOpen;
 
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -28,7 +28,7 @@ class InitialProgramDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::program.initialProgram.action', ['module' => $module]);
+                return view('content::content.program.initialProgram.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

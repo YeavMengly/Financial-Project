@@ -6,13 +6,13 @@ use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
 use App\Exports\BeginExport;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Loans\BudgetVoucherLoan;
-use App\Models\Program;
+use App\Models\Content\Program;
 use App\Models\TaskType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -471,7 +471,7 @@ class BudgetVoucherController extends Controller
     }
 
 
-  
+
     public function export(Request $request, $params)
     {
         try {

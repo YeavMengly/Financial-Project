@@ -16,6 +16,9 @@ class DashboardController extends Controller
             ->orderBy('year', 'desc')
             ->get();
 
+        // dd( $ministries->first()->id);
+
+
         $programs = DB::table('programs')
             ->join('ministries', 'programs.ministry_id', '=', 'ministries.id')
             ->where('ministries.id', $ministries->first()->id ?? 0)
@@ -23,7 +26,7 @@ class DashboardController extends Controller
             ->orderBy('no')
             ->get();
 
-            // dd('programs', $programs);
+        // dd('programs', $programs);
 
 
         // ✅ default year = request('year') else latest ministry year else current year
@@ -63,7 +66,7 @@ class DashboardController extends Controller
         $chartTotalIncrease   = $loanReport->pluck('total_increase')->toArray();
         $loanCount            = $loanReport->count();
 
-        // DUEL
+        // DUEL Entry
         $duelEntries = DB::table('duel_entries')
             ->join('ministries', 'duel_entries.ministry_id', '=', 'ministries.id')
             ->select('duel_entries.*', 'ministries.year')
@@ -84,6 +87,32 @@ class DashboardController extends Controller
         $totalDiesel = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ូត')->count();
         $totalOil    = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ីន')->count();
 
+        // Duel Release
+        $duelReleases = DB::table('duel_releases')
+            ->join('ministries', 'duel_releases.ministry_id', '=', 'ministries.id')
+            ->select('duel_releases.*', 'ministries.year')
+            ->where('ministries.year', $year)
+            ->get();
+
+        $totalsReleaseByItem = $duelReleases
+            ->groupBy('item_name')
+            ->map(fn($rows) => $rows->sum('quantity_request'));
+
+        $qtyFuelRelease   = $totalsReleaseByItem['ប្រេងសាំង'] ?? 0;
+        $qtyDieselRelease = $totalsReleaseByItem['ប្រេងម៉ាស៊ូត'] ?? 0;
+        $qtyOilRelease    = $totalsReleaseByItem['ប្រេងម៉ាស៊ីន'] ?? 0;
+
+        $chartReleaseFuel   = $duelReleases->where('item_name', 'ប្រេងសាំង')->pluck('quantity_request')->toArray();
+        $chartReleaseDiesel = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ូត')->pluck('quantity_request')->toArray();
+        $chartReleaseOil    = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ីន')->pluck('quantity_request')->toArray();
+
+        $totalFuelRelease   = $duelReleases->where('item_name', 'ប្រេងសាំង')->count();
+        $totalDieselRelease = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ូត')->count();
+        $totalOilRelease    = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ីន')->count();
+
+
+        $totalEntry   = $duelEntries->count();
+        $itemOptions = ['ប្រេងសាំង', 'ប្រេងម៉ាស៊ូត', 'ប្រេងម៉ាស៊ីន'];
         // MATERIAL
         $materialQuery = DB::table('material_entries')
             ->join('ministries', 'material_entries.ministry_id', '=', 'ministries.id')
@@ -96,19 +125,49 @@ class DashboardController extends Controller
         $materialCount = $materialEntries->count();
 
 
-            $programTotals = DB::table('begin_vouchers')
-            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
-            ->where('ministries.year', $year)
+        // $programTotals = DB::table('begin_vouchers')
+        //     ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+        //     ->where('ministries.year', $year)
+        //     ->groupBy('begin_vouchers.program_id')
+        //     ->selectRaw('
+        //     begin_vouchers.program_id,
+        //     SUM(begin_vouchers.fin_law) AS fin_law,
+        //     SUM(begin_vouchers.apply) AS apply,
+        //     SUM(begin_vouchers.deadline_balance) AS remain,
+        //     COUNT(*) AS total_records
+        // ')
+        //     ->get()
+        //     ->keyBy('program_id');
+
+        $programTotals = DB::table('begin_vouchers')
+            // ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('begin_vouchers.ministry_id', $ministries->first()->id)
             ->groupBy('begin_vouchers.program_id')
             ->selectRaw('
             begin_vouchers.program_id,
             SUM(begin_vouchers.fin_law) AS fin_law,
             SUM(begin_vouchers.apply) AS apply,
             SUM(begin_vouchers.deadline_balance) AS remain,
+             SUM(begin_vouchers.credit) AS credit,
             COUNT(*) AS total_records
         ')
             ->get()
             ->keyBy('program_id');
+
+        // dd($programTotals);
+
+        $programs = $programs->map(function ($program) use ($programTotals) {
+            $total = $programTotals->get($program->id);
+            $program->fin_law        = $total->fin_law        ?? 0;
+            $program->apply         = $total->apply         ?? 0;
+            $program->remain        = $total->remain        ?? 0;
+            $program->credit        = $total->credit        ?? 0;
+            $program->total_records = $total->total_records ?? 0;
+            $program->percent =    $program->fin_law > 0 ? ($program->apply  /  $program->fin_law) * 100 : 0;
+            return $program;
+        });
+
+        // dd($programs[0]);
 
         return view('dashboard::index', [
             'ministries' => $ministries,
@@ -141,6 +200,13 @@ class DashboardController extends Controller
             'totalFuel' => $totalFuel,
             'totalDiesel' => $totalDiesel,
             'totalOil' => $totalOil,
+
+            'qtyFuelRelease' => $qtyFuelRelease,
+            'qtyDieselRelease' => $qtyDieselRelease,
+            'qtyOilRelease' => $qtyOilRelease,
+            'itemOptions' => $itemOptions,
+            // 'totalEntry' => $totalEntry,
+
 
             'total_quantity' => $total_quantity,
             'chartTotalquantity' => $chartTotalquantity,

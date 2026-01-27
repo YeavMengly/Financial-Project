@@ -37,7 +37,7 @@ return [
     'th.agency' => 'អង្គភាព',
     'th.sub.program' => 'អនុកម្មវិធី',
     'th.program' => 'កម្មវិធី',
-    'th.clusters' => 'ចង្កោម',
+    'th.cluster' => 'ចង្កោម',
     'th.rank' => 'ចំណាត់ថ្នាក់',
     'th.financeLaw' => 'ច្បាប់ហិរញ្ញវត្ថុ',
     'th.currentCredit' => 'ឥណទានបច្ចុប្បន្ន',

@@ -342,7 +342,7 @@
                     </li>
                 @endif
 
-                @if (hasPermission('ministries.index'))
+                {{-- @if (hasPermission('ministries.index'))
                     <li class="{{ Request::routeIs('initialAccount.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('initialAccount.index') }}"
                             class="{{ Request::routeIs('initialAccount.*') ? 'active' : '' }}">
@@ -350,7 +350,7 @@
                             <span>{{ __('menus.accounts') }}</span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
                 @if (hasPermission('ministries.index'))
                     <li class="{{ Request::routeIs('initialAccountSub.*') ? 'mm-active' : '' }}">

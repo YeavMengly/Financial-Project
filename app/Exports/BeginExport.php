@@ -2,11 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\BeginCredit\Account;
-use App\Models\BeginCredit\AccountSub;
+use App\Models\Content\Account;
+use App\Models\Content\AccountSub;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\BeginCredit\Ministry;
-use App\Models\Chapter;
+use App\Models\Content\Ministry;
+use App\Models\Content\Chapter;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -36,7 +36,10 @@ class BeginExport
 
         $currentMonth = date('m');
         $currentYear = date('Y');
-        $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
+
+        $ministry = Ministry::where('id', $id)->first();
+
+        $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $ministry->year;
 
         $row = 10;
         $sheet->getStyle("A{$row}:T{$row}")->applyFromArray([

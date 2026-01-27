@@ -6,7 +6,7 @@ use App\DataTables\Duel\DuelEntryDataTable;
 use App\DataTables\Duel\InitialDuelEntryDataTable;
 use App\Exports\Duel\DuelEntriesExport;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\Duel\DuelEntry;
 use App\Models\DuelType;
 use App\Models\UnitType;

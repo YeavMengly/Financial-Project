@@ -2,8 +2,7 @@
 
 namespace App\DataTables\AnnualOpen;
 
-use App\Models\BeginCredit\InitialBudget;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\InitialAccount;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -31,7 +30,7 @@ class InitialAccountDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::accounts.initialAccount.action', ['module' => $module]);
+                return view('content::content.accounts.initialAccount.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

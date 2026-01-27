@@ -2,7 +2,7 @@
 
 namespace App\DataTables\AnnualOpen;
 
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -18,9 +18,6 @@ class InititalAccountSubDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        // return (new EloquentDataTable($query))
-        //     ->addColumn('action', 'inititalaccountsub.action')
-        //     ->setRowId('id');
 
         return (new EloquentDataTable($query))
             ->addIndexColumn()
@@ -30,7 +27,7 @@ class InititalAccountSubDataTable extends DataTable
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
-                return view('beginningcredit::accounts.accountSub.initialAccountSub.action', ['module' => $module]);
+                return view('content::content.accounts.accountSub.initialAccountSub.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
     }

@@ -2,10 +2,10 @@
 
 namespace App\Exports;
 
-use App\Models\BeginCredit\Account;
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Ministry;
-use App\Models\Chapter;
+use App\Models\Content\Account;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Ministry;
+use App\Models\Content\Chapter;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -29,13 +29,15 @@ class BeginMandateExport
         $params =  $request->params;
         $id = decode_params($params);
 
+
+
         $templatePath = public_path('template.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
         $currentMonth = date('m');
         $currentYear = date('Y');
-        $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
+        $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth ;
 
         $row = 10;
         $sheet->getStyle("A{$row}:T{$row}")->applyFromArray([

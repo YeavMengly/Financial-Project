@@ -2,7 +2,7 @@
 
 namespace App\DataTables\Duel;
 
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\InitialDuelRelease;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
