@@ -25,3 +25,6 @@ Route::get('/begin-voucher/by-program/program-subs', [BeginVoucherController::cl
 
 Route::get('/begin-voucher/by-program/agencies', [BeginVoucherController::class, 'editByAgency'])
     ->name('beginVoucher.by.agency');
+
+Route::get('/begin-voucher/by-program-sub/clusters', [BeginVoucherController::class, 'editByProgramSubId'])
+    ->name('beginVoucher.by.cluster');

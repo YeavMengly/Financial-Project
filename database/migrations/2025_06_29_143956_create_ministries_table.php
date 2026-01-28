@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('title');
             $table->string('refer');
             $table->string('name');
+            $table->boolean('status')
+                ->default(true)
+                ->comment('1 = active, 0 = inactive');
             $table->timestamps();
             $table->softDeletes();
         });

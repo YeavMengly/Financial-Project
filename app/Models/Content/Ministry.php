@@ -26,7 +26,12 @@ class Ministry extends Model
         'year',
         'title',
         'refer',
-        'name'
+        'name',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
     ];
 
     /* -----------------------------------------------------------------

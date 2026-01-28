@@ -57,6 +57,8 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
+
                                 <a class="btn btn-dark"
                                     href="{{ route('accounts.index', ['params' => $params, 'chId' => $chId]) }}">{{ __('buttons.back') }}</a>
 
@@ -75,5 +77,4 @@
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
 @endsection

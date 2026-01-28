@@ -13,6 +13,7 @@ use App\Models\BeginCredit\BeginVoucher;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Chapter;
+use App\Models\Content\Cluster;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
@@ -55,41 +56,6 @@ class BeginVoucherController extends Controller
     /**
      * AJAX: Fetch program sub-options by program ID.
      */
-    // public function getByProgramId(Request $request)
-    // {
-    //     if ($request->program_id) {
-    //         $data       = ProgramSub::select('id', 'program_id', 'no', 'decription')
-    //             ->where('program_id', $request->program_id)
-    //             ->get();
-    //         $selectedId = $request->selected_id ?? null;
-
-    //         foreach ($data as $d) {
-    //             $selected = $selectedId == $d->id ? 'selected' : '';
-    //             echo "<option value='{$d->id}' {$selected}>{$d->no}-{$d->decription}</option>";
-    //         }
-    //     }
-    // }
-
-    // public function editByProgramId(Request $request)
-    // {
-    //     if ($request->program_id) {
-    //         $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
-    //             ->where('program_id', $request->program_id)
-    //             ->get();
-
-    //         $selectedId = $request->selected_id ?? null;
-
-    //         $html = '';
-    //         foreach ($data as $d) {
-    //             $selected = $selectedId == $d->id ? 'selected' : '';
-    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
-    //         }
-
-    //         return response($html);
-    //     }
-
-    //     return response('');
-    // }
     public function editByProgramId(Request $request)
     {
         if ($request->program_id) {
@@ -132,6 +98,27 @@ class BeginVoucherController extends Controller
         return response('');
     }
 
+    public function editByProgramSubId(Request $request)
+    {
+        if ($request->program_sub_id) {
+
+            $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
+                ->where('program_sub_id', $request->program_sub_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -161,6 +148,7 @@ class BeginVoucherController extends Controller
         $validatedData = $request->validate([
             'cboProgram'     => 'required',
             'cboProgramSub'  => 'required',
+            'cluster_id'     => 'required',
             'cboAgency'      => 'required',
             'cboSubAccount'  => 'required',
             'no'             => 'required',

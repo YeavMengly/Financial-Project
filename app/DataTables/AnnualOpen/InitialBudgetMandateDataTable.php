@@ -3,7 +3,7 @@
 namespace App\DataTables\AnnualOpen;
 
 use App\Models\BeginCredit\InitialBudget;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;

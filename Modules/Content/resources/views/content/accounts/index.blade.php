@@ -40,7 +40,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="no">{{ __('menus.account') }}</label>
@@ -74,7 +74,7 @@
                             </a>
                         </div>
                     </form>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@
                 <h4 class="mb-sm-0 font-size-18">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"> {{ __('menus.credit') }}</li>
-                        <li class="breadcrumb-item">{{ __('menus.initial.voucher') }}</li>
+                        {{-- <li class="breadcrumb-item">{{ __('menus.initial.voucher') }}</li> --}}
                     </ol>
                 </h4>
                 <div class="page-title-right">
@@ -98,17 +98,17 @@
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 
-                            {{-- Search --}}
+
                             <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
                                 <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
                             </button>
 
-                            {{-- Reset --}}
+
                             <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
 
-                            {{-- Export --}}
+
                             <a href="{{ route(
                                 'beginVoucher.export',
                                 array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),

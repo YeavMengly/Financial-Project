@@ -42,6 +42,7 @@ class MinistryController extends Controller
             'title' => ['required', 'string'],
             'refer' => ['required', 'string'],
             'name' => ['required', 'string'],
+            'status' => ['nullable', 'boolean'], // ✅ ADD
         ], [
             'year.unique' => 'ឆ្នាំនេះត្រូវបានបញ្ចូលរួចហើយ។',
         ]);
@@ -52,7 +53,8 @@ class MinistryController extends Controller
             $validateData['name'] = strip_tags($validateData['name']);
             Ministry::create([
                 ...$validateData,
-                'no' => '32'
+                'no' => '32',
+                'status' => $request->has('status') ? 1 : 0, // ✅ DEFAULT ACTIVE
             ]);
 
             DB::commit();
@@ -104,6 +106,7 @@ class MinistryController extends Controller
             'title' => ['required', 'string'],
             'refer' => ['required', 'string'],
             'name' => ['required', 'string'],
+            'status' => ['nullable', 'boolean'], // ✅ ADD
         ], [
             'year.unique' => 'ឆ្នាំនេះត្រូវបានបញ្ចូលរួចហើយ។',
         ]);
@@ -112,10 +115,13 @@ class MinistryController extends Controller
         DB::beginTransaction();
 
         try {
-            $ministries = Ministry::where('id', $id)->first();
+            $ministry = Ministry::where('id', $id)->first();
 
             $validateData['name'] = strip_tags($validateData['name']);
-            $ministries->update($validateData);
+            $ministry->update([
+                ...$validateData,
+                'status' => $request->has('status') ? 1 : 0, // ✅ IMPORTANT
+            ]);
 
             DB::commit();
 

@@ -49,11 +49,10 @@ class AccountDataTable extends DataTable
         $id = decode_params($params);
         $chId = decode_params($chId);
 
-
         $model = $model->newQuery();
         $model->withTrashed();
         $query = $model->newQuery()
-            ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.no')
+            ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
             ->select([
                 'accounts.id',
                 'accounts.ministry_id',
@@ -64,10 +63,8 @@ class AccountDataTable extends DataTable
                 'accounts.deleted_at'
             ])
             ->where('accounts.ministry_id', $id)
-            // ->where('accounts.chapter_id', $chId)
+            ->where('accounts.chapter_id', $chId)
             ->orderBy('accounts.created_at', 'DESC');
-
-
         // $query->where('accounts.ministry_id', $id);
         // $query->where('accounts.chapter_id', $chId);
 

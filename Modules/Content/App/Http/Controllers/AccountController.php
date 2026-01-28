@@ -67,18 +67,16 @@ class AccountController extends Controller
             'name' => ['required'],
         ]);
 
-
-
         DB::beginTransaction();
         try {
 
             $id = decode_params($params);
-            $chId = decode_params($chId);
+            // $chId = decode_params($chId);
 
             $ministry = Ministry::where('id', $id)->first();
-            $chapter = Chapter::where('id', $chId)->first();
+            $chapter = Chapter::where('id', decode_params($chId))->first();
 
-            $existingRecord = Account::where('chapter_id', $chapter->no)
+            $existingRecord = Account::where('chapter_id', $chapter->id)
                 ->where('no', $request->no)
                 ->first();
 
@@ -90,7 +88,7 @@ class AccountController extends Controller
 
             Account::create([
                 'ministry_id' => $ministry->id,
-                'chapter_id' => $chapter->no,
+                'chapter_id' => $chapter->id,
                 'no' => $request->no,
                 'name' => $request->name
             ]);
@@ -108,11 +106,10 @@ class AccountController extends Controller
                     'accounts.index',
                     [
                         'params' => $params,
-                        'chId' => encode_params($chId)
+                        'chId' => $chId
                     ]
                 );
             }
-
 
             return redirect()->route('accounts.create', [
                 'params' => $params,
@@ -137,15 +134,20 @@ class AccountController extends Controller
      */
     public function edit($params, $chId, $id)
     {
+        // dd($chId);
+
         $id = decode_params($id);
-        $chapter = Chapter::where('id', decode_params($chId))->first();
+        // $chapter = Chapter::where('id', decode_params($chId))->first();
 
 
         $module = Account::where('id', $id)
-            ->where('chapter_id', $chapter->no)
+            // ->where('chapter_id', $chapter->no)
             ->first();
 
-        return view('content::content.accounts.edit')->with('module', $module)->with('chapter', $chapter)->with('params', $params)
+        return view('content::content.accounts.edit')
+            ->with('module', $module)
+            // ->with('chapter', $chapter)
+            ->with('params', $params)
             ->with('chId', $chId)
         ;
     }
@@ -165,17 +167,15 @@ class AccountController extends Controller
         try {
 
             $ministry = Ministry::where('id', decode_params($params))->first();
-            $chapter = Chapter::where('no', decode_params($chId))->first();
-
-
+            $chapter = Chapter::where('id', decode_params($chId))->first();
             $account = Account::where('id', $id)
                 ->where('ministry_id', $ministry->id)
-                ->where('chapter_id', $chapter->no)
+                ->where('chapter_id', $chapter->id)
                 ->first();
 
             $account->update([
                 'ministr_id' => $account->ministry_id,
-                'chapter_id' => $account->no,
+                'chapter_id' => $chapter->id,
                 'no' => $request->no,
                 'name' => $request->name
             ]);

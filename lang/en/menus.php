@@ -8,7 +8,7 @@ return [
     'categories' => 'ប្រភេទ',
     'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
-    'credit' => 'ឥណទានអនុម័តតាមឆ្នាំ',
+    'credit' => 'ឥណទានអនុម័ត',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'content' => 'មាតិកា',

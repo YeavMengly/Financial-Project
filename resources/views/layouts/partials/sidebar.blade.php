@@ -14,15 +14,25 @@
                 </li>
 
                 {{-- ========== Beginning Credit ========== --}}
-                @php
+                <li class="menu-title" data-key="t-inventory">{{ __('menus.inventory') }}</li>
+                @if (hasPermission('ministries.index'))
+                    <li>
+                        <a href="{{ route('initialBudgetVoucher.index') }}"
+                            class="{{ Request::routeIs('initialBudgetVoucher.*') ? 'active' : '' }}">
+                            <i data-feather="book"></i>
+                            <span data-key="t-initialVoucher">{{ __('menus.credit') }}</span>
+                        </a>
+                    </li>
+                @endif
+                {{-- @php
                     $beginCreditActive =
                         Request::routeIs('initialBudgetVoucher.*') ||
                         Request::routeIs('initialBudgetMandate.*') ||
                         Request::routeIs('beginVoucher.*') ||
                         Request::routeIs('beginMandate.*');
-                @endphp
+                @endphp --}}
 
-                <li class="{{ $beginCreditActive ? 'mm-active' : '' }}">
+                {{-- <li class="{{ $beginCreditActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="credit-card"></i>
                         <span data-key="t-beginning-credit">{{ __('menus.credit') }}</span>
@@ -50,7 +60,7 @@
                             </li>
                         @endif
                     </ul>
-                </li>
+                </li> --}}
 
                 {{-- ========== Budget Plan ========== --}}
                 @php

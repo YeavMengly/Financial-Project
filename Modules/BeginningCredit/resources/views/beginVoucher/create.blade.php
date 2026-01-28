@@ -33,141 +33,6 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        {{-- <form id="pristine-valid-example" action="{{ route('beginVoucher.store', $params) }}" novalidate
-                            method="post">
-                            @csrf
-                            <div class="row">
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboProgram" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.program') }}
-                                        </label>
-                                        <select class="form-select" id="cboProgram" name="cboProgram" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($program as $p)
-                                                <option value="{{ $p->no }}">
-                                                    {{ $p->no }}-
-                                                    {{ $p->title }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboProgram')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.program.sub') }}
-                                        </label>
-                                        <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                        </select>
-                                        @error('cboProgramSub')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
-                                            class="form-control" name="no" tabindex="2" />
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $agc)
-                                                <option value="{{ $agc->id }}">
-                                                    {{ $agc->no }}-
-                                                    {{ $agc->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.sub.account') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboSubAccount" name="cboSubAccount"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($accountSub as $sa)
-                                                <option value="{{ $sa->no }}">
-                                                    {{ $sa->no }} - {{ $sa->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboSubAccount')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="fin_law"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.fin.law') }}</label>
-                                        <input type="number" min="1" name="fin_law" required
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" class="form-control" />
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="current_loan"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.current.loan') }}</label>
-                                        <input type="number" min="1" required name="current_loan"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" class="form-control" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="txtDescription"
-                                        class="form-label font-size-13 text-muted">{{ __('forms.document.description') }}</label>
-                                    <textarea id="vDescription" data-pristine-text-message="{{ __('messages.required') }}" rows="5"
-                                        class="form-control" name="txtDescription" required></textarea>
-                                    @error('txtDescription')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-primary" type="submit" name="submit"
-                                    value="save">{{ __('buttons.save') }}</button>
-                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
-                                <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
-                                </a>
-                                <a class="btn btn-dark"
-                                    href="{{ route('beginVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
-                            </div>
-                        </form> --}}
                         <form id="pristine-valid-example" action="{{ route('beginVoucher.store', $params) }}" novalidate
                             method="post">
                             @csrf
@@ -191,7 +56,6 @@
                                         @enderror
                                     </div>
                                 </div>
-
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboProgramSub" class="form-label font-size-13 text-muted">
@@ -207,7 +71,24 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.cluster') }}
+                                        </label>
+                                        <select id="cboCluster" class="form-select" name="cluster_id" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cluster_id')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                {{-- Cluster --}}
+                                {{-- <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="no"
                                             class="form-label font-size-13 text-muted">{{ __('forms.cluster') }}</label>
@@ -216,27 +97,8 @@
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
                                             class="form-control" name="no" tabindex="2" />
                                     </div>
-                                </div>
-
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $agc)
-                                                <option value="{{ $agc->id }}">
-                                                    {{ $agc->no }}-
-                                                    {{ $agc->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
                                 </div> --}}
+
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
@@ -271,8 +133,6 @@
                                         @enderror
                                     </div>
                                 </div>
-
-
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -440,7 +300,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             let programSubChoices = new Choices('#cboProgramSub', {
@@ -504,6 +364,238 @@
                         agencyChoices = resetChoices('#cboAgency', agencyChoices);
                     }
                 });
+            });
+
+        });
+    </script> --}}
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            let programSubChoices = new Choices('#cboProgramSub', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let agencyChoices = new Choices('#cboAgency', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let clusterChoices = new Choices('#cboCluster', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            function resetChoices(selectId, instance) {
+                instance.destroy();
+                return new Choices(selectId, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            // Program -> ProgramSub + Agency
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                $('#cboProgramSub').html(`<option value="">{{ __('forms.search...') }}</option>`);
+                $('#cboAgency').html(`<option value="">{{ __('forms.search...') }}</option>`);
+                $('#cboCluster').html(`<option value="">{{ __('forms.search...') }}</option>`);
+
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programId) return;
+
+                $.ajax({
+                    url: "{{ route('beginVoucher.by.program_sub') }}",
+                    type: "GET",
+                    data: {
+                        program_id: programId
+                    },
+                    success: function(html) {
+                        $('#cboProgramSub').html(html);
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+
+                $.ajax({
+                    url: "{{ route('beginVoucher.by.agency') }}",
+                    type: "GET",
+                    data: {
+                        program_id: programId
+                    },
+                    success: function(html) {
+                        $('#cboAgency').html(html);
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            });
+
+            // ProgramSub -> Cluster
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+
+                $('#cboCluster').html(`<option value="">{{ __('forms.search...') }}</option>`);
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                $.ajax({
+                    url: "{{ route('beginVoucher.by.cluster') }}",
+                    type: "GET",
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    success: function(html) {
+                        $('#cboCluster').html(html);
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            });
+
+        });
+    </script> --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========= Choices Instances =========
+            let programSubChoices = new Choices('#cboProgramSub', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let agencyChoices = new Choices('#cboAgency', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let clusterChoices = new Choices('#cboCluster', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            // ========= Helpers =========
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        // optional: keep empty if error
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            // ========= Script 1: Program -> ProgramSub =========
+            function handleProgramChangeForProgramSub(programId) {
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('beginVoucher.by.program_sub') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => {
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+            }
+
+            // ========= Script 2: Program -> Agency =========
+            function handleProgramChangeForAgency(programId) {
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('beginVoucher.by.agency') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => {
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            }
+
+            // ========= Script 3: ProgramSub -> Cluster =========
+            function handleProgramSubChangeForCluster(programSubId) {
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('beginVoucher.by.cluster') }}",
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => {
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            }
+
+            // ========= Events =========
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                // when program changes -> always clear cluster too
+                handleProgramChangeForProgramSub(programId);
+                handleProgramChangeForAgency(programId);
+                handleProgramSubChangeForCluster(null); // reset cluster
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+                handleProgramSubChangeForCluster(programSubId);
             });
 
         });

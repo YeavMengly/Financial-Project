@@ -31,7 +31,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="year">{{ __('menus.year') }}</label>
@@ -49,7 +49,7 @@
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                         </div>
                     </form>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -60,7 +60,6 @@
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>

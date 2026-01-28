@@ -426,13 +426,10 @@ class ProgramController extends Controller
 
     public function clusterEdit($params, $pId, $pSubId, $id)
     {
-
         $module = Cluster::where('ministry_id', decode_params($params))
             ->where('program_id', decode_params($pId))
             ->where('program_sub_id', decode_params($pSubId))
             ->findOrFail($id);
-
-        // dd($cluster);
 
         return view('content::content.program.sub.cluster.edit')
             ->with('params', $params)
@@ -443,7 +440,6 @@ class ProgramController extends Controller
 
     public function clusterUpdate($params, $pId, $pSubId, $id)
     {
-
         $cluster = Cluster::findOrFail($id);
 
         return view('content::content.program.sub.cluster.edit')
