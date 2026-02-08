@@ -28,7 +28,7 @@ return [
     'download' => 'ទាញយក',
     'credit' => 'កំណត់ឥណទាន',
     'sub.program' => 'អនុកម្មវិធី',
-    'account.sub' => 'អនុគណនិ',
+    'account' => 'គណនី',
+    'account.sub' => 'អនុគណនី',
     'cluster' => 'ចង្កោម'
-
 ];

@@ -8,6 +8,7 @@ use App\DataTables\AnnualOpen\InititalAccountSubDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Account;
 use App\Models\Content\AccountSub;
+use App\Models\Content\Chapter;
 use App\Models\Content\Ministry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,15 +25,30 @@ class AccountSubController extends Controller
     /**
      * Display a listing of the resource
      */
-    public function index(AccountSubDataTable $dataTable, $params)
+    public function index(AccountSubDataTable $dataTable, $params, $chId, $accId)
     {
+
+        // dd($params, $chId, $accId);
+
         $id  = decode_params($params);
-        $data = Ministry::where('id', $id)->first();
-        $accountSub =  AccountSub::where('ministry_id', $id)->get();
+        $module = Ministry::where('id', $id)->first();
+        $chapter =  Chapter::where('id', decode_params($chId))
+            ->where('ministry_id', decode_params($params))->first();
+
+        $account =  Account::where('id', decode_params($accId))
+            ->where('ministry_id', $id)->first();
+
+        $accountSub =  AccountSub::where('chapter_id', decode_params($chId))
+            ->where('account_id', decode_params($accId))
+            ->where('ministry_id', $id)->get();
 
         return $dataTable->render('content::content.accounts.accountSub.index', [
-            'data' => $data,
+            'module' => $module,
             'params' => $params,
+            'chId' => $chId,
+            'accId' => $accId,
+            'chapter' => $chapter,
+            'account' => $account,
             'accountSub' => $accountSub,
         ]);
     }
@@ -40,31 +56,50 @@ class AccountSubController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create($params)
+    public function create($params, $chId, $accId)
     {
         $id  = decode_params($params);
-        $data = Account::where('ministry_id', $id)->get();
+        $module = Ministry::where('id', $id)->first();
+        $chapter =  Chapter::where('id', decode_params($chId))
+            ->where('ministry_id', decode_params($params))->first();
+        $account =  Account::where('id', decode_params($accId))
+            ->where('ministry_id', $id)->first();
+        $accountSub =  AccountSub::where('chapter_id', decode_params($chId))
+            ->where('account_id', decode_params($accId))
+            ->where('ministry_id', $id)->first();
 
         return view('content::content.accounts.accountSub.create')
-            ->with('account', $data)
-            ->with('params', $params);
+            ->with('module', $module)
+            ->with('chapter', $chapter)
+            ->with('account', $account)
+            ->with('accountSub', $accountSub)
+            ->with('params', $params)
+            ->with('chId', $chId)
+            ->with('accId', $accId);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $params)
+    public function store(Request $request, $params, $chId, $accId)
     {
         $request->validate([
-            'cboAccountNumber' => ['required'],
             'no' => ['required'],
             'name' =>  ['required'],
         ]);
 
-        $id = decode_params($params);
+        dd($request->all(), $params, $chId, $accId);
         DB::beginTransaction();
         try {
-            $existingRecord = AccountSub::where('account_id', $request->cboAccountNumber)
+            $id = decode_params($params);
+
+            $ministry = Ministry::where('id', $id)->first();
+            $chapter = Chapter::where('id', decode_params($chId))->first();
+            $account = Account::where('id', decode_params($accId))
+                ->where('chapter_id', $chapter->id)->first();
+
+
+            $existingRecord = AccountSub::where('account_id', $account->id)
                 ->where('no', $request->no)
                 ->first();
 
@@ -82,7 +117,8 @@ class AccountSubController extends Controller
 
             AccountSub::create([
                 'ministry_id' => $ministry->id,
-                'account_id' => $request->cboAccountNumber,
+                'chapter_id' => $chapter->id,
+                'account_id' => $account->id,
                 'no' => $request->no,
                 'name' => $request->name
             ]);
@@ -95,7 +131,7 @@ class AccountSubController extends Controller
                 ->flash();
 
             if ($request->submit == 'save') {
-                return redirect()->route('accountSub.index', $params);
+                return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -107,43 +143,61 @@ class AccountSubController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('accountSub.index', $params);
+            return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
         }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($params, $id)
+    public function edit($params, $chId, $accId, $id)
     {
         $id = decode_params($id);
-        $account = Account::all();
-        $module = AccountSub::where('id', $id)->first();
+        $module = Ministry::where('id', decode_params($params))->first();
+        $chapter = Chapter::where('id', decode_params($chId))
+            ->where('ministry_id', decode_params($params))->first();
+        $account = Account::where('id', decode_params($accId))
+            ->where('chapter_id', $chapter->id)->first();
+        $accountSub = AccountSub::where('id', $id)
+            ->where('chapter_id', decode_params($chId))
+            ->where('account_id', decode_params($accId))
+            ->where('ministry_id', decode_params($params))->first();
 
-        return view('content::content.accounts.accountSub.edit')->with('module', $module)->with('account', $account)->with('params', $params);
+        return view('content::content.accounts.accountSub.edit')
+            ->with('module', $module)
+            ->with('chapter', $chapter)
+            ->with('account', $account)
+            ->with('accountSub', $accountSub)
+            ->with('params', $params)
+            ->with('chId', $chId)
+            ->with('accId', $accId);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $params, $id)
+    public function update(Request $request, $params, $chId, $accId, $id)
     {
         $request->validate([
-            'cboAccountNumber' => ['required'],
             'no' => ['required'],
             'name' => ['required'],
         ]);
 
         DB::beginTransaction();
-        $accountSub = AccountSub::where('id', $id)->first();
-
         try {
-            $existingRecord = AccountSub::where('account_id', $request->cboAccountNumber)
+
+            $id = decode_params($id);
+            $chapter = Chapter::where('id', decode_params($chId))->first();
+            $account = Account::where('id', decode_params($accId))
+                ->where('chapter_id', $chapter->id)->first();
+
+            $existingRecord = AccountSub::where('account_id', $account->id)
+                ->where('chapter_id', $chapter->id)
                 ->where('no', $request->no)
                 ->where('id', '<>', $id)
                 ->first();
 
-            if ($existingRecord) {
+            if (!$existingRecord) {
                 flash()
                     ->translate('en')
                     ->option('timeout', 2000)
@@ -153,8 +207,7 @@ class AccountSubController extends Controller
                 return redirect()->back()->withInput();
             }
 
-            $accountSub->update([
-                'account_id' => $request->cboAccountNumber,
+            $existingRecord->update([
                 'no' => $request->no,
                 'name' => $request->name,
             ]);
@@ -167,7 +220,7 @@ class AccountSubController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('accountSub.index', $params);
+            return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -178,17 +231,22 @@ class AccountSubController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('accountSub.index', $params);
+            return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
         }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($params, $id)
+    public function destroy($params, $chId, $accId, $id)
     {
         $id = decode_params($id);
-        $accountSub = AccountSub::where('id', $id)->first();
+
+        $accountSub = AccountSub::where('id', $id)
+            ->where('chapter_id', decode_params($chId))
+            ->where('account_id', decode_params($accId))
+            ->first();
+
         $accountSub->delete();
 
         flash()
@@ -197,13 +255,17 @@ class AccountSubController extends Controller
             ->error('delete_msg', 'delete')
             ->flash();
 
-        return redirect()->route('accountSub.index', $params);
+        return redirect()->route('accountSub.index', [
+            'params' => $params,
+            'chId' => $chId,
+            'accId' => $accId
+        ]);
     }
 
     /**
      * Restore the specified resource from storage.
      */
-    public function restore($params, $id)
+    public function restore($params, $chId, $accId, $id)
     {
         $asid = decode_params($id);
 
@@ -215,6 +277,6 @@ class AccountSubController extends Controller
             ->success('restore_msg', 'restore')
             ->flash();
 
-        return redirect()->route('accountSub.index', $params);
+        return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
     }
 }

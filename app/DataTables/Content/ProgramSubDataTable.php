@@ -44,6 +44,7 @@ class ProgramSubDataTable extends DataTable
         // return $model->newQuery();
         $params = $request->params;
         $pId = $request->pId;
+
         $id = decode_params($params);
         $pId = decode_params($pId);
 
@@ -54,16 +55,15 @@ class ProgramSubDataTable extends DataTable
             ->select([
                 'program_subs.id',
                 'program_subs.ministry_id',
-                'programs.no as program_id',
+                'programs.id as program_id',
                 'program_subs.no',
                 'program_subs.decription',
                 'program_subs.created_at',
                 'program_subs.deleted_at',
             ])
-            ->orderBy('program_subs.no', 'ASC');
-
-        $query->where('program_subs.ministry_id', $id);
-        $query->where('program_subs.program_id', $pId);
+            ->where('program_subs.ministry_id', $id)
+            ->where('program_subs.program_id', $pId)
+            ->orderBy('program_subs.id', 'ASC');
 
         return $query;
     }

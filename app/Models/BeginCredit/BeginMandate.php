@@ -115,8 +115,7 @@ class BeginMandate extends Model
     {
         $agent = new Agent();
         $browser = $agent->browser();
-
-        $activity->default_field = "{$this->subAccountNumber}";
+        $activity->default_field = "{$this->name}";
         $activity->log_name = trans('menus.beginning.credit');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();

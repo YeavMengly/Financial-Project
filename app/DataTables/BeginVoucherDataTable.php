@@ -36,7 +36,7 @@ class BeginVoucherDataTable extends DataTable
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
             })
-            ->rawColumns(['txtDescription'])
+            ->rawColumns(['txtDescription', 'soft_delete'])
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::beginVoucher.action', ['module' => $module]);
             })
@@ -54,6 +54,7 @@ class BeginVoucherDataTable extends DataTable
         $query = $model->newQuery()
             ->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
             ->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id')
+            ->leftJoin('clusters', 'begin_vouchers.cluster_id', '=', 'clusters.id')
             ->select([
                 'begin_vouchers.id',
                 'begin_vouchers.agency_id',
@@ -66,6 +67,7 @@ class BeginVoucherDataTable extends DataTable
                 'begin_vouchers.ministry_id',
                 'agencies.name as agency_name',
                 'account_subs.no as account_sub_no',
+                'clusters.decription',
             ])
             ->where('begin_vouchers.ministry_id', $id)
             ->when(
@@ -88,11 +90,11 @@ class BeginVoucherDataTable extends DataTable
                 fn($q) =>
                 $q->where('begin_vouchers.account_sub_id', $request->accountSub)
             )
-            ->when(
-                $request->filled('no'),
-                fn($q) =>
-                $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
-            )
+            // ->when(
+            //     $request->filled('no'),
+            //     fn($q) =>
+            //     $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
+            // )
             ->when(
                 $request->filled('txtDescription'),
                 fn($q) =>

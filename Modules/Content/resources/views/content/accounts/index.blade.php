@@ -15,20 +15,21 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
 
-                {{-- <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4> --}}
-                <h4 class="mb-sm-0 font-size-18">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">{{ __('menus.accounts') }} <span>{{ $first->no }}</span> </li>
-                        {{-- <li class="breadcrumb-item active">{{ __('menus.program.sub') }}</li> --}}
-                    </ol>
-                </h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.chapters') }}</span>
+                                    <span>{{ $chapter->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ __('menus.accounts') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -110,64 +111,5 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
-    <script>
-        function confirm(url, condi) {
-            if (condi == 1) {
-                Swal.fire({
-                    title: '{{ __('messages.confirm.delete') }}',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#e7515a',
-                    cancelButtonColor: '#e2a03f',
-                    confirmButtonText: '{{ __('buttons.delete') }}!',
-                    cancelButtonText: '{{ __('buttons.back') }}'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.href = url;
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: '{{ __('messages.confirm.back') }}',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#2ab57d',
-                    cancelButtonColor: '#e2a03f',
-                    confirmButtonText: '{{ __('buttons.get.back') }}!',
-                    cancelButtonText: '{{ __('buttons.back') }}'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        location.href = url;
-                    }
-                });
-            }
-        }
-    </script>
     {!! $dataTable->scripts() !!}
-
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const accountNumberSelect = document.getElementById('no');
-            const accountNumberChoice = new Choices(accountNumberSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const txtAccountSelect = document.getElementById('name');
-            const txtAccountChoice = new Choices(txtAccountSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-    </script>
 @endsection

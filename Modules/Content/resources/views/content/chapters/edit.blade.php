@@ -3,10 +3,16 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"></h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapters') }}</h4>
+
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.chapters') }}</a>
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
@@ -16,7 +22,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
@@ -32,7 +38,7 @@
                                     <label>{{ __('forms.chapter') }}</label>
                                     <input type="text" class="form-control" name="no" required
                                         data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ $module->no }}" />
+                                        value="{{ $chapter->no }}" />
                                     @error('no')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -44,7 +50,7 @@
                                     <label>{{ __('forms.name') }}</label>
                                     <input type="text" class="form-control" name="name" required
                                         data-pristine-required-message="{{ __('messages.required') }}"
-                                        value="{{ $module->name }}" />
+                                        value="{{ $chapter->name }}" />
                                     @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror

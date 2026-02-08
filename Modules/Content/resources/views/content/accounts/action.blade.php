@@ -6,6 +6,13 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+                @if (hasPermission('accounts.index'))
+                    <a href="{{ route('accountSub.index', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->chapter_id), 'accId' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.account.sub') }}</a>
+                @endif
+                @if (hasPermission('account.index') and (hasPermission('chapters.edit') or hasPermission('chapters.destroy')))
+                    <hr />
+                @endif
                 @if (hasPermission('accounts.edit'))
                     <a href="{{ route('accounts.edit', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->chapter_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

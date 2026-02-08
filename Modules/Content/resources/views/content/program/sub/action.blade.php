@@ -18,8 +18,6 @@
                 @if (hasPermission('program.sub.index') and (hasPermission('program.edit') or hasPermission('program.destroy')))
                     <hr />
                 @endif
-
-
                 @if (hasPermission('program.sub.edit'))
                     <a href="{{ route('program.sub.edit', ['params' => encode_params($module->ministry_id), 'pId' => encode_params($module->program_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

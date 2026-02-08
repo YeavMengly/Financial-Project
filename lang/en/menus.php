@@ -6,12 +6,25 @@ return [
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
+
     'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័ត',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
+
+    'beginning.credit' => 'ឥណទានអនុម័ត',
+    // Content
     'content' => 'មាតិកា',
+    'content.ministries' => 'កំណត់ឆ្នាំ',
+    'content.chapters' => 'ជំពូក',
+    'content.accounts' => 'គណនី',
+    'content.subaccounts' => 'អនុគណនី',
+    'content.agency' => 'អង្គភាព',
+    'content.cluster' => 'ចង្កោម',
+    'content.program' => 'កម្មវិធី',
+    'content.program.sub'  => 'អនុកម្មវិធី',
+
     'cluster' => 'ចង្កោម',
     'chapters' => 'ជំពូក',
     'accounts' => 'គណនី',

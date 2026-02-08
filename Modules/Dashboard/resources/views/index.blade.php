@@ -73,12 +73,7 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, .12);
         }
     </style>
-
-    </style>
-
-    </style>
 @endsection
-
 
 @section('content')
     <!-- start page title -->
@@ -89,10 +84,8 @@
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        {{-- <li class="breadcrumb-item"><a href="javascript: void(0);">  {{ $item->year }}</a>
-                        </li> --}}
                         <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.dashboard') }}</a></li>
-                        <li class="breadcrumb-item active">{{ __('menus.dashboard') }}</li>
+                        {{-- <li class="breadcrumb-item active">{{ __('menus.dashboard') }}</li> --}}
                     </ol>
                 </div>
             </div>
@@ -103,33 +96,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
-                        <div class="col-sm-3">
-                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                {{ __('forms.year') }}
-                            </label>
-
-                            <select class="form-control" name="year" id="year">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($ministries as $item)
-                                    <option value="{{ $item->year }}"
-                                        {{ $selectedYear == $item->year ? 'selected' : '' }}>
-                                        {{ $item->year }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3 d-flex align-items-center gap-2" style="margin-top: 36px;">
-                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
-                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
-                            </button>
-
-                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
-                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
-                            </a>
-                        </div>
-                    </form> --}}
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET"
                         action="{{ url()->current() }}">
                         <div class="col-sm-3">
@@ -147,36 +113,14 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        {{-- <div class="col-sm-3 d-flex align-items-center gap-2" style="margin-top: 36px;">
-                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
-                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
-                            </button>
-
-                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
-                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
-                            </a>
-                        </div> --}}
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
+    {{-- Main Production --}}
     <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <div class="page-title-left">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item active">{{ __('menus.initial.voucher') }}</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -213,7 +157,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -250,7 +194,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -287,7 +231,7 @@
             </div>
         </div>
 
-        <div class="col-xl-3 col-md-6">
+        <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -341,123 +285,155 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    {{-- <div class="row g-3">
-        @foreach ($programs as $program)
-            @php
-                $t = $programTotals[$program->no] ?? null;
-                $finLaw = $t->fin_law ?? 0;
-                $apply = $t->apply ?? 0;
-                $deadlineBalance = $t->deadline_balance ?? 0;
-                $remain = max($finLaw - $deadlineBalance, 0);
-                $applyPercent = $finLaw > 0 ? ($apply / $finLaw) * 100 : 0;
-                $total_records = $t->total_records ?? 0;
-
-            @endphp
-
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-h-100 cursor-pointer program-card" role="button" data-bs-toggle="modal"
-                    data-bs-target="#programSubModal" data-program-id="{{ $program->id }}"
-                    data-program-title="កម្មវិធី {{ $program->no ?? '' }}">
-
-                    <div class="card-body">
-
-                        <div class="mb-3">
-                            <span class="text-muted d-block text-truncate">
-                                កម្មវិធី {{ $program->no ?? '' }} - {{ $program->name_kh ?? ($program->name ?? '') }}
-                            </span>
-                        </div>
-
-                        <div class="row text-center">
-                            <div class="col-4 border-end">
-                                <span class="text-muted font-size-12 d-block">ច្បាប់ហរិញ្ញវត្ថុ</span>
-                                <h6 class="mb-0 text-primary">{{ number_format($finLaw) }}</h6>
-                                <small class="text-muted">រៀល</small>
-                            </div>
-
-                            <div class="col-4 border-end">
-                                <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
-                                <h6 class="mb-0 text-success">{{ number_format($apply) }}</h6>
-                                <small class="text-muted">រៀល</small>
-                            </div>
-
-                            <div class="col-4">
-                                <span class="text-muted font-size-12 d-block">នៅសល់</span>
-                                <h6 class="mb-0 text-danger">{{ number_format($remain) }}</h6>
-                                <small class="text-muted">រៀល</small>
-                            </div>
-                        </div>
-
-                        <div class="text-nowrap mt-3 text-center">
-                            <span class="badge bg-info-subtle text-info">
-                                {{ $program->name_en ?? 'Program Summary' }}
-                            </span>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    </div> --}}
     <div class="row">
-        @foreach ($programs as $program)
-            <div class="col-xl-3 col-md-6">
-                <div class="card card-h-100 program-card" role="button" data-program-id="{{ $program->id }}"
-                    data-program-title="km {{ $program->no }}">
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted d-block text-truncate">
-                                {{ __('menus.program') }} {{ $program->no }}
-                            </span>
-                            <div class="ms-auto">
+        <div class="col-xl-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    {{-- <div class="d-flex flex-wrap align-items-center mb-4">
+                        <h5 class="card-title me-2">{{ __('labels.begin.budget') }}</h5>
+                        <div class="ms-auto">
+                            <div>
+                                <button type="button" class="btn btn-soft-secondary btn-sm">
+                                    ALL
+                                </button>
                                 <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{ $program->total_records }}
+                                    1M
+                                </button>
+                                <button type="button" class="btn btn-soft-secondary btn-sm">
+                                    6M
+                                </button>
+                                <button type="button" class="btn btn-soft-secondary btn-sm">
+                                    1Y
                                 </button>
                             </div>
                         </div>
-                        <div class="row text-center">
-                            <div class="col-4 border-end">
-                                <span class="text-muted font-size-12 d-block">ច្បាប់ហរិញ្ញវត្ថុ</span>
-                                <h6 class="mb-0 text-primary">{{ number_format($program->fin_law) }}</h6>
-                                <small class="text-muted">រៀល</small>
-                            </div>
-                            <div class="col-4 border-end">
-                                <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
-                                <h6 class="mb-0 text-success">{{ number_format($program->remain) }}</h6>
-                                <small class="text-muted">រៀល</small>
-                            </div>
-                            <div class="col-4">
-                                <span class="text-muted font-size-12 d-block">នៅសល់</span>
-                                <h6 class="mb-0 text-danger">{{ number_format($program->credit) }}</h6>
-                                <small class="text-muted">រៀល</small>
+                    </div> --}}
+
+                    <div class="row align-items-center">
+                        <div class="col-sm">
+                            <div id="wallet-balance" data-colors='["#1890ff", "#52c41a", "#faad14"]' class="apex-charts">
                             </div>
                         </div>
-                        <div class="text-nowrap mt-3 text-center">
-                            <small class="text-muted d-block">
-                                អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
-                            </small>
+                        <div class="col-sm align-self-center">
+                            <div class="mt-4 mt-sm-0">
+                                <div>
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#faad14"></i>
+                                        {{ __('tables.th.financeLaw') }}
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($total_fin_law) }}
+                                        </span>
+                                    </h6>
+                                </div>
+
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#52c41a"></i>
+                                        {{ __('tables.th.deadline_balance') }}
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($total_deadline_balance) }}
+                                        </span>
+                                    </h6>
+                                </div>
+
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#1890ff"></i>
+                                        {{ __('tables.th.credit') }}
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($total_credit) }}
+                                        </span>
+                                    </h6>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @endforeach
-    </div>
+            <!-- end card -->
+        </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <div class="page-title-left">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item active">{{ __('menus.initial.mandate') }}</li>
-                    </ol>
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">ទិន្នន័យជំពូក</h5>
+                </div>
+                <div class="card-body">
+                    <div id="chapter-bar" class="apex-charts"></div>
                 </div>
             </div>
         </div>
     </div>
+    {{-- Program Data Info --}}
+    <div class="row">
+        @foreach ($programs as $program)
+            <div class="col-xl-3 col-lg-4 col-md-6">
+                <div class="card card-h-100 shadow-sm border-1 program-card" role="button"
+                    data-program-id="{{ $program->id }}"
+                    data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="text-truncate">
+                                <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
+                                </div>
+                            </div>
 
-    {{-- <div class="row">
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
+                                    {{ $program->total_records }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row text-center g-2">
+                            <div class="col-4 border-end">
+                                <span class="text-muted font-size-12 d-block">ច្បាប់ហិរញ្ញវត្ថុ</span>
+                                <span
+                                    class="counter-value mb-0 text-primary">{{ number_format($program->fin_law) }}</span>
+                                <small class="text-muted">រៀល</small>
+                            </div>
+
+                            <div class="col-4 border-end">
+                                <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
+                                <span class="counter-value mb-0 text-success">{{ number_format($program->apply) }}</span>
+                                <small class="text-muted">រៀល</small>
+                            </div>
+
+                            <div class="col-4">
+                                <span class="text-muted font-size-12 d-block">នៅសល់</span>
+                                <span class="counter-value mb-0 text-danger">{{ number_format($program->credit) }}</span>
+                                <small class="text-muted">រៀល</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-center">
+                            <small class="text-muted d-block">
+                                អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
+                            </small>
+                        </div>
+                        <span class="badge bg-success-subtle text-success">
+                            Click to view details
+                        </span>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="row">
         @php
             $qtyFuelRemain = max(($qtyFuel ?? 0) - ($qtyFuelRelease ?? 0), 0);
         @endphp
@@ -658,135 +634,55 @@
                 </div><!-- end card body -->
             </div><!-- end card -->
         </div>
-    </div> --}}
+    </div>
 
-    <div class="modal fade" id="programSubModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    {{-- Modal Program Sub --}}
+    <div class="modal fade" id="programSubModal" tabindex="-1" aria-labelledby="programSubModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title" id="programSubTitle">Program Sub</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="programSubModalLabel">Program Sub List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <div class="modal-body">
-                    <div class="row g-3">
-
-                        @php
-                            $subs = [
-                                [
-                                    'id' => 1,
-                                    'no' => '01',
-                                    'kh' => 'អនុកម្មវិធី ១',
-                                    'en' => 'Sub Program 1',
-                                    'badge' => 'primary',
-                                ],
-                                [
-                                    'id' => 2,
-                                    'no' => '02',
-                                    'kh' => 'អនុកម្មវិធី ២',
-                                    'en' => 'Sub Program 2',
-                                    'badge' => 'success',
-                                ],
-                                [
-                                    'id' => 3,
-                                    'no' => '03',
-                                    'kh' => 'អនុកម្មវិធី ៣',
-                                    'en' => 'Sub Program 3',
-                                    'badge' => 'warning',
-                                ],
-                                [
-                                    'id' => 4,
-                                    'no' => '04',
-                                    'kh' => 'អនុកម្មវិធី ៤',
-                                    'en' => 'Sub Program 4',
-                                    'badge' => 'danger',
-                                ],
-                                [
-                                    'id' => 5,
-                                    'no' => '05',
-                                    'kh' => 'អនុកម្មវិធី ៥',
-                                    'en' => 'Sub Program 5',
-                                    'badge' => 'info',
-                                ],
-                                [
-                                    'id' => 6,
-                                    'no' => '06',
-                                    'kh' => 'អនុកម្មវិធី ៦',
-                                    'en' => 'Sub Program 6',
-                                    'badge' => 'secondary',
-                                ],
-                            ];
-                        @endphp
-
-                        @foreach ($subs as $sub)
-                            <div class="col-xl-4 col-md-6">
-                                <div class="card h-100 shadow-sm border-0 text-center program-sub-card" role="button"
-                                    data-sub-id="{{ $sub['id'] }}" data-sub-title="{{ $sub['kh'] }}"
-                                    data-bs-toggle="modal" data-bs-target="#clusterModal">
-                                    <div class="card-body">
-                                        <span class="badge bg-{{ $sub['badge'] }} mb-2">{{ $sub['no'] }}</span>
-                                        <h6 class="mt-2">{{ $sub['kh'] }}</h6>
-                                        <small class="text-muted">{{ $sub['en'] }}</small>
-                                    </div>
-                                </div>
-
-                            </div>
-                        @endforeach
-
-                    </div>
+                <div class="modal-body" id="programSubContent">
+                    Loading...
                 </div>
-
             </div>
         </div>
     </div>
 
-    {{-- <div class="modal fade" id="clusterModal" tabindex="-1">
+    {{-- Modal Cluster --}}
+    <div class="modal fade" id="clusterModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
-
                 <div class="modal-header">
-                    <h5 class="modal-title" id="clusterModalTitle">Cluster</h5>
+                    <h5 class="modal-title">
+                        {{ __('menus.program.sub') }} <span id="clusterModalTitle"></span>
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>#</th>
-                                    <th>លេខចង្កោម</th>
-                                    <th>Name KH</th>
-                                    <th>Name EN</th>
-                                    <th>ហិរញ្ញវត្ថុ</th>
-
-                                    <th>អនុវត្ត</th>
-
-                                    <th>នៅសល់</th>
-
-
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="clusterRows">
-
-                            </tbody>
-                        </table>
+                    <div id="clusterContent" class="text-center text-muted">
+                        កំពុងផ្ទុកទិន្នន័យ...
                     </div>
-
                 </div>
-
             </div>
         </div>
-    </div> --}}
+    </div>
 @endsection
 
 @section('script')
     {{-- Plugin JS just for this page --}}
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
+    <!-- apexcharts -->
+    {{-- <script src="assets/libs/apexcharts/apexcharts.min.js"></script> --}}
+    {{-- <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script> --}}
+
+    <!-- dashboard init -->
+    <script src="{{ asset('assets/js/pages/dashboard.init.js') }}"></script>
     {{-- DataTables --}}
     <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
@@ -995,355 +891,346 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const modalTitle = document.getElementById('programSubTitle');
-            const loading = document.getElementById('programSubLoading');
-            const content = document.getElementById('programSubContent');
-            const empty = document.getElementById('programSubEmpty');
-            const rows = document.getElementById('programSubRows');
+            const cards = document.querySelectorAll('.program-card');
 
-            document.querySelectorAll('.program-card').forEach(card => {
-                card.addEventListener('click', async () => {
-                    const programId = card.dataset.programId;
-                    const programTitle = card.dataset.programTitle || 'Program';
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const programId = this.dataset.programId;
+                    const programTitle = this.dataset.programTitle;
 
-                    modalTitle.textContent = programTitle + ' - Program Sub';
+                    // Set modal title
+                    document.getElementById('programSubModalLabel').innerText = programTitle;
 
-                    // reset UI
-                    rows.innerHTML = '';
-                    loading.classList.remove('d-none');
-                    content.classList.add('d-none');
-                    empty.classList.add('d-none');
+                    // Show modal immediately with loading spinner
+                    const modalElement = document.getElementById('programSubModal');
+                    document.getElementById('programSubContent').innerHTML = `
+                        <div class="d-flex justify-content-center align-items-center" style="height:150px;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `;
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
 
-                    try {
-                        const url = `{{ url('/dashboard/programs') }}/${programId}/subs`;
-                        const res = await fetch(url, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
+                    // Fetch programSubs via AJAX
+                    fetch(`/dashboard/program/${programId}/subs`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.length === 0) {
+                                document.getElementById('programSubContent').innerHTML =
+                                    '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
+                                return;
                             }
+
+                            // Build HTML grid
+                            let html = '<div class="row g-2">';
+                            data.forEach(sub => {
+                                html += `
+                           <div class="col-md-4 mb-2">
+                                <div class="card shadow-sm program-sub-card"
+                                    data-sub-id="${sub.id}"
+                                    data-sub-no="${sub.no}"
+                                    style="cursor:pointer">
+                                    <div class="card-body">
+
+                                    <!-- Header -->
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="text-truncate">
+                                            <div class="text-muted small">
+                                                អនុកម្មវិធី <span>${sub.no}</span>
+                                            </div>
+                                            <small class="text-muted">
+                                                ${sub.description ?? '-'}
+                                            </small>
+                                        </div>
+
+                                        <div class="ms-auto">
+                                            <button type="button" class="btn btn-soft-primary btn-sm">
+                                                ${sub.total_records ?? 0}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Financial Row -->
+                                    <div class="row text-center g-2">
+                                        <div class="col-4 border-end">
+                                            <span class="text-muted font-size-12 d-block">ច្បាប់ហិរញ្ញវត្ថុ</span>
+                                            <span class="counter-value mb-0 text-primary">
+                                                ${Number(sub.fin_law ?? 0).toLocaleString()}
+                                            </span>
+                                            <small class="text-muted">រៀល</small>
+                                        </div>
+
+                                        <div class="col-4 border-end">
+                                            <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
+                                            <span class="counter-value mb-0 text-success">
+                                                ${Number(sub.apply ?? 0).toLocaleString()}
+                                            </span>
+                                            <small class="text-muted">រៀល</small>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <span class="text-muted font-size-12 d-block">នៅសល់</span>
+                                            <span class="counter-value mb-0 text-danger">
+                                                ${Number(sub.credit ?? 0).toLocaleString()}
+                                            </span>
+                                            <small class="text-muted">រៀល</small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Percent -->
+                                    <div class="mt-3 text-center">
+                                        <small class="text-muted d-block">
+                                            អនុវត្ត:
+                                            <strong>${Number(sub.percent ?? 0).toFixed(2)}%</strong>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                            });
+                            html += '</div>';
+
+                            document.getElementById('programSubContent').innerHTML = html;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            document.getElementById('programSubContent').innerHTML =
+                                '<p class="text-danger text-center">មិនមានទិន្នន័យដែលអាចបង្ហាញបាន។</p>';
                         });
+                });
+            });
+        });
+    </script>
 
+    <script>
+        document.addEventListener('click', function(e) {
+            const card = e.target.closest('.program-sub-card');
+            if (!card) return;
 
-                        const json = await res.json();
-                        const data = json.data || [];
+            const programSubId = card.dataset.subId;
+            const subNo = card.dataset.subNo;
 
-                        loading.classList.add('d-none');
+            document.getElementById('clusterModalTitle').innerText = subNo;
+            document.getElementById('clusterContent').innerHTML =
+                '<p class="text-center">កំពុងផ្ទុកទិន្នន័យ...</p>';
 
-                        if (data.length === 0) {
-                            empty.classList.remove('d-none');
-                            return;
-                        }
+            const modal = new bootstrap.Modal(document.getElementById('clusterModal'));
+            modal.show();
 
-                        data.forEach((item, i) => {
-                            rows.insertAdjacentHTML('beforeend', `
-                        <tr>
-                            <td class="text-center">${i + 1}</td>
-                            <td>${item.no ?? ''}</td>
-                            <td>${item.name_kh ?? ''}</td>
-                            <td>${item.name_en ?? ''}</td>
-                        </tr>
-                    `);
-                        });
-
-                        content.classList.remove('d-none');
-                    } catch (e) {
-                        loading.classList.add('d-none');
-                        empty.classList.remove('d-none');
-                        empty.textContent = 'Error loading program_sub.';
+            fetch(`/dashboard/program-sub/${programSubId}/clusters`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('clusterContent').innerHTML =
+                            '<p class="text-center">មិនមានចង្កោម (Cluster)</p>';
+                        return;
                     }
-                });
-            });
-        });
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.program-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const title = card.dataset.programTitle || 'Program';
-                    document.getElementById('programSubTitle').textContent = title +
-                        ' - Program Sub';
-                });
-            });
-        });
-    </script>
+                    let html = '<div class="row g-2">';
+                    data.forEach(cluster => {
+                        html += `
+                        <div class="col-md-4">
+                            <div class="card shadow-sm cluster-card"
+                                data-cluster-id="${cluster.id}"
+                                style="cursor:pointer">
+                                <div class="card-body">
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
+                                    <div class="text-muted small mb-1">
+                                        ចង្កោម ${cluster.no}
+                                    </div>
 
-            const clusterTitle = document.getElementById('clusterModalTitle');
-            const clusterRows = document.getElementById('clusterRows');
+                                    <div class="row text-center g-2">
+                                        <div class="col-4 border-end">
+                                            <small class="text-muted">ច្បាប់</small>
+                                            <div class="counter-value text-primary">
+                                                ${Number(cluster.fin_law ?? 0).toLocaleString()}
+                                            </div>
+                                        </div>
+                                        <div class="col-4 border-end">
+                                            <small class="text-muted">អនុវត្ត</small>
+                                            <div class="counter-valuetext-success ">
+                                                ${Number(cluster.apply ?? 0).toLocaleString()}
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">នៅសល់</small>
+                                            <div class="counter-value text-danger">
+                                                ${Number(cluster.credit ?? 0).toLocaleString()}
+                                            </div>
+                                        </div>
+                                    </div>
 
-            document.querySelectorAll('.program-sub-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const subTitle = card.dataset.subTitle;
-
-                    clusterTitle.textContent = subTitle + ' - Clusters';
-                    clusterRows.innerHTML = '';
-
-                    // Static example (replace with dynamic later)
-                    const clusters = [{
-                            code: '01',
-                            kh: 'ក្លាស្ទ័រ ១',
-                            en: 'Cluster 1',
-                            financial: '5000000',
-                            status: 'Active'
-                        },
-                        {
-                            code: '02',
-                            kh: 'ក្លាស្ទ័រ ២',
-                            en: 'Cluster 2',
-                            financial: '3000000',
-                            status: 'Active'
-                        },
-                        {
-                            code: '03',
-                            kh: 'ក្លាស្ទ័រ ៣',
-                            en: 'Cluster 3',
-                            financial: '2000000',
-                            status: 'Inactive'
-                        },
-                        {
-                            code: '04',
-                            kh: 'ក្លាស្ទ័រ ៤',
-                            en: 'Cluster 4',
-                            financial: '0',
-                            status: 'Inactive'
-                        },
-                        {
-                            code: '05',
-                            kh: 'ក្លាស្ទ័រ ៥',
-                            en: 'Cluster 5',
-                            financial: '1500000',
-                            status: 'Active'
-                        },
-                        {
-                            code: '06',
-                            kh: 'ក្លាស្ទ័រ ៦',
-                            en: 'Cluster 6',
-                            financial: '1500000',
-                            status: 'Active'
-                        },
-                        {
-                            code: '07',
-                            kh: 'ក្លាស្ទ័រ ៧',
-                            en: 'Cluster 7',
-                            financial: '1300000',
-                            status: 'Inactive'
-                        }
-                    ];
-
-                    clusters.forEach((item, i) => {
-                        clusterRows.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td class="text-center">${i + 1}</td>
-                        <td>${item.code}</td>
-                        <td>${item.kh}</td>
-                        <td>${item.en}</td>
-                        <td>${item.financial}</td>
-
-                        <td>
-                            <span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-danger'}">
-                                ${item.status}
-                            </span>
-                        </td>
-                    </tr>
-                `);
+                                </div>
+                            </div>
+                        </div>
+                    `;
                     });
-                });
-            });
+                    html += '</div>';
 
+                    document.getElementById('clusterContent').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('clusterContent').innerHTML =
+                        '<p class="text-danger text-center">បរាជ័យក្នុងការផ្ទុកទិន្នន័យ</p>';
+                });
         });
-    </script> --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const programSubModalEl = document.getElementById('programSubModal'); // first modal
-            const clusterModalEl = document.getElementById('clusterModal'); // second modal
 
-            const clusterTitle = document.getElementById('clusterModalTitle');
-            const clusterRows = document.getElementById('clusterRows');
+        document.addEventListener('click', e => {
+            const cluster = e.target.closest('.cluster-card');
+            if (!cluster) return;
 
-            document.querySelectorAll('.program-sub-card').forEach(card => {
-                card.addEventListener('click', (e) => {
-                    // prevent bootstrap auto open (we will open after hiding first modal)
-                    e.preventDefault();
+            const clusterId = cluster.dataset.clusterId;
+            console.log('Load vouchers for cluster:', clusterId);
 
-                    const subTitle = card.dataset.subTitle || 'Program Sub';
-
-                    clusterTitle.textContent = subTitle + ' - Clusters';
-                    clusterRows.innerHTML = '';
-
-                    // Static example (replace with dynamic later)
-                    const clusters = [{
-                            code: '01',
-                            kh: 'ក្លាស្ទ័រ ១',
-                            en: 'Cluster 1',
-                            fin: 5000000,
-                            apply: 3000000,
-                            remain: 2000000,
-                            status: 'Active'
-                        },
-                        {
-                            code: '02',
-                            kh: 'ក្លាស្ទ័រ ២',
-                            en: 'Cluster 2',
-                            fin: 3000000,
-                            apply: 1000000,
-                            remain: 2000000,
-                            status: 'Active'
-                        },
-                        {
-                            code: '03',
-                            kh: 'ក្លាស្ទ័រ ៣',
-                            en: 'Cluster 3',
-                            fin: 2000000,
-                            apply: 0,
-                            remain: 2000000,
-                            status: 'Inactive'
-                        },
-                    ];
-
-                    clusters.forEach((item, i) => {
-                        clusterRows.insertAdjacentHTML('beforeend', `
-                    <tr>
-                        <td class="text-center">${i + 1}</td>
-                        <td>${item.code}</td>
-                        <td>${item.kh}</td>
-                        <td>${item.en}</td>
-                        <td class="text-end">${Number(item.fin).toLocaleString()}</td>
-                        <td class="text-end">${Number(item.apply).toLocaleString()}</td>
-                        <td class="text-end">${Number(item.remain).toLocaleString()}</td>
-                        <td class="text-center">
-                            <span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-danger'}">
-                                ${item.status}
-                            </span>
-                        </td>
-                    </tr>
-                `);
-                    });
-
-                    // ✅ Hide first modal, then show second modal (no conflict)
-                    const programSubModal = bootstrap.Modal.getInstance(programSubModalEl);
-                    if (programSubModal) programSubModal.hide();
-
-                    programSubModalEl.addEventListener('hidden.bs.modal',
-                        function openClusterOnce() {
-                            programSubModalEl.removeEventListener('hidden.bs.modal',
-                                openClusterOnce);
-                            new bootstrap.Modal(clusterModalEl).show();
-                        });
-                });
-            });
+            // fetch(`/dashboard/cluster/${clusterId}/vouchers`)
         });
     </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const entry = Number(@json((float) ($qtyFuel ?? 0)));
-            const release = Number(@json((float) ($qtyFuelRelease ?? 0)));
-            const remain = Math.max(entry - release, 0);
 
-            const series = (entry === 0 && release === 0 && remain === 0) ? [1, 1, 1] : [entry, release, remain];
+            const el = document.querySelector("#wallet-balance");
+            const colors = JSON.parse(el.getAttribute("data-colors"));
 
-            new ApexCharts(document.querySelector("#fuelDonutChart"), {
+            const options = {
                 chart: {
                     type: "donut",
-                    height: 160
+                    height: 260
                 },
-                series: series,
-                labels: ["បញ្ចូល", "បញ្ចេញ", "នៅសល់"],
-                legend: {
-                    show: false
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    width: 0
-                },
+
+                series: [
+                    {{ round($percent_credit, 2) }},
+                    {{ round($percent_deadline_balance, 2) }},
+                    {{ round($percent_fin_law, 2) }}
+                ],
+
+                labels: [
+                    "{{ __('tables.th.credit') }}",
+                    "{{ __('tables.th.deadline_balance') }}",
+                    "{{ __('tables.th.financeLaw') }}"
+                ],
+
+                colors: colors,
+
                 plotOptions: {
                     pie: {
                         donut: {
-                            size: "72%",
-                            labels: {
-                                show: true,
-                                name: {
-                                    show: false
-                                },
-                                value: {
-                                    show: false
-                                },
-                                total: {
-                                    show: true,
-                                    label: "Remain",
-                                    formatter: function() {
-                                        return remain.toFixed(2);
-                                    }
-                                }
-                            }
+                            size: "0%" // 👈 makes it look like your image
                         }
                     }
                 },
+
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toFixed(1) + "%";
+                    },
+                    style: {
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        colors: ["#fff"]
+                    },
+                    dropShadow: {
+                        enabled: false
+                    }
+                },
+
+                stroke: {
+                    width: 0
+                },
+
+                legend: {
+                    position: "bottom",
+                    show: true // 👈 image has no legend under donut
+                },
+
                 tooltip: {
                     y: {
-                        formatter: (val) => Number(val).toFixed(0) + " លីត្រ"
+                        formatter: function(val) {
+                            return val.toFixed(2) + "%";
+                        }
                     }
                 }
-            }).render();
+            };
+
+            new ApexCharts(el, options).render();
         });
     </script>
 
+
+    {{-- Chapter --}}
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const entry = Number(@json((float) ($qtyDiesel ?? 0)));
-            const release = Number(@json((float) ($qtyDieselRelease ?? 0)));
-            const remain = Math.max(entry - release, 0);
 
-            const series = (entry === 0 && release === 0 && remain === 0) ? [1, 1, 1] : [entry, release, remain];
-
-            new ApexCharts(document.querySelector("#dieselDonutChart"), {
+            const options = {
                 chart: {
-                    type: "donut",
-                    height: 160
+                    type: 'bar',
+                    height: 260,
+                    toolbar: {
+                        show: false,
+                        color: '#1e90ff',
+                    }
                 },
-                series: series,
-                labels: ["បញ្ចូល", "បញ្ចេញ", "នៅសល់"],
-                legend: {
-                    show: false
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    width: 0
-                },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: "72%",
-                            labels: {
-                                show: true,
-                                name: {
-                                    show: false
-                                },
-                                value: {
-                                    show: false
-                                },
-                                total: {
-                                    show: true,
-                                    label: "Remain",
-                                    formatter: () => remain.toFixed(0)
-                                }
-                            }
+                series: [{
+                    name: 'Fin Law',
+                    data: @json($finLawData),
+                    color: '#1e90ff'
+                }],
+                // xaxis: {
+                //     categories: @json($chapterLabels)
+                // }
+
+                xaxis: {
+                    categories: @json($chapterLabels),
+                    labels: {
+                        style: {
+                            fontSize: '12px'
                         }
                     }
                 },
+
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        barHeight: '65%',
+                        borderRadius: 3
+                    }
+                },
+
+                colors: ['#1e90ff'],
+
+                dataLabels: {
+                    enabled: false,
+                },
+
+                grid: {
+                    strokeDashArray: 4,
+                    xaxis: {
+                        lines: {
+                            show: true
+                        }
+                    },
+                    yaxis: {
+                        lines: {
+                            show: false
+                        }
+                    }
+                },
+
                 tooltip: {
                     y: {
-                        formatter: (val) => Number(val).toFixed(0) + " លីត្រ"
+                        formatter: val => val.toLocaleString()
                     }
                 }
-            }).render();
+            };
+
+            new ApexCharts(
+                document.querySelector("#chapter-bar"),
+                options
+            ).render();
         });
     </script>
-@endsection

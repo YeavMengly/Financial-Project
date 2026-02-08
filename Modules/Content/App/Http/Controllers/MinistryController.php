@@ -69,11 +69,9 @@ class MinistryController extends Controller
             DB::rollBack();
             Log::error($e->getMessage());
 
-            if ($e instanceof QueryException && $e->getCode() == 23000 && str_contains($e->getMessage(), 'initial_budgets_year_unique')) {
-                $errorMessage = 'ឆ្នាំនេះបានបញ្ចូលរួចហើយ។';
-            } else {
-                $errorMessage = 'បញ្ហាក្នុងការរក្សាទុកទិន្នន័យ។';
-            }
+            $errorMessage = ($e instanceof QueryException && $e->getCode() == 23000)
+                ? 'ឆ្នាំនេះបានបញ្ចូលរួចហើយ។'
+                : 'បញ្ហាក្នុងការរក្សាទុកទិន្នន័យ។';
 
             flash()
                 ->translate('en')

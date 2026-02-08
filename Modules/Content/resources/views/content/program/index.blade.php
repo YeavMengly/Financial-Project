@@ -19,9 +19,12 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ __('menus.content.program') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -29,13 +32,13 @@
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-12">
             <div class="card">
 
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="row">
         <div class="col-12">
             <div class="card">

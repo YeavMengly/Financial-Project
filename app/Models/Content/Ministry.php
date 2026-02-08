@@ -5,7 +5,7 @@ namespace App\Models\Content;
 use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
 use App\Models\Content\Chapter;
-use App\Models\Program;
+use App\Models\Content\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -90,7 +90,7 @@ class Ministry extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.ministries'))
+            ->useLogName(trans('menus.content.ministries'))
             ->logOnly(['no', 'year', 'title', 'refer', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -104,7 +104,7 @@ class Ministry extends Model
     {
         $agent = new Agent();
         $activity->default_field    = "{$this->name} ";
-        $activity->log_name         = trans('menus.beginningcredit.ministries');
+        $activity->log_name         = trans('menus.content.ministries');
         $platform = $agent->platform();
         $browser = $agent->browser();
         $activity->ip_address = request()->ip();

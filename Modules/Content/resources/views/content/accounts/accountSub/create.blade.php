@@ -1,57 +1,48 @@
 @extends('layouts.master')
-@section('css')
-    <!-- Choices.js CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-@endsection
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"></h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.content.subaccounts') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.sub.account') }}</a></li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.chapters') }}</span>
+                                    <span>{{ $chapter->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.accounts') }}</span>
+                                    <span>{{ $account->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.sub.account') }}</a>
+                            </li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
     <!-- end page title -->
- 
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('accountSub.store', $params) }}" autocomplete="off">
+                        action="{{ route('accountSub.store', ['params' => $params, 'chId' => $chId, 'accId' => $accId]) }}"
+                        autocomplete="off">
                         @csrf
                         <input type="hidden" />
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="cboAccountNumber">{{ __('forms.account') }}</label>
-                                    <select id="cboAccountNumber" class="form-control" name="cboAccountNumber" required
-                                        data-trigger placeholder="ស្វែងរកលេខគណនី"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">ជ្រើសរើស</option>
-                                        @foreach ($account as $acc)
-                                            <option value="{{ $acc->no }}">{{ $acc->no }}-{{ $acc->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('no')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.sub.account') }}</label>
@@ -75,7 +66,7 @@
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
                                 <a class="btn btn-dark"
-                                    href="{{ route('accountSub.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]) }}">{{ __('buttons.back') }}</a>
                             </div>
                         </div>
                     </form>
@@ -88,19 +79,4 @@
 @section('script')
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-
-    <!-- Choices.js JS -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const accountElement = document.getElementById('cboAccountNumber');
-            const accountChoices = new Choices(accountElement, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script>
 @endsection

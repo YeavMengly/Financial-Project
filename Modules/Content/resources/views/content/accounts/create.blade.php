@@ -1,17 +1,24 @@
 @extends('layouts.master')
-@section('css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-@endsection
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"></h4>
+
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.chapters') }}</span>
+                                    <span>{{ $chapter->no }}</span></a>
+                            </li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.accounts') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
@@ -75,6 +82,4 @@
 @section('script')
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 @endsection

@@ -62,7 +62,7 @@ class ClusterDataTable extends DataTable
         $model->withTrashed();
         $query = $model->newQuery()
             // ->leftJoin('programs', 'clusters.program_id', '=', 'programs.id')
-            // ->leftJoin('program_subs', 'clusters.program_sub_id', '=', 'program_subs.id')
+            ->leftJoin('program_subs', 'clusters.program_sub_id', '=', 'program_subs.id')
             ->select([
                 'clusters.id',
                 'clusters.ministry_id',
@@ -73,9 +73,11 @@ class ClusterDataTable extends DataTable
                 'clusters.created_at',
                 'clusters.deleted_at',
             ])
+            ->where('clusters.ministry_id', $id)
+            ->where('clusters.program_sub_id', $pSubId)
             ->orderBy('clusters.no', 'ASC');
 
-        $query->where('clusters.ministry_id', $id);
+        // $query->where('clusters.ministry_id', $id);
         // $query->where('clusters.program_id', $pId);
         // $query->where('clusters.program_sub_id', $pSubId);
 

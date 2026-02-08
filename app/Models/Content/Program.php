@@ -57,7 +57,7 @@ class Program extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.program'))
+            ->useLogName(trans('menus.conten.program'))
             ->logOnly(['ministry_id', 'no', 'title'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -71,7 +71,7 @@ class Program extends Model
     {
         $agent = new Agent();
         $activity->default_field    = "{$this->name} ";
-        $activity->log_name         = trans('menus.beginningcredit.program');
+        $activity->log_name         = trans('menus.content.program');
         $platform = $agent->platform();
         $browser = $agent->browser();
         $activity->ip_address = request()->ip();

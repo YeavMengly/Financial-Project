@@ -24,10 +24,10 @@
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-12">
             <div class="card">
-                {{-- <div class="card-body">
+                <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="year">{{ __('menus.account') }}</label>
@@ -45,83 +45,83 @@
                         </div>
                     </form>
                 </div>
-            </div> --}}
             </div>
         </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        @if (hasPermission('ministries.create'))
-                            <div class="col-sm">
-                                <div class="mb-4">
-                                    <a class="btn btn-light waves-effect waves-light"
-                                        href="{{ route('ministries.create') }}"><i class="bx bx-plus me-1"></i>
-                                        {{ __('buttons.create') }}</a>
-                                </div>
+    </div> --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    @if (hasPermission('ministries.create'))
+                        <div class="col-sm">
+                            <div class="mb-4">
+                                <a class="btn btn-light waves-effect waves-light" href="{{ route('ministries.create') }}"><i
+                                        class="bx bx-plus me-1"></i>
+                                    {{ __('buttons.create') }}</a>
                             </div>
-                        @endif
-                        <div class="table-responsive">
-                            {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                         </div>
-
+                    @endif
+                    <div class="table-responsive">
+                        {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
+
                 </div>
             </div>
         </div>
-    @endsection
-    @section('script')
-        <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-        <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-        <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-        <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
-        <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
-        <script>
-            function confirm(url, condi) {
-                if (condi == 1) {
-                    Swal.fire({
-                        title: '{{ __('messages.confirm.delete') }}',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#e7515a',
-                        cancelButtonColor: '#e2a03f',
-                        confirmButtonText: '{{ __('buttons.delete') }}!',
-                        cancelButtonText: '{{ __('buttons.back') }}'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.href = url;
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        title: '{{ __('messages.confirm.back') }}',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#2ab57d',
-                        cancelButtonColor: '#e2a03f',
-                        confirmButtonText: '{{ __('buttons.get.back') }}!',
-                        cancelButtonText: '{{ __('buttons.back') }}'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.href = url;
-                        }
-                    });
-                }
-            }
-        </script>
-        {!! $dataTable->scripts() !!}
-        <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const taskTypeSelect = document.getElementById('year');
-                const taskTypeChoices = new Choices(taskTypeSelect, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholderValue: 'ជ្រើសរើស',
-                    searchPlaceholderValue: 'ស្វែងរក...',
-                    /
-                    shouldSort: false
+    </div>
+@endsection
+@section('script')
+    <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script>
+        function confirm(url, condi) {
+            if (condi == 1) {
+                Swal.fire({
+                    title: '{{ __('messages.confirm.delete') }}',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#e7515a',
+                    cancelButtonColor: '#e2a03f',
+                    confirmButtonText: '{{ __('buttons.delete') }}!',
+                    cancelButtonText: '{{ __('buttons.back') }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.href = url;
+                    }
                 });
+            } else {
+                Swal.fire({
+                    title: '{{ __('messages.confirm.back') }}',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#2ab57d',
+                    cancelButtonColor: '#e2a03f',
+                    confirmButtonText: '{{ __('buttons.get.back') }}!',
+                    cancelButtonText: '{{ __('buttons.back') }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.href = url;
+                    }
+                });
+            }
+        }
+    </script>
+    {!! $dataTable->scripts() !!}
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('year');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                /
+                shouldSort: false
             });
-        </script>
-    @endsection
+        });
+    </script>
+@endsection

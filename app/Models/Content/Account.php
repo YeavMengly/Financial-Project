@@ -67,7 +67,7 @@ class Account extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.accounts'))
+            ->useLogName(trans('menus.content.accounts'))
             ->logOnly(['ministry_id', 'chapter_id', 'no', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -80,9 +80,8 @@ class Account extends Model
     public function tapActivity(Activity $activity): void
     {
         $agent = new Agent();
-
         $activity->default_field   = "{$this->no}";
-        $activity->log_name        = trans('menus.beginningcredit.accounts');
+        $activity->log_name        = trans('menus.content.accounts');
         $activity->ip_address      = request()->ip();
         $activity->platform        = $agent->platform();
         $activity->device          = $agent->device();

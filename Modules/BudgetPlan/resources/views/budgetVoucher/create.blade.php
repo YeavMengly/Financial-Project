@@ -34,7 +34,60 @@
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
                             <div class="row">
+
                                 <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboProgram" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program') }}
+                                        </label>
+                                        <select class="form-select" id="cboProgram" name="cboProgram" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($program as $p)
+                                                <option value="{{ $p->id }}">
+                                                    {{ $p->no }}-
+                                                    {{ $p->title }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('cboProgram')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program.sub') }}
+                                        </label>
+                                        <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+                                        @error('cboProgramSub')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.cluster') }}
+                                        </label>
+                                        <select id="cboCluster" class="form-select" name="cboCluster" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cluster_id')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
@@ -53,6 +106,20 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                </div> --}}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.agency') }}
+                                        </label>
+                                        <select id="cboAgency" class="form-select" name="cboAgency" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+                                        @error('cboAgency')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <div class="col-lg-4 col-md-6">
@@ -63,10 +130,17 @@
 
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginVoucher as $bv)
+                                            {{-- @foreach ($beginVoucher as $bv)
                                                 <option value="{{ $bv->account_sub_id }}"
-                                                    data-program="{{ $bv->voucher_no }}">
-                                                    {{ $bv->account_sub_id }} - {{ $bv->voucher_no }}
+                                                    data-program="{{ $bv->cluster_id }}">
+                                                    {{ $bv->account_sub_id }} -
+                                                    {{ $bv->sub_name }}
+                                                </option>
+                                            @endforeach --}}
+                                            @foreach ($accountSub as $bv)
+                                                <option value="{{ $bv->no }}" data-program="{{ $bv->cluster_id }}">
+                                                    {{ $bv->no }} -
+                                                    {{ $bv->name }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -77,7 +151,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6 d-none">
+                                {{-- <div class="col-xl-4 col-md-6 d-none">
                                     <div class="form-group mb-3">
                                         <label for="no"
                                             class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
@@ -88,7 +162,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -169,7 +243,7 @@
 
                     </div>
                 </div>
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
                             <tr>
@@ -194,7 +268,7 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -217,14 +291,218 @@
             });
         }
     </script>
+
     <script>
+        $(document).ready(function() {
+            $('#vDescription').summernote({
+                backColor: 'red',
+                height: 150,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['color', ['color']],
+                ]
+            });
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboProgram');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboSubAccount');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        $(document).ready(function() {
+            const element = document.getElementById('cboAgency');
+            let choicesInstance = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false,
+            });
+
+            $('#cboAgency').on('change', function() {
+                const selected = $(this).val();
+                let message = '';
+
+                switch (selected) {
+                    case '1':
+                        message = 'You selected Choice 1';
+                        break;
+                    case '2':
+                        message = 'You selected Choice 2';
+                        break;
+                    case '3':
+                        message = 'You selected Choice 3';
+                        break;
+                    default:
+                        message = '';
+                }
+                $('#resultDisplay').text(message);
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========= Choices Instances =========
+            let programSubChoices = new Choices('#cboProgramSub', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let agencyChoices = new Choices('#cboAgency', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let clusterChoices = new Choices('#cboCluster', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            // ========= Helpers =========
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            // ========= Script 1: Program -> ProgramSub =========
+            function handleProgramChangeForProgramSub(programId) {
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetVoucher.by.program_sub') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => {
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+            }
+
+            // ========= Script 2: Program -> Agency =========
+            function handleProgramChangeForAgency(programId) {
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetVoucher.by.agency') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => {
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            }
+
+            // ========= Script 3: ProgramSub -> Cluster =========
+            function handleProgramSubChangeForCluster(programSubId) {
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetVoucher.by.cluster') }}",
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => {
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            }
+
+            // ========= Events =========
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                // when program changes -> always clear cluster too
+                handleProgramChangeForProgramSub(programId);
+                handleProgramChangeForAgency(programId);
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+                handleProgramSubChangeForCluster(programSubId);
+            });
+        });
+    </script>
+
+    {{-- Event Get BeginVoucher to BudgetVoucher  --}}
+
+
+    {{-- <script>
         // ---------- helpers ----------
         function initChoicesOnce(selectEl, opts = {}) {
             if (!selectEl) return null;
             if (selectEl.dataset.choicesInit === '1') return null; // our own guard
             selectEl.dataset.choicesInit = '1';
             return new Choices(selectEl, Object.assign({
-                searchEnabled: true,
                 itemSelectText: '',
                 shouldSort: false
             }, opts));
@@ -341,5 +619,5 @@
 
             budgetInput?.addEventListener('input', recomputeRemaining);
         });
-    </script>
+    </script> --}}
 @endsection

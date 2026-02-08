@@ -65,9 +65,10 @@ class Agency extends Model
                 'name',
                 'nick_name',
             ])
-            ->useLogName('agency')
+            ->useLogName('menus.content.agency')
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => __("Event: :event", ['event' => $eventName]));
     }
 
     /**
@@ -77,7 +78,7 @@ class Agency extends Model
     {
         $agent = new Agent();
         $activity->default_field    = "{$this->name} ";
-        $activity->log_name         = trans('agency');
+        $activity->log_name         = trans('menus.content.agency');
         $platform = $agent->platform();
         $browser = $agent->browser();
         $activity->ip_address = request()->ip();

@@ -17,12 +17,10 @@ class ProgramSub extends Model
     use HasFactory, SoftDeletes, LogsActivity;
 
     protected $fillable = [
-
         'ministry_id',
         'program_id',
         'no',
         'decription'
-
     ];
     /**
      * Get the ministry this programSub belongs to.
@@ -54,7 +52,6 @@ class ProgramSub extends Model
         return $this->belongsTo(Cluster::class, 'program_sub_id', 'id');
     }
 
-
     /* -----------------------------------------------------------------
      |  Activity Log Configuration
      | -----------------------------------------------------------------
@@ -66,7 +63,7 @@ class ProgramSub extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.programSub'))
+            ->useLogName(trans('menus.content.program.sub'))
             ->logOnly(['ministry_id', 'program_id', 'no', 'decription'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -80,7 +77,7 @@ class ProgramSub extends Model
     {
         $agent = new Agent();
         $activity->default_field    = "{$this->name} ";
-        $activity->log_name         = trans('menus.beginningcredit.programsub');
+        $activity->log_name         = trans('menus.content.program.sub');
         $platform = $agent->platform();
         $browser = $agent->browser();
         $activity->ip_address = request()->ip();
