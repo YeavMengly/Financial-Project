@@ -9,24 +9,26 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"></h4>
-                {{-- <h4 class="mb-sm-0 font-size-18">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">{{ __('menus.program') }} <span>{{ $module->no }}</span> </li>
+                <h4 class="mb-sm-0 font-size-18">
+                    {{ __('menus.content.cluster') }}
+                </h4>
 
-                        <li class="breadcrumb-item active">{{ __('menus.program.sub') }}</li>
-                    </ol>
-                </h4> --}}
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ $ministry->year }}</span></a>
+                            </li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.program') }}
-                                    {{-- <span>{{ $module->no }}</span> --}}
+                                    <span>{{ $program->no }}</span>
                                 </a>
                             </li>
-                            <li class="breadcrumb-item">{{ __('menus.program.sub') }}
+                            <li class="breadcrumb-item">{{ __('menus.program.sub') }} <span>{{ $programSub->no }}</span>
                             </li>
-                             <li class="breadcrumb-item">{{ __('menus.cluster') }}
+                            <li class="breadcrumb-item">{{ __('menus.cluster') }}
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
@@ -65,9 +67,10 @@
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-primary" type="submit" name="submit"
-                                    value="save">{{ __('buttons.save') }}</button>
-                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
+                                <button type="submit" id="btnSave" name="submit" value="save" class="btn btn-primary">
+                                    {{ __('buttons.save') }}
+                                </button>
+                                {{-- <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button> --}}
 
                                 <a class="btn btn-dark"
                                     href="{{ route('cluster.index', ['params' => $params, 'pId' => $pId, 'pSubId' => $pSubId]) }}">{{ __('buttons.back') }}</a>
@@ -110,5 +113,22 @@
                 shouldSort: false
             });
         });
+    </script>
+    <script>
+        document.getElementById('pristine-valid-example')
+            .addEventListener('submit', function(e) {
+
+                const no = this.querySelector('[name="no"]').value.trim();
+                const desc = this.querySelector('[name="decription"]').value.trim();
+
+                if (!no || !desc) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                const btn = document.getElementById('btnSave');
+                btn.disabled = true;
+                btn.innerText = 'កំពុងរក្សាទុក...';
+            });
     </script>
 @endsection

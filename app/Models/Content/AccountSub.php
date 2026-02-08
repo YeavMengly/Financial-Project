@@ -25,6 +25,7 @@ class AccountSub extends Model
      */
     protected $fillable = [
         'ministry_id',
+        'chapter_id',
         'account_id',
         'no',
         'name'
@@ -79,8 +80,8 @@ class AccountSub extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.subaccounts'))
-            ->logOnly(['ministry_id', 'account_id', 'no', 'name'])
+            ->useLogName(trans('menus.content.subaccounts'))
+            ->logOnly(['ministry_id', 'chapter_id', 'account_id', 'no', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
@@ -92,8 +93,8 @@ class AccountSub extends Model
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();
-        $activity->default_field = "{$this->subAccountNumber}";
-        $activity->log_name = trans('menus.beginningcredit.subaccounts');
+        $activity->default_field = "{$this->no}";
+        $activity->log_name = trans('menus.content.subaccounts');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();
         $activity->device = $agent->device();

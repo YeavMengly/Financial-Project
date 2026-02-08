@@ -45,23 +45,34 @@ class AccountSubDataTable extends DataTable
     {
 
         $params = $request->params;
-        $id = decode_params($params);
+        $chId = $request->chId;
+        $accId = $request->accId;
 
+        $id = decode_params($params);
+        $chId = decode_params($chId);
+        $accId = decode_params($accId);
 
         $model = $model->newQuery();
         $model->withTrashed();
         $query = $model->newQuery()
+            ->leftJoin('chapters', 'account_subs.chapter_id', '=', 'chapters.id')
+            ->leftJoin('accounts', 'account_subs.account_id', '=', 'accounts.id')
             ->select([
                 'account_subs.id',
                 'account_subs.ministry_id',
-                'account_subs.account_id as CNA',
-                'account_subs.no as SNA',
+                'account_subs.chapter_id',
+                'account_subs.account_id',
+                'account_subs.no',
                 'account_subs.name',
+                'account_subs.created_at',
                 'account_subs.deleted_at',
             ])
-            ->orderBy('account_subs.created_at', 'ASC');
+            ->where('account_subs.ministry_id', $id)
+            ->where('account_subs.chapter_id', $chId)
+            ->where('account_subs.account_id', $accId)
+            ->orderBy('account_subs.no', 'ASC');
 
-        $query->where('account_subs.ministry_id', $id);
+
         if ($request->filled('no')) {
             $query->where('account_subs.id', $request->no);
         }
@@ -99,8 +110,7 @@ class AccountSubDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('CNA')->title(__('tables.th.account'))->addClass('align-middle'),
-            Column::make('SNA')->title(__('tables.th.sub.account'))->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.sub.account'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.name'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),

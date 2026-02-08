@@ -16,17 +16,23 @@
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">{{ __('menus.program') }} <span>{{ $program->no }}</span> </li>
-                        <li class="breadcrumb-item active">{{ __('menus.program.sub') }}</li>
+                        <li class="breadcrumb-item">{{ __('menus.content.program.sub') }} </li>
                     </ol>
                 </h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content.program') }}</span>
+                                    <span>{{ $program->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ __('menus.content.program.sub') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -35,10 +41,10 @@
     </div>
     <!-- end page title -->
 
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-12">
             <div class="card">
-                {{-- <div class="card-body">
+                <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
 
                         <div class="col-sm-3">
@@ -75,10 +81,10 @@
                         </div>
                     </form>
 
-                </div> --}}
+                </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="row">
         <div class="col-12">
             <div class="card">

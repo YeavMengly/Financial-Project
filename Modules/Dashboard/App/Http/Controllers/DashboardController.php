@@ -3,7 +3,9 @@
 namespace Modules\Dashboard\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProgramSub;
+use App\Models\Content\Chapter;
+use App\Models\Content\Cluster;
+use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,19 +18,6 @@ class DashboardController extends Controller
             ->orderBy('year', 'desc')
             ->get();
 
-        // dd( $ministries->first()->id);
-
-
-        $programs = DB::table('programs')
-            ->join('ministries', 'programs.ministry_id', '=', 'ministries.id')
-            ->where('ministries.id', $ministries->first()->id ?? 0)
-            ->select('programs.*', 'ministries.year')
-            ->orderBy('no')
-            ->get();
-
-        // dd('programs', $programs);
-
-
         // ✅ default year = request('year') else latest ministry year else current year
         $defaultYear = $ministries->first()->year ?? date('Y');
         $year = $request->filled('year') ? $request->input('year') : $defaultYear;
@@ -36,7 +25,7 @@ class DashboardController extends Controller
         // BEGIN VOUCHERS (by year)
         $beginReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
-            ->select('begin_vouchers.*', 'ministries.year')
+            ->select('begin_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
 
@@ -47,6 +36,18 @@ class DashboardController extends Controller
         $total_deadline_balance = $beginReport->sum('deadline_balance');
         $chartDataDeadLine      = $beginReport->pluck('deadline_balance')->toArray();
 
+        $total_credit       = $beginReport->sum('credit');
+        $chartDataCredit     = $beginReport->pluck('credit')->toArray();
+        // $totalBeginVoucher   = $beginReport->count();
+
+        $percent_credit = $total_fin_law > 0 ? ($total_credit / $total_fin_law) * 100 : 0;
+        $percent_deadline_balance = $total_fin_law > 0 ? ($total_deadline_balance / $total_fin_law) * 100 : 0;
+        $percent_fin_law = $total_fin_law > 0 ? 100 : 0;
+
+        // remaining percent so donut works correctly
+        // $percent_remaining = max(0, 100 - ($percent_credit + $percent_deadline_balance));
+
+        // dd($percent_fin_law);
         $law_average_sum     = $beginReport->sum('law_average');
         $law_correction_sum  = $beginReport->sum('law_correction');
         $law_average_percent    = $law_average_sum / 100;
@@ -124,50 +125,87 @@ class DashboardController extends Controller
         $chartTotalquantity = $materialEntries->pluck('quantity')->toArray();
         $materialCount = $materialEntries->count();
 
-
-        // $programTotals = DB::table('begin_vouchers')
-        //     ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
-        //     ->where('ministries.year', $year)
-        //     ->groupBy('begin_vouchers.program_id')
-        //     ->selectRaw('
-        //     begin_vouchers.program_id,
-        //     SUM(begin_vouchers.fin_law) AS fin_law,
-        //     SUM(begin_vouchers.apply) AS apply,
-        //     SUM(begin_vouchers.deadline_balance) AS remain,
-        //     COUNT(*) AS total_records
-        // ')
-        //     ->get()
-        //     ->keyBy('program_id');
-
         $programTotals = DB::table('begin_vouchers')
-            // ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
-            ->where('begin_vouchers.ministry_id', $ministries->first()->id)
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('begin_vouchers.program_id')
             ->selectRaw('
-            begin_vouchers.program_id,
-            SUM(begin_vouchers.fin_law) AS fin_law,
-            SUM(begin_vouchers.apply) AS apply,
-            SUM(begin_vouchers.deadline_balance) AS remain,
-             SUM(begin_vouchers.credit) AS credit,
-            COUNT(*) AS total_records
-        ')
+        begin_vouchers.program_id,
+        SUM(begin_vouchers.fin_law) AS fin_law,
+        SUM(begin_vouchers.apply) AS apply,
+        SUM(begin_vouchers.deadline_balance) AS remain,
+        SUM(begin_vouchers.credit) AS credit,
+        COUNT(*) AS total_records
+    ')
             ->get()
             ->keyBy('program_id');
 
-        // dd($programTotals);
+        $data = DB::table('programs')
+            ->join('ministries', 'programs.ministry_id', '=', 'ministries.id')
+            ->where('ministries.year', $year)
+            ->select('programs.*', 'ministries.year')
+            ->orderBy('no')
+            ->get();
 
-        $programs = $programs->map(function ($program) use ($programTotals) {
-            $total = $programTotals->get($program->id);
-            $program->fin_law        = $total->fin_law        ?? 0;
-            $program->apply         = $total->apply         ?? 0;
-            $program->remain        = $total->remain        ?? 0;
-            $program->credit        = $total->credit        ?? 0;
-            $program->total_records = $total->total_records ?? 0;
-            $program->percent =    $program->fin_law > 0 ? ($program->apply  /  $program->fin_law) * 100 : 0;
-            return $program;
+        $programs = $data->map(function ($data) use ($programTotals) {
+            $total = $programTotals[$data->id] ?? null;
+            $data->fin_law        = $total->fin_law        ?? 0;
+            $data->apply          = $total->apply          ?? 0;
+            $data->remain         = $total->remain         ?? 0;
+            $data->credit         = $total->credit         ?? 0;
+            $data->total_records  = $total->total_records  ?? 0;
+            $data->percent        = $data->fin_law > 0 ? ($data->apply / $data->fin_law) * 100 : 0;
+            return $data;
         });
 
-        // dd($programs[0]);
+
+
+        $chapters = Chapter::where('ministries.year', $year)
+            ->join('ministries', 'chapters.ministry_id', '=', 'ministries.id')
+            ->select('chapters.*')
+            ->orderBy('no')
+            ->get();
+        // dd($chapter[0]);
+
+        $chapterTotals = DB::table('begin_vouchers')
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('ministries.year', $year)
+            ->groupBy('begin_vouchers.chapter_id')
+            ->selectRaw('
+        begin_vouchers.chapter_id,
+        SUM(begin_vouchers.fin_law) AS fin_law,
+        SUM(begin_vouchers.apply) AS apply,
+        SUM(begin_vouchers.deadline_balance) AS remain,
+        SUM(begin_vouchers.credit) AS credit,
+        COUNT(*) AS total_records
+    ')
+            ->get()
+            ->keyBy('chapter_id');
+
+
+        $chapters = $chapters->map(function ($chapter) use ($chapterTotals) {
+
+            $total = $chapterTotals[$chapter->id] ?? null;
+
+            $chapter->fin_law       = $total->fin_law ?? 0;
+            $chapter->apply         = $total->apply ?? 0;
+            $chapter->remain        = $total->remain ?? 0;
+            $chapter->credit        = $total->credit ?? 0;
+            $chapter->total_records = $total->total_records ?? 0;
+
+            // example percentage
+            $chapter->percent_apply = $chapter->fin_law > 0
+                ? round(($chapter->apply / $chapter->fin_law) * 100, 2)
+                : 0;
+
+            return $chapter;
+        });
+
+        $chapterLabels = $chapters->pluck('no')->map(fn($n) => "ជំពូក $n");
+        $finLawData    = $chapters->pluck('fin_law');
+
+
+
+        // dd($chapters);
 
         return view('dashboard::index', [
             'ministries' => $ministries,
@@ -179,6 +217,9 @@ class DashboardController extends Controller
 
             'total_deadline_balance' => $total_deadline_balance,
             'chartDataDeadLine' => $chartDataDeadLine,
+
+            'total_credit' => $total_credit,
+            'chartDataCredit' => $chartDataCredit,
 
             'law_average_percent' => $law_average_percent,
             'law_correction_percent' => $law_correction_percent,
@@ -205,31 +246,140 @@ class DashboardController extends Controller
             'qtyDieselRelease' => $qtyDieselRelease,
             'qtyOilRelease' => $qtyOilRelease,
             'itemOptions' => $itemOptions,
-            // 'totalEntry' => $totalEntry,
-
 
             'total_quantity' => $total_quantity,
             'chartTotalquantity' => $chartTotalquantity,
             'materialCount' => $materialCount,
             'programs' => $programs,
             'programTotals' => $programTotals,
+
+            'percent_credit'           => round($percent_credit, 2),
+            'percent_deadline_balance' => round($percent_deadline_balance, 2),
+            'percent_fin_law'           => round($percent_fin_law, 2),
+            // 'percent_remaining'        => round($percent_remaining, 2),
+
+            'chapters' => $chapters,
+            'chapterLabels' => $chapterLabels,
+            'finLawData' => $finLawData,
         ]);
     }
 
-    // DashboardController.php
-    public function subs($programId)
-    {
+    // public function getProgramSubs($programId)
+    // {
+    //     // Get all programSubs for this program
+    //     $programSubs = ProgramSub::where('program_id', $programId)
+    //         ->select('id', 'no', 'decription') // adjust fields you want to show
+    //         ->get();
 
-        dd('hit subs', $programId);
-        $subs = ProgramSub::where('program_id', $programId)
-            ->select('id', 'no', 'name_kh', 'name_en')
-            ->orderBy('no')
+    //     $programTotals = DB::table('begin_vouchers')
+    //         ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+    //         ->groupBy('begin_vouchers.program_id')
+    //         ->selectRaw('
+    //     begin_vouchers.program_id,
+    //     SUM(begin_vouchers.fin_law) AS fin_law,
+    //     SUM(begin_vouchers.apply) AS apply,
+    //     SUM(begin_vouchers.deadline_balance) AS remain,
+    //     SUM(begin_vouchers.credit) AS credit,
+    //     COUNT(*) AS total_records
+    //     ')
+    //         ->get()
+    //         ->keyBy('program_id');
+
+    //     $programSubs = $programSubs->map(function ($data) use ($programTotals) {
+    //         $total = $programTotals[$data->id] ?? null;
+    //         $data->fin_law        = $total->fin_law        ?? 0;
+    //         $data->apply          = $total->apply          ?? 0;
+    //         $data->remain         = $total->remain         ?? 0;
+    //         $data->credit         = $total->credit         ?? 0;
+    //         $data->total_records  = $total->total_records  ?? 0;
+    //         $data->percent        = $data->fin_law > 0 ? ($data->apply / $data->fin_law) * 100 : 0;
+    //         return $data;
+    //     });
+
+    //     return response()->json($programSubs);
+    // }
+    public function getProgramSubs($programId)
+    {
+        // 1️⃣ Get program subs
+        $programSubs = ProgramSub::where('program_id', $programId)
+            ->select('id', 'no', 'decription')
             ->get();
 
-        dd('subs', $subs);
+        // 2️⃣ Get totals grouped by program_sub_id
+        $programSubTotals = DB::table('begin_vouchers')
+            ->where('program_id', $programId) // 🔥 IMPORTANT
+            ->groupBy('program_sub_id')
+            ->selectRaw('
+            program_sub_id,
+            SUM(fin_law) AS fin_law,
+            SUM(apply) AS apply,
+            SUM(deadline_balance) AS remain,
+            SUM(credit) AS credit,
+            COUNT(*) AS total_records
+        ')
+            ->get()
+            ->keyBy('program_sub_id');
 
-        return response()->json([
-            'data' => $subs
-        ]);
+        // 3️⃣ Merge totals into program subs
+        $programSubs = $programSubs->map(function ($sub) use ($programSubTotals) {
+            $total = $programSubTotals->get($sub->id);
+
+            $sub->fin_law       = $total->fin_law ?? 0;
+            $sub->apply         = $total->apply ?? 0;
+            $sub->remain        = $total->remain ?? 0;
+            $sub->credit        = $total->credit ?? 0;
+            $sub->total_records = $total->total_records ?? 0;
+            $sub->percent       = $sub->fin_law > 0
+                ? ($sub->apply / $sub->fin_law) * 100
+                : 0;
+
+            return $sub;
+        });
+
+        return response()->json($programSubs);
+    }
+
+    public function getClusters($programSubId)
+    {
+        $clusters = Cluster::where('program_sub_id', $programSubId)
+            ->select(
+                'id',
+                'no',
+                'decription as description'
+            )
+            ->get();
+
+        // 2️⃣ Get totals grouped by program_sub_id
+        $clusterTotal = DB::table('begin_vouchers')
+            ->where('program_sub_id', $programSubId) // 🔥 IMPORTANT
+            ->groupBy('cluster_id')
+            ->selectRaw('
+            cluster_id,
+            SUM(fin_law) AS fin_law,
+            SUM(apply) AS apply,
+            SUM(deadline_balance) AS remain,
+            SUM(credit) AS credit,
+            COUNT(*) AS total_records
+        ')
+            ->get()
+            ->keyBy('cluster_id');
+
+        // 3️⃣ Merge totals into program subs
+        $clusters = $clusters->map(function ($cluster) use ($clusterTotal) {
+            $total = $clusterTotal->get($cluster->id);
+            $cluster->fin_law       = $total->fin_law ?? 0;
+            $cluster->apply         = $total->apply ?? 0;
+            $cluster->remain        = $total->remain ?? 0;
+            $cluster->credit        = $total->credit ?? 0;
+            $cluster->total_records = $total->total_records ?? 0;
+            $cluster->percent       = $cluster->fin_law > 0
+                ? ($cluster->apply / $cluster->fin_law) * 100
+                : 0;
+            return $cluster;
+        });
+
+        // dd($clusters);
+
+        return response()->json($clusters);
     }
 }

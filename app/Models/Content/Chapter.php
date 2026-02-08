@@ -58,7 +58,7 @@ class Chapter extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.beginningcredit.chapters'))
+            ->useLogName(trans('menus.content.chapters'))
             ->logOnly(['ministry_id', 'no', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -71,8 +71,8 @@ class Chapter extends Model
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();
-        $activity->default_field = "{$this->chapterNumber}";
-        $activity->log_name = trans('menus.beginningcredit.chapters');
+        $activity->default_field = "{$this->name}";
+        $activity->log_name = trans('menus.content.chapters');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();
         $activity->device = $agent->device();

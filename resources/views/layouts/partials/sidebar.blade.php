@@ -83,7 +83,10 @@
                                 <a href="{{ route('initialVoucher.index') }}"
                                     class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-voucher">{{ __('menus.initial.voucher') }}</span>
+                                    <span data-key="t-budget-control-voucher">
+                                        {{-- {{ __('menus.initial.voucher') }} --}}
+                                        ទូទាត់
+                                    </span>
                                 </a>
                             </li>
                         @endif
@@ -93,7 +96,10 @@
                                 <a href="{{ route('initialMandate.index') }}"
                                     class="{{ Request::routeIs('initialMandate.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-mandate">{{ __('menus.initial.mandate') }}</span>
+                                    <span data-key="t-budget-control-mandate">
+                                        {{-- {{ __('menus.initial.mandate') }} --}}
+                                        ធានាចំណាយ
+                                    </span>
                                 </a>
                             </li>
                         @endif
@@ -144,7 +150,7 @@
                 @php
                     $reportActive = false;
                 @endphp
-                <li class="{{ $reportActive ? 'mm-active' : '' }}">
+                {{-- <li class="{{ $reportActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="zap"></i>
                         <span data-key="t-reprots">{{ __('menus.check.control.general') }}</span>
@@ -161,18 +167,18 @@
                                 </a>
                             </li>
                         @endif
-                        {{-- @if (hasPermission('ministries.index'))
+                        @if (hasPermission('ministries.index'))
                             <li>
                                 <a href="#" class="">
                                     <i data-feather="file"></i>
                                     <span data-key="t-report-program">{{ __('menus.report') }}</span>
                                 </a>
                             </li>
-                        @endif --}}
+                        @endif
                     </ul>
-                </li>
+                </li> --}}
 
-                <li class="menu-title" data-key="t-inventory">{{ __('menus.inventory') }}</li>
+                {{-- <li class="menu-title" data-key="t-inventory">{{ __('menus.inventory') }}</li> --}}
 
                 {{-- ========== Duel ========== --}}
                 @php
@@ -362,7 +368,7 @@
                     </li>
                 @endif --}}
 
-                @if (hasPermission('ministries.index'))
+                {{-- @if (hasPermission('ministries.index'))
                     <li class="{{ Request::routeIs('initialAccountSub.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('initialAccountSub.index') }}"
                             class="{{ Request::routeIs('initialAccountSub.*') ? 'active' : '' }}">
@@ -370,7 +376,7 @@
                             <span>{{ __('menus.sub.account') }}</span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
                 @if (hasPermission('ministries.index'))
                     <li class="{{ Request::routeIs('initialProgram.*') ? 'mm-active' : '' }}">
@@ -406,13 +412,13 @@
                 @if (auth()->user()->role_id == 1)
                     <li class="menu-title" data-key="t-setting">{{ __('menus.setting') }}</li>
 
-                    {{-- <li class="{{ Request::routeIs('system.*') ? 'mm-active' : '' }}">
+                    <li class="{{ Request::routeIs('system.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('system.index') }}"
                             class="{{ Request::routeIs('system.*') ? 'active' : '' }}">
                             <i data-feather="database"></i>
                             <span data-key="t-roles">{{ __('menus.setting.log') }}</span>
                         </a>
-                    </li> --}}
+                    </li>
 
                     {{-- <li class="{{ Request::routeIs('keys.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('keys.index') }}"

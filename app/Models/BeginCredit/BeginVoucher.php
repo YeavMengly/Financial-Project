@@ -2,7 +2,9 @@
 
 namespace App\Models\BeginCredit;
 
+use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
+use App\Models\Content\Ministry;
 use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +17,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class BeginVoucher extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +30,7 @@ class BeginVoucher extends Model
         'chapter_id',
         'account_id',
         'account_sub_id',
+        'cluster_id',
         'no',
         'txtDescription',
         'fin_law',
@@ -118,8 +121,7 @@ class BeginVoucher extends Model
     {
         $agent = new Agent();
         $browser = $agent->browser();
-
-        $activity->default_field = "{$this->subAccountNumber}";
+        $activity->default_field = "{$this->name}";
         $activity->log_name = trans('menus.beginning.credit');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();

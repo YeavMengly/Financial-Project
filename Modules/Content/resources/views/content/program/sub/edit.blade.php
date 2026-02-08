@@ -9,20 +9,21 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"></h4>
-                {{-- <h4 class="mb-sm-0 font-size-18">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item">{{ __('menus.program') }} <span>{{ $module->no }}</span> </li>
-                        <li class="breadcrumb-item active">{{ __('menus.program.sub') }}
-                        </li>
-                    </ol>
-                </h4> --}}
+              <h4 class="mb-sm-0 font-size-18">
+                    {{ __('menus.content.program.sub') }}
+                </h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
+                               <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ $ministry->year }}</span></a>
+                            </li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.program') }}
-                                    <span>{{ $module->no }}</span></a>
+                                    <span>{{ $program->no }}</span></a>
                             </li>
                             <li class="breadcrumb-item">{{ __('menus.program.sub') }}
                             </li>
@@ -41,26 +42,17 @@
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('program.sub.update', ['params' => $params, 'pId' => encode_params($pId), 'id' => encode_params($id)]) }}"
+                        action="{{ route('program.sub.update', ['params' => $params, 'pId' => $pId, 'id' => encode_params($module->id),]) }}"
                         autocomplete="off">
                         @csrf
                         <input type="hidden" />
                         <div class="row">
-
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.program') }}</label>
-                                    <input type="text" class="form-control"
-                                        value="{{ $module->no }} . {{ $module->title }}" tabindex="1" disabled />
-                                </div>
-                            </div>
-
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.program.sub') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         type="text" class="form-control" name="no"
-                                        value="{{ old('no', substr($programSub->no, 1, 1)) }}" tabindex="1" />
+                                        value="{{ old('no', substr($module->no, 1, 1)) }}" tabindex="1" />
 
                                 </div>
                             </div>
@@ -69,7 +61,7 @@
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.title') }}</label>
                                     <textarea id="decription" data-pristine-required-message="{{ __('messages.required') }}" rows="5"
-                                        class="form-control" name="decription" required> {{ old('decription', $programSub->decription) }}</textarea>
+                                        class="form-control" name="decription" required> {{ old('decription', $module->decription) }}</textarea>
                                 </div>
                             </div>
 
@@ -77,7 +69,7 @@
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
                                 <a class="btn btn-dark"
-                                    href="{{ route('program.sub.index', ['params' => $params, 'pId' => encode_params($pId)]) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('program.sub.index', ['params' => $params, 'pId' => $pId]) }}">{{ __('buttons.back') }}</a>
 
                             </div>
                         </div>

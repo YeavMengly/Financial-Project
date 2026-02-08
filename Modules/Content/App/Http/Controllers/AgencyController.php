@@ -7,7 +7,7 @@ use App\DataTables\AnnualOpen\InitialAgencyDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Agency;
 use App\Models\Content\Ministry;
-use App\Models\Program;
+use App\Models\Content\Program;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,13 +41,11 @@ class AgencyController extends Controller
     public function create($params)
     {
         $id = decode_params($params);
+        $ministry = Ministry::where('id', $id)->first();
         $data = Program::where('ministry_id', $id)->get();
 
-
-        // dd($data);
-
         return view('content::content.agency.create')->with('params', $params)
-            ->with('data', $data);
+            ->with('data', $data)->with('ministry', $ministry) ;
     }
 
     /**
@@ -107,10 +105,11 @@ class AgencyController extends Controller
     public function edit($params, $id)
     {
         $id = decode_params($id);
+        $ministry = Ministry::where('id', decode_params($params))->first();
         $program = Program::where('ministry_id', decode_params($params))->get();
         $agency = Agency::where('id', $id)->first();
 
-        return view('beginningcredit::agency.edit')->with('params', $params)->with('agency', $agency)->with('program', $program);
+        return view('content::content.agency.edit')->with('params', $params)->with('agency', $agency)->with('program', $program)->with('ministry', $ministry);
     }
 
     /**

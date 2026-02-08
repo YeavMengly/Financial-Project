@@ -29,12 +29,11 @@ class ProgramController extends Controller
      */
     public function index(ProgramDataTable $dataTable, $params)
     {
-        $id  = decode_params($params);
-        $data = Ministry::where('id', $id)->first();
+        $module = Ministry::where('id', decode_params($params))->first();
 
         return $dataTable->render('content::content.program.index', [
             'params' => $params,
-            'data' => $data
+            'module' => $module
         ]);
     }
 
@@ -43,7 +42,10 @@ class ProgramController extends Controller
      */
     public function create($params)
     {
+        $ministry = Ministry::where('id', decode_params($params))->first();
+
         return view('content::content.program.create')
+            ->with('ministry', $ministry)
             ->with('params', $params);
     }
 
@@ -54,21 +56,22 @@ class ProgramController extends Controller
             'title' => 'required',
         ]);
 
-        $id = decode_params($params);
         DB::beginTransaction();
         try {
-            $ministry = Ministry::where('id', $id)->first();
+            $ministry = Ministry::where('id', decode_params($params))->first();
             Program::create([
                 'ministry_id' => $ministry->id,
                 'no' => $request->no,
                 'title' => strip_tags($request->title),
             ]);
+
             DB::commit();
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
                 ->success('success_msg', 'successful')
                 ->flash();
+
             if ($request->submit == 'save') {
                 return redirect()->route('program.index', $params);
             }
@@ -90,18 +93,65 @@ class ProgramController extends Controller
 
     public function edit($params, $id)
     {
-        $id = decode_params($id);
-        $module = Program::where('id', $id)->firstOrFail();
+
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $module = Program::where('id', decode_params($id))
+            ->where('ministry_id', $ministry->id)
+            ->first();
 
         return view('content::content.program.edit')
             ->with('module', $module)
+            ->with('ministry', $ministry)
             ->with('params', $params);
+    }
+
+    public function update(Request $request, $params, $id)
+    {
+        $request->validate([
+            'no' => ['required'],
+            'title' => ['required'],
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $program = Program::findOrfail($id);
+
+            $program->update([
+                'no' => $request->no,
+                'title' => $request->title,
+            ]);
+
+            DB::commit();
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            return redirect()->route('program.index',  $params);
+        } catch (Exception $e) {
+            DB::rollBack();
+            $bug = $e->getMessage();
+            Log::error($bug);
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error($bug, 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('program.index',  $params);
+        }
     }
 
     public function destroy($params, $id)
     {
         $pid = decode_params($id);
-        $program = Program::where('id', $pid)->first();
+
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $program = Program::where('id', $pid)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
         $program->delete();
 
         flash()
@@ -113,16 +163,33 @@ class ProgramController extends Controller
         return redirect()->route('program.index', $params);
     }
 
+    public function restore($params, $id)
+    {
+        $pid = decode_params($id);
+
+        Program::withTrashed()->whereKey($pid)->restore();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('program.index', $params);
+    }
+
     public function subIndex(ProgramSubDataTable $dataTable, $params, $pId)
     {
-        $data = Ministry::where('id', decode_params($params))->first();
-        $program = Program::where('id', decode_params($pId))->first();
+        $module = Ministry::where('id', decode_params($params))->first();
+        $program = Program::where('id', decode_params($pId))
+            ->where('ministry_id', $module->id)
+            ->first();
 
         return $dataTable
             ->render('content::content.program.sub.index', [
                 'params' => $params,
                 'pId' => $pId,
-                'data' => $data,
+                'module' => $module,
                 'program' => $program,
             ]);
     }
@@ -131,12 +198,16 @@ class ProgramController extends Controller
     {
         $id = decode_params($pId);
 
-        $module = Program::where('id', $id)->first();
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $program = Program::where('id', $id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
 
         return view('content::content.program.sub.create')
             ->with('params', $params)
             ->with('pId', $pId)
-            ->with('module', $module);
+            ->with('ministry', $ministry)
+            ->with('program', $program);
     }
 
     public function subStore(Request $request, $params, $pId)
@@ -148,11 +219,11 @@ class ProgramController extends Controller
 
         DB::beginTransaction();
         try {
-            $params = decode_params($params);
             $id = decode_params($pId);
 
-            $program = Program::where('id', $id)->first();
-            $ministry = Ministry::where('id', $params)->first();
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $program = Program::where('id', $id)
+                ->where('ministry_id', $ministry->id)->first();
 
             ProgramSub::create([
                 'ministry_id' => $ministry->id,
@@ -166,16 +237,17 @@ class ProgramController extends Controller
                 ->option('timeout', 2000)
                 ->success('success_msg', 'successful')
                 ->flash();
+
             if ($request->submit == 'save') {
                 return redirect()->route('program.sub.index', [
-                    'params' => encode_params($ministry->id),
-                    'pId' => encode_params($program->id)
+                    'params' => $params,
+                    'pId' => $pId
                 ]);
             }
 
             return redirect()->route('program.sub.create', [
-                'params' => encode_params($ministry->id),
-                'pId' => encode_params($program->id)
+                'params' => $params,
+                'pId' => $pId
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -187,24 +259,35 @@ class ProgramController extends Controller
                 ->error($bug, 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('program.sub.index',  ['params' => $params, 'pId' => $program->id]);
+            return redirect()->route(
+                'program.sub.index',
+                [
+                    'params' => $params,
+                    'pId' => $pId
+                ]
+            );
         }
     }
 
     public function subEdit($params, $pId, $id)
     {
-        $pId = decode_params($pId);
         $id = decode_params($id);
 
-        $module = Program::where('id', $pId)->first();
-        $programSub = ProgramSub::where('id', $id)->first();
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $program = Program::where('id', decode_params($pId))
+            ->where('ministry_id', $ministry->id)->first();
+        $module = ProgramSub::where('id', $id)
+            ->where('program_id', $program->id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
 
         return view('content::content.program.sub.edit')
             ->with('id', $id)
             ->with('pId', $pId)
             ->with('module', $module)
+            ->with('ministry', $ministry)
             ->with('params', $params)
-            ->with('programSub', $programSub);
+            ->with('program', $program);
     }
 
     public function subUpdate(Request $request, $params, $pId, $id)
@@ -217,8 +300,12 @@ class ProgramController extends Controller
         DB::beginTransaction();
         try {
 
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $program = Program::where('id', decode_params($pId))
+                ->where('ministry_id', $ministry->id)->first();
             $programSub = ProgramSub::where('id', decode_params($id))
-                ->where('program_id', decode_params($pId))
+                ->where('program_id', $program->id)
+                ->where('ministry_id', $ministry->id)
                 ->first();
 
             $programSub->update([
@@ -253,43 +340,6 @@ class ProgramController extends Controller
         }
     }
 
-    public function update(Request $request, $params, $id)
-    {
-        $request->validate([
-            'no' => ['required'],
-            'title' => ['required'],
-        ]);
-
-        DB::beginTransaction();
-        try {
-            $program = Program::findOrfail($id);
-            $program->update([
-                'no' => '0' . $request->no,
-                'title' => $request->title,
-            ]);
-
-            DB::commit();
-            flash()
-                ->translate('en')
-                ->option('timeout', 2000)
-                ->success('success_msg', 'successful')
-                ->flash();
-
-            return redirect()->route('program.index',  $params);
-        } catch (Exception $e) {
-            DB::rollBack();
-            $bug = $e->getMessage();
-            Log::error($bug);
-            flash()
-                ->translate('en')
-                ->option('timeout', 2000)
-                ->error($bug, 'បញ្ហា')
-                ->flash();
-
-            return redirect()->route('program.index',  $params);
-        }
-    }
-
     public function subDestroy($params, $pId, $id)
     {
         $programSub = ProgramSub::where('id', decode_params($id))
@@ -320,24 +370,9 @@ class ProgramController extends Controller
         return redirect()->route('program.sub.index', $cateId);
     }
 
-    public function restore($params, $id)
-    {
-        $pid = decode_params($id);
-
-        Program::withTrashed()->whereKey($pid)->restore();
-
-        flash()
-            ->translate('en')
-            ->option('timeout', 2000)
-            ->success('restore_msg', 'restore')
-            ->flash();
-
-        return redirect()->route('program.index', $params);
-    }
-
     public function clusterIndex(ClusterDataTable $dataTable, $params, $pId, $pSubId)
     {
-        $data = Ministry::where('id', decode_params($params))->first();
+        $module = Ministry::where('id', decode_params($params))->first();
         $program = Program::where('id', decode_params($pId))->first();
 
         $programSub =  ProgramSub::where('id', decode_params($pSubId))
@@ -347,7 +382,7 @@ class ProgramController extends Controller
             'params' => $params,
             'pId' => $pId,
             'pSubId' => $pSubId,
-            'data' => $data,
+            'module' => $module,
             'program' => $program,
             'programSub' => $programSub
         ]);
@@ -355,15 +390,26 @@ class ProgramController extends Controller
 
     public function clusterCreate($params, $pId, $pSubId)
     {
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $program = Program::where('id', decode_params($pId))
+            ->where('ministry_id', $ministry->id)->first();
+        $programSub = ProgramSub::where('id', decode_params($pSubId))
+            ->where('program_id', $program->id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
         return view('content::content.program.sub.cluster.create')
             ->with('params', $params)
             ->with('pSubId', $pSubId)
-            ->with('pId', $pId);
+            ->with('pId', $pId)
+            ->with('ministry', $ministry)
+            ->with('program', $program)
+            ->with('programSub', $programSub);
     }
 
     public function clusterStore(Request $request, $params, $pId, $pSubId)
     {
-        $validated = $request->validate([
+        $request->validate([
             'no' => ['required'],
             'decription' => ['required'],
         ]);
@@ -417,36 +463,108 @@ class ProgramController extends Controller
                 ->flash();
 
             return redirect()->route('cluster.create', [
-                'params' => encode_params(decode_params($params)),
-                'pId' => encode_params(decode_params($pId)),
-                'pSubId' => encode_params(decode_params($pSubId)),
+                'params' => $params,
+                'pId' => $pId,
+                'pSubId' => $pSubId,
             ]);
         }
     }
 
     public function clusterEdit($params, $pId, $pSubId, $id)
     {
-        $module = Cluster::where('ministry_id', decode_params($params))
-            ->where('program_id', decode_params($pId))
-            ->where('program_sub_id', decode_params($pSubId))
-            ->findOrFail($id);
+
+        $id = decode_params($id);
+
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $program = Program::where('id', decode_params($pId))
+            ->where('ministry_id', $ministry->id)->first();
+        $programSub = ProgramSub::where('id', decode_params($pSubId))
+            ->where('program_id', $program->id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+        $module = Cluster::where('id', $id)
+            ->where('ministry_id', $ministry->id)
+            ->where('program_id', $program->id)
+            ->where('program_sub_id', $programSub->id)
+            ->first();
 
         return view('content::content.program.sub.cluster.edit')
+            ->with('id', $id)
             ->with('params', $params)
             ->with('pSubId', $pSubId)
             ->with('pId', $pId)
+            ->with('program', $program)
+            ->with('programSub', $programSub)
+            ->with('ministry', $ministry)
             ->with('module', $module);
     }
 
-    public function clusterUpdate($params, $pId, $pSubId, $id)
+    public function clusterUpdate(Request $request, $params, $pId, $pSubId, $id)
     {
-        $cluster = Cluster::findOrFail($id);
+        $request->validate([
+            'no'         => ['required'],
+            'decription' => ['required'],
+        ]);
 
-        return view('content::content.program.sub.cluster.edit')
-            ->with('params', $params)
-            ->with('pSubId', $pSubId)
-            ->with('pId', $pId)
-            ->with('cluster', $cluster);
+        DB::beginTransaction();
+
+        try {
+            $ministryId   = decode_params($params);
+            $programId    = decode_params($pId);
+            $programSubId = decode_params($pSubId);
+            $clusterId    = decode_params($id);
+
+            $ministry   = Ministry::where('id', $ministryId)->firstOrFail();
+            $programSub = ProgramSub::where('id', $programSubId)->firstOrFail();
+            $cluster    = Cluster::where('id', $clusterId)->firstOrFail();
+
+            $cluster->update([
+                'ministry_id'     => $ministry->id,
+                'program_id'      => $programSub->program_id,
+                'program_sub_id'  => $programSub->id,
+                'no'              => str_pad($request->no, 2, '0', STR_PAD_LEFT),
+                'decription'      => strip_tags($request->decription),
+            ]);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            if ($request->submit === 'save') {
+                return redirect()->route('cluster.index', [
+                    'params' => $params,
+                    'pId'    => $pId,
+                    'pSubId' => $pSubId,
+                ]);
+            }
+
+            return redirect()->route('cluster.index', [
+                'params' => $params,
+                'pId'    => $pId,
+                'pSubId' => $pSubId,
+                'id'     => $id,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error($e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('cluster.index', [
+                'params' => $params,
+                'pId'    => $pId,
+                'pSubId' => $pSubId,
+                'id'     => $id,
+            ]);
+        }
     }
 
     public function clusterDestroy($params, $pId, $pSubId, $id)

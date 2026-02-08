@@ -1,18 +1,26 @@
 @extends('layouts.master')
 @section('css')
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"></h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.accounts') }}</a>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.chapters') }}</span>
+                                    <span>{{ $chapter->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.accounts') }}</a></li>
+
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>
                     </div>
@@ -39,7 +47,7 @@
                                     <label>{{ __('forms.account') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         type="text" class="form-control" name="no" tabindex="2"
-                                        value="{{ old('no', $module->no) }}" />
+                                        value="{{ $account->no }}" />
                                     @error('no')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -51,7 +59,7 @@
                                     <label>{{ __('forms.name') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         type="text" class="form-control" name="name" tabindex="3"
-                                        value="{{ old('name', $module->name) }}" />
+                                        value="{{ $account->name }}" />
                                     @error('name')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -78,7 +86,4 @@
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
 @endsection

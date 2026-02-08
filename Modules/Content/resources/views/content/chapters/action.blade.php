@@ -8,7 +8,7 @@
             @if (is_null($module->deleted_at))
                 @if (hasPermission('accounts.index'))
                     <a href="{{ route('accounts.index', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->id)]) }}"
-                        class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.account.sub') }}</a>
+                        class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.account') }}</a>
                 @endif
                 @if (hasPermission('account.index') and (hasPermission('chapters.edit') or hasPermission('chapters.destroy')))
                     <hr />

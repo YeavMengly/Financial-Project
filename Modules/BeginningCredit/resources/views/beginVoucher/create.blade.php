@@ -56,6 +56,7 @@
                                         @enderror
                                     </div>
                                 </div>
+
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboProgramSub" class="form-label font-size-13 text-muted">
@@ -76,28 +77,16 @@
                                         <label for="cboCluster" class="form-label font-size-13 text-muted">
                                             {{ __('forms.cluster') }}
                                         </label>
-                                        <select id="cboCluster" class="form-select" name="cluster_id" required
+                                        <select id="cboCluster" class="form-select" name="cboCluster" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
 
-                                        @error('cluster_id')
+                                        @error('cboCluster')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-
-                                {{-- Cluster --}}
-                                {{-- <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster') }}</label>
-                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
-                                            class="form-control" name="no" tabindex="2" />
-                                    </div>
-                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -154,18 +143,7 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="txtDescription"
-                                        class="form-label font-size-13 text-muted">{{ __('forms.document.description') }}</label>
-                                    <textarea id="vDescription" data-pristine-text-message="{{ __('messages.required') }}" rows="5"
-                                        class="form-control" name="txtDescription" required></textarea>
-                                    @error('txtDescription')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                            {{-- <div class="row" style="height: 38vh;"></div> --}}
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
@@ -216,36 +194,7 @@
             });
         });
     </script>
-    {{-- <script>
-        let programSubChoices = new Choices('#cboProgramSub', {
-            searchEnabled: true,
-            itemSelectText: '',
-            placeholder: true,
-            placeholderValue: "ស្វែងរក..."
-        });
 
-        $('#cboProgram').change(function() {
-            var id = $(this).val();
-            $.ajax({
-                url: '{!! route('beginVoucher.by.program_id') !!}',
-                type: 'get',
-                data: {
-                    program_id: id
-                },
-                success: function(data) {
-                    $('#cboProgramSub').html(data);
-
-                    programSubChoices.destroy();
-                    programSubChoices = new Choices('#cboProgramSub', {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: "ស្វែងរក..."
-                    });
-                }
-            });
-        });
-    </script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -299,172 +248,6 @@
             });
         });
     </script>
-
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            let programSubChoices = new Choices('#cboProgramSub', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
-
-            let agencyChoices = new Choices('#cboAgency', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
-
-            function resetChoices(selectId, instance) {
-                instance.destroy();
-                return new Choices(selectId, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក..."
-                });
-            }
-
-            $('#cboProgram').on('change', function() {
-                const programId = $(this).val();
-
-                // reset html
-                $('#cboProgramSub').html(`<option value="">{{ __('forms.search...') }}</option>`);
-                $('#cboAgency').html(`<option value="">{{ __('forms.search...') }}</option>`);
-
-                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-                agencyChoices = resetChoices('#cboAgency', agencyChoices);
-
-                if (!programId) return;
-
-                // load program subs
-                $.ajax({
-                    url: "{{ route('beginVoucher.by.program_sub') }}",
-                    type: "GET",
-                    data: {
-                        program_id: programId
-                    },
-                    success: function(html) {
-                        $('#cboProgramSub').html(html);
-                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-                    }
-                });
-
-                // load agencies
-                $.ajax({
-                    url: "{{ route('beginVoucher.by.agency') }}",
-                    type: "GET",
-                    data: {
-                        program_id: programId
-                    },
-                    success: function(html) {
-                        $('#cboAgency').html(html);
-                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
-                    }
-                });
-            });
-
-        });
-    </script> --}}
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            let programSubChoices = new Choices('#cboProgramSub', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
-
-            let agencyChoices = new Choices('#cboAgency', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
-
-            let clusterChoices = new Choices('#cboCluster', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
-
-            function resetChoices(selectId, instance) {
-                instance.destroy();
-                return new Choices(selectId, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក..."
-                });
-            }
-
-            // Program -> ProgramSub + Agency
-            $('#cboProgram').on('change', function() {
-                const programId = $(this).val();
-
-                $('#cboProgramSub').html(`<option value="">{{ __('forms.search...') }}</option>`);
-                $('#cboAgency').html(`<option value="">{{ __('forms.search...') }}</option>`);
-                $('#cboCluster').html(`<option value="">{{ __('forms.search...') }}</option>`);
-
-                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-                agencyChoices = resetChoices('#cboAgency', agencyChoices);
-                clusterChoices = resetChoices('#cboCluster', clusterChoices);
-
-                if (!programId) return;
-
-                $.ajax({
-                    url: "{{ route('beginVoucher.by.program_sub') }}",
-                    type: "GET",
-                    data: {
-                        program_id: programId
-                    },
-                    success: function(html) {
-                        $('#cboProgramSub').html(html);
-                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-                    }
-                });
-
-                $.ajax({
-                    url: "{{ route('beginVoucher.by.agency') }}",
-                    type: "GET",
-                    data: {
-                        program_id: programId
-                    },
-                    success: function(html) {
-                        $('#cboAgency').html(html);
-                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
-                    }
-                });
-            });
-
-            // ProgramSub -> Cluster
-            $('#cboProgramSub').on('change', function() {
-                const programSubId = $(this).val();
-
-                $('#cboCluster').html(`<option value="">{{ __('forms.search...') }}</option>`);
-                clusterChoices = resetChoices('#cboCluster', clusterChoices);
-
-                if (!programSubId) return;
-
-                $.ajax({
-                    url: "{{ route('beginVoucher.by.cluster') }}",
-                    type: "GET",
-                    data: {
-                        program_sub_id: programSubId
-                    },
-                    success: function(html) {
-                        $('#cboCluster').html(html);
-                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
-                    }
-                });
-            });
-
-        });
-    </script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

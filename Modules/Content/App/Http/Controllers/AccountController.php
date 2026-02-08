@@ -26,19 +26,19 @@ class AccountController extends Controller
     public function index(AccountDataTable $dataTable, $params, $chId)
     {
         $id  = decode_params($params);
-        $data = Ministry::where('id', $id)->first();
-        $first =  Chapter::where('id', decode_params($chId))
+        $module = Ministry::where('id', $id)->first();
+        $chapter =  Chapter::where('id', decode_params($chId))
             ->where('ministry_id', decode_params($params))->first();
         $account =  Account::where('ministry_id', $id)->get();
 
         return $dataTable->render(
             'content::content.accounts.index',
             [
-                'data' => $data,
+                'module' => $module,
                 'params' => $params,
                 'account' => $account,
                 'chId' => $chId,
-                'first' => $first
+                'chapter' => $chapter
             ]
         );
     }
@@ -49,11 +49,13 @@ class AccountController extends Controller
     public function create($params, $chId)
     {
         $id = decode_params($chId);
-        $chapter = Chapter::where('id', $id)->get();
+        $module = Ministry::where('id', decode_params($params))->first();
+        $chapter = Chapter::where('id', $id)->first();
 
         return view('content::content.accounts.create')
             ->with('params', $params)
             ->with('chId', $chId)
+            ->with('module', $module)
             ->with('chapter', $chapter);
     }
 
@@ -71,7 +73,6 @@ class AccountController extends Controller
         try {
 
             $id = decode_params($params);
-            // $chId = decode_params($chId);
 
             $ministry = Ministry::where('id', $id)->first();
             $chapter = Chapter::where('id', decode_params($chId))->first();
@@ -134,22 +135,19 @@ class AccountController extends Controller
      */
     public function edit($params, $chId, $id)
     {
-        // dd($chId);
-
         $id = decode_params($id);
-        // $chapter = Chapter::where('id', decode_params($chId))->first();
-
-
-        $module = Account::where('id', $id)
-            // ->where('chapter_id', $chapter->no)
+        $module = Ministry::where('id', decode_params($params))->first();
+        $chapter = Chapter::where('id', decode_params($chId))->first();
+        $account = Account::where('id', $id)
+            ->where('chapter_id', $chapter->id)
             ->first();
 
         return view('content::content.accounts.edit')
             ->with('module', $module)
-            // ->with('chapter', $chapter)
+            ->with('account', $account)
+            ->with('chapter', $chapter)
             ->with('params', $params)
-            ->with('chId', $chId)
-        ;
+            ->with('chId', $chId);
     }
 
     /**
@@ -157,6 +155,8 @@ class AccountController extends Controller
      */
     public function update(Request $request, $params, $chId, $id)
     {
+
+
         $request->validate([
             'no' => ['required'],
             'name' => ['required'],
@@ -168,14 +168,23 @@ class AccountController extends Controller
 
             $ministry = Ministry::where('id', decode_params($params))->first();
             $chapter = Chapter::where('id', decode_params($chId))->first();
+
             $account = Account::where('id', $id)
-                ->where('ministry_id', $ministry->id)
                 ->where('chapter_id', $chapter->id)
+                ->where('ministry_id', $ministry->id)
                 ->first();
 
+
+            if (!$account) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error(__('messages.account.not.found'), 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('accounts.index', ['params' => $params, 'chId' => $chId]);
+            }
             $account->update([
-                'ministr_id' => $account->ministry_id,
-                'chapter_id' => $chapter->id,
                 'no' => $request->no,
                 'name' => $request->name
             ]);
@@ -187,7 +196,6 @@ class AccountController extends Controller
                 ->option('timeout', 2000)
                 ->success('success_msg', 'successful')
                 ->flash();
-
 
             return redirect()->route('accounts.index', ['params' => $params, 'chId' => $chId]);
         } catch (\Exception $e) {

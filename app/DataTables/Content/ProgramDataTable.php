@@ -46,7 +46,15 @@ class ProgramDataTable extends DataTable
 
         $model = $model->newQuery();
         $model->withTrashed();
-        $model->select(['programs.id', 'programs.ministry_id', 'programs.no', 'programs.title',  'programs.created_at', 'programs.deleted_at'])->where('programs.ministry_id', $id);
+        $model->select([
+            'programs.id',
+            'programs.ministry_id',
+            'programs.no',
+            'programs.title',
+            'programs.created_at',
+            'programs.deleted_at'
+        ])
+            ->where('programs.ministry_id', $id);
 
         return $model->orderBy('programs.id', 'ASC');
     }

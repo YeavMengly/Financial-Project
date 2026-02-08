@@ -42,8 +42,11 @@ class ChapterController extends Controller
      */
     public function create($params)
     {
+        $module = Ministry::where('id', decode_params($params))->first();
+
         return view('content::content.chapters.create')
-            ->with('params', $params);
+            ->with('params', $params)
+            ->with('module', $module);
     }
 
     /**
@@ -98,11 +101,13 @@ class ChapterController extends Controller
     public function edit($params, $id)
     {
         $id = decode_params($id);
-        $module = Chapter::where('id', $id)->first();
+        $module = Ministry::where('id', decode_params($params))->first();
+        $chapter = Chapter::where('id', $id)->first();
 
         return view('content::content.chapters.edit')
-            ->with('module', $module)
-            ->with('params', $params);
+            ->with('chapter', $chapter)
+            ->with('params', $params)
+            ->with('module', $module);
     }
 
     /**
@@ -115,7 +120,10 @@ class ChapterController extends Controller
             'name' => 'required',
         ]);
 
-        $chapter = Chapter::where('id', $id)->first();
+        $chapter = Chapter::where('id', $id)
+            ->where('ministry_id', decode_params($params))
+            ->first();
+
         $chapter->update([
             'no' => $request->no,
             'name' => $request->name,

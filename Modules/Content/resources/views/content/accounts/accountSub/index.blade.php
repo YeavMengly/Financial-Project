@@ -14,18 +14,29 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.sub.account') }}</h4>
+
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.content.subaccounts') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $data->year }}</span></a>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.chapters') }}</span>
+                                    <span>{{ $chapter->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.accounts') }}</span>
+                                    <span>{{ $account->no }}</span></a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ __('menus.content.subaccounts') }}</li>
                         </ol>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -33,7 +44,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
+                {{-- <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
 
                         <!-- Sub-Account Number -->
@@ -71,7 +82,7 @@
                         </div>
                     </form>
 
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
@@ -83,8 +94,13 @@
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('accountSub.create', $params) }}"><i class="bx bx-plus me-1"></i>
+                                    href="{{ route('accountSub.create', ['params' => $params, 'chId' => $chId, 'accId' => $accId]) }}"><i
+                                        class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
+
+                                <a class="btn btn-dark"
+                                    href="{{ route('accounts.index', ['params' => $params, 'chId' => $chId]) }}">{{ __('buttons.back') }}</a>
+
                             </div>
                         </div>
                     @endif
