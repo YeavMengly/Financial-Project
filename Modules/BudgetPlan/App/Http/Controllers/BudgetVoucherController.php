@@ -4,13 +4,17 @@ namespace Modules\BudgetPlan\App\Http\Controllers;
 
 use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
+use App\Exports\BeginExport;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
-use App\Models\Program;
+use App\Models\Content\Cluster;
+use App\Models\Loans\BudgetVoucherLoan;
+use App\Models\Content\Program;
+use App\Models\Content\ProgramSub;
 use App\Models\TaskType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +49,73 @@ class BudgetVoucherController extends Controller
     }
 
     /**
+     * AJAX: Fetch program sub-options by program ID.
+     */
+    // public function getProgram(Request $request)
+    // {
+    //     if ($request->program_id) {
+    //         $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
+    //             ->where('program_id', $request->program_id)
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
+
+    // public function getAgency(Request $request)
+    // {
+    //     if ($request->program_id) {
+    //         $data = Agency::select('id', 'program_id', 'no', 'name')
+    //             ->where('program_id', $request->program_id)
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
+
+    // public function getProgramSub(Request $request)
+    // {
+    //     if ($request->program_sub_id) {
+
+    //         $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
+    //             ->where('program_sub_id', $request->program_sub_id)
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create($params)
@@ -56,16 +127,23 @@ class BudgetVoucherController extends Controller
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $taskType = TaskType::all();
 
-        $beginVoucher = BeginVoucher::select(
-            'begin_vouchers.id',
-            'begin_vouchers.no as voucher_no',
-            'begin_vouchers.account_sub_id',
-            'begin_vouchers.no',
-            'account_subs.no as sub_no',
-            'account_subs.name as sub_name'
-        )
-            ->join('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.no')
+        $beginVoucher = BeginVoucher::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
             ->where('begin_vouchers.ministry_id', $ministry->id)
+            ->select(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_vouchers.account_sub_id')
             ->get();
 
         return view('budgetplan::budgetVoucher.create')
@@ -77,21 +155,95 @@ class BudgetVoucherController extends Controller
             ->with('program', $program);
     }
 
+    // public function getEarlyBalance(Request $request, $params)
+    // {
+    //     $ministryId = decode_params($params);
+    //     $request->validate([
+    //         'account_sub_id' => 'required',
+    //         'no'             => 'required'
+    //     ]);
+
+    //     $begin = BeginVoucher::with('loans')
+    //         ->where('ministry_id', $ministryId)
+    //         ->where('account_sub_id', $request->account_sub_id)
+    //         ->where('no', $request->no)
+    //         ->first();
+
+    //     if (!$begin) {
+    //         return response()->json([
+    //             'fin_law'            => 0,
+    //             'new_credit_status'  => 0,
+    //             'credit'             => 0,
+    //             'deadline_balance'   => 0,
+    //             'exists'             => false,
+    //         ]);
+    //     }
+
+    //     $loan = $begin->loans;
+    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+
+    //     return response()->json([
+    //         'fin_law'            => (float) ($begin->fin_law ?? 0),
+    //         'credit_movement'    => (float) $credit_movement,
+    //         'new_credit_status'  => (float) ($begin->new_credit_status ?? 0),
+    //         'credit'             => (float) ($begin->credit ?? 0),
+    //         'deadline_balance'   => (float) ($begin->deadline_balance ?? 0),
+    //         'exists'             => true,
+    //     ]);
+    // }
+
+    // BudgetVoucherController.php (or BeginVoucherController)
+    // public function getBeginVoucher(Request $request)
+    // {
+    //     $request->validate([
+    //         'program_id'     => 'required|integer',
+    //         'program_sub_id' => 'required|integer',
+    //         'cluster_id'     => 'required|integer',
+    //     ]);
+
+    //     $begin = BeginVoucher::where('program_id', $request->program_id)
+    //         ->where('program_sub_id', $request->program_sub_id)
+    //         ->where('chapter_id', $request->cluster_id) // cluster
+    //         ->latest()
+    //         ->first();
+
+    //     if (!$begin) {
+    //         return response()->json([
+    //             'fin_law'            => 0,
+    //             'credit_movement'   => 0,
+    //             'new_credit_status' => 0,
+    //             'credit'            => 0,
+    //             'deadline_balance'  => 0,
+    //             'exists'            => false,
+    //         ]);
+    //     }
+
+    //     return response()->json([
+    //         'fin_law'            => (float) $begin->fin_law,
+    //         'credit_movement'   => (float) $begin->total_increase,
+    //         'new_credit_status' => (float) $begin->new_credit_status,
+    //         'credit'            => (float) $begin->credit,
+    //         'deadline_balance'  => (float) $begin->deadline_balance,
+    //         'exists'            => true,
+    //     ]);
+    // }
+
     public function getEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
+
         $request->validate([
             'account_sub_id' => 'required',
             'no'             => 'required'
         ]);
 
-        $begin = BeginVoucher::with('loans')
+        $beginVoucher = BeginVoucher::with('loans')
             ->where('ministry_id', $ministryId)
             ->where('account_sub_id', $request->account_sub_id)
             ->where('no', $request->no)
             ->first();
 
-        if (!$begin) {
+        if (!$beginVoucher) {
             return response()->json([
                 'fin_law'            => 0,
                 'credit_movement'    => 0,
@@ -102,18 +254,19 @@ class BudgetVoucherController extends Controller
             ]);
         }
 
-        $loan = $begin->loans;
+        $loan = $beginVoucher->loans;
         $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
 
         return response()->json([
-            'fin_law'            => (float) ($begin->fin_law ?? 0),
+            'fin_law'            => (float) ($beginVoucher->fin_law ?? 0),
             'credit_movement'    => (float) $credit_movement,
-            'new_credit_status'  => (float) ($begin->new_credit_status ?? 0),
-            'credit'             => (float) ($begin->credit ?? 0),
-            'deadline_balance'   => (float) ($begin->deadline_balance ?? 0),
+            'new_credit_status'  => (float) ($beginVoucher->new_credit_status ?? 0),
+            'credit'             => (float) ($beginVoucher->credit ?? 0),
+            'deadline_balance'   => (float) ($beginVoucher->deadline_balance ?? 0),
             'exists'             => true,
         ]);
     }
+
 
     public function store(Request $request, $params)
     {
@@ -128,6 +281,7 @@ class BudgetVoucherController extends Controller
             'date'            => 'required|date',
             'txtDescription'  => 'required',
         ]);
+
         try {
             $ministryId = decode_params($params);
             $ministry   = Ministry::where('id', $ministryId)->first();
@@ -135,7 +289,6 @@ class BudgetVoucherController extends Controller
             DB::transaction(function () use ($request, $validated, $ministry) {
                 $beginVoucher = BeginVoucher::where('no', $validated['no'])
                     ->where('account_sub_id', $validated['cboSubAccount'])
-                    ->where('agency_id', $validated['cboAgency'])
                     ->where('ministry_id', $ministry->id)
                     ->first();
 
@@ -231,21 +384,32 @@ class BudgetVoucherController extends Controller
     {
         $id = decode_params($id);
         $ministry = Ministry::where('id', decode_params($params))->first();
+
         $agency   = Agency::where('ministry_id', $ministry->id)->get();
         $taskType = TaskType::all();
+
         $module = BudgetVoucher::where('id', $id)
             ->where('ministry_id', $ministry->id)
             ->first();
 
-        $beginVoucher = BeginVoucher::select(
-            'begin_vouchers.id',
-            'begin_vouchers.no',
-            'begin_vouchers.account_sub_id',
-            'account_subs.no as sub_no',
-            'account_subs.name as sub_name'
-        )
-            ->join('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.no')
+
+        $beginVoucher = BeginVoucher::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
             ->where('begin_vouchers.ministry_id', $ministry->id)
+            ->select(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_vouchers.account_sub_id')
             ->get();
 
         return view('budgetplan::budgetVoucher.edit')
@@ -279,6 +443,7 @@ class BudgetVoucherController extends Controller
             $ministry = Ministry::where('id', decode_params($params))->first();
             $voucher = BudgetVoucher::where('id', $id)
                 ->where('ministry_id', $ministry->id)->first();
+
             $beginCredit = BeginVoucher::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('agency_id', $validated['cboAgency'])
@@ -414,18 +579,18 @@ class BudgetVoucherController extends Controller
     {
         $newApplyTotal = BudgetVoucher::where('no', $beginVoucher->no)
             ->where('account_sub_id', $beginVoucher->account_sub_id)
-            ->where('agency_id', $beginVoucher->agency_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
 
         $beginVoucher->early_balance = $this->calculateEarlyBalance($beginVoucher);
+
         $beginVoucher->apply = $newApplyTotal;
         $credit = $beginVoucher->new_credit_status - $beginVoucher->deadline_balance;
         $beginVoucher->credit = $credit;
         $beginVoucher->deadline_balance = $beginVoucher->early_balance + $beginVoucher->apply;
         $beginVoucher->credit = $beginVoucher->new_credit_status - $beginVoucher->deadline_balance;
-        $beginVoucher->law_average = $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance / $beginVoucher->fin_law) * 100 : 0;
-        $beginVoucher->law_correction =  $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance /  $beginVoucher->new_credit_status) * 100 : 0;
+        $beginVoucher->law_average = $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance / $beginVoucher->fin_law * 100)  : 0;
+        $beginVoucher->law_correction =  $beginVoucher->deadline_balance > 0 ? ($beginVoucher->deadline_balance /  $beginVoucher->new_credit_status * 100)  : 0;
         $beginVoucher->save();
     }
 
@@ -434,6 +599,7 @@ class BudgetVoucherController extends Controller
         $budgetVoucher = BudgetVoucher::where('no', $beginCredit->no)
             ->where('account_sub_id', $beginCredit->account_sub_id)
             ->get();
+
         if ($budgetVoucher->count() === 1) {
             return 0;
         }
@@ -444,5 +610,101 @@ class BudgetVoucherController extends Controller
             ->sum('budget');
 
         return $totalEarlyBalance ?: 0;
+    }
+
+    public function export(Request $request, $params)
+    {
+        try {
+            $ministryId = decode_params($params);
+
+            // Base JOIN query
+            $query = BeginVoucher::query()
+                ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
+                ->where('begin_vouchers.ministry_id', $ministryId)
+                ->select(
+                    'begin_vouchers.*',
+
+                    // alias loan columns to avoid confusion
+                    'budget_voucher_loans.internal_increase as loan_internal_increase',
+                    'budget_voucher_loans.unexpected_increase as loan_unexpected_increase',
+                    'budget_voucher_loans.additional_increase as loan_additional_increase',
+                    'budget_voucher_loans.total_increase as loan_total_increase',
+                    'budget_voucher_loans.decrease as loan_decrease',
+                    'budget_voucher_loans.editorial as loan_editorial'
+                );
+
+            // === Filters (PREFIX table name!) ===
+            if ($request->filled('agency')) {
+                $query->where('begin_vouchers.agency_id', $request->agency);
+            }
+
+            if ($request->filled('account')) {
+                $query->where('begin_vouchers.account_id', $request->account);
+            }
+
+            if ($request->filled('accountSub')) {
+                $query->where('begin_vouchers.account_sub_id', $request->accountSub);
+            }
+
+            if ($request->filled('no')) {
+                $query->where('begin_vouchers.no', 'like', "%{$request->no}%");
+            }
+
+            if ($request->filled('txtDescription')) {
+                $query->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%");
+            }
+
+            // === DATE RANGE FILTER ===
+            // === DATE RANGE FILTER ===
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_vouchers.created_at', '>=', $request->start_date)
+                    ->whereDate('budget_vouchers.created_at', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_vouchers.created_at', '>=', $request->start_date);
+                }
+
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_vouchers.created_at', '<=', $request->end_date);
+                }
+            }
+
+
+            $query->orderBy('begin_vouchers.created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported BeginVoucher Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('budgetVoucher.index', $params);
+            }
+
+            // Pass filtered data + ministry id into export
+            $export = new BeginExport($data, $ministryId);
+
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetVoucher.index', $params);
+        }
     }
 }

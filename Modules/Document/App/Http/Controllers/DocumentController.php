@@ -27,9 +27,9 @@ class DocumentController extends Controller
     }
 
     public function getByCategoryId(Request $request)
-    {
+{
         echo '<option value="">ជ្រើសរើស អនុប្រភេទ</option>';
-        
+
         if ($request->cate_id != '') {
             $data = CategorySub::select('id', 'name')->where('cate_id', $request->cate_id)->get();
             foreach ($data as $d) {
@@ -38,7 +38,7 @@ class DocumentController extends Controller
         }
     }
 
-    
+
 
     public function destroy($params)
     {

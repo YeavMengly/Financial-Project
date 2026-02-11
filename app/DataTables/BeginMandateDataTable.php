@@ -24,6 +24,12 @@ class BeginMandateDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('fin_law', function ($row) {
+                return number_format($row->fin_law ?? 0);
+            })
+            ->editColumn('current_loan', function ($row) {
+                return number_format($row->current_loan ?? 0);
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
@@ -31,7 +37,7 @@ class BeginMandateDataTable extends DataTable
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
             })
-            ->rawColumns(['txtDescription']) 
+            ->rawColumns(['txtDescription'])
 
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::beginMandate.action', ['module' => $module]);
@@ -53,37 +59,44 @@ class BeginMandateDataTable extends DataTable
             ->select([
                 'begin_mandates.id',
                 'begin_mandates.agency_id',
-                'account_subs.no as account_sub_no',
+                'begin_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'begin_mandates.no as program_no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.current_loan',
                 'begin_mandates.ministry_id',
                 'agencies.name as agency_name',
+                'account_subs.no as account_sub_no',
             ])
-            ->where('begin_mandates.ministry_id', $id);
+            ->where('begin_mandates.ministry_id', $id)
+            ->when(
+                $request->filled('agency'),
+                fn($q) =>
+                $q->where('begin_mandates.agency_id', $request->agency)
+            )
+            ->when(
+                $request->filled('account'),
+                fn($q) =>
+                $q->where('begin_mandates.account_id', $request->account)
+            )
+            ->when(
+                $request->filled('accountSub'),
+                fn($q) =>
+                $q->where('begin_mandates.account_sub_id', $request->accountSub)
+            )
+            ->when(
+                $request->filled('no'),
+                fn($q) =>
+                $q->where('begin_mandates.no', 'like', "%{$request->no}%")
+            )
+            ->when(
+                $request->filled('txtDescription'),
+                fn($q) =>
+                $q->where('begin_mandates.txtDescription', 'like', "%{$request->txtDescription}%")
+            );
 
-        // 🔎 Filter by agency
-        if ($request->filled('agency')) {
-            $query->where('begin_mandates.agency_id', $request->agency);
-        }
-
-        // 🔎 Filter by account sub
-        if ($request->filled('accountSub')) {
-            $query->where('begin_mandates.account_sub_id', $request->accountSub);
-        }
-
-        // 🔎 Filter by program (voucher no)
-        if ($request->filled('program')) {
-            $query->where('begin_mandates.no', $request->program);
-        }
-
-        // 🔎 Filter by description (LIKE for partial search)
-        if ($request->filled('txtDescription')) {
-            $query->where('begin_mandates.txtDescription', 'like', "%{$request->txtDescription}%");
-        }
-
-        return $query;
+        return $query->orderBy('begin_mandates.created_at', 'DESC');
     }
 
     /**
@@ -110,9 +123,9 @@ class BeginMandateDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-                
+
             Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
-            Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
+            Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('fin_law')->title(__('tables.th.financeLaw'))->width(120)->addClass('align-middle'),

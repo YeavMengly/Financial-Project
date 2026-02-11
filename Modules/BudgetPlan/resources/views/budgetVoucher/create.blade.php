@@ -1,15 +1,22 @@
 @extends('layouts.master')
 @section('css')
-    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- preloader css -->
+    <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">
-                </h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.voucher') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -23,6 +30,9 @@
         </div>
     </div>
 
+    <div id="flashMessage"></div>
+
+    <!-- end page title -->
     <div class="row">
         <div class="col-12"></div>
         <div class="col-12">
@@ -32,6 +42,7 @@
                         <form id="pristine-valid-example" action="{{ route('budgetVoucher.store', $params) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
+
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -64,20 +75,17 @@
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($beginVoucher as $bv)
                                                 <option value="{{ $bv->account_sub_id }}"
-                                                    data-program="{{ $bv->no }}">
-                                                    {{ $bv->account_sub_id }} - {{ $bv->no }}
-
+                                                    data-program="{{ $bv->voucher_no }}">
+                                                    {{ $bv->account_sub_id }} - {{ $bv->voucher_no }}
                                                 </option>
                                             @endforeach
                                         </select>
-
-
                                         @error('cboSubAccount')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-
+                                {{-- Sub Account Number --}}
                                 <div class="col-xl-4 col-md-6 d-none">
                                     <div class="form-group mb-3">
                                         <label for="no"
@@ -91,6 +99,7 @@
                                     </div>
                                 </div>
 
+                                {{-- Program Code (auto-filled from JS) --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="budget">{{ __('forms.budget') }}</label>
@@ -120,11 +129,12 @@
                                     </div>
                                 </div>
 
+
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="example-datetime-local-input">{{ __('forms.select_date') }}</label>
-                                        <input type="date" name="date" id="example-datetime-local-input" required
-                                            class="form-control"
+                                        <label for="date" class="form-label">{{ __('forms.select_date') }}</label>
+                                        <input type="text" id="datepicker-basic" name="date" class="form-control"
+                                            placeholder="{{ __('forms.select_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('date')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -143,8 +153,9 @@
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
 
+
+                            </div>
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
@@ -155,12 +166,11 @@
                                     @enderror
                                 </div>
                             </div>
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                                    {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
                                     href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
@@ -205,7 +215,19 @@
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script>
+        const dateInput = document.getElementById('datepicker-basic');
+        if (dateInput) {
+            flatpickr(dateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: dateInput.value || null
+            });
+        }
+    </script>
     <script>
         // ---------- helpers ----------
         function initChoicesOnce(selectEl, opts = {}) {

@@ -19,7 +19,7 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.initial.voucher') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.credit') }}</a>
                             </li>
                         </ol>
                     </div>
@@ -28,7 +28,7 @@
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -60,7 +60,6 @@
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>

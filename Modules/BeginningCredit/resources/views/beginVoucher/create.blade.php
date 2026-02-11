@@ -46,7 +46,7 @@
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($program as $p)
-                                                <option value="{{ $p->no }}">
+                                                <option value="{{ $p->id }}">
                                                     {{ $p->no }}-
                                                     {{ $p->title }}</option>
                                             @endforeach
@@ -74,17 +74,28 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.cluster') }}
+                                        </label>
+                                        <select id="cboCluster" class="form-select" name="cboCluster" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cboCluster')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
-                                        <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
+                                        <select id="cboAgency" class="form-select" name="cboAgency" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $agc)
-                                                <option value="{{ $agc->id }}">
-                                                    {{ $agc->no }}-
-                                                    {{ $agc->name }}</option>
-                                            @endforeach
                                         </select>
                                         @error('cboAgency')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -114,17 +125,6 @@
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
-                                            class="form-control" name="no" tabindex="2" />
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
                                         <label for="fin_law"
                                             class="form-label font-size-13 text-muted">{{ __('forms.fin.law') }}</label>
                                         <input type="number" min="1" name="fin_law" required
@@ -143,21 +143,11 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="txtDescription"
-                                        class="form-label font-size-13 text-muted">{{ __('forms.document.description') }}</label>
-                                    <textarea id="vDescription" data-pristine-text-message="{{ __('messages.required') }}" rows="5"
-                                        class="form-control" name="txtDescription" required></textarea>
-                                    @error('txtDescription')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+                            {{-- <div class="row" style="height: 38vh;"></div> --}}
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                     <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
@@ -204,36 +194,7 @@
             });
         });
     </script>
-    <script>
-        let programSubChoices = new Choices('#cboProgramSub', {
-            searchEnabled: true,
-            itemSelectText: '',
-            placeholder: true,
-            placeholderValue: "ស្វែងរក..."
-        });
 
-        $('#cboProgram').change(function() {
-            var id = $(this).val();
-            $.ajax({
-                url: '{!! route('beginVoucher.by.program_id') !!}',
-                type: 'get',
-                data: {
-                    program_id: id
-                },
-                success: function(data) {
-                    $('#cboProgramSub').html(data);
-
-                    programSubChoices.destroy();
-                    programSubChoices = new Choices('#cboProgramSub', {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: "ស្វែងរក..."
-                    });
-                }
-            });
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -285,6 +246,141 @@
                 }
                 $('#resultDisplay').text(message);
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========= Choices Instances =========
+            let programSubChoices = new Choices('#cboProgramSub', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let agencyChoices = new Choices('#cboAgency', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let clusterChoices = new Choices('#cboCluster', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            // ========= Helpers =========
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        // optional: keep empty if error
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            // ========= Script 1: Program -> ProgramSub =========
+            function handleProgramChangeForProgramSub(programId) {
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('beginVoucher.by.program_sub') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => {
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+            }
+
+            // ========= Script 2: Program -> Agency =========
+            function handleProgramChangeForAgency(programId) {
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('beginVoucher.by.agency') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => {
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            }
+
+            // ========= Script 3: ProgramSub -> Cluster =========
+            function handleProgramSubChangeForCluster(programSubId) {
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('beginVoucher.by.cluster') }}",
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => {
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            }
+
+            // ========= Events =========
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                // when program changes -> always clear cluster too
+                handleProgramChangeForProgramSub(programId);
+                handleProgramChangeForAgency(programId);
+                handleProgramSubChangeForCluster(null); // reset cluster
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+                handleProgramSubChangeForCluster(programSubId);
+            });
+
         });
     </script>
 @endsection

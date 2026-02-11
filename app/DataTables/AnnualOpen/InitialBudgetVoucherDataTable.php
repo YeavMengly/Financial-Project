@@ -2,7 +2,7 @@
 
 namespace App\DataTables\AnnualOpen;
 
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\InitialBudgetVoucher;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -49,7 +49,7 @@ class InitialBudgetVoucherDataTable extends DataTable
             'ministries.name'
         ]);
 
-        return $query->orderBy('ministries.id', 'ASC');
+        return $query->orderBy('ministries.id', 'DESC');
     }
 
     /**

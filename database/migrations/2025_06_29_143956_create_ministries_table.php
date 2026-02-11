@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('ministries', function (Blueprint $table) {
             $table->id();
             $table->integer('no');
-            $table->string('year')->unique();
+            $table->unsignedBigInteger("year");
             $table->string('title');
             $table->string('refer');
             $table->string('name');
+            $table->boolean('status')->default(true)->comment('1=active, 0=inactive');
             $table->timestamps();
             $table->softDeletes();
         });

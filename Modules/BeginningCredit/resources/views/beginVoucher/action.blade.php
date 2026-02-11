@@ -8,8 +8,11 @@
             @if (is_null($module->deleted_at))
                 @if (hasPermission('beginVoucher.edit'))
                     <a href="{{ route('beginVoucher.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
-                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                        class="dropdown-item">
+                        <i class="bx bx-edit"></i> {{ __('buttons.edit') }}
+                    </a>
                 @endif
+
                 @if (hasPermission('beginVoucher.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('beginVoucher.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"

@@ -27,5 +27,8 @@ return [
     "select" => "ជ្រើសរើស",
     'download' => 'ទាញយក',
     'credit' => 'កំណត់ឥណទាន',
-    'sub.program' => 'អនុកម្មវិធី'
+    'sub.program' => 'អនុកម្មវិធី',
+    'account' => 'គណនី',
+    'account.sub' => 'អនុគណនី',
+    'cluster' => 'ចង្កោម'
 ];

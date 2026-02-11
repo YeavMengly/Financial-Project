@@ -34,8 +34,8 @@ class BudgetVoucherDataTable extends DataTable
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
-            ->editColumn('task_type', function ($row) {
-                return $row->task_name ?? '-';
+            ->editColumn('t_name', function ($row) {
+                return $row->t_name ?? '-';
             })
             ->addColumn('action', function ($module) {
                 return view('budgetplan::budgetVoucher.action', ['module' => $module]);
@@ -73,7 +73,11 @@ class BudgetVoucherDataTable extends DataTable
         $id = decode_params($params);
 
         $query = $model->newQuery()
-            ->leftJoin('account_subs', 'budget_vouchers.account_sub_id', '=', 'account_subs.no')
+            ->from('budget_vouchers')
+            ->leftJoin('account_subs', function ($join) use ($id) {
+                $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $id);
+            })
             ->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id')
             ->leftJoin('task_types', 'budget_vouchers.task_type', '=', 'task_types.id')
             ->select([
@@ -82,7 +86,7 @@ class BudgetVoucherDataTable extends DataTable
                 'agencies.no AS agency_no',
                 'agencies.name AS agency_name',
                 'account_subs.no as account_sub_no',
-                'budget_vouchers.no',
+                // 'budget_vouchers.no',
                 'budget_vouchers.txtDescription',
                 'budget_vouchers.budget',
                 'task_types.name AS t_name',
@@ -90,6 +94,7 @@ class BudgetVoucherDataTable extends DataTable
                 'budget_vouchers.date',
             ])
             ->where('budget_vouchers.ministry_id', $id);
+
 
         return $query;
     }
@@ -118,16 +123,14 @@ class BudgetVoucherDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
-            Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
+            // Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('t_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
-
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

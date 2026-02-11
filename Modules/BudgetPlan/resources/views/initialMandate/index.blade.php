@@ -47,9 +47,9 @@
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                             @if (hasPermission('budget-voucher.create'))
                                 {{-- <div class="mb-4"> --}}
-                                <a class="btn btn-light waves-effect waves-light" href=""><i
+                                {{-- <a class="btn btn-light waves-effect waves-light" href=""><i
                                         class="bx bx-download me-1"></i>
-                                    {{ __('buttons.download') }}</a>
+                                    {{ __('buttons.download') }}</a> --}}
                                 {{-- </div> --}}
                             @endif
                         </div>
@@ -63,7 +63,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                  
+
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>

@@ -20,4 +20,22 @@ Route::middleware('PermissionCheck')
 Route::controller(BudgetVoucherController::class)->group(function () {
     Route::post('voucher/{params}/store', 'store')->name('budgetVoucher.store');
     Route::post('voucher/{params}/update/{id}', 'update')->name('budgetVoucher.update');
+    Route::get('voucher/{params}/export', 'export')->name('budgetVoucher.export');
 });
+
+// Route::get('/begin-voucher/by-program/program-subs', [BudgetVoucherController::class, 'getProgram'])
+//     ->name('budgetVoucher.by.program_sub');
+
+// Route::get('/begin-voucher/by-program/agencies', [BudgetVoucherController::class, 'getAgency'])
+//     ->name('budgetVoucher.by.agency');
+
+// Route::get('/begin-voucher/by-program-sub/clusters', [BudgetVoucherController::class, 'getProgramSub'])
+//     ->name('budgetVoucher.by.cluster');
+
+// Route::get('/begin-voucher/data', [BudgetVoucherController::class, 'getBeginVoucher'])
+//     ->name('beginVoucher.getData');
+
+// Route::post(
+//     '/budget-voucher/early-balance/{params}',
+//     [BudgetVoucherController::class, 'getEarlyBalance']
+// )->name('budgetVoucher.getEarlyBalance');

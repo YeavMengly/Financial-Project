@@ -91,11 +91,13 @@
                             <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}" />
                         </div>
 
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                            <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
+                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            </a>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -108,7 +110,7 @@
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('mandate.create', encode_params($params)) }}"><i
+                                    href="{{ route('mandate.create', $params) }}"><i
                                         class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>

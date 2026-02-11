@@ -23,6 +23,12 @@ class BeginVoucherDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('fin_law', function ($row) {
+                return number_format($row->fin_law ?? 0);
+            })
+            ->editColumn('current_loan', function ($row) {
+                return number_format($row->current_loan ?? 0);
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
@@ -30,7 +36,7 @@ class BeginVoucherDataTable extends DataTable
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
             })
-            ->rawColumns(['txtDescription'])
+            ->rawColumns(['txtDescription', 'soft_delete'])
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::beginVoucher.action', ['module' => $module]);
             })
@@ -48,10 +54,12 @@ class BeginVoucherDataTable extends DataTable
         $query = $model->newQuery()
             ->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
             ->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id')
+            ->leftJoin('clusters', 'begin_vouchers.cluster_id', '=', 'clusters.id')
             ->select([
                 'begin_vouchers.id',
                 'begin_vouchers.agency_id',
                 'begin_vouchers.account_sub_id',
+                'begin_vouchers.account_id',
                 'begin_vouchers.no as program_no',
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
@@ -59,6 +67,7 @@ class BeginVoucherDataTable extends DataTable
                 'begin_vouchers.ministry_id',
                 'agencies.name as agency_name',
                 'account_subs.no as account_sub_no',
+                'clusters.decription',
             ])
             ->where('begin_vouchers.ministry_id', $id)
             ->when(
@@ -67,15 +76,25 @@ class BeginVoucherDataTable extends DataTable
                 $q->where('begin_vouchers.agency_id', $request->agency)
             )
             ->when(
+                $request->filled('chapter'),
+                fn($q) =>
+                $q->where('begin_vouchers.chapter_id', $request->chapter)
+            )
+            ->when(
+                $request->filled('account'),
+                fn($q) =>
+                $q->where('begin_vouchers.account_id', $request->account)
+            )
+            ->when(
                 $request->filled('accountSub'),
                 fn($q) =>
                 $q->where('begin_vouchers.account_sub_id', $request->accountSub)
             )
-            ->when(
-                $request->filled('no'),
-                fn($q) =>
-                $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
-            )
+            // ->when(
+            //     $request->filled('no'),
+            //     fn($q) =>
+            //     $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
+            // )
             ->when(
                 $request->filled('txtDescription'),
                 fn($q) =>
@@ -109,7 +128,7 @@ class BeginVoucherDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-                
+
             Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
