@@ -5,12 +5,12 @@ namespace Modules\LoanBudget\App\Http\Controllers;
 use App\DataTables\BudgetLoans\BudgetVoucherLoanDataTable;
 use App\DataTables\BudgetLoans\InitialVoucherLoanDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
-use App\Models\BeginCredit\BeginCredit;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
+use App\Models\Content\Content;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\BeginCredit\InitialBudget;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\InitialBudget;
+use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Loans\LoanBudget;
@@ -51,6 +51,7 @@ class LoanBudgetVoucherController extends Controller
             'voucherLoan' => $voucherLoan,
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.

@@ -89,7 +89,7 @@ class MinistryController extends Controller
     public function edit($params)
     {
         $id =  decode_params($params);
-        $data = Ministry::where('id', $id)->first();
+        $data = Ministry::where('id', $id)->firstOrFail();
 
         return view('content::content.ministries.edit')->with('data', $data)->with('params', $params);
     }
@@ -100,7 +100,7 @@ class MinistryController extends Controller
     public function update(Request $request, $params)
     {
         $validateData = $request->validate([
-            'year' => ['required', 'digits:4', 'unique:ministries,year'],
+            'year' => ['required', 'digits:4'],
             'title' => ['required', 'string'],
             'refer' => ['required', 'string'],
             'name' => ['required', 'string'],

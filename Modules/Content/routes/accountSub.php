@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Modules\Content\App\Http\Controllers\AccountSubController;
 
 Route::middleware('PermissionCheck')->controller(AccountSubController::class)->group(function () {
-    // Route::get('chapter/{params}/accounts/{chId}/account/{{accId}/sub/', 'getIndex')->name('initialAccountSub.index');
     Route::get('{params}/chapter/{chId}/accounts/{accId}/sub', 'index')->name('accountSub.index');
     Route::get('{params}/chapter/{chId}/accounts/{accId}/sub/create', 'create')->name('accountSub.create');
     Route::get('{params}/chapter/{chId}/accounts/{accId}/sub/edit/{id}', 'edit')->name('accountSub.edit');

@@ -378,8 +378,6 @@ class DashboardController extends Controller
             return $cluster;
         });
 
-        // dd($clusters);
-
         return response()->json($clusters);
     }
 }

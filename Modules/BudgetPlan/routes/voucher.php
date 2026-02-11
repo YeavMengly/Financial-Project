@@ -13,8 +13,8 @@ Route::middleware('PermissionCheck')
         Route::get('voucher/{params}/edit/{id}', 'edit')->name('budgetVoucher.edit');
         Route::get('voucher/{params}/destroy/{id}', 'destroy')->name('budgetVoucher.destroy');
 
-        // Route::get('voucher/{params}/early-balance', 'getEarlyBalance')
-        //     ->name('budgetVoucher.getEarlyBalance');
+        Route::get('voucher/{params}/early-balance', 'getEarlyBalance')
+            ->name('budgetVoucher.getEarlyBalance');
     });
 
 Route::controller(BudgetVoucherController::class)->group(function () {
@@ -23,14 +23,14 @@ Route::controller(BudgetVoucherController::class)->group(function () {
     Route::get('voucher/{params}/export', 'export')->name('budgetVoucher.export');
 });
 
-Route::get('/begin-voucher/by-program/program-subs', [BudgetVoucherController::class, 'getProgram'])
-    ->name('budgetVoucher.by.program_sub');
+// Route::get('/begin-voucher/by-program/program-subs', [BudgetVoucherController::class, 'getProgram'])
+//     ->name('budgetVoucher.by.program_sub');
 
-Route::get('/begin-voucher/by-program/agencies', [BudgetVoucherController::class, 'getAgency'])
-    ->name('budgetVoucher.by.agency');
+// Route::get('/begin-voucher/by-program/agencies', [BudgetVoucherController::class, 'getAgency'])
+//     ->name('budgetVoucher.by.agency');
 
-Route::get('/begin-voucher/by-program-sub/clusters', [BudgetVoucherController::class, 'getProgramSub'])
-    ->name('budgetVoucher.by.cluster');
+// Route::get('/begin-voucher/by-program-sub/clusters', [BudgetVoucherController::class, 'getProgramSub'])
+//     ->name('budgetVoucher.by.cluster');
 
 // Route::get('/begin-voucher/data', [BudgetVoucherController::class, 'getBeginVoucher'])
 //     ->name('beginVoucher.getData');

@@ -14,7 +14,7 @@ use Modules\LoanBudget\App\Http\Controllers\LoanBudgetController;
 |
 */
 
-Route::prefix('loanbudget')->middleware(['auth'])->group(function () {
+Route::prefix('inventory')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/voucher.php';
     require_once __DIR__ . '/mandate.php';
 });

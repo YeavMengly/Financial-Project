@@ -287,6 +287,8 @@
         </div>
     </div>
 
+
+
     <div class="row">
         <div class="col-xl-6">
             <!-- card -->
@@ -366,13 +368,75 @@
             <!-- end card -->
         </div>
 
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">ទិន្នន័យជំពូក</h5>
-                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
                 <div class="card-body">
-                    <div id="chapter-bar" class="apex-charts"></div>
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{-- {{ __('tables.th.financeLaw') }} --}}ធានាចំណាយ
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{-- {{ $totalBeginVoucher }} --}}0
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="">
+                                    0 <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-success-subtle text-success">
+                            0
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{-- {{ __('tables.th.financeLaw') }} --}}ទូទាត់ត្រង់
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{-- {{ $totalBeginVoucher }} --}}0
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="">
+                                    0 <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-success-subtle text-success">
+                            0
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -674,16 +738,8 @@
 @endsection
 
 @section('script')
-    {{-- Plugin JS just for this page --}}
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
-
-    <!-- apexcharts -->
-    {{-- <script src="assets/libs/apexcharts/apexcharts.min.js"></script> --}}
-    {{-- <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script> --}}
-
-    <!-- dashboard init -->
     <script src="{{ asset('assets/js/pages/dashboard.init.js') }}"></script>
-    {{-- DataTables --}}
     <script src="{{ asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>

@@ -63,13 +63,6 @@ class ExpenseTypeDataTable extends DataTable
             ])
             ->orderBy('created_at', 'ASC');
         return $model->orderBy('expense_types.id', 'ASC');
-
-        /**
-         * ================       Step 2:  Filter by chapter number if provided        ================
-         */
-        $model->where('chapters.ministry_id', $id);
-
-        return $model->orderBy('chapters.id', 'ASC');
     }
 
     /**

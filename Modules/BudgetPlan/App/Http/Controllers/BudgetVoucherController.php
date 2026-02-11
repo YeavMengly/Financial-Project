@@ -51,69 +51,69 @@ class BudgetVoucherController extends Controller
     /**
      * AJAX: Fetch program sub-options by program ID.
      */
-    public function getProgram(Request $request)
-    {
-        if ($request->program_id) {
-            $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
-                ->where('program_id', $request->program_id)
-                ->get();
+    // public function getProgram(Request $request)
+    // {
+    //     if ($request->program_id) {
+    //         $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
+    //             ->where('program_id', $request->program_id)
+    //             ->get();
 
-            $selectedId = $request->selected_id ?? null;
+    //         $selectedId = $request->selected_id ?? null;
 
-            $html = '';
-            foreach ($data as $d) {
-                $selected = $selectedId == $d->id ? 'selected' : '';
-                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
-            }
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+    //         }
 
-            return response($html);
-        }
+    //         return response($html);
+    //     }
 
-        return response('');
-    }
+    //     return response('');
+    // }
 
-    public function getAgency(Request $request)
-    {
-        if ($request->program_id) {
-            $data = Agency::select('id', 'program_id', 'no', 'name')
-                ->where('program_id', $request->program_id)
-                ->get();
+    // public function getAgency(Request $request)
+    // {
+    //     if ($request->program_id) {
+    //         $data = Agency::select('id', 'program_id', 'no', 'name')
+    //             ->where('program_id', $request->program_id)
+    //             ->get();
 
-            $selectedId = $request->selected_id ?? null;
+    //         $selectedId = $request->selected_id ?? null;
 
-            $html = '';
-            foreach ($data as $d) {
-                $selected = $selectedId == $d->id ? 'selected' : '';
-                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
-            }
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+    //         }
 
-            return response($html);
-        }
+    //         return response($html);
+    //     }
 
-        return response('');
-    }
+    //     return response('');
+    // }
 
-    public function getProgramSub(Request $request)
-    {
-        if ($request->program_sub_id) {
+    // public function getProgramSub(Request $request)
+    // {
+    //     if ($request->program_sub_id) {
 
-            $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
-                ->where('program_sub_id', $request->program_sub_id)
-                ->get();
+    //         $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
+    //             ->where('program_sub_id', $request->program_sub_id)
+    //             ->get();
 
-            $selectedId = $request->selected_id ?? null;
+    //         $selectedId = $request->selected_id ?? null;
 
-            $html = '';
-            foreach ($data as $d) {
-                $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
-                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
-            }
+    //         $html = '';
+    //         foreach ($data as $d) {
+    //             $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+    //         }
 
-            return response($html);
-        }
+    //         return response($html);
+    //     }
 
-        return response('');
-    }
+    //     return response('');
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -135,18 +135,16 @@ class BudgetVoucherController extends Controller
             ->where('begin_vouchers.ministry_id', $ministry->id)
             ->select(
                 'begin_vouchers.account_sub_id',
-                'begin_vouchers.cluster_id',
+                'begin_vouchers.no as voucher_no',
                 'account_subs.name as sub_name'
             )
             ->groupBy(
                 'begin_vouchers.account_sub_id',
-                'begin_vouchers.cluster_id',
+                'begin_vouchers.no',
                 'account_subs.name'
             )
             ->orderBy('begin_vouchers.account_sub_id')
             ->get();
-
-
 
         return view('budgetplan::budgetVoucher.create')
             ->with('accountSub', $accountSub)
@@ -230,60 +228,52 @@ class BudgetVoucherController extends Controller
     //     ]);
     // }
 
-    // public function getEarlyBalance(Request $request, $params)
-    // {
-    //     $ministryId = decode_params($params);
+    public function getEarlyBalance(Request $request, $params)
+    {
+        $ministryId = decode_params($params);
 
-    //     $request->validate([
-    //         'cboProgram'     => 'required|integer',
-    //         'cboProgramSub' => 'required|integer',
-    //         'cboCluster'     => 'required|integer',
-    //         'cboSubAccount' => 'required|integer',
-    //     ]);
+        $request->validate([
+            'account_sub_id' => 'required',
+            'no'             => 'required'
+        ]);
 
+        $beginVoucher = BeginVoucher::with('loans')
+            ->where('ministry_id', $ministryId)
+            ->where('account_sub_id', $request->account_sub_id)
+            ->where('no', $request->no)
+            ->first();
 
-    //     dd ($request->all());
+        if (!$beginVoucher) {
+            return response()->json([
+                'fin_law'            => 0,
+                'credit_movement'    => 0,
+                'new_credit_status'  => 0,
+                'credit'             => 0,
+                'deadline_balance'   => 0,
+                'exists'             => false,
+            ]);
+        }
 
-    //     $begin = BeginVoucher::where('ministry_id', $ministryId)
-    //         ->where('program_id', $request->cboProgram)
-    //         ->where('program_sub_id', $request->cboProgramSub)
-    //         ->where('cluster_id', $request->cboCluster)
-    //         ->where('account_sub_id', $request->cboSubAccount)
-    //         ->first();
+        $loan = $beginVoucher->loans;
+        $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
 
-    //     if (!$begin) {
-    //         return response()->json([
-    //             'fin_law'           => 0,
-    //             'credit_movement'   => 0,
-    //             'new_credit_status' => 0,
-    //             'credit'            => 0,
-    //             'deadline_balance'  => 0,
-    //             'exists'            => false,
-    //         ]);
-    //     }
-
-    //     $credit_movement =
-    //         ($begin->total_increase ?? 0) - ($begin->current_loan ?? 0);
-
-    //     return response()->json([
-    //         'fin_law'           => (float) $begin->fin_law,
-    //         'credit_movement'   => (float) $credit_movement,
-    //         'new_credit_status' => (float) $begin->new_credit_status,
-    //         'credit'            => (float) $begin->credit,
-    //         'deadline_balance'  => (float) $begin->deadline_balance,
-    //         'exists'            => true,
-    //     ]);
-    // }
+        return response()->json([
+            'fin_law'            => (float) ($beginVoucher->fin_law ?? 0),
+            'credit_movement'    => (float) $credit_movement,
+            'new_credit_status'  => (float) ($beginVoucher->new_credit_status ?? 0),
+            'credit'             => (float) ($beginVoucher->credit ?? 0),
+            'deadline_balance'   => (float) ($beginVoucher->deadline_balance ?? 0),
+            'exists'             => true,
+        ]);
+    }
 
 
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'cboProgram'       => 'required',
-            'cboProgramSub'       => 'required',
-            'cboCluster'       => 'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
+            'no'              => 'required',
             'budget'          => 'required|numeric|min:0',
             'task_type'       => 'required',
             'attachments'     => 'nullable|array',
@@ -297,11 +287,8 @@ class BudgetVoucherController extends Controller
             $ministry   = Ministry::where('id', $ministryId)->first();
 
             DB::transaction(function () use ($request, $validated, $ministry) {
-                $beginVoucher = BeginVoucher::where('program_id', $validated['cboProgram'])
-                    ->where('program_sub_id', $validated['cboProgramSub'])
-                    ->where('cluster_id', $validated['cboCluster'])
+                $beginVoucher = BeginVoucher::where('no', $validated['no'])
                     ->where('account_sub_id', $validated['cboSubAccount'])
-                    ->where('agency_id', $validated['cboAgency'])
                     ->where('ministry_id', $ministry->id)
                     ->first();
 
@@ -340,11 +327,9 @@ class BudgetVoucherController extends Controller
 
                 BudgetVoucher::create([
                     'ministry_id'    => $ministry->id,
-                    'program_id'     => $validated['cboProgram'],
-                    'program_sub_id' => $validated['cboProgramSub'],
-                    'cluster_id'     => $validated['cboCluster'],
                     'agency_id'      => $validated['cboAgency'],
                     'account_sub_id' => $validated['cboSubAccount'],
+                    'no'             => $validated['no'],
                     'txtDescription' => strip_tags($validated['txtDescription']),
                     'budget'         => $applyValue,
                     'task_type'      => $validated['task_type'],
@@ -355,9 +340,7 @@ class BudgetVoucherController extends Controller
                 $this->recalculateAndSaveReport($beginVoucher);
 
                 $beginVoucher->refresh();
-                $lastVoucher = BudgetVoucher::where('program_id', $validated['cboProgram'])
-                    ->where('program_sub_id', $validated['cboProgramSub'])
-                    ->where('cluster_id', $validated['cboCluster'])
+                $lastVoucher = BudgetVoucher::where('no', $validated['no'])
                     ->where('account_sub_id', $validated['cboSubAccount'])
                     ->where('agency_id', $validated['cboAgency'])
                     ->latest()->first();
@@ -594,12 +577,8 @@ class BudgetVoucherController extends Controller
 
     private function recalculateAndSaveReport(BeginVoucher $beginVoucher)
     {
-        $newApplyTotal = BudgetVoucher::where('ministry_id', $beginVoucher->ministry_id)
-            ->where('cluster_id', $beginVoucher->cluster_id)
-            ->where('program_id', $beginVoucher->program_id)
-            ->where('program_sub_id', $beginVoucher->program_sub_id)
+        $newApplyTotal = BudgetVoucher::where('no', $beginVoucher->no)
             ->where('account_sub_id', $beginVoucher->account_sub_id)
-            ->where('agency_id', $beginVoucher->agency_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
 
@@ -617,9 +596,7 @@ class BudgetVoucherController extends Controller
 
     private function calculateEarlyBalance($beginCredit)
     {
-        $budgetVoucher = BudgetVoucher::where('cluster_id', $beginCredit->cluster_id)
-            ->where('program_id', $beginCredit->program_id)
-            ->where('program_sub_id', $beginCredit->program_sub_id)
+        $budgetVoucher = BudgetVoucher::where('no', $beginCredit->no)
             ->where('account_sub_id', $beginCredit->account_sub_id)
             ->get();
 

@@ -2,7 +2,7 @@
 
 namespace App\DataTables\BudgetLoans;
 
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -46,7 +46,7 @@ class InitialMandateLoanDataTable extends DataTable
             'ministries.name'
         ]);
 
-        return $query->orderBy('ministries.id', 'ASC');
+        return $query->orderBy('ministries.id', 'DESC');
     }
     /**
      * Optional method if you want to use the html builder.
@@ -79,7 +79,7 @@ class InitialMandateLoanDataTable extends DataTable
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
-            
+
             Column::computed(
                 'action',
                 __('tables.th.action')

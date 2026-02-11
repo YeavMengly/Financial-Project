@@ -26,7 +26,6 @@
                         </ol>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -81,8 +80,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-
-
                                         @error('cboSubAccount')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
