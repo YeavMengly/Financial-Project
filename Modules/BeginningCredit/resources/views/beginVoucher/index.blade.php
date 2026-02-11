@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" name="no" value="{{ request('no') }}"
+                            <input type="text" class="form-control" id="cluster_id" name="clusters" value="{{ request('cluster_id') }}"
                                 placeholder="{{ __('menus.cluster') }}" />
                         </div>
 

@@ -23,6 +23,7 @@ class BeginMandate extends Model
         'chapter_id',
         'account_id',
         'account_sub_id',
+        'cluster_id',
         'no',
         'txtDescription',
         'fin_law',
