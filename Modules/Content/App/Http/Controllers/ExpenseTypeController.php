@@ -116,9 +116,6 @@ class ExpenseTypeController extends Controller
      */
     public function update(Request $request, $params)
     {
-        $id = decode_params($params);
-
-
         $request->validate([
             'name_kh' => [
                 'required',
@@ -131,6 +128,7 @@ class ExpenseTypeController extends Controller
             'status' => ['nullable', 'boolean'],
         ]);
 
+        $id = decode_params($params);
         DB::beginTransaction();
         try {
             $expenseType = ExpenseType::where('id', $id)

@@ -3,7 +3,6 @@
 namespace Modules\Content\App\Http\Controllers;
 
 use App\DataTables\Content\AccountDataTable;
-use App\DataTables\AnnualOpen\InitialAccountDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Account;
 use App\Models\Content\Ministry;
@@ -15,11 +14,6 @@ use Exception;
 
 class AccountController extends Controller
 {
-    public function getIndex(InitialAccountDataTable $dataTable)
-    {
-        return $dataTable->render('content::content.accounts.initialAccount.index');
-    }
-
     /**
      * Display a listing of the resource.
      */

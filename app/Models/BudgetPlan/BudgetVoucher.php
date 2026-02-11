@@ -17,11 +17,9 @@ class BudgetVoucher extends Model
      */
     protected $fillable = [
         'ministry_id',
-        'program_id',
-        'program_sub_id',
         'agency_id',
         'account_sub_id',
-        'cluster_id',
+        'no',
         'txtDescription',
         'budget',
         'task_type',

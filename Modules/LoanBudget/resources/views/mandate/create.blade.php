@@ -52,13 +52,13 @@
                                         <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginMandate as $bc)
+                                            {{-- @foreach ($beginMandate as $bc)
                                                 <option value="{{ $bc->agencyNumber }}"
                                                     data-program="{{ $bc->agencyNumber }}">
                                                     {{ $bc->agencyNumber }} -
                                                     {{ optional($bc->agency)->agencyTitle ?? 'មិនមានទិន្ន័យ' }}
                                                 </option>
-                                            @endforeach
+                                            @endforeach --}}
 
                                         </select>
                                         @error('cboAgency')
@@ -75,11 +75,11 @@
                                         <select class="form-control" data-trigger id="cboSubDepart" name="cboSubDepart"
                                             required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginMandate as $bc)
+                                            {{-- @foreach ($beginMandate as $bc)
                                                 <option value="{{ $bc->subDepart }}" data-program="{{ $bc->subDepart }}">
                                                     {{ $bc->subDepart }}
                                                 </option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                         @error('cboAgency')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -96,12 +96,12 @@
                                         <select class="form-control" id="cboSubAccountNumber" name="subAccountNumber"
                                             required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginMandate as $bc)
+                                            {{-- @foreach ($beginMandate as $bc)
                                                 <option value="{{ $bc->subAccountNumber }}"
                                                     data-program="{{ $bc->program }}">
                                                     {{ $bc->subAccount->subAccountNumber }} | {{ $bc->program }}
                                                 </option>
-                                            @endforeach
+                                            @endforeach --}}
                                         </select>
                                         @error('subAccountNumber')
                                             <div class="pristine-error text-help">{{ $message }}</div>

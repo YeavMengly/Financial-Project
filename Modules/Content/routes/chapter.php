@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Content\App\Http\Controllers\ChapterController;
 
 Route::middleware('PermissionCheck')->controller(ChapterController::class)->group(function () {
-    Route::get('/chapter', 'getIndex')->name('initialChapter.index'); // GET: initial-budget/
+    Route::get('/chapter', 'getIndex')->name('initialChapter.index');
     Route::get('{params}/chapter', 'index')->name('chapters.index');
     Route::get('{params}/chapter/create', 'create')->name('chapters.create');
     Route::get('{params}/chapter/edit/{id}', 'edit')->name('chapters.edit');

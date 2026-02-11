@@ -110,7 +110,7 @@
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('mandate.create', encode_params($params)) }}"><i
+                                    href="{{ route('mandate.create', $params) }}"><i
                                         class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>

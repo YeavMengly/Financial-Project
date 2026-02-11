@@ -5,7 +5,6 @@ use Modules\Content\App\Http\Controllers\AccountController;
 
 
 Route::middleware('PermissionCheck')->controller(AccountController::class)->group(function () {
-    // Route::get('{params}/chapter/{chId}/accounts/', 'getIndex')->name('initialAccount.index'); // GET: initial-budget/
     Route::get('{params}/chapter/{chId}/accounts/', 'index')->name('accounts.index');
     Route::get('{params}/chapter/{chId}/accounts/create', 'create')->name('accounts.create');
     Route::get('{params}/chapter/{chId}/accounts/edit/{id}', 'edit')->name('accounts.edit');

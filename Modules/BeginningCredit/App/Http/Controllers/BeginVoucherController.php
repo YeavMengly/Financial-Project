@@ -155,6 +155,7 @@ class BeginVoucherController extends Controller
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);
+        // dd($validatedData);
 
         $id = decode_params($params);
         DB::beginTransaction();
@@ -168,6 +169,8 @@ class BeginVoucherController extends Controller
             $cluster    = Cluster::where('id', $validatedData['cboCluster'])
                 ->where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])->first();
+
+            // dd($cluster);
 
             $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
             $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
@@ -189,7 +192,7 @@ class BeginVoucherController extends Controller
             $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
 
 
-            $currentApplyTotal = BudgetVoucher::where('cluster_id', $validatedData['cboCluster'])
+            $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->where('agency_id', $validatedData['cboAgency'])
                 ->sum('budget');
@@ -214,7 +217,7 @@ class BeginVoucherController extends Controller
                 'chapter_id'        => substr($validatedData['cboSubAccount'], 0, 2),
                 'account_id'        => substr($validatedData['cboSubAccount'], 0, 4),
                 'account_sub_id'    => $validatedData['cboSubAccount'],
-                'cluster_id'                => $validatedData['cboCluster'],
+                'cluster_id'        => $validatedData['cboCluster'],
                 'no'                => $valueNo,
                 'txtDescription'    => $cluster->decription ?? null,
                 'fin_law'           => $validatedData['fin_law'],
@@ -431,7 +434,7 @@ class BeginVoucherController extends Controller
      */
     private function ResavedData(BeginVoucher $data)
     {
-        $newApplyTotal = BudgetVoucher::where('cluster_id', $data->cluster_id)
+        $newApplyTotal = BudgetVoucher::where('no', $data->no)
             ->where('account_sub_id', $data->account_sub_id)
             ->where('agency_id', $data->agency_id)
             ->latest('created_at')

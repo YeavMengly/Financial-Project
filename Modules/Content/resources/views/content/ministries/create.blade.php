@@ -104,11 +104,7 @@
 @section('script')
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
-    {{-- <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script> --}}
-
-    {{-- <script src="https://cdn.jsdelivr.net/npm/pristinejs/dist/pristine.min.js"></script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('pristine-valid-example');

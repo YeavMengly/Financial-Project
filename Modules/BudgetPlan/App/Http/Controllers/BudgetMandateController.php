@@ -242,15 +242,11 @@ class BudgetMandateController extends Controller
             $ministry   = Ministry::where('id', $ministryId)->first();
 
             DB::transaction(function () use ($request, $validated, $ministry) {
-                $beginVoucher = BeginMandate::where('no', $validated['no'])
+                $beginMandate = BeginMandate::where('no', $validated['no'])
                     ->where('account_sub_id', $validated['cboSubAccount'])
-                    // ->where('agency_id', $validated['cboAgency'])
                     ->where('ministry_id', $ministry->id)
                     ->first();
-
-                // dd($beginVoucher);
-
-                if (!$beginVoucher) {
+                if (!$beginMandate) {
                     flash()
                         ->translate('en')
                         ->option('timeout', 2000)
@@ -295,16 +291,16 @@ class BudgetMandateController extends Controller
                     'date'           => $validated['date'],
                 ]);
 
-                $this->recalculateAndSaveReport($beginVoucher);
+                $this->recalculateAndSaveReport($beginMandate);
 
-                $beginVoucher->refresh();
-                $lastVoucher = BudgetMandate::where('no', $validated['no'])
+                $beginMandate->refresh();
+                $lastMandate = BudgetMandate::where('no', $validated['no'])
                     ->where('account_sub_id', $validated['cboSubAccount'])
                     ->where('agency_id', $validated['cboAgency'])
                     ->latest()->first();
 
-                $beginVoucher->apply = $lastVoucher?->budget ?? 0;
-                $beginVoucher->save();
+                $beginMandate->apply = $lastMandate?->budget ?? 0;
+                $beginMandate->save();
             });
 
             flash()
@@ -529,7 +525,6 @@ class BudgetMandateController extends Controller
     {
         $newApplyTotal = BudgetMandate::where('no', $beginMandate->no)
             ->where('account_sub_id', $beginMandate->account_sub_id)
-            ->where('agency_id', $beginMandate->agency_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
 
