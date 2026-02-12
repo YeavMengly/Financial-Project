@@ -6,10 +6,12 @@ use App\DataTables\AnnualOpen\InitialBudgetVoucherDataTable;
 use App\DataTables\BeginVoucherDataTable;
 use App\Exports\ReportBook;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\BeginMandate;
 use App\Models\Content\Account;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Chapter;
@@ -43,7 +45,7 @@ class BeginVoucherController extends Controller
             ->get();
         $account = Account::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-
+        $program = Program::where('ministry_id', $ministry->id)->get();
         return $dataTable->render('beginningcredit::beginVoucher.index', [
             'ministry'   => $ministry,
             'params' => $params,
@@ -51,6 +53,7 @@ class BeginVoucherController extends Controller
             'account' => $account,
             'agency' => $agency,
             'accountSub' => $accountSub,
+            'program' => $program,
         ]);
     }
 
@@ -222,7 +225,7 @@ class BeginVoucherController extends Controller
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);
-
+       
         $id = decode_params($params);
         DB::beginTransaction();
         try {
@@ -260,6 +263,8 @@ class BeginVoucherController extends Controller
                 ->where('agency_id', $validatedData['cboAgency'])
                 ->sum('budget');
 
+            // dd($currentApplyTotal);
+
             $early_balance     = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
             $deadline_balance  = $early_balance + $currentApplyTotal;
             $credit            = $new_credit_status - $deadline_balance;
@@ -294,13 +299,36 @@ class BeginVoucherController extends Controller
                 'law_correction'    => $law_correction,
             ]);
 
+            $BeginMandate = BeginMandate::create([
+                'ministry_id'       => $ministry->id,
+                'agency_id'         => $validatedData['cboAgency'],
+                'program_id'        => $validatedData['cboProgram'],
+                'program_sub_id'    => $validatedData['cboProgramSub'],
+                'chapter_id'        => substr($validatedData['cboSubAccount'], 0, 2),
+                'account_id'        => substr($validatedData['cboSubAccount'], 0, 4),
+                'account_sub_id'    => $validatedData['cboSubAccount'],
+                'cluster_id'                => $validatedData['cboCluster'],
+                'no'                => $valueNo,
+                'txtDescription'    => $cluster->decription ?? null,
+                'fin_law'           => $validatedData['fin_law'],
+                'current_loan'      => $validatedData['current_loan'],
+                'new_credit_status' => $new_credit_status,
+                'apply'             => $currentApplyTotal,
+                'deadline_balance'  => $deadline_balance,
+                'early_balance'     => $early_balance,
+                'credit'            => $credit,
+                'law_average'       => $law_average,
+            ]);
+
             $this->ResavedData($beginCredit);
+            //  $this->ResavedDataMandate($BeginMandate);
+
 
             DB::commit();
 
             flash()
                 ->translate('en')
-                ->option('timeout', 2000)
+                ->option('timeout', 1000)
                 ->success('success_msg', 'successful')
                 ->flash();
 
@@ -376,7 +404,7 @@ class BeginVoucherController extends Controller
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);
-
+        dd($validatedData);
         DB::beginTransaction();
         try {
             $ministry = Ministry::where('id', decode_params($params))->first();
@@ -521,7 +549,7 @@ class BeginVoucherController extends Controller
         $data->save();
     }
 
-    // Export filtered data to Excel
+    // Export Data to Excel
     public function export(Request $request, $params)
     {
         try {

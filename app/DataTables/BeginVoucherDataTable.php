@@ -90,11 +90,11 @@ class BeginVoucherDataTable extends DataTable
                 fn($q) =>
                 $q->where('begin_vouchers.account_sub_id', $request->accountSub)
             )
-            // ->when(
-            //     $request->filled('no'),
-            //     fn($q) =>
-            //     $q->where('begin_vouchers.no', 'like', "%{$request->no}%")
-            // )
+            ->when(
+                $request->filled('clusters'),
+                fn($q) =>
+                $q->where('begin_vouchers.cluster_id', 'like', "%{$request->clusters}%")
+            )
             ->when(
                 $request->filled('txtDescription'),
                 fn($q) =>
