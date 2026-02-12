@@ -143,7 +143,6 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="row" style="height: 38vh;"></div> --}}
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>

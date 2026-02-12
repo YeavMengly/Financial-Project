@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 class BeginVoucherController extends Controller
 {
 
+    //   public function __construct()
     public function getIndex(InitialBudgetVoucherDataTable $dataTable)
     {
         $module = Ministry::all();
@@ -54,7 +55,7 @@ class BeginVoucherController extends Controller
     }
 
     /**
-     * AJAX: Fetch program sub-options by program ID.
+     * AJAX: Fetch program sub-options by program ID request.
      */
     public function getByProgramId(Request $request)
     {
@@ -75,6 +76,28 @@ class BeginVoucherController extends Controller
         }
 
         return response('');
+    }
+
+    public function editByProgramId(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = ProgramSub::select('id', 'no', 'decription')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
     }
 
     public function getByAgency(Request $request)
@@ -98,6 +121,28 @@ class BeginVoucherController extends Controller
         return response('');
     }
 
+    public function editByAgency(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Agency::select('id', 'no', 'name')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+        }
+
+        return response($html);
+    }
+
     public function getByProgramSubId(Request $request)
     {
         if ($request->program_sub_id) {
@@ -118,6 +163,28 @@ class BeginVoucherController extends Controller
         }
 
         return response('');
+    }
+
+    public function editByProgramSubId(Request $request)
+    {
+        if (!$request->program_sub_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Cluster::select('id', 'no', 'decription')
+            ->where('program_sub_id', $request->program_sub_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
     }
 
     /**
@@ -155,7 +222,6 @@ class BeginVoucherController extends Controller
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);
-        // dd($validatedData);
 
         $id = decode_params($params);
         DB::beginTransaction();
@@ -169,8 +235,6 @@ class BeginVoucherController extends Controller
             $cluster    = Cluster::where('id', $validatedData['cboCluster'])
                 ->where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])->first();
-
-            // dd($cluster);
 
             $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
             $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
@@ -190,7 +254,6 @@ class BeginVoucherController extends Controller
                 $validatedData['editorial'];
 
             $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
-
 
             $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
@@ -321,9 +384,14 @@ class BeginVoucherController extends Controller
             $programSub = ProgramSub::where('program_id', $program->id)
                 ->where('id', $validatedData['cboProgramSub'])
                 ->firstOrFail();
-
+            $cluster    = Cluster::where('id', $validatedData['cboCluster'])
+                ->where('program_id', $validatedData['cboProgram'])
+                ->where('program_sub_id', $validatedData['cboProgramSub'])->first();
 
             $beginCredit = BeginVoucher::where('id', $id)
+                ->where('program_id', $validatedData['cboProgram'])
+                ->where('program_sub_id', $validatedData['cboProgramSub'])
+                ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -344,9 +412,9 @@ class BeginVoucherController extends Controller
                 $validatedData['decrease'] -
                 $validatedData['editorial'];
 
-            $valueNo = $ministry->no . $program->no . $programSub->no . '0' . $validatedData['no'];
+            $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
 
-            $currentApplyTotal = BudgetVoucher::where('no', $validatedData['no'])
+            $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->where('agency_id', $validatedData['cboAgency'])
                 ->sum('budget');
@@ -453,7 +521,7 @@ class BeginVoucherController extends Controller
         $data->save();
     }
 
-    // Export Data to Excel
+    // Export filtered data to Excel
     public function export(Request $request, $params)
     {
         try {
@@ -520,15 +588,6 @@ class BeginVoucherController extends Controller
                 ->flash();
 
             return redirect()->route('beginVoucher.index', $params);
-        }
-    }
-
-    private function preventIfMinistryDeleted($ministryId)
-    {
-        $ministry = Ministry::withTrashed()->findOrFail($ministryId);
-
-        if (!is_null($ministry->deleted_at)) {
-            abort(403, 'This ministry is deleted. You can only view records.');
         }
     }
 }
