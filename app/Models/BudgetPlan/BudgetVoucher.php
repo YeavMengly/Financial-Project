@@ -2,8 +2,8 @@
 
 namespace App\Models\BudgetPlan;
 
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Ministry;
 use App\Models\TaskType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
