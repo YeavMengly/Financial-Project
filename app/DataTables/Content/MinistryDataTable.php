@@ -21,6 +21,12 @@ class MinistryDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('status', function ($row) {
+                if ($row->status) {
+                    return '<span class="badge bg-success">Active</span>';
+                }
+                return '<span class="badge bg-danger">Inactive</span>';
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
@@ -31,7 +37,7 @@ class MinistryDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('content::content.ministries.action', ['module' => $module]);
             })
-            ->rawColumns(['soft_delete', 'action']);
+            ->rawColumns(['status', 'soft_delete', 'action']);
     }
 
     /**
@@ -48,6 +54,7 @@ class MinistryDataTable extends DataTable
             'ministries.title',
             'ministries.refer',
             'ministries.name',
+            'ministries.status',
             'ministries.created_at',
             'ministries.deleted_at'
         ]);
@@ -81,12 +88,15 @@ class MinistryDataTable extends DataTable
                 'DT_RowIndex',
                 __('tables.th.no')
             )->width(30)->addClass('text-center align-middle')->orderable(false),
-            // Column::make('no')->title(__('tables.th.no'))->width(80)->addClass('align-middle'),
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.ministries'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('status')
+                ->title(__('tables.th.status'))
+                ->width(100)
+                ->addClass('text-center align-middle'),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed(
                 'action',

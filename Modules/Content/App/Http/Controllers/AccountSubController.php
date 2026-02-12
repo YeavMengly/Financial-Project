@@ -4,7 +4,6 @@
 namespace Modules\Content\App\Http\Controllers;
 
 use App\DataTables\Content\AccountSubDataTable;
-use App\DataTables\AnnualOpen\InititalAccountSubDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Account;
 use App\Models\Content\AccountSub;
@@ -16,11 +15,6 @@ use Illuminate\Support\Facades\Log;
 
 class AccountSubController extends Controller
 {
-
-    public function getIndex(InititalAccountSubDataTable $dataTable)
-    {
-        return $dataTable->render('content::content.accounts.accountSub.initialAccountSub.index');
-    }
 
     /**
      * Display a listing of the resource
@@ -88,7 +82,7 @@ class AccountSubController extends Controller
             'name' =>  ['required'],
         ]);
 
-        dd($request->all(), $params, $chId, $accId);
+        // dd($request->all(), $params, $chId, $accId);
         DB::beginTransaction();
         try {
             $id = decode_params($params);
