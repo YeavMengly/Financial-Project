@@ -155,79 +155,6 @@ class BudgetVoucherController extends Controller
             ->with('program', $program);
     }
 
-    // public function getEarlyBalance(Request $request, $params)
-    // {
-    //     $ministryId = decode_params($params);
-    //     $request->validate([
-    //         'account_sub_id' => 'required',
-    //         'no'             => 'required'
-    //     ]);
-
-    //     $begin = BeginVoucher::with('loans')
-    //         ->where('ministry_id', $ministryId)
-    //         ->where('account_sub_id', $request->account_sub_id)
-    //         ->where('no', $request->no)
-    //         ->first();
-
-    //     if (!$begin) {
-    //         return response()->json([
-    //             'fin_law'            => 0,
-    //             'new_credit_status'  => 0,
-    //             'credit'             => 0,
-    //             'deadline_balance'   => 0,
-    //             'exists'             => false,
-    //         ]);
-    //     }
-
-    //     $loan = $begin->loans;
-    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
-
-    //     return response()->json([
-    //         'fin_law'            => (float) ($begin->fin_law ?? 0),
-    //         'credit_movement'    => (float) $credit_movement,
-    //         'new_credit_status'  => (float) ($begin->new_credit_status ?? 0),
-    //         'credit'             => (float) ($begin->credit ?? 0),
-    //         'deadline_balance'   => (float) ($begin->deadline_balance ?? 0),
-    //         'exists'             => true,
-    //     ]);
-    // }
-
-    // BudgetVoucherController.php (or BeginVoucherController)
-    // public function getBeginVoucher(Request $request)
-    // {
-    //     $request->validate([
-    //         'program_id'     => 'required|integer',
-    //         'program_sub_id' => 'required|integer',
-    //         'cluster_id'     => 'required|integer',
-    //     ]);
-
-    //     $begin = BeginVoucher::where('program_id', $request->program_id)
-    //         ->where('program_sub_id', $request->program_sub_id)
-    //         ->where('chapter_id', $request->cluster_id) // cluster
-    //         ->latest()
-    //         ->first();
-
-    //     if (!$begin) {
-    //         return response()->json([
-    //             'fin_law'            => 0,
-    //             'credit_movement'   => 0,
-    //             'new_credit_status' => 0,
-    //             'credit'            => 0,
-    //             'deadline_balance'  => 0,
-    //             'exists'            => false,
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'fin_law'            => (float) $begin->fin_law,
-    //         'credit_movement'   => (float) $begin->total_increase,
-    //         'new_credit_status' => (float) $begin->new_credit_status,
-    //         'credit'            => (float) $begin->credit,
-    //         'deadline_balance'  => (float) $begin->deadline_balance,
-    //         'exists'            => true,
-    //     ]);
-    // }
-
     public function getEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
@@ -271,6 +198,7 @@ class BudgetVoucherController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
+            'legalNumber' =>  'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
@@ -327,6 +255,7 @@ class BudgetVoucherController extends Controller
 
                 BudgetVoucher::create([
                     'ministry_id'    => $ministry->id,
+                    'legalNumber'      => $validated['legalNumber'],
                     'agency_id'      => $validated['cboAgency'],
                     'account_sub_id' => $validated['cboSubAccount'],
                     'no'             => $validated['no'],
@@ -427,6 +356,7 @@ class BudgetVoucherController extends Controller
     {
 
         $validated = $request->validate([
+            'legalNumber' =>  'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
@@ -481,6 +411,7 @@ class BudgetVoucherController extends Controller
 
             $voucher->update([
                 'ministry_id'    => $ministry->id,
+                'legalNumber'    => $validated['legalNumber'],
                 'agency_id'      => $validated['cboAgency'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no' => $beginCredit->no,

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('no');
             $table->decimal('budget', 15, 2)->default(0);
             $table->string('task_type');
+            $table->string('legalNumber');
             $table->text('txtDescription');
             $table->json('attachments')->nullable();
             $table->date('date');
