@@ -17,7 +17,6 @@
                 <h4 class="mb-sm-0 font-size-18">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"> {{ __('menus.credit') }}</li>
-                        {{-- <li class="breadcrumb-item">{{ __('menus.initial.voucher') }}</li> --}}
                     </ol>
                 </h4>
                 <div class="page-title-right">
@@ -84,6 +83,16 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="cluster_id" name="clusters" value="{{ request('cluster_id') }}"
+                                placeholder="{{ __('menus.cluster') }}" />
+                        </div>
+
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="txtDescription"
+                                value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
                         </div>
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
