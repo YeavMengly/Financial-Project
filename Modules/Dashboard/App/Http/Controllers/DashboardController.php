@@ -3,6 +3,7 @@
 namespace Modules\Dashboard\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Content\Account;
 use App\Models\Content\Chapter;
 use App\Models\Content\Cluster;
 use App\Models\Content\ProgramSub;
@@ -164,8 +165,7 @@ class DashboardController extends Controller
             ->select('chapters.*')
             ->orderBy('no')
             ->get();
-        // dd($chapter[0]);
-
+        // dd($chapters);
         $chapterTotals = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->where('ministries.year', $year)
@@ -181,10 +181,10 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('chapter_id');
 
-
         $chapters = $chapters->map(function ($chapter) use ($chapterTotals) {
 
-            $total = $chapterTotals[$chapter->id] ?? null;
+            $total = $chapterTotals[$chapter->no] ?? null;
+
 
             $chapter->fin_law       = $total->fin_law ?? 0;
             $chapter->apply         = $total->apply ?? 0;
@@ -201,12 +201,51 @@ class DashboardController extends Controller
         });
 
         $chapterLabels = $chapters->pluck('no')->map(fn($n) => "ជំពូក $n");
+        // dd($chapterLabels);
         $finLawData    = $chapters->pluck('fin_law');
 
+        $account = Account::where('ministries.year', $year)
+            ->join('ministries', 'accounts.ministry_id', '=', 'ministries.id')
+            ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
+            ->select('accounts.*')
+            ->orderBy('no')
+            ->get();
+
+        $accountTotal = DB::table('begin_vouchers')
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('ministries.year', $year)
+            ->groupBy('begin_vouchers.account_id')
+            ->selectRaw('
+        begin_vouchers.account_id,
+        SUM(begin_vouchers.fin_law) AS fin_law,
+        SUM(begin_vouchers.apply) AS apply,
+        SUM(begin_vouchers.deadline_balance) AS remain,
+        SUM(begin_vouchers.credit) AS credit,
+        COUNT(*) AS total_records
+    ')
+            ->get()
+            ->keyBy('account_id');
+        $accounts = $account->map(function ($account) use ($accountTotal) {
+
+            $total = $accountTotal[$account->no] ?? null;
 
 
-        // dd($chapters);
+            $account->fin_law       = $total->fin_law ?? 0;
+            $account->apply         = $total->apply ?? 0;
+            $account->remain        = $total->remain ?? 0;
+            $account->credit        = $total->credit ?? 0;
+            $account->total_records = $total->total_records ?? 0;
 
+            // example percentage
+            $account->percent_apply = $account->fin_law > 0
+                ? round(($account->apply / $account->fin_law) * 100, 2)
+                : 0;
+
+            return $account;
+        });
+
+      //   $finLawData    = $acc->pluck('fin_law');
+//   dd($accounts);
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
@@ -261,6 +300,7 @@ class DashboardController extends Controller
             'chapters' => $chapters,
             'chapterLabels' => $chapterLabels,
             'finLawData' => $finLawData,
+            'accounts' => $accounts
         ]);
     }
 

@@ -72,6 +72,22 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, .12);
         }
+
+        .table-scroll {
+            max-height: 31vh;
+            /* Set scroll height */
+            overflow-y: auto;
+        }
+
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        #tableBody td {
+            font-size: small;
+        }
     </style>
 @endsection
 
@@ -287,8 +303,84 @@
         </div>
     </div>
 
+    <div class="row">
+        {{-- bar chart --}}
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-body">
+                    <div id="bar_chart" data-colors='["#2ab57d"]' class="apex-charts" dir="ltr"></div>
+                </div>
+            </div>
+        </div>
 
+    </div>
+    {{-- account --}}
+    <div class=" ">
+        <div class="card">
+            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
+                action="{{ url()->current() }}">
+                <div class="flex-shrink-0">
+                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
+                        <option selected="">ជំពូក</option>
+                        @foreach ($chapterLabels as $ch)
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                                {{ $ch }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+            <div class="card-body">
+                <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll">
+                        <table class="table table-bordered table-striped table-hover align-middle  ">
+                            <thead class=" text-center table-light sticky-header">
+                                <tr>
+                                    <th>{{ __('forms.account') }}</th>
+                                    <th>{{ __('forms.fin.law') }}</th>
+                                    <th>{{ __('menus.fin.law.data') }}</th>
+                                    <th>{{ __('menus.remain') }}</th>
+                                    <th>{{ __('menus.credit') }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @forelse ($accounts as $acc)
+                                    <tr data-chapter="{{ $acc->chapter_id }}">
+                                        <td class="text-center">{{ $acc->no }}</td>
+                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->finLawData) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->remain) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td>
+                                            <div class="dropdown text-center">
+                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    <i class="mdi mdi-dots-vertical"></i>
+                                                </a>
+                                                {{-- <div class="dropdown-menu dropdown-menu-end">
+                                                        <a class="dropdown-item" href="#">Action</a>
 
+                                                    </div> --}}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            No accounts found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+    </div>
     <div class="row">
         <div class="col-xl-6">
             <!-- card -->
@@ -746,6 +838,7 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js') }}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('year');
@@ -937,10 +1030,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const year = document.getElementById('year');
+            const chapter = document.getElementById('chapterLabels');
             const form = document.getElementById('filter');
+            const chapterForm = document.getElementById('chapterFilter');
 
             year.addEventListener('change', function() {
                 form.submit();
+            });
+
+            chapter.addEventListener('change', function() {
+                chapterForm.submit();
             });
         });
     </script>
@@ -1215,78 +1314,189 @@
             new ApexCharts(el, options).render();
         });
     </script>
-
-
-    {{-- Chapter --}}
-
+    {{-- barchart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
+            const el = document.querySelector("#bar_chart");
+            const colors = JSON.parse(el.getAttribute("data-colors"));
+            const label = @json($chapterLabels);
+            const finLawData = @json($finLawData);
+            // console.log('finLawData:', finLawData);
             const options = {
                 chart: {
-                    type: 'bar',
+                    type: "bar",
                     height: 260,
                     toolbar: {
-                        show: false,
-                        color: '#1e90ff',
+                        show: false
                     }
                 },
+                colors: colors,
                 series: [{
-                    name: 'Fin Law',
-                    data: @json($finLawData),
-                    color: '#1e90ff'
+                    name: "សរុប",
+                    data: finLawData
                 }],
-                // xaxis: {
-                //     categories: @json($chapterLabels)
-                // }
-
                 xaxis: {
-                    categories: @json($chapterLabels),
-                    labels: {
-                        style: {
-                            fontSize: '12px'
-                        }
-                    }
+                    categories: label
                 },
-
                 plotOptions: {
                     bar: {
-                        horizontal: true,
-                        barHeight: '65%',
-                        borderRadius: 3
+                        borderRadius: 4,
+                        columnWidth: "50%",
+                        // distributed: true
                     }
                 },
-
-                colors: ['#1e90ff'],
-
                 dataLabels: {
-                    enabled: false,
+                    enabled: false
                 },
-
-                grid: {
-                    strokeDashArray: 4,
-                    xaxis: {
-                        lines: {
-                            show: true
-                        }
-                    },
-                    yaxis: {
-                        lines: {
-                            show: false
+                yaxis: {
+                    labels: {
+                        formatter: function(value) {
+                            return value.toLocaleString() + " ៛";
                         }
                     }
                 },
-
                 tooltip: {
                     y: {
-                        formatter: val => val.toLocaleString()
+                        formatter: function(value) {
+                            return value.toLocaleString() + " ៛";
+                        }
                     }
                 }
+                // grid: {
+                //     strokeDashArray: 4
+                // }
             };
 
-            new ApexCharts(
-                document.querySelector("#chapter-bar"),
-                options
-            ).render();
+            new ApexCharts(el, options).render();
         });
+        // 
+    </script>
+    {{-- chapter --}}
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chapter = document.getElementById('chapterLabels');
+            const chapterChoices = new Choices(chapter, {
+                searchEnabled: true,
+                itemSelectText: '',
+                // placeholderValue: 'ជ្រើសរើស',
+                // searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+        chapter.addEventListener('change', () => {
+            document.getElementById('chFilter').submit();
+        });
+    </script> --}}
+    {{-- search Chapter --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const chapterSelect = document.getElementById('chapterLabels');
+            const tableRows = document.querySelectorAll('#tableBody tr');
+
+            new Choices(chapterSelect, {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false,
+                placeholderValue: 'ជ្រើសរើសជំពូក',
+                searchPlaceholderValue: 'ស្វែងរក...'
+            });
+
+            chapterSelect.addEventListener('change', function() {
+
+                const selectedChapter = this.value.trim().toLowerCase();
+
+                tableRows.forEach(row => {
+                    const rowChapter = (row.getAttribute('data-chapter') || '').trim()
+                        .toLowerCase();
+                    const selected = selectedChapter.trim().toLowerCase();
+
+                    if (!selected || selected === 'ជំពូក'.toLowerCase()) {
+                        row.style.display = '';
+                    } else if (rowChapter.includes(selected)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+
+            });
+
+        });
+    </script>
+
+
+
+    <script>
+        // document.addEventListener("DOMContentLoaded", function() {
+
+        //     const options = {
+        //         chart: {
+        //             type: 'bar',
+        //             height: 260,
+        //             toolbar: {
+        //                 show: false,
+        //                 color: '#1e90ff',
+        //             }
+        //         },
+        //         series: [{
+        //             name: 'Fin Law',
+        //             data: @json($finLawData),
+        //             color: '#1e90ff'
+        //         }],
+        //         // xaxis: {
+        //         //     categories: @json($chapterLabels)
+        //         // }
+
+        //         xaxis: {
+        //             categories: @json($finLawData),
+        //             labels: {
+        //                 style: {
+        //                     fontSize: '12px'
+        //                 }
+        //             }
+        //         },
+
+        //         plotOptions: {
+        //             bar: {
+        //                 horizontal: true,
+        //                 barHeight: '65%',
+        //                 borderRadius: 3
+        //             }
+        //         },
+
+        //         colors: ['#1e90ff'],
+
+        //         dataLabels: {
+        //             enabled: false,
+        //         },
+
+        //         grid: {
+        //             strokeDashArray: 4,
+        //             xaxis: {
+        //                 lines: {
+        //                     show: true
+        //                 }
+        //             },
+        //             yaxis: {
+        //                 lines: {
+        //                     show: false
+        //                 }
+        //             }
+        //         },
+
+        //         tooltip: {
+        //             y: {
+        //                 formatter: val => val.toLocaleString()
+        //             }
+        //         }
+        //     };
+
+        //     new ApexCharts(
+        //         document.querySelector("#chapter-bar"),
+        //         options
+        //     ).render();
+        // });
     </script>
