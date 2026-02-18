@@ -128,6 +128,7 @@
                                         <label for="fin_law"
                                             class="form-label font-size-13 text-muted">{{ __('forms.fin.law') }}</label>
                                         <input type="number" min="1" name="fin_law" required
+                                            data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" class="form-control" />
                                     </div>
@@ -138,6 +139,7 @@
                                         <label for="current_loan"
                                             class="form-label font-size-13 text-muted">{{ __('forms.current.loan') }}</label>
                                         <input type="number" min="1" required name="current_loan"
+                                            data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" class="form-control" />
                                     </div>

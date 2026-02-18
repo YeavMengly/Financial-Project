@@ -46,6 +46,14 @@
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.number') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            type="text" class="form-control" name="legalNumber" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
@@ -59,9 +67,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -80,9 +85,6 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('cboSubAccount')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
                                 {{-- Sub Account Number --}}
@@ -93,9 +95,6 @@
                                         <input type="number" min="0" name="no" id="programInput" readonly
                                             placeholder="xxxxxxx" required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('no')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -106,9 +105,6 @@
                                         <input type="number" min="0" name="budget" id="budget" required
                                             class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('budget')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -124,9 +120,6 @@
                                                 <option value="{{ $ts->id }}">{{ $ts->name }}</option>
                                             @endforeach
                                         </select>
-                                        @error('task_type')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -137,9 +130,6 @@
                                         <input type="text" id="datepicker-basic" name="date" class="form-control"
                                             placeholder="{{ __('forms.select_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('date')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -149,9 +139,6 @@
                                         <input type="file" id="fileInput" name="attachments[]" class="form-control"
                                             accept=".pdf,.doc,.docx" multiple />
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
-                                        @error('attachments.*')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -162,9 +149,6 @@
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
                                     <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required
                                         data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                    @error('txtDescription')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap gap-2">

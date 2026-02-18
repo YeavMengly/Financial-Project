@@ -73,30 +73,38 @@ class BudgetMandateDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
-            ->from('budget_mandates')
+        $model = $model->newQuery();
+
+        $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
                 $join->on('budget_mandates.account_sub_id', '=', 'account_subs.no')
                     ->where('account_subs.ministry_id', '=', $id);
-            })
-            ->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id')
-            ->leftJoin('task_types', 'budget_mandates.task_type', '=', 'task_types.id')
-            ->select([
-                'budget_mandates.id',
-                'budget_mandates.ministry_id',
-                'agencies.no AS agency_no',
-                'agencies.name AS agency_name',
-                'account_subs.no as account_sub_no',
-                'budget_mandates.no',
-                'budget_mandates.txtDescription',
-                'budget_mandates.budget',
-                'task_types.name AS t_name',
-                'budget_mandates.attachments',
-                'budget_mandates.date',
-            ])
-            ->where('budget_mandates.ministry_id', $id);
+            });
+        $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
+        $model->leftJoin('task_types', 'budget_mandates.task_type', '=', 'task_types.id');
 
-        return $query;
+        // ===== FIXED CONDITION =====
+        $model->where('budget_mandates.ministry_id', $id);
+
+        // ===== SELECT =====
+        $model->select([
+            'budget_mandates.id',
+            'budget_mandates.ministry_id',
+            'agencies.no AS agency_no',
+            'agencies.name AS agency_name',
+            'account_subs.no as account_sub_no',
+            'budget_mandates.no',
+            'budget_mandates.txtDescription',
+            'budget_mandates.budget',
+            'task_types.name AS t_name',
+            'budget_mandates.attachments',
+            'budget_mandates.date',
+            'budget_mandates.created_at'
+        ]);
+
+        $model->orderByDesc('budget_mandates.created_at');
+
+        return $model;
     }
 
     /**
@@ -105,14 +113,26 @@ class BudgetMandateDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('budgetmandate-table')
-            ->columns($this->getColumns())
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
-            ->orderBy(2, 'ASC');
+            ->ajax([
+                'data' => 'function(d) {
+                d.agency     = $("#agency").val();
+                d.no    = $("#no").val();
+                d.accountSub = $("#accountSub").val();
+                }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#budgetmandate-table").DataTable().ajax.reload();
+                });
+            }')
+            ->setTableId('budgetmandate-table')
+            ->columns($this->getColumns());
     }
 
     /**

@@ -47,6 +47,7 @@ return [
     'th.budget' => 'ថវិកា',
     'th.type' => 'ប្រភេទ',
     'th.date' => 'កាលបរិច្ឆេទ',
+    'th.legal.number' => 'លេខកិច្ចសន្យា',
 
     'th.fin_law' => 'ឥណទានអនុម័ត',
     'th.current_loan' => 'ឥណទានបច្ចុប្បន្ន',

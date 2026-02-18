@@ -5,6 +5,7 @@ namespace App\DataTables;
 use App\Models\BeginCredit\BeginVoucher;
 use App\Models\BeginCredit\InitialBudget;
 use App\Models\BeginCredit\SubAccount;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -33,6 +34,9 @@ class BeginVoucherDataTable extends DataTable
                 $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
+            })
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
             })
@@ -50,6 +54,8 @@ class BeginVoucherDataTable extends DataTable
     {
         $params = $request->params;
         $id = decode_params($params);
+
+        $model = $model->newQuery();
 
         $query = $model->newQuery()
             ->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
@@ -101,7 +107,55 @@ class BeginVoucherDataTable extends DataTable
                 $q->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%")
             );
 
-        return $query->orderBy('begin_vouchers.created_at', 'DESC');
+        $model->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id');
+        $model->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id');
+        $model->leftJoin('clusters', 'begin_vouchers.cluster_id', '=', 'clusters.id');
+
+        // ===== FILTERS =====
+
+        if ($request->agency) {
+            $model->where('begin_vouchers.agency_id', $request->agency);
+        }
+
+        if ($request->chapter) {
+            $model->where('begin_vouchers.chapter_id', $request->chapter);
+        }
+
+        if ($request->account) {
+            $model->where('begin_vouchers.account_id', $request->account);
+        }
+
+        if ($request->accountSub) {
+            $model->where('begin_vouchers.account_sub_id', $request->accountSub);
+        }
+
+        if ($request->txtDescription) {
+            $model->where('begin_vouchers.txtDescription', 'like', '%' . $request->txtDescription . '%');
+        }
+
+        // ===== FIXED CONDITION =====
+        $model->where('begin_vouchers.ministry_id', $id);
+
+        // ===== SELECT =====
+        $model->select([
+            'begin_vouchers.id',
+            'begin_vouchers.agency_id',
+            'begin_vouchers.account_sub_id',
+            'begin_vouchers.account_id',
+            'begin_vouchers.no',
+            'begin_vouchers.txtDescription',
+            'begin_vouchers.fin_law',
+            'begin_vouchers.current_loan',
+            'begin_vouchers.ministry_id',
+            'agencies.name as agency_name',
+            'account_subs.no as account_sub_no',
+            'clusters.decription',
+            'begin_vouchers.created_at',
+        ]);
+
+        $model->orderBy('begin_vouchers.created_at', 'DESC');
+
+        return $model;
     }
 
     /**
@@ -116,6 +170,35 @@ class BeginVoucherDataTable extends DataTable
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
+            ->ajax([
+                'data' => 'function(d) {
+                d.agency     = $("#agency").val();
+                d.chapter    = $("#chapter").val();
+                d.account    = $("#account").val();
+                d.accountSub = $("#accountSub").val();
+                }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#beginvoucher-table").DataTable().ajax.reload();
+                });
+                var tr = document.createElement("tr");
+                var columns = this.api().init().columns;
+                this.api().columns().every(function (index) {
+                    var column = this;
+                    var td = document.createElement("td");
+                    if (columns[index] && columns[index].searchable) {
+                        var input = document.createElement("input");
+                        input.className = "form-control form-control-sm";
+                        $(input).on("change", function () {
+                            column.search($(this).val(), false, false, true).draw();
+                        }).appendTo(td);
+                    }
+                    $(td).appendTo(tr);
+                });
+                $(".table-responsive table thead").append(tr);
+            }')
             ->columns($this->getColumns())
             ->orderBy(2, 'ASC');
     }
@@ -131,10 +214,11 @@ class BeginVoucherDataTable extends DataTable
 
             Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
-            Column::make('program_no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
-            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('fin_law')->title(__('tables.th.financeLaw'))->width(120)->addClass('align-middle'),
             Column::make('current_loan')->title(__('tables.th.currentCredit'))->width(120)->addClass('align-middle'),
+            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

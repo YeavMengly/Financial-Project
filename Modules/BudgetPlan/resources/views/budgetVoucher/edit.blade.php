@@ -32,6 +32,16 @@
                         @csrf
 
                         <div class="row">
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.legal.number') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        type="text" class="form-control" name="legalNumber"
+                                        value="{{ old('legalNumber', $module->legalNumber) }}" tabindex="2" />
+                                </div>
+                            </div>
+
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboAgency" class="form-label font-size-13 text-muted">

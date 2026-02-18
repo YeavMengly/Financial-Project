@@ -33,7 +33,7 @@ return new class extends Migration
             $table->decimal('law_average', 15, 2)->default(0);
             $table->decimal('law_correction', 15, 2)->default(0);
             $table->timestamps();
-            $table->softDeletes();
+            // $table->softDeletes();
         });
     }
 
