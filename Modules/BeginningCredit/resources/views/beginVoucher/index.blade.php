@@ -86,28 +86,15 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="no" value="{{ request('no') }}"
-                                placeholder="{{ __('menus.cluster') }}" />
-                        </div>
-
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="txtDescription"
-                                value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
-
                         <div class="col-sm-3 d-flex align-items-center gap-2">
-
 
                             <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
                                 <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
                             </button>
 
-
                             <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
-
 
                             <a href="{{ route(
                                 'beginVoucher.export',

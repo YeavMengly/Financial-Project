@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('agency_id');
             $table->unsignedBigInteger('program_id');
             $table->unsignedBigInteger('program_sub_id');
+            $table->unsignedBigInteger('cluster_id');
             $table->unsignedBigInteger('chapter_id');
             $table->unsignedBigInteger('account_id');
             $table->unsignedBigInteger('account_sub_id');
@@ -32,7 +33,7 @@ return new class extends Migration
             $table->decimal('law_average', 15, 2)->default(0);
             $table->decimal('law_correction', 15, 2)->default(0);
             $table->timestamps();
-            $table->softDeletes();
+            // $table->softDeletes();
         });
     }
 
