@@ -3,8 +3,8 @@
 namespace App\Models\BudgetPlan;
 
 use App\Models\Content\AccountSub;
+use App\Models\Content\ExpenseType;
 use App\Models\Content\Ministry;
-use App\Models\TaskType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,15 +17,13 @@ class BudgetVoucher extends Model
      */
     protected $fillable = [
         'ministry_id',
-        'legalNumber',
-        'program_id',
-        'program_sub_id',
         'agency_id',
         'account_sub_id',
-        'cluster_id',
-        'txtDescription',
+        'no',
         'budget',
-        'task_type',
+        'expense_type_id',
+        'legalNumber',
+        'txtDescription',
         'attachments',
         'date'
     ];
@@ -41,11 +39,11 @@ class BudgetVoucher extends Model
      */
 
     /**
-     * Get the taskType this budgetVoucher belongs to.
+     * Get the expense_type_id this budgetVoucher belongs to.
      */
-    public function taskType()
+    public function expenseType()
     {
-        return $this->belongsTo(TaskType::class, 'task_type', 'id');
+        return $this->belongsTo(ExpenseType::class, 'expense_type_id', 'id');
     }
 
     /**

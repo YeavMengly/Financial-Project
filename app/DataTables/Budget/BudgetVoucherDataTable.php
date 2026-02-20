@@ -34,8 +34,8 @@ class BudgetVoucherDataTable extends DataTable
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
-            ->editColumn('t_name', function ($row) {
-                return $row->t_name ?? '-';
+            ->editColumn('name_kh', function ($row) {
+                return $row->name_kh ?? '-';
             })
             ->addColumn('action', function ($module) {
                 return view('budgetplan::budgetVoucher.action', ['module' => $module]);
@@ -80,7 +80,7 @@ class BudgetVoucherDataTable extends DataTable
                 ->where('account_subs.ministry_id', '=', $id);
         })->from('budget_vouchers');
         $model->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id');
-        $model->leftJoin('task_types', 'budget_vouchers.task_type', '=', 'task_types.id');
+        $model->leftJoin('expense_types', 'budget_vouchers.expense_type_id', '=', 'expense_types.id');
 
         // ===== FIXED CONDITION =====
         $model->where('budget_vouchers.ministry_id', $id);
@@ -96,7 +96,7 @@ class BudgetVoucherDataTable extends DataTable
             'budget_vouchers.txtDescription',
             'budget_vouchers.budget',
             'budget_vouchers.legalNumber',
-            'task_types.name AS t_name',
+            'expense_types.name_kh',
             'budget_vouchers.attachments',
             'budget_vouchers.date',
             'budget_vouchers.created_at'
@@ -147,7 +147,7 @@ class BudgetVoucherDataTable extends DataTable
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
-            Column::make('t_name')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
+            Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
