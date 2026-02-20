@@ -57,56 +57,6 @@ class BeginVoucherDataTable extends DataTable
 
         $model = $model->newQuery();
 
-        $query = $model->newQuery()
-            ->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id')
-            ->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id')
-            ->leftJoin('clusters', 'begin_vouchers.cluster_id', '=', 'clusters.id')
-            ->select([
-                'begin_vouchers.id',
-                'begin_vouchers.agency_id',
-                'begin_vouchers.account_sub_id',
-                'begin_vouchers.account_id',
-                'begin_vouchers.no as program_no',
-                'begin_vouchers.txtDescription',
-                'begin_vouchers.fin_law',
-                'begin_vouchers.current_loan',
-                'begin_vouchers.ministry_id',
-                'agencies.name as agency_name',
-                'account_subs.no as account_sub_no',
-                'clusters.decription',
-            ])
-            ->where('begin_vouchers.ministry_id', $id)
-            ->when(
-                $request->filled('agency'),
-                fn($q) =>
-                $q->where('begin_vouchers.agency_id', $request->agency)
-            )
-            ->when(
-                $request->filled('chapter'),
-                fn($q) =>
-                $q->where('begin_vouchers.chapter_id', $request->chapter)
-            )
-            ->when(
-                $request->filled('account'),
-                fn($q) =>
-                $q->where('begin_vouchers.account_id', $request->account)
-            )
-            ->when(
-                $request->filled('accountSub'),
-                fn($q) =>
-                $q->where('begin_vouchers.account_sub_id', $request->accountSub)
-            )
-            ->when(
-                $request->filled('clusters'),
-                fn($q) =>
-                $q->where('begin_vouchers.cluster_id', 'like', "%{$request->clusters}%")
-            )
-            ->when(
-                $request->filled('txtDescription'),
-                fn($q) =>
-                $q->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%")
-            );
-
         $model->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id');
         $model->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id');
         $model->leftJoin('clusters', 'begin_vouchers.cluster_id', '=', 'clusters.id');

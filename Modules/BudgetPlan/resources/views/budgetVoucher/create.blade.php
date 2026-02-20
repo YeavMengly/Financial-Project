@@ -122,16 +122,16 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="task_type"
+                                        <label for="cboExpenseType"
                                             class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
-                                        <select class="form-control" name="task_type" id="task_type" required
+                                        <select class="form-control" name="cboExpenseType" id="cboExpenseType" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($taskType as $ts)
-                                                <option value="{{ $ts->id }}">{{ $ts->name }}</option>
+                                            @foreach ($expenseType as $ts)
+                                                <option value="{{ $ts->id }}">{{ $ts->name_kh }}</option>
                                             @endforeach
                                         </select>
-                                        @error('task_type')
+                                        @error('cboExpenseType')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -397,7 +397,7 @@
             }
 
             // Choices — once per element
-            initChoicesOnce(document.getElementById('task_type'), {
+            initChoicesOnce(document.getElementById('cboExpenseType'), {
                 placeholderValue: 'ជ្រើសរើស',
                 searchPlaceholderValue: 'ស្វែងរក...'
             });

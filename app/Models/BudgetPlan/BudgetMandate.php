@@ -3,9 +3,9 @@
 namespace App\Models\BudgetPlan;
 
 use App\Models\Content\AccountSub;
+use App\Models\Content\ExpenseType;
 use App\Models\Content\Ministry;
 use App\Models\Loans\BudgetMandateLoan;
-use App\Models\TaskType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,13 +18,13 @@ class BudgetMandate extends Model
      */
     protected $fillable = [
         'ministry_id',
-        'legalNumber',
         'agency_id',
         'account_sub_id',
         'no',
-        'txtDescription',
         'budget',
-        'task_type',
+        'expense_type_id',
+        'legalNumber',
+        'txtDescription',
         'attachments',
         'date'
     ];
@@ -40,11 +40,11 @@ class BudgetMandate extends Model
      */
 
     /**
-     * Get the taskType this budgetMandate belongs to.
+     * Get the expenseType this budgetMandate belongs to.
      */
-    public function taskType()
+    public function expenseType()
     {
-        return $this->belongsTo(TaskType::class, 'task_type', 'task');
+        return $this->belongsTo(ExpenseType::class, 'expense_type_id', 'id');
     }
 
     /**
