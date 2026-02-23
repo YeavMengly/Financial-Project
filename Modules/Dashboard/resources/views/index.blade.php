@@ -314,7 +314,7 @@
         </div>
 
     </div>
-    {{-- account --}}
+    {{-- chapter ,account --}}
     <div class=" ">
         <div class="card">
             <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
@@ -336,32 +336,28 @@
                         <table class="table table-bordered table-striped table-hover align-middle  ">
                             <thead class=" text-center table-light sticky-header">
                                 <tr>
-                                    <th>{{ __('forms.account') }}</th>
-                                    <th>{{ __('forms.fin.law') }}</th>
-                                    <th>{{ __('menus.fin.law.data') }}</th>
-                                    <th>{{ __('menus.remain') }}</th>
-                                    <th>{{ __('menus.credit') }}</th>
+                                    <th>{{ __('tables.th.account') }}</th>
+                                    <th>{{ __('tables.th.fin_law') }}</th>
+                                    <th>{{ __('tables.th.deadline_balance') }}</th>
+                                    <th>{{ __('tables.th.remaining_credit') }}</th>
+
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
                                 @forelse ($accounts as $acc)
-                                    <tr data-chapter="{{ $acc->chapter_id }}">
+                                    <tr data-chapter="{{ $acc->no }}">
                                         <td class="text-center">{{ $acc->no }}</td>
                                         <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
-                                        <td class="text-end">{{ number_format($acc->finLawData) }} ៛</td>
-                                        <td class="text-end">{{ number_format($acc->remain) }} ៛</td>
+
+                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
                                         <td>
-                                            <div class="dropdown text-center">
+                                            <div class="dropdown text-center Sub-Account-card">
                                                 <a class="text-muted dropdown-toggle font-size-15" role="button"
                                                     data-bs-toggle="dropdown" aria-haspopup="true">
                                                     <i class="mdi mdi-dots-vertical"></i>
                                                 </a>
-                                                {{-- <div class="dropdown-menu dropdown-menu-end">
-                                                        <a class="dropdown-item" href="#">Action</a>
-
-                                                    </div> --}}
                                             </div>
                                         </td>
                                     </tr>
@@ -507,6 +503,164 @@
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm">
                                     {{-- {{ $totalBeginVoucher }} --}}0
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="">
+                                    0 <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-success-subtle text-success">
+                            0
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- Expense type --}}
+    <div class="row">
+        <div class="col-xl-6">
+            <!-- card -->
+            <div class="card card-h-100">
+                <!-- card body -->
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-sm">
+                            <div id="Expense-Type" data-colors='["#faad14","#52c41a","#2200ff","#e81a2c" ,"#fde50c" ]'
+                                class="apex-charts">
+                            </div>
+                        </div>
+                        <div class="col-sm align-self-center">
+                            <div class="mt-4 mt-sm-0">
+                                <div>
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#faad14"></i>
+                                        ធានាចំណាយ
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($expenditure_Guarantee) }} រៀល
+                                        </span>
+                                    </h6>
+                                </div>
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#52c41a"></i>
+                                        បុរេប្រទាន
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($advance_Payment) }}​ ​រៀល
+                                        </span>
+                                    </h6>
+                                </div>
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#2200ff"></i>
+                                        ទូទាត់ត្រង់
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                           {{ number_format($direct_Payment) }} រៀល
+                                        </span>
+                                    </h6>
+                                </div>
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#e81a2c"></i>
+                                        លទ្ធកម្ម
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($procurement) }} រៀល
+                                        </span>
+                                    </h6>
+                                </div>
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#fde50c"></i>
+                                        បើកផ្ដល់មុន
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($pre_Financing) }} រៀល
+                                        </span>
+                                    </h6>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end card -->
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{-- {{ __('tables.th.financeLaw') }} --}}ធានាចំណាយ
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{-- {{ $totalExpenditure_Guarantee }} --}}0
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="">
+                                    0 <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-success-subtle text-success">
+                            0
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{-- {{ __('tables.th.financeLaw') }} --}}ទូទាត់ត្រង់
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{-- {{ $totalDirect_Payment }}  --}}0
                                 </button>
                             </div>
                         </div>
@@ -821,6 +975,25 @@
 
                 <div class="modal-body">
                     <div id="clusterContent" class="text-center text-muted">
+                        កំពុងផ្ទុកទិន្នន័យ...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- Modal Sub-Account --}}
+    <div class="modal fade" id="accountModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{ __('menus.accounts') }} <span id="accountModalTitle"></span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="accountContent" class="text-center text-muted">
                         កំពុងផ្ទុកទិន្នន័យ...
                     </div>
                 </div>
@@ -1314,13 +1487,88 @@
             new ApexCharts(el, options).render();
         });
     </script>
+    {{-- Expense type --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const el = document.querySelector("#Expense-Type");
+            const colors = JSON.parse(el.getAttribute("data-colors"));
+
+            const options = {
+                chart: {
+                    type: "donut",
+                    height: 260
+                },
+
+                series: [
+                    {{ round($percent_expenditure_Guarantee, 2) }},
+                    {{ round($percent_advance_Payment, 2) }},
+                    {{ round($percent_direct_Payment, 2) }},
+                    {{ round($percent_procurement, 2) }},
+                    {{ round($percent_pre_Financing, 2) }},
+                ],
+
+                labels: [
+                    "ធានាចំណាយ",
+                    "បុរេប្រទាន",
+                    "ទូទាត់ត្រង់",
+                    "លទ្ធកម្ម",
+                    "បើកផ្ដល់មុន",
+                ],
+
+                colors: colors,
+
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: "0%" // 👈 makes it look like your image
+                        }
+                    }
+                },
+
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toFixed(1) + "%";
+                    },
+                    style: {
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        colors: ["#fff"]
+                    },
+                    dropShadow: {
+                        enabled: false
+                    }
+                },
+
+                stroke: {
+                    width: 0
+                },
+
+                legend: {
+                    position: "bottom",
+                    show: true // 👈 image has no legend under donut
+                },
+
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return val.toFixed(2) + "%";
+                        }
+                    }
+                }
+            };
+
+            new ApexCharts(el, options).render();
+        });
+    </script>
     {{-- barchart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
             const el = document.querySelector("#bar_chart");
             const colors = JSON.parse(el.getAttribute("data-colors"));
-            const label = @json($chapterLabels);
+            const label = @json($chapterLabels).map(item => 'ជំពូក' + item);;
             const finLawData = @json($finLawData);
             // console.log('finLawData:', finLawData);
             const options = {
@@ -1372,22 +1620,6 @@
         });
         // 
     </script>
-    {{-- chapter --}}
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const chapter = document.getElementById('chapterLabels');
-            const chapterChoices = new Choices(chapter, {
-                searchEnabled: true,
-                itemSelectText: '',
-                // placeholderValue: 'ជ្រើសរើស',
-                // searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-        chapter.addEventListener('change', () => {
-            document.getElementById('chFilter').submit();
-        });
-    </script> --}}
     {{-- search Chapter --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1414,7 +1646,7 @@
 
                     if (!selected || selected === 'ជំពូក'.toLowerCase()) {
                         row.style.display = '';
-                    } else if (rowChapter.includes(selected)) {
+                    } else if (rowChapter.includes(selectedChapter)) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
@@ -1423,11 +1655,88 @@
 
 
             });
-
         });
     </script>
+    {{-- Modal Sub-Account --}}
+    <script>
+        document.addEventListener('click', function(e) {
+            const card = e.target.closest('.Sub-Account-card');
+            if (!card) return;
 
+            const accountSubId = card.dataset.id;
+            const subNo = card.dataset.id;
 
+            document.getElementById('accountModalTitle').innerText = subNo;
+            document.getElementById('accountContent').innerHTML =
+                '<p class="text-center">កំពុងផ្ទុកទិន្នន័យ...</p>';
+
+            const modal = new bootstrap.Modal(document.getElementById('accountModal'));
+            modal.show();
+
+            fetch(`/dashboard/account-sub/${accountSubId}/accountSub`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('accountContent').innerHTML =
+                            '<p class="text-center">មិនមានអនុគណនី (Sub Account)</p>';
+                        return;
+                    }
+
+                    let html = '<div class="row g-2">';
+                    data.forEach(accountSubTotals => {
+                        html += `
+                        <div class="col-md-4">
+                              <div class="card shadow-sm account-card"
+                              <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll">
+                        <table class="table table-bordered table-striped table-hover align-middle  ">
+                            <thead class=" text-center table-light sticky-header">
+                                <tr>
+                                    <th>dfdgdgd </th>
+                                    <th> </th>
+                                    <th> </th>
+                                    <th> </th>
+                                    <th> </th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">   
+                                    <tr  data-account-id=" ">
+                                        <td class="text-center"> </td>
+                                        <td class="text-end"></td>
+                                        <td class="text-end"></td>
+                                        <td class="text-end"></td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+                              </div>
+                        </div>
+                    `;
+                    });
+                    html += '</div>';
+
+                    document.getElementById('accountContent').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('accountContent').innerHTML =
+                        '<p class="text-danger text-center">បរាជ័យក្នុងការផ្ទុកទិន្នន័យ</p>';
+                });
+        });
+
+        document.addEventListener('click', e => {
+            const cluster = e.target.closest('.account-card');
+            if (!cluster) return;
+
+            const clusterId = cluster.dataset.clusterId;
+            console.log('Load vouchers for cluster:', clusterId);
+
+            // fetch(`/dashboard/cluster/${clusterId}/vouchers`)
+        });
+    </script>
 
     <script>
         // document.addEventListener("DOMContentLoaded", function() {
