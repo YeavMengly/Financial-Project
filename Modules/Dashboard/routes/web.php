@@ -23,7 +23,7 @@ Route::prefix('dashboard')->middleware(['auth'])->group(function () {
         // ✅ AJAX: get program subs for popup
         Route::get("/program/{program}/subs", "getProgramSubs")
             ->name("dashboard.program.subs");
-        Route::get("/account/{account}/subs", "getAccountSub")
+        Route::get("/account/{account}/subs", "getAccountSubs")
             ->name("dashboard.account.subs");
     });
 });
@@ -34,8 +34,8 @@ Route::get(
     '/dashboard/program-sub/{programSub}/clusters',
     [DashboardController::class, 'getClusters']
 );
-Route::get('/account-sub/{account}', [DashboardController::class, 'getAccountSub']);
+Route::get('/account-sub/{account}', [DashboardController::class, 'getAccountSubs']);
 Route::get(
     '/dashboard/account-sub/{accountSub}/accountSub',
-    [DashboardController::class, 'getAccountSub']
+    [DashboardController::class, 'getAccountSubs']
 );
