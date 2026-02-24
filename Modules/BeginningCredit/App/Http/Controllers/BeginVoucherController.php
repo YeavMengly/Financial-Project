@@ -45,7 +45,7 @@ class BeginVoucherController extends Controller
             ->get();
         $account = Account::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-        $program = Program::where('ministry_id', $ministry->id)->get();
+
         return $dataTable->render('beginningcredit::beginVoucher.index', [
             'ministry'   => $ministry,
             'params' => $params,
@@ -53,7 +53,6 @@ class BeginVoucherController extends Controller
             'account' => $account,
             'agency' => $agency,
             'accountSub' => $accountSub,
-            'program' => $program,
         ]);
     }
 

@@ -85,18 +85,7 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" id="cluster_id" name="clusters" value="{{ request('cluster_id') }}"
-                                placeholder="{{ __('menus.cluster') }}" />
-                        </div>
-
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="txtDescription"
-                                value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
-
                         <div class="col-sm-3 d-flex align-items-center gap-2">
-
                             <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
                                 <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
                             </button>
@@ -112,7 +101,6 @@
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
-
                         </div>
                     </form>
                 </div>
@@ -190,7 +178,7 @@
             const agencyChoices = new Choices(agency, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសអង្គភាព',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
@@ -201,19 +189,18 @@
             const chapterChoices = new Choices(chapter, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសជំពូក',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
         });
-
 
         document.addEventListener('DOMContentLoaded', function() {
             const account = document.getElementById('account');
             const accountChoices = new Choices(account, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសគណនី',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
@@ -224,18 +211,7 @@
             const accountSubChoices = new Choices(accountSub, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const program = document.getElementById('program');
-            const programChoices = new Choices(program, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
@@ -243,21 +219,6 @@
 
         document.getElementById('btnReset').addEventListener('click', function() {
             document.getElementById('filter').reset();
-        });
-
-        $('#cboCategory').change(function() {
-            var cateId = $(this).val();
-            $.ajax({
-                url: '{!! route('document.by.category_id') !!}',
-                type: 'get',
-                global: false,
-                data: {
-                    cate_id: cateId
-                },
-                success: function(data) {
-                    $('#cboCategorySub').html(data);
-                }
-            });
         });
     </script>
 @endsection

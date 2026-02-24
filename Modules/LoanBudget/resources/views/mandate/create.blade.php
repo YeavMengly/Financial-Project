@@ -39,47 +39,25 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('mandate.store', encode_params($params)) }}"
+                        <form id="pristine-valid-example" action="{{ route('mandate.store',$params) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
 
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubAccountNumber" class="form-label font-size-13 text-muted">
+                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
                                         <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            {{-- @foreach ($beginMandate as $bc)
-                                                <option value="{{ $bc->agencyNumber }}"
-                                                    data-program="{{ $bc->agencyNumber }}">
-                                                    {{ $bc->agencyNumber }} -
-                                                    {{ optional($bc->agency)->agencyTitle ?? 'មិនមានទិន្ន័យ' }}
+                                            @foreach ($agency as $item)
+                                                <option value="{{ $item->id }}">
+                                                    {{ $item->no }} -
+                                                    {{ $item->name ?? 'មិនមានទិន្ន័យ' }}
                                                 </option>
-                                            @endforeach --}}
-
-                                        </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboSubDepart" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.sub.depart') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboSubDepart" name="cboSubDepart"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            {{-- @foreach ($beginMandate as $bc)
-                                                <option value="{{ $bc->subDepart }}" data-program="{{ $bc->subDepart }}">
-                                                    {{ $bc->subDepart }}
-                                                </option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
                                         @error('cboAgency')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -90,20 +68,20 @@
                                 {{-- Sub Account Number --}}
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubAccountNumber" class="form-label text-muted">
+                                        <label for="cboSubAccount" class="form-label text-muted">
                                             {{ __('forms.sub.account') }}
                                         </label>
-                                        <select class="form-control" id="cboSubAccountNumber" name="subAccountNumber"
+                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount"
                                             required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            {{-- @foreach ($beginMandate as $bc)
-                                                <option value="{{ $bc->subAccountNumber }}"
-                                                    data-program="{{ $bc->program }}">
-                                                    {{ $bc->subAccount->subAccountNumber }} | {{ $bc->program }}
+                                            @foreach ($accountSub as $as)
+                                                <option value="{{ $as->no }}">
+                                                    {{ $as->no }} -
+                                                    {{ $as->name }}
                                                 </option>
-                                            @endforeach --}}
+                                            @endforeach
                                         </select>
-                                        @error('subAccountNumber')
+                                        @error('cboSubAccount')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -113,10 +91,10 @@
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="programInput">{{ __('forms.program.code') }}</label>
-                                        <input type="number" min="0" name="program" id="programInput" readonly
-                                            required class="form-control"
+                                        <input type="number" min="0" name="no" placeholder="xxxxxxx" required
+                                            class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('program')
+                                        @error('no')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -203,6 +181,9 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                                <a class="btn btn-dark"
+                                    href="{{ route('mandate.index', $params) }}">{{ __('buttons.back') }}</a>
+
                             </div>
                         </form>
 
@@ -259,7 +240,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const subAccountSelect = document.getElementById('cboSubAccountNumber');
+            const subAccountSelect = document.getElementById('cboSubAccount');
             const programInput = document.getElementById('programInput');
             const budgetInput = document.getElementById('budget');
             const programHidden = document.getElementById('programHiddenInput');
