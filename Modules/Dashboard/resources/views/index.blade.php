@@ -353,7 +353,7 @@
                                         <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
                                         <td>
-                                            <div class="dropdown text-center Sub-Account-card">
+                                            <div class="dropdown text-center account-card">
                                                 <a class="text-muted dropdown-toggle font-size-15" role="button"
                                                     data-bs-toggle="dropdown" aria-haspopup="true">
                                                     <i class="mdi mdi-dots-vertical"></i>
@@ -556,7 +556,7 @@
                                         </span>
                                     </h6>
                                 </div>
-                                <div class="mt-4 pt-2">
+                                {{-- <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#52c41a"></i>
@@ -567,7 +567,7 @@
                                             {{ number_format($advance_Payment) }}​ ​រៀល
                                         </span>
                                     </h6>
-                                </div>
+                                </div> --}}
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
@@ -580,7 +580,7 @@
                                         </span>
                                     </h6>
                                 </div>
-                                <div class="mt-4 pt-2">
+                                {{-- <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#e81a2c"></i>
@@ -603,7 +603,7 @@
                                             {{ number_format($pre_Financing) }} រៀល
                                         </span>
                                     </h6>
-                                </div>
+                                </div> --}}
 
 
                             </div>
@@ -982,20 +982,16 @@
         </div>
     </div>
     {{-- Modal Sub-Account --}}
-    <div class="modal fade" id="accountModal" tabindex="-1">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+     <div class="modal fade" id="accountSubModal" tabindex="-1" aria-labelledby="accountSubModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
-                        {{ __('menus.accounts') }} <span id="accountModalTitle"></span>
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="accountSubModalLabel">Account Sub List</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <div class="modal-body">
-                    <div id="accountContent" class="text-center text-muted">
-                        កំពុងផ្ទុកទិន្នន័យ...
-                    </div>
+                <div class="modal-body" id="accountSubContent">
+                    Loading...
                 </div>
             </div>
         </div>
@@ -1257,7 +1253,7 @@
                                 html += `
                            <div class="col-md-4 mb-2">
                                 <div class="card shadow-sm program-sub-card"
-                                    data-sub-id="${sub.id}"
+                                    data-sub-id="${sub.account_ido}"
                                     data-sub-no="${sub.no}"
                                     style="cursor:pointer">
                                     <div class="card-body">
@@ -1502,10 +1498,9 @@
 
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
-                    {{ round($percent_advance_Payment, 2) }},
+                   
                     {{ round($percent_direct_Payment, 2) }},
-                    {{ round($percent_procurement, 2) }},
-                    {{ round($percent_pre_Financing, 2) }},
+                    
                 ],
 
                 labels: [
@@ -1659,82 +1654,82 @@
     </script>
     {{-- Modal Sub-Account --}}
     <script>
-        document.addEventListener('click', function(e) {
-            const card = e.target.closest('.Sub-Account-card');
-            if (!card) return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.account-card');
 
-            const accountSubId = card.dataset.id;
-            const subNo = card.dataset.id;
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const accountId = this.dataset.accountId;
+                    const accountTitle = this.dataset.accountTitle;
 
-            document.getElementById('accountModalTitle').innerText = subNo;
-            document.getElementById('accountContent').innerHTML =
-                '<p class="text-center">កំពុងផ្ទុកទិន្នន័យ...</p>';
+                    // Set modal title
+                    document.getElementById('accountSubModalLabel').innerText = accountTitle;
 
-            const modal = new bootstrap.Modal(document.getElementById('accountModal'));
-            modal.show();
+                    // Show modal immediately with loading spinner
+                    const modalElement = document.getElementById('accountSubModal');
+                    document.getElementById('accountSubContent').innerHTML = `
+                        <div class="d-flex justify-content-center align-items-center" style="height:150px;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    `;
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
 
-            fetch(`/dashboard/account-sub/${accountSubId}/accountSub`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.length === 0) {
-                        document.getElementById('accountContent').innerHTML =
-                            '<p class="text-center">មិនមានអនុគណនី (Sub Account)</p>';
-                        return;
-                    }
+                    // Fetch programSubs via AJAX
+                    fetch(`/dashboard//account/${accountId}/subs`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.length === 0) {
+                                document.getElementById('accountSubContent').innerHTML =
+                                    '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
+                                return;
+                            }
 
-                    let html = '<div class="row g-2">';
-                    data.forEach(accountSubTotals => {
-                        html += `
-                        <div class="col-md-4">
-                              <div class="card shadow-sm account-card"
-                              <div class=" " data-simplebar style="max-height: 380px;">
-                    <div class="table-responsive table-scroll">
+                            // Build HTML grid
+                            let html = '<div class="row g-2">';
+                            data.forEach(sub => {
+                                html += `
+                           <div class="card-body">
+                <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll"  
+                    data-sub-id="${sub.id}"
+                    data-sub-no="${sub.no}">
                         <table class="table table-bordered table-striped table-hover align-middle  ">
                             <thead class=" text-center table-light sticky-header">
                                 <tr>
-                                    <th>dfdgdgd </th>
-                                    <th> </th>
+                                    <th>អនុគណនី</th>
                                     <th> </th>
                                     <th> </th>
                                     <th> </th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody">   
-                                    <tr  data-account-id=" ">
-                                        <td class="text-center"> </td>
-                                        <td class="text-end"></td>
-                                        <td class="text-end"></td>
-                                        <td class="text-end"></td>
-                                    </tr>
+                            <tbody>
+                                <tr>
+                                    <td class="text-center">${sub.no}</td>
+                                    <td class="text-end"> </td>
+                                    <td class="text-end"> </td>
+                                    <td class="text-end"> </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <!-- end card body -->
-        </div>
-                              </div>
-                        </div>
-                    `;
-                    });
-                    html += '</div>';
+                        `;
+                            });
+                            html += '</div>';
 
-                    document.getElementById('accountContent').innerHTML = html;
-                })
-                .catch(() => {
-                    document.getElementById('accountContent').innerHTML =
-                        '<p class="text-danger text-center">បរាជ័យក្នុងការផ្ទុកទិន្នន័យ</p>';
+                            document.getElementById('accountSubContent').innerHTML = html;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            document.getElementById('accountSubContent').innerHTML =
+                                '<p class="text-danger text-center">មិនមានទិន្នន័យដែលអាចបង្ហាញបាន។</p>';
+                        });
                 });
-        });
-
-        document.addEventListener('click', e => {
-            const cluster = e.target.closest('.account-card');
-            if (!cluster) return;
-
-            const clusterId = cluster.dataset.clusterId;
-            console.log('Load vouchers for cluster:', clusterId);
-
-            // fetch(`/dashboard/cluster/${clusterId}/vouchers`)
+            });
         });
     </script>
 
