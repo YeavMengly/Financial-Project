@@ -7,12 +7,15 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @if (hasPermission('mandate.edit'))
-                    <a href="{{ route('mandate.edit', encode_params($module->id)) }}" class="dropdown-item"><i
-                            class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
+                    <a href="{{ route('mandate.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
                 @if (hasPermission('mandate.destroy'))
-                    <a href="#" onclick="confirm('{{ route('mandate.destroy', encode_params($module->id)) }}', 1)"
-                        class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
+                    <a href="#"
+                        onclick="confirm('{{ route('mandate.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
+                        class="dropdown-item">
+                        <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
+                    </a>
                 @endif
             @endif
         </ul>

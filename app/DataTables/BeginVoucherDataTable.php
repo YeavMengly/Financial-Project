@@ -79,10 +79,6 @@ class BeginVoucherDataTable extends DataTable
             $model->where('begin_vouchers.account_sub_id', $request->accountSub);
         }
 
-        if ($request->txtDescription) {
-            $model->where('begin_vouchers.txtDescription', 'like', '%' . $request->txtDescription . '%');
-        }
-
         // ===== FIXED CONDITION =====
         $model->where('begin_vouchers.ministry_id', $id);
 

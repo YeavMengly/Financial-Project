@@ -2,8 +2,8 @@
 
 namespace App\Models\Loans;
 
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginCredit;
 use App\Models\BeginCredit\BeginVoucher;
 use App\Models\BudgetPlan\BudgetVoucher;
