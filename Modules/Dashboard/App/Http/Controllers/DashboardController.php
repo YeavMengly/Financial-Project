@@ -257,17 +257,17 @@ class DashboardController extends Controller
             ->select('budget_mandates.*')
             ->where('ministries.year', $year)
             ->get();
-        $expenditure_Guarantee = $budgetVouchers->where('task_type', '1')->pluck('budget');
-        $advance_Payment = $budgetVouchers->where('task_type', '2')->pluck('budget');
-        $direct_Payment = $budgetMandate->where('task_type', '3')->pluck('budget');
-        $procurement = $budgetVouchers->where('task_type', '4')->pluck('budget');
-        $pre_Financing = $budgetVouchers->where('task_type', '5')->pluck('budget');
-        //$taskType = $budgetVouchers->where('task_type', '2')->pluck('budget')->toArray();
-        $expenditure_Guarantee = round($budgetVouchers->where('task_type', '1')->sum('budget'), 2);
-        $advance_Payment = round($budgetVouchers->where('task_type', '2')->sum('budget'), 2);
-        $direct_Payment = round($budgetMandate->where('task_type', '3')->sum('budget'), 2);
-        $procurement = round($budgetVouchers->where('task_type', '4')->sum('budget'), 2);
-        $pre_Financing = round($budgetVouchers->where('task_type', '5')->sum('budget'), 2);
+        $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
+        // $advance_Payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
+        $direct_Payment = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
+        // $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
+        // $pre_Financing = $budgetVouchers->where('expense_type_id', '5')->pluck('budget');
+        //$taskType = $budgetVouchers->where('expense_type_id', '2')->pluck('budget')->toArray();
+        $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
+        // $advance_Payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
+        $direct_Payment = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
+        // $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
+        // $pre_Financing = round($budgetVouchers->where('expense_type_id', '5')->sum('budget'), 2);
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
@@ -276,10 +276,10 @@ class DashboardController extends Controller
 
         $total_fin_law       = $budgetReport->sum('fin_law');
         $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
-        $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
+       // $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
-        $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
-        $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
+       // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+       // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
 
         $totalExpenditure_Guarantee   = $budgetVouchers->count('task_type', '1');
         $totalDirect_Payment   = $budgetMandate->count();
@@ -340,15 +340,15 @@ class DashboardController extends Controller
             'finLawData' => $finLawData,
             'accounts' => $accounts,
             'expenditure_Guarantee' => $expenditure_Guarantee,
-            'advance_Payment' => $advance_Payment,
+            //'advance_Payment' => $advance_Payment,
             'direct_Payment' => $direct_Payment,
-            'procurement' => $procurement,
-            'pre_Financing' => $pre_Financing,
+           // 'procurement' => $procurement,
+           // 'pre_Financing' => $pre_Financing,
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
-            'percent_advance_Payment' => $percent_advance_Payment,
+           // 'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
-            'percent_procurement' => $percent_procurement,
-            'percent_pre_Financing' => $percent_pre_Financing,
+           // 'percent_procurement' => $percent_procurement,
+           // 'percent_pre_Financing' => $percent_pre_Financing,
             'totalExpenditure_Guarantee' => $totalExpenditure_Guarantee,
             'totalDirect_Payment' => $totalDirect_Payment
             // 'taskType' => $taskType,
@@ -472,4 +472,45 @@ class DashboardController extends Controller
         return response()->json($clusters);
     }
      
+    public function getAccountSub($accountId)
+    {
+        // 1️⃣ Get program subs
+        $accountSubs = AccountSub::where('account_id', $accountId)
+            ->select('id', 'no', 'decription')
+            ->get();
+
+        // 2️⃣ Get totals grouped by program_sub_id
+        $accountSubTotals = DB::table('begin_vouchers')
+            ->where('account_id', $accountId) // 🔥 IMPORTANT
+            ->groupBy('account_sub_id')
+            ->selectRaw('
+            account_sub_id,
+            SUM(fin_law) AS fin_law,
+            SUM(apply) AS apply,
+            SUM(deadline_balance) AS remain,
+            SUM(credit) AS credit,
+            COUNT(*) AS total_records
+        ')
+            ->get()
+            ->keyBy('account_sub_id');
+
+        // 3️⃣ Merge totals into program subs
+        $accountSubs = $accountSubs->map(function ($sub) use ($accountSubTotals) {
+            $total = $accountSubTotals->get($sub->id);
+
+            $sub->fin_law       = $total->fin_law ?? 0;
+            $sub->apply         = $total->apply ?? 0;
+            $sub->remain        = $total->remain ?? 0;
+            $sub->credit        = $total->credit ?? 0;
+            $sub->total_records = $total->total_records ?? 0;
+            $sub->percent       = $sub->fin_law > 0
+                ? ($sub->apply / $sub->fin_law) * 100
+                : 0;
+
+            return $sub;
+        });
+
+        return response()->json($accountSubs);
+    }
+
 }
