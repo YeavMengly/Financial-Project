@@ -4,6 +4,7 @@ namespace Modules\Dashboard\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Content\Account;
+use App\Models\Content\AccountSub;
 use App\Models\Content\Chapter;
 use App\Models\Content\Cluster;
 use App\Models\Content\ProgramSub;
@@ -200,7 +201,7 @@ class DashboardController extends Controller
             return $chapter;
         });
 
-        $chapterLabels = $chapters->pluck('no')->map(fn($n) => "ជំពូក $n");
+        $chapterLabels = $chapters->pluck('no')->map(fn($n) => " $n");
         // dd($chapterLabels);
         $finLawData    = $chapters->pluck('fin_law');
 
@@ -218,9 +219,8 @@ class DashboardController extends Controller
             ->selectRaw('
         begin_vouchers.account_id,
         SUM(begin_vouchers.fin_law) AS fin_law,
-        SUM(begin_vouchers.apply) AS apply,
-        SUM(begin_vouchers.deadline_balance) AS remain,
-        SUM(begin_vouchers.credit) AS credit,
+        SUM(begin_vouchers.deadline_balance) as deadline_balance,
+        SUM(begin_vouchers.credit) as credit,
         COUNT(*) AS total_records
     ')
             ->get()
@@ -231,21 +231,59 @@ class DashboardController extends Controller
 
 
             $account->fin_law       = $total->fin_law ?? 0;
-            $account->apply         = $total->apply ?? 0;
-            $account->remain        = $total->remain ?? 0;
+
+            $account->deadline_balance        = $total->deadline_balance ?? 0;
             $account->credit        = $total->credit ?? 0;
-            $account->total_records = $total->total_records ?? 0;
+
 
             // example percentage
-            $account->percent_apply = $account->fin_law > 0
-                ? round(($account->apply / $account->fin_law) * 100, 2)
-                : 0;
+            // $account->percent_apply = $account->fin_law > 0
+            //     ? round(($account->apply / $account->fin_law) * 100, 2)
+            //     : 0;
 
             return $account;
         });
 
-      //   $finLawData    = $acc->pluck('fin_law');
-//   dd($accounts);
+        // expense Type donut chart
+        //exp_guarantee
+        $budgetVouchers = DB::table('budget_vouchers')
+            ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
+            ->select('budget_vouchers.*')
+            ->where('ministries.year', $year)
+            ->get();
+        //exp_directPayment
+        $budgetMandate = DB::table('budget_mandates')
+            ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
+            ->select('budget_mandates.*')
+            ->where('ministries.year', $year)
+            ->get();
+        $expenditure_Guarantee = $budgetVouchers->where('task_type', '1')->pluck('budget');
+        $advance_Payment = $budgetVouchers->where('task_type', '2')->pluck('budget');
+        $direct_Payment = $budgetMandate->where('task_type', '3')->pluck('budget');
+        $procurement = $budgetVouchers->where('task_type', '4')->pluck('budget');
+        $pre_Financing = $budgetVouchers->where('task_type', '5')->pluck('budget');
+        //$taskType = $budgetVouchers->where('task_type', '2')->pluck('budget')->toArray();
+        $expenditure_Guarantee = round($budgetVouchers->where('task_type', '1')->sum('budget'), 2);
+        $advance_Payment = round($budgetVouchers->where('task_type', '2')->sum('budget'), 2);
+        $direct_Payment = round($budgetMandate->where('task_type', '3')->sum('budget'), 2);
+        $procurement = round($budgetVouchers->where('task_type', '4')->sum('budget'), 2);
+        $pre_Financing = round($budgetVouchers->where('task_type', '5')->sum('budget'), 2);
+        $budgetReport = DB::table('begin_vouchers')
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->select('begin_vouchers.*')
+            ->where('ministries.year', $year)
+            ->get();
+
+        $total_fin_law       = $budgetReport->sum('fin_law');
+        $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
+        $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
+        $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
+        $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+        $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
+
+        $totalExpenditure_Guarantee   = $budgetVouchers->count('task_type', '1');
+        $totalDirect_Payment   = $budgetMandate->count();
+        // dd($budgetMandate);
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
@@ -300,7 +338,20 @@ class DashboardController extends Controller
             'chapters' => $chapters,
             'chapterLabels' => $chapterLabels,
             'finLawData' => $finLawData,
-            'accounts' => $accounts
+            'accounts' => $accounts,
+            'expenditure_Guarantee' => $expenditure_Guarantee,
+            'advance_Payment' => $advance_Payment,
+            'direct_Payment' => $direct_Payment,
+            'procurement' => $procurement,
+            'pre_Financing' => $pre_Financing,
+            'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
+            'percent_advance_Payment' => $percent_advance_Payment,
+            'percent_direct_Payment' => $percent_direct_Payment,
+            'percent_procurement' => $percent_procurement,
+            'percent_pre_Financing' => $percent_pre_Financing,
+            'totalExpenditure_Guarantee' => $totalExpenditure_Guarantee,
+            'totalDirect_Payment' => $totalDirect_Payment
+            // 'taskType' => $taskType,
         ]);
     }
 
@@ -420,4 +471,5 @@ class DashboardController extends Controller
 
         return response()->json($clusters);
     }
+     
 }
