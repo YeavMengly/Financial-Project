@@ -7,6 +7,7 @@ use App\Models\Content\Account;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Chapter;
 use App\Models\Content\Cluster;
+use App\Models\Content\ExpenseType;
 use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -245,13 +246,13 @@ class DashboardController extends Controller
         });
 
         // expense Type donut chart
-        //exp_guarantee
+        //exp_directPayment
         $budgetVouchers = DB::table('budget_vouchers')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
-        //exp_directPayment
+       //exp_guarantee
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->select('budget_mandates.*')
@@ -280,10 +281,10 @@ class DashboardController extends Controller
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
        // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
        // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-
-        $totalExpenditure_Guarantee   = $budgetVouchers->count('task_type', '1');
-        $totalDirect_Payment   = $budgetMandate->count();
-        // dd($budgetMandate);
+        $expenseType = ExpenseType::all();
+            
+       
+      // dd($taskType);
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
@@ -349,9 +350,8 @@ class DashboardController extends Controller
             'percent_direct_Payment' => $percent_direct_Payment,
            // 'percent_procurement' => $percent_procurement,
            // 'percent_pre_Financing' => $percent_pre_Financing,
-            'totalExpenditure_Guarantee' => $totalExpenditure_Guarantee,
-            'totalDirect_Payment' => $totalDirect_Payment
             // 'taskType' => $taskType,
+            'expenseType' => $expenseType,
         ]);
     }
 
@@ -472,11 +472,11 @@ class DashboardController extends Controller
         return response()->json($clusters);
     }
      
-    public function getAccountSub($accountId)
+    public function getAccountSubs($accountId)
     {
         // 1️⃣ Get program subs
         $accountSubs = AccountSub::where('account_id', $accountId)
-            ->select('id', 'no', 'decription')
+            ->select('id', 'no', 'name')
             ->get();
 
         // 2️⃣ Get totals grouped by program_sub_id
@@ -495,19 +495,19 @@ class DashboardController extends Controller
             ->keyBy('account_sub_id');
 
         // 3️⃣ Merge totals into program subs
-        $accountSubs = $accountSubs->map(function ($sub) use ($accountSubTotals) {
-            $total = $accountSubTotals->get($sub->id);
+        $accountSubs = $accountSubs->map(function ($subs) use ($accountSubTotals) {
+            $total = $accountSubTotals->get($subs->id);
 
-            $sub->fin_law       = $total->fin_law ?? 0;
-            $sub->apply         = $total->apply ?? 0;
-            $sub->remain        = $total->remain ?? 0;
-            $sub->credit        = $total->credit ?? 0;
-            $sub->total_records = $total->total_records ?? 0;
-            $sub->percent       = $sub->fin_law > 0
-                ? ($sub->apply / $sub->fin_law) * 100
-                : 0;
+            $subs->fin_law       = $total->fin_law ?? 0;
+            $subs->apply         = $total->apply ?? 0;
+            $subs->remain        = $total->remain ?? 0;
+            $subs->credit        = $total->credit ?? 0;
+            // $subs->total_records = $total->total_records ?? 0;
+            // $subs->percent       = $subs->fin_law > 0
+            //     ? ($subs->apply / $subs->fin_law) * 100
+            //     : 0;
 
-            return $sub;
+            return $subs;
         });
 
         return response()->json($accountSubs);
