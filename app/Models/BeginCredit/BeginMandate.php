@@ -13,7 +13,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class BeginMandate extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'ministry_id',
@@ -23,6 +23,7 @@ class BeginMandate extends Model
         'chapter_id',
         'account_id',
         'account_sub_id',
+        'cluster_id',
         'no',
         'txtDescription',
         'fin_law',

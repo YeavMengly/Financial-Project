@@ -2,8 +2,8 @@
 
 namespace App\Models\Loans;
 
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginMandate;
 use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +19,9 @@ class BudgetMandateLoan extends Model
     protected $fillable = [
         'ministry_id',
         'agency_id',
+        'program_id',
+        'program_sub_id',
+        'cluster_id',
         'account_sub_id',
         'no',
         'internal_increase',

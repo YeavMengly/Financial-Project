@@ -7,9 +7,7 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
@@ -38,18 +36,6 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- <div class="col-sm-3">
-                            <label class="visually-hidden" for="agencyNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="agencyNumber" id="agencyNumber">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($agency as $ts)
-                                    <option value="{{ $ts->agencyNumber }}"
-                                        {{ request('agencyNumber') == $ts->agencyNumber ? 'selected' : '' }}>
-                                        {{ $ts->agencyNumber }} - {{ $ts->agencyTitle }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div> --}}
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
@@ -66,47 +52,23 @@
                             </select>
                         </div>
 
-                        <!-- Program -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="program">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="program" id="program">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($budgetVoucher as $ts)
-                                    <option value="{{ $ts->program }}"
-                                        {{ request('program') == $ts->no ? 'selected' : '' }}>
-                                        {{ $ts->no }}
-                                    </option>
-                                @endforeach --}}
-                            </select>
-                        </div>
-
                         <!-- Task Type -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="task_type">{{ __('menus.task') }}</label>
-                            <select class="form-control" name="task_type" id="task_type">
+                            <label class="visually-hidden" for="cboExpenseType">{{ __('menus.task') }}</label>
+                            <select class="form-control" name="cboExpenseType" id="cboExpenseType">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($budgetVoucher as $ts)
-                                    <option value="{{ $ts->task_type }}"
-                                        {{ request('task_type') == $ts->task_type ? 'selected' : '' }}>
-                                        {{ $ts->task_type }}
+                                @foreach ($expenseType as $ts)
+                                    <option value="{{ $ts->id }}"
+                                        {{ request('cboExpenseType') == $ts->name_kh ? 'selected' : '' }}>
+                                        {{ $ts->name_kh }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <!-- Description -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="description">{{ __('menus.description') }}</label>
-                            <input type="text" class="form-control" name="description"
-                                value="{{ request('description') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
-
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
-                            {{-- <input type="date" class="form-control" name="start_date"
-                                value="{{ request('start_date') }}" /> --}}
-
                             <input type="text" id="start_date" name="date" class="form-control"
                                 placeholder="{{ __('forms.select_date') }}" name="start_date"
                                 value="{{ request('start_date') }}"
@@ -253,7 +215,7 @@
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
@@ -271,11 +233,11 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('task_type');
+            const taskTypeSelect = document.getElementById('cboExpenseType');
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });

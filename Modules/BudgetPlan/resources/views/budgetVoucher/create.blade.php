@@ -46,6 +46,14 @@
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.number') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            type="text" class="form-control" name="legalNumber" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
@@ -70,8 +78,8 @@
                                         <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.sub.account') }}
                                         </label>
-
-                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
+                                        <select class="form-control" data-trigger id="cboSubAccount" name="cboSubAccount"
+                                            required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($beginVoucher as $bv)
                                                 <option value="{{ $bv->account_sub_id }}"
@@ -114,16 +122,16 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="task_type"
+                                        <label for="cboExpenseType"
                                             class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
-                                        <select class="form-control" name="task_type" id="task_type" required
+                                        <select class="form-control" name="cboExpenseType" id="cboExpenseType" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($taskType as $ts)
-                                                <option value="{{ $ts->id }}">{{ $ts->name }}</option>
+                                            @foreach ($expenseType as $ts)
+                                                <option value="{{ $ts->id }}">{{ $ts->name_kh }}</option>
                                             @endforeach
                                         </select>
-                                        @error('task_type')
+                                        @error('cboExpenseType')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -212,10 +220,111 @@
 @endsection
 @section('script')
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
-    <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script> --}}
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+            const pristine = new Pristine(form);
+
+            form.addEventListener('submit', function(e) {
+                if (!pristine.validate()) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#vDescription').summernote({
+                height: 150,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['color', ['color']],
+                ]
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const subAccountSelect = document.getElementById('cboSubAccount');
+            const programInput = document.getElementById('programInput');
+            const budgetInput = document.getElementById('budget');
+            const programHidden = document.getElementById('programHiddenInput');
+
+            if (typeof Choices !== 'undefined') {
+                new Choices(subAccountSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    shouldSort: false,
+                    placeholderValue: '',
+                    searchPlaceholderValue: 'ជ្រើសរើស...'
+                });
+            }
+
+            // ✅ Handle SubAccount selection change
+            subAccountSelect.addEventListener('change', function() {
+                const selectedOption = subAccountSelect.options[subAccountSelect.selectedIndex];
+                const subAccountId = this.value;
+                const programCode = selectedOption.getAttribute('data-program');
+
+                // Set program code in the input field
+                if (programInput) {
+                    programInput.value = programCode;
+                }
+
+                // If using a hidden input field to store program
+                if (programHidden) {
+                    programHidden.value = programCode;
+                }
+
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            const element = document.getElementById('cboAgency');
+            let choicesInstance = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false,
+            });
+
+            $('#cboAgency').on('change', function() {
+                const selected = $(this).val();
+                let message = '';
+
+                switch (selected) {
+                    case '1':
+                        message = 'You selected Choice 1';
+                        break;
+                    case '2':
+                        message = 'You selected Choice 2';
+                        break;
+                    case '3':
+                        message = 'You selected Choice 3';
+                        break;
+                    default:
+                        message = '';
+                }
+                $('#resultDisplay').text(message);
+            });
+        });
+    </script>
+
     <script>
         const dateInput = document.getElementById('datepicker-basic');
         if (dateInput) {
@@ -288,7 +397,7 @@
             }
 
             // Choices — once per element
-            initChoicesOnce(document.getElementById('task_type'), {
+            initChoicesOnce(document.getElementById('cboExpenseType'), {
                 placeholderValue: 'ជ្រើសរើស',
                 searchPlaceholderValue: 'ស្វែងរក...'
             });

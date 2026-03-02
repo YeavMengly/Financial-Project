@@ -23,9 +23,11 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.duel') }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $ministry->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.entry') }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $ministry->year }}</li>
                         </ol>
                     </div>
                 </div>
@@ -105,10 +107,7 @@
                             </a>
 
                             {{-- Export --}}
-                            <a href="{{ route(
-                                'duelEntry.export',
-                                array_merge(['params' => $params],),
-                            ) }}"
+                            <a href="{{ route('duelEntry.export', array_merge(['params' => $params])) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('account_sub_id');
             $table->unsignedBigInteger('no');
             $table->decimal('budget', 15, 2)->default(0);
-            $table->string('task_type');
+            $table->unsignedBigInteger('expense_type_id');
+            $table->string('legalNumber');
             $table->text('txtDescription');
             $table->json('attachments')->nullable();
             $table->date('date');

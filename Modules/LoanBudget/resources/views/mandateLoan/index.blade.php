@@ -15,7 +15,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.initial.voucher') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.initial.mandate') }}</h4>
 
                 <div class="page-title-right">
 
@@ -25,41 +25,6 @@
         </div>
     </div>
     <!-- end page title -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter">
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cbochapterNum">{{ __('menus.account') }}</label>
-                            {{-- <input type="text" class="form-control" name="chapterNum" required
-                                data-pristine-required-message="{{ __('messages.required') }}"
-                                placeholder="{{ __('menus.year') }}" /> --}}
-                            <select class="form-control" name="task_type" id="task_type" required
-                                data-pristine-required-message="{{ __('messages.required') }}">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($mandateLoan as $ts)
-                                    <option value="{{ $ts->year }}">{{ $ts->year }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            @if (hasPermission('budget-voucher.create'))
-                                {{-- <div class="mb-4"> --}}
-                                {{-- <a class="btn btn-light waves-effect waves-light" href=""><i
-                                        class="bx bx-download me-1"></i>
-                                    {{ __('buttons.download') }}</a> --}}
-                                {{-- </div> --}}
-                            @endif
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">

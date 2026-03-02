@@ -8,6 +8,8 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -41,23 +43,10 @@
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($budgetMandate as $ts)
-                                    <option value="{{ $ts->subAccountNumber }}"
-                                        {{ request('subAccountNumber') == $ts->subAccountNumber ? 'selected' : '' }}>
-                                        {{ $ts->subAccountNumber }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Program -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="program">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="program" id="program">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($budgetMandate as $ts)
-                                    <option value="{{ $ts->program }}"
-                                        {{ request('program') == $ts->program ? 'selected' : '' }}>
-                                        {{ $ts->program }}
+                                    <option value="{{ $ts->account_sub_id }}"
+                                        {{ request('subAccountNumber') == $ts->account_sub_id ? 'selected' : '' }}>
+                                        {{ $ts->account_sub_id }} -
+                                        {{ $ts->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -65,36 +54,34 @@
 
                         <!-- Task Type -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="task_type">{{ __('menus.task') }}</label>
-                            <select class="form-control" name="task_type" id="task_type">
+                            <label class="visually-hidden" for="cboExpenseType">{{ __('menus.task') }}</label>
+                            <select class="form-control" name="cboExpenseType" id="cboExpenseType">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($taskType as $ts)
-                                    <option value="{{ $ts->task }}"
-                                        {{ request('task_type') == $ts->task ? 'selected' : '' }}>
-                                        {{ $ts->task }}
+                                @foreach ($expenseType as $ts)
+                                    <option value="{{ $ts->id }}"
+                                        {{ request('cboExpenseType') == $ts->name_kh ? 'selected' : '' }}>
+                                        {{ $ts->name_kh }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <!-- Description -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="description">{{ __('menus.description') }}</label>
-                            <input type="text" class="form-control" name="description"
-                                value="{{ request('description') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
-
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
-                            <input type="date" class="form-control" name="start_date"
-                                value="{{ request('start_date') }}" />
+                            <input type="text" id="start_date" name="date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" name="start_date"
+                                value="{{ request('start_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
                         <!-- End Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
-                            <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}" />
+                            <input type="text" id="end_date" name="date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" name="end_date"
+                                value="{{ request('end_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
@@ -179,6 +166,32 @@
             }
         }
     </script>
+
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script>
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        if (startDateInput) {
+            flatpickr(startDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: startDateInput.value || null
+            });
+        }
+
+        if (endDateInput) {
+            flatpickr(endDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: endDateInput.value || null
+            });
+        }
+    </script>
+
     {!! $dataTable->scripts() !!}
 
     <!-- Choices.js (dropdowns) -->
@@ -220,7 +233,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('task_type');
+            const taskTypeSelect = document.getElementById('cboExpenseType');
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
