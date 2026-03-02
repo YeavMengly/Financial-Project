@@ -35,7 +35,9 @@ class DashboardController extends Controller
         $total_fin_law       = $beginReport->sum('fin_law');
         $chartDataFinLaw     = $beginReport->pluck('fin_law')->toArray();
         $totalBeginVoucher   = $beginReport->count();
-
+         $total_new_credit_status     = $beginReport->sum('new_credit_status');
+        $chartDataCreditStatus     = $beginReport->pluck('new_credit_status')->toArray();
+        
         $total_deadline_balance = $beginReport->sum('deadline_balance');
         $chartDataDeadLine      = $beginReport->pluck('deadline_balance')->toArray();
 
@@ -292,6 +294,8 @@ class DashboardController extends Controller
             'total_fin_law' => $total_fin_law,
             'chartDataFinLaw' => $chartDataFinLaw,
             'totalBeginVoucher' => $totalBeginVoucher,
+            'total_new_credit_status' => $total_new_credit_status,
+            'chartDataCreditStatus'=>$chartDataCreditStatus,
 
             'total_deadline_balance' => $total_deadline_balance,
             'chartDataDeadLine' => $chartDataDeadLine,

@@ -179,7 +179,7 @@
                     <div class="row align-items-center">
                         <div class="d-flex flex-wrap align-items-center mb-4 w-100">
                             <span class="text-muted lh-4 d-block text-truncate">
-                                {{ __('tables.th.total.increase') }}
+                                {{ __('tables.th.credit_movement') }}
                             </span>
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm">
@@ -198,6 +198,42 @@
 
                         <div class="col-6">
                             <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_total_increase) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.new_credit_status') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $loanCount }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_new_credit_status }}">
+                                    {{ number_format($total_new_credit_status) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart9" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
 
@@ -314,71 +350,7 @@
         </div>
 
     </div>
-    {{-- chapter ,account --}}
-    <div class=" ">
-        <div class="card">
-            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
-                action="{{ url()->current() }}">
-                <div class="flex-shrink-0">
-                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
-                        <option selected="">ជំពូក</option>
-                        @foreach ($chapterLabels as $ch)
-                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
-                                {{ $ch }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </form>
-            <div class="card-body">
-                <div class=" " data-simplebar style="max-height: 380px;">
-                    <div class="table-responsive table-scroll">
-                        <table class="table table-bordered table-striped table-hover align-middle  ">
-                            <thead class=" text-center table-light sticky-header">
-                                <tr>
-                                    <th>{{ __('tables.th.account') }}</th>
-                                    <th>{{ __('tables.th.fin_law') }}</th>
-                                    <th>{{ __('tables.th.deadline_balance') }}</th>
-                                    <th>{{ __('tables.th.remaining_credit') }}</th>
-
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                @forelse ($accounts as $acc)
-                                    <tr data-chapter="{{ $acc->no }}">
-                                        <td class="text-center">{{ $acc->no }}</td>
-                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
-
-                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
-                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
-                                        <td>
-                                            <div class="dropdown text-center account-card"
-                                                data-account-id="{{ $acc->id }}"
-                                                data-account-title="គណនី {{ $acc->no }}">
-                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    <i class="mdi mdi-dots-vertical"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">
-                                            No accounts found
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- end card body -->
-        </div>
-        <!-- end card -->
-    </div>
+   
     <div class="row">
         <div class="col-xl-6">
             <!-- card -->
@@ -610,6 +582,71 @@
                 </div>
             </div>
         @endforeach
+    </div>
+     {{-- chapter ,account --}}
+    <div class=" ">
+        <div class="card">
+            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
+                action="{{ url()->current() }}">
+                <div class="flex-shrink-0">
+                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
+                        <option selected="">ជំពូក</option>
+                        @foreach ($chapterLabels as $ch)
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                                {{ $ch }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+            <div class="card-body">
+                <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll">
+                        <table class="table table-bordered table-striped table-hover align-middle  ">
+                            <thead class=" text-center table-light sticky-header">
+                                <tr>
+                                    <th>{{ __('tables.th.account') }}</th>
+                                    <th>{{ __('tables.th.fin_law') }}</th>
+                                    <th>{{ __('tables.th.deadline_balance') }}</th>
+                                    <th>{{ __('tables.th.remaining_credit') }}</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @forelse ($accounts as $acc)
+                                    <tr data-chapter="{{ $acc->no }}">
+                                        <td class="text-center">{{ $acc->no }}</td>
+                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
+
+                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td>
+                                            <div class="dropdown text-center account-card"
+                                                data-account-id="{{ $acc->id }}"
+                                                data-account-title="គណនី {{ $acc->no }}">
+                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    <i class="mdi mdi-dots-vertical"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            No accounts found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
     </div>
 
     <div class="row">
@@ -919,6 +956,40 @@
             };
 
             var chart = new ApexCharts(document.querySelector("#mini-chart1"), options);
+            chart.render();
+
+        });
+    </script>
+     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartDataCreditStatus = @json($chartDataCreditStatus);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart9"),
+                series: [{
+                    name: "ស្ថានភាពឥណទានថ្មី",
+                    data: chartDataCreditStatus
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart9"), options);
             chart.render();
 
         });
