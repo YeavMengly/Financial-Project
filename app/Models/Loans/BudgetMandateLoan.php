@@ -19,6 +19,9 @@ class BudgetMandateLoan extends Model
     protected $fillable = [
         'ministry_id',
         'agency_id',
+        'program_id',
+        'program_sub_id',
+        'cluster_id',
         'account_sub_id',
         'no',
         'internal_increase',

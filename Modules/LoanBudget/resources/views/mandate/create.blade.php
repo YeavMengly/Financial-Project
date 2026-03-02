@@ -39,12 +39,78 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('mandate.store',$params) }}"
-                            method="POST" enctype="multipart/form-data" novalidate>
+                        <form id="pristine-valid-example" action="{{ route('mandate.store', $params) }}" method="POST"
+                            enctype="multipart/form-data" novalidate>
                             @csrf
 
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboProgram" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program') }}
+                                        </label>
+                                        <select class="form-select" id="cboProgram" name="cboProgram" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($program as $p)
+                                                <option value="{{ $p->id }}">
+                                                    {{ $p->no }}-
+                                                    {{ $p->title }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('cboProgram')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program.sub') }}
+                                        </label>
+                                        <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+                                        @error('cboProgramSub')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.cluster') }}
+                                        </label>
+                                        <select id="cboCluster" class="form-select" name="cboCluster" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cboCluster')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.agency') }}
+                                        </label>
+                                        <select id="cboAgency" class="form-select" name="cboAgency" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+                                        @error('cboAgency')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
@@ -63,7 +129,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 {{-- Sub Account Number --}}
                                 <div class="col-lg-4 col-md-6">
@@ -71,8 +137,8 @@
                                         <label for="cboSubAccount" class="form-label text-muted">
                                             {{ __('forms.sub.account') }}
                                         </label>
-                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
+                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($accountSub as $as)
                                                 <option value="{{ $as->no }}">
@@ -88,7 +154,7 @@
                                 </div>
 
                                 {{-- Program Code (auto-filled from JS) --}}
-                                <div class="col-xl-4 col-md-6">
+                                {{-- <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="programInput">{{ __('forms.program.code') }}</label>
                                         <input type="number" min="0" name="no" placeholder="xxxxxxx" required
@@ -98,7 +164,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 {{-- internal --}}
                                 <div class="col-xl-4 col-md-6">
@@ -235,115 +301,27 @@
 
     <!-- Dropzone.js (file upload) -->
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
-
-    <!-- Custom logic for BeginCredit loading -->
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const subAccountSelect = document.getElementById('cboSubAccount');
-            const programInput = document.getElementById('programInput');
-            const budgetInput = document.getElementById('budget');
-            const programHidden = document.getElementById('programHiddenInput');
-
-            // Initialize Choices.js (optional)
-            if (typeof Choices !== 'undefined') {
-                new Choices(subAccountSelect, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    shouldSort: false,
-                    placeholderValue: '',
-                    searchPlaceholderValue: 'ជ្រើសរើស...'
-                });
-            }
-
-            let credit = 0;
-
-            subAccountSelect.addEventListener('change', function() {
-                const selectedOption = subAccountSelect.options[subAccountSelect.selectedIndex];
-                const subAccountId = this.value;
-                const programCode = selectedOption.getAttribute('data-program');
-
-                // Fill program inputs
-                if (programInput) programInput.value = programCode;
-                // if (programHidden) programHidden.value = programCode;
-
-                // if (subAccountId && programCode) {
-                //     const url = `/create/${subAccountId}/${programCode}/early-balance`;
-
-                //     console.log("Fetching from:", url); // ✅ Show URL
-
-                //     fetch(url)
-                //         .then(response => response.json())
-                //         .then(data => {
-                //             console.log("✅ Raw Data Fetched:", data);
-
-                //             credit = data.credit;
-
-                //             document.getElementById('fin_law').textContent = formatNumber(data.fin_law);
-                //             document.getElementById('credit_movement').textContent = formatNumber(data
-                //                 .credit_movement);
-                //             document.getElementById('new_credit_status').textContent = formatNumber(data
-                //                 .new_credit_status);
-                //             document.getElementById('credit').textContent = formatNumber(data.credit);
-                //             document.getElementById('deadline_balance').textContent = formatNumber(data
-                //                 .deadline_balance);
-
-                //             const apply = parseFloat(budgetInput.value) || 0;
-                //             updateRemainingCredit(apply);
-                //         })
-
-                //         .catch(error => console.error('❌ Error fetching early balance:', error));
-                // }
+            const element = document.getElementById('cboProgram');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
             });
+        });
 
-            // if (budgetInput) {
-            //     budgetInput.addEventListener('input', updateApplyValue);
-            // }
-
-            // function updateApplyValue() {
-            //     const apply = parseFloat(budgetInput.value) || 0;
-            //     document.getElementById('applying').textContent = formatNumber(apply);
-            //     updateRemainingCredit(apply);
-            // }
-
-            //     function updateRemainingCredit(apply) {
-            //         const credit = parseFloat(document.getElementById('credit').textContent.replace(/,/g, '')) || 0;
-            //         const display = document.getElementById('remaining_credit');
-            //         const flashMessage = document.getElementById('flashMessage'); // Ensure this exists in your HTML
-
-            //         const remaining = credit - apply;
-
-            //         if (remaining < 0) {
-            //             display.textContent = "0";
-
-            //             // Optional: Clear the input if over-limit
-            //             document.getElementById('budget').value = ''; // Clear the input field
-
-            //             // Show flash message
-            //             flashMessage.innerHTML = `
-        //     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        //         <strong>ជូនដំណឹង:</strong> ឥណទាននៅសល់មិនគ្រប់ចំនួន!
-        //         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        //     </div>
-        // `;
-            //             return false;
-            //         }
-
-            //         display.textContent = formatNumber(remaining);
-            //         // flashMessage.innerHTML = ''; // Clear flash message if input is valid
-            //         return true;
-            //     }
-
-
-
-            // function formatNumber(num) {
-            //     const parsed = parseFloat(num);
-            //     if (isNaN(parsed)) return "0";
-            //     return parsed.toLocaleString('en-US', {
-            //         minimumFractionDigits: 0,
-            //         maximumFractionDigits: 2
-            //     });
-            // }
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboSubAccount');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
         });
     </script>
     <script>
@@ -375,34 +353,140 @@
                 $('#resultDisplay').text(message);
             });
         });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-        $(document).ready(function() {
-            const element = document.getElementById('cboSubDepart');
-            let choicesInstance = new Choices(element, {
+            // ========= Choices Instances =========
+            let programSubChoices = new Choices('#cboProgramSub', {
                 searchEnabled: true,
                 itemSelectText: '',
-                shouldSort: false,
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
             });
 
-            $('#cboSubDepart').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
+            let agencyChoices = new Choices('#cboAgency', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
             });
+
+            let clusterChoices = new Choices('#cboCluster', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            // ========= Helpers =========
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        // optional: keep empty if error
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            // ========= Script 1: Program -> ProgramSub =========
+            function handleProgramChangeForProgramSub(programId) {
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('mandate.by.program_sub') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => {
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+            }
+
+            // ========= Script 2: Program -> Agency =========
+            function handleProgramChangeForAgency(programId) {
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('mandate.by.agency') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => {
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            }
+
+            // ========= Script 3: ProgramSub -> Cluster =========
+            function handleProgramSubChangeForCluster(programSubId) {
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('mandate.by.cluster') }}",
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => {
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            }
+
+            // ========= Events =========
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                // when program changes -> always clear cluster too
+                handleProgramChangeForProgramSub(programId);
+                handleProgramChangeForAgency(programId);
+                handleProgramSubChangeForCluster(null); // reset cluster
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+                handleProgramSubChangeForCluster(programSubId);
+            });
+
         });
     </script>
 @endsection
