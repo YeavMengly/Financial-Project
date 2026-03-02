@@ -23,9 +23,11 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.duel') }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $ministry->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.release') }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $ministry->year }}</li>
                         </ol>
                     </div>
                 </div>

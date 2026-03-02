@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('agency_id');
+            $table->unsignedBigInteger('program_id');
+            $table->unsignedBigInteger('program_sub_id');
+            $table->unsignedBigInteger('cluster_id');
             $table->unsignedBigInteger('account_sub_id');
-            $table->unsignedBigInteger('no');
+            $table->string('no');
             $table->decimal('internal_increase', 15, 2)->default(0);
             $table->decimal('unexpected_increase', 15, 2)->default(0);
             $table->decimal('additional_increase', 15, 2)->default(0);

@@ -10,15 +10,15 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
-                    {{ __('buttons.edit') }}
+                    {{ __('menus.duel.release') }}
                 </h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a></li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.duel') }}</a></li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.release') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>
                     </div>
@@ -38,7 +38,7 @@
                             action="{{ route('duelRelease.update', ['params' => $params, 'id' => $duelRelease->id]) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
-                            
+
                             <div class="row">
 
                                 {{-- STOCK NUMBER --}}

@@ -3,7 +3,7 @@
 
 namespace App\DataTables\Material;
 
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\InitialMaterialEntry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
