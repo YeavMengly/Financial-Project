@@ -34,8 +34,3 @@ Route::get(
     '/dashboard/program-sub/{programSub}/clusters',
     [DashboardController::class, 'getClusters']
 );
-Route::get('/account-sub/{account}', [DashboardController::class, 'getAccountSubs']);
-Route::get(
-    '/dashboard/account-sub/{accountSub}/accountSub',
-    [DashboardController::class, 'getAccountSubs']
-);

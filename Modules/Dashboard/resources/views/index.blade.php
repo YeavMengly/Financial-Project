@@ -179,7 +179,7 @@
                     <div class="row align-items-center">
                         <div class="d-flex flex-wrap align-items-center mb-4 w-100">
                             <span class="text-muted lh-4 d-block text-truncate">
-                                {{ __('tables.th.total.increase') }}
+                                {{ __('tables.th.credit_movement') }}
                             </span>
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm">
@@ -198,6 +198,42 @@
 
                         <div class="col-6">
                             <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_total_increase) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.new_credit_status') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $loanCount }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_new_credit_status }}">
+                                    {{ number_format($total_new_credit_status) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart9" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
 
@@ -314,69 +350,7 @@
         </div>
 
     </div>
-    {{-- chapter ,account --}}
-    <div class=" ">
-        <div class="card">
-            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
-                action="{{ url()->current() }}">
-                <div class="flex-shrink-0">
-                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
-                        <option selected="">ជំពូក</option>
-                        @foreach ($chapterLabels as $ch)
-                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
-                                {{ $ch }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </form>
-            <div class="card-body">
-                <div class=" " data-simplebar style="max-height: 380px;">
-                    <div class="table-responsive table-scroll">
-                        <table class="table table-bordered table-striped table-hover align-middle  ">
-                            <thead class=" text-center table-light sticky-header">
-                                <tr>
-                                    <th>{{ __('tables.th.account') }}</th>
-                                    <th>{{ __('tables.th.fin_law') }}</th>
-                                    <th>{{ __('tables.th.deadline_balance') }}</th>
-                                    <th>{{ __('tables.th.remaining_credit') }}</th>
-
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                @forelse ($accounts as $acc)
-                                    <tr data-chapter="{{ $acc->no }}">
-                                        <td class="text-center">{{ $acc->no }}</td>
-                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
-
-                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
-                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
-                                        <td>
-                                            <div class="dropdown text-center account-card">
-                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    <i class="mdi mdi-dots-vertical"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">
-                                            No accounts found
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- end card body -->
-        </div>
-        <!-- end card -->
-    </div>
+   
     <div class="row">
         <div class="col-xl-6">
             <!-- card -->
@@ -455,82 +429,7 @@
             </div>
             <!-- end card -->
         </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="card card-h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                {{-- {{ __('tables.th.financeLaw') }} --}}ធានាចំណាយ
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{-- {{ $totalBeginVoucher }} --}}0
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="">
-                                    0 <span>រៀល</span>
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="col-6">
-                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="text-nowrap mt-2">
-                        <span class="badge bg-success-subtle text-success">
-                            0
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card card-h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                {{-- {{ __('tables.th.financeLaw') }} --}}ទូទាត់ត្រង់
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{-- {{ $totalBeginVoucher }} --}}0
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="">
-                                    0 <span>រៀល</span>
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="col-6">
-                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="text-nowrap mt-2">
-                        <span class="badge bg-success-subtle text-success">
-                            0
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- Expense type --}}
-    <div class="row">
+        {{-- Expense type --}}
         <div class="col-xl-6">
             <!-- card -->
             <div class="card card-h-100">
@@ -538,7 +437,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-sm">
-                            <div id="Expense-Type" data-colors='["#faad14","#52c41a","#2200ff","#e81a2c" ,"#fde50c" ]'
+                            <div id="Expense-Type" data-colors='["#faad14","#2200ff","#e81a2c" ,"#fde50c" ]'
                                 class="apex-charts">
                             </div>
                         </div>
@@ -576,7 +475,7 @@
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                           {{ number_format($direct_Payment) }} រៀល
+                                            {{ number_format($direct_Payment) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
@@ -604,8 +503,6 @@
                                         </span>
                                     </h6>
                                 </div> --}}
-
-
                             </div>
                         </div>
                     </div>
@@ -613,93 +510,35 @@
             </div>
             <!-- end card -->
         </div>
-
-        <div class="col-xl-3 col-md-6">
-            <div class="card card-h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                {{-- {{ __('tables.th.financeLaw') }} --}}ធានាចំណាយ
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{-- {{ $totalExpenditure_Guarantee }} --}}0
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="">
-                                    0 <span>រៀល</span>
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="col-6">
-                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="text-nowrap mt-2">
-                        <span class="badge bg-success-subtle text-success">
-                            0
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card card-h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                {{-- {{ __('tables.th.financeLaw') }} --}}ទូទាត់ត្រង់
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{-- {{ $totalDirect_Payment }}  --}}0
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-6">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="">
-                                    0 <span>រៀល</span>
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="col-6">
-                            <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
-                        </div>
-                    </div>
-
-                    <div class="text-nowrap mt-2">
-                        <span class="badge bg-success-subtle text-success">
-                            0
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
+
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
             <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="card card-h-100 shadow-sm border-1 program-card" role="button"
-                    data-program-id="{{ $program->id }}"
-                    data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
+                <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             <div class="text-truncate">
                                 <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
+                            {{-- select expanseType --}}
+                            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
+                                action="{{ url()->current() }}">
+                                <div class="flex-shrink-0">
+                                    <select class="form-select-sm" name="expenseType" id="expenseType">
+                                        <option selected="">ប្រភេទចំណាយ </option>
+                                        @foreach ($expenseType as $et)
+                                            <option value="{{ $et->id }}"
+                                                {{ ($expenseType ?? '') === $et ? 'selected' : '' }}>
+                                                {{ $et->name_kh }}
+                                            </option>
+                                        @endforeach
+
+                                    </select>
+                                </div>
+                            </form>
 
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
@@ -734,13 +573,80 @@
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
                             </small>
                         </div>
-                        <span class="badge bg-success-subtle text-success">
+                        <span class="badge bg-success-subtle text-success program-card" role="button"
+                            data-program-id="{{ $program->id }}"
+                            data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
                             Click to view details
                         </span>
                     </div>
                 </div>
             </div>
         @endforeach
+    </div>
+     {{-- chapter ,account --}}
+    <div class=" ">
+        <div class="card">
+            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
+                action="{{ url()->current() }}">
+                <div class="flex-shrink-0">
+                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
+                        <option selected="">ជំពូក</option>
+                        @foreach ($chapterLabels as $ch)
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                                {{ $ch }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+            <div class="card-body">
+                <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll">
+                        <table class="table table-bordered table-striped table-hover align-middle  ">
+                            <thead class=" text-center table-light sticky-header">
+                                <tr>
+                                    <th>{{ __('tables.th.account') }}</th>
+                                    <th>{{ __('tables.th.fin_law') }}</th>
+                                    <th>{{ __('tables.th.deadline_balance') }}</th>
+                                    <th>{{ __('tables.th.remaining_credit') }}</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @forelse ($accounts as $acc)
+                                    <tr data-chapter="{{ $acc->no }}">
+                                        <td class="text-center">{{ $acc->no }}</td>
+                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
+
+                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td>
+                                            <div class="dropdown text-center account-card"
+                                                data-account-id="{{ $acc->id }}"
+                                                data-account-title="គណនី {{ $acc->no }}">
+                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    <i class="mdi mdi-dots-vertical"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            No accounts found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
     </div>
 
     <div class="row">
@@ -982,7 +888,7 @@
         </div>
     </div>
     {{-- Modal Sub-Account --}}
-     <div class="modal fade" id="accountSubModal" tabindex="-1" aria-labelledby="accountSubModalLabel"
+    <div class="modal fade" id="accountSubModal" tabindex="-1" aria-labelledby="accountSubModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -1050,6 +956,40 @@
             };
 
             var chart = new ApexCharts(document.querySelector("#mini-chart1"), options);
+            chart.render();
+
+        });
+    </script>
+     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartDataCreditStatus = @json($chartDataCreditStatus);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart9"),
+                series: [{
+                    name: "ស្ថានភាពឥណទានថ្មី",
+                    data: chartDataCreditStatus
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart9"), options);
             chart.render();
 
         });
@@ -1253,7 +1193,7 @@
                                 html += `
                            <div class="col-md-4 mb-2">
                                 <div class="card shadow-sm program-sub-card"
-                                    data-sub-id="${sub.account_ido}"
+                                    data-sub-id="${sub.id}"
                                     data-sub-no="${sub.no}"
                                     style="cursor:pointer">
                                     <div class="card-body">
@@ -1498,17 +1438,17 @@
 
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
-                   
+
                     {{ round($percent_direct_Payment, 2) }},
-                    
+
                 ],
 
                 labels: [
                     "ធានាចំណាយ",
-                    "បុរេប្រទាន",
+                    // "បុរេប្រទាន",
                     "ទូទាត់ត្រង់",
-                    "លទ្ធកម្ម",
-                    "បើកផ្ដល់មុន",
+                    // "លទ្ធកម្ម",
+                    // "បើកផ្ដល់មុន",
                 ],
 
                 colors: colors,
@@ -1678,48 +1618,50 @@
                     modal.show();
 
                     // Fetch programSubs via AJAX
-                    fetch(`/dashboard//account/${accountId}/subs`)
+                    fetch(`/dashboard/account/${accountId}/subs`)
                         .then(res => res.json())
                         .then(data => {
+                            // console.log(data);
                             if (data.length === 0) {
                                 document.getElementById('accountSubContent').innerHTML =
-                                    '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
+                                    '<p class="text-center">មិនមានអនុគណនីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
 
                             // Build HTML grid
-                            let html = '<div class="row g-2">';
-                            data.forEach(sub => {
+                            let html = `
+                                <div class="card-body">
+                                    <div data-simplebar style="max-height: 380px;">
+                                        <div class="table-responsive table-scroll">
+                                            <table class="table table-bordered table-striped table-hover align-middle">
+                                                <thead class="text-center table-light sticky-header">
+                                                    <tr>
+                                                        <th>អនុគណនី</th>
+                                                        <th>ច្បាប់ហិរញ្ញវត្ថុ</th>
+                                                        <th>អនុវត្ត</th>
+                                                        <th>នៅសល់</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                            `;
+                            data.forEach(subs => {
                                 html += `
-                           <div class="card-body">
-                <div class=" " data-simplebar style="max-height: 380px;">
-                    <div class="table-responsive table-scroll"  
-                    data-sub-id="${sub.id}"
-                    data-sub-no="${sub.no}">
-                        <table class="table table-bordered table-striped table-hover align-middle  ">
-                            <thead class=" text-center table-light sticky-header">
-                                <tr>
-                                    <th>អនុគណនី</th>
-                                    <th> </th>
-                                    <th> </th>
-                                    <th> </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="text-center">${sub.no}</td>
-                                    <td class="text-end"> </td>
-                                    <td class="text-end"> </td>
-                                    <td class="text-end"> </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-                        `;
+                                    <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
+                                        <td class="text-center">${subs.no}</td>
+                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()}</td>
+                                        <td>${Number(subs.apply ?? 0).toLocaleString()}</td>
+                                        <td>${Number(subs.credit ?? 0).toLocaleString()}</td>
+                                    </tr>
+                                `;
                             });
-                            html += '</div>';
+
+                            html += `
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
 
                             document.getElementById('accountSubContent').innerHTML = html;
                         })
