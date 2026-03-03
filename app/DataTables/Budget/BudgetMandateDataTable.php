@@ -26,7 +26,7 @@ class BudgetMandateDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('agency', function ($row) {
-                return $row->agency_no . ' - ' . $row->agency_name;
+                return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
@@ -40,6 +40,11 @@ class BudgetMandateDataTable extends DataTable
             })
             ->addColumn('action', function ($module) {
                 return view('budgetplan::budgetMandate.action', ['module' => $module]);
+            })
+            ->editColumn('is_archived', function ($module) {
+                $notes = ($module->is_archived == 2) ? '<button class="btn btn-sm btn-outline-success">បានបញ្ចប់</button>' : '<button class="btn btn-sm btn-outline-primary">កំពុងធ្វើ</button>';
+
+                return $notes;
             })
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
@@ -62,7 +67,8 @@ class BudgetMandateDataTable extends DataTable
                     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
                 }
             })
-            ->rawColumns(['txtDescription', 'attachments']);
+            ->rawColumns(['txtDescription', 'attachments', 'agency', 'is_archived'])
+            ->setRowId('id');
     }
 
     /**
@@ -87,6 +93,16 @@ class BudgetMandateDataTable extends DataTable
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
 
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('is_archived', 2);
+            }
+        } else {
+            $model->where('is_archived', 1);
+        }
+
         // ===== SELECT =====
         $model->select([
             'budget_mandates.id',
@@ -97,6 +113,9 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.no',
             'budget_mandates.txtDescription',
             'budget_mandates.budget',
+            'budget_mandates.legalNumber',
+            'budget_mandates.legalName',
+            'budget_mandates.is_archived',
             'expense_types.name_kh',
             'budget_mandates.attachments',
             'budget_mandates.date',
@@ -124,6 +143,7 @@ class BudgetMandateDataTable extends DataTable
                 d.agency     = $("#agency").val();
                 d.no    = $("#no").val();
                 d.accountSub = $("#accountSub").val();
+                d.cboStatus = $("#cboStatus").val();
                 }',
             ])
             ->initComplete('function () {
@@ -144,7 +164,8 @@ class BudgetMandateDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
+            Column::make('legalNumber')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legalName')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
@@ -154,6 +175,7 @@ class BudgetMandateDataTable extends DataTable
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 
+            Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

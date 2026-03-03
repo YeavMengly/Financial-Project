@@ -25,7 +25,7 @@ class BudgetVoucherDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('agency', function ($row) {
-                return $row->agency_no . ' - ' . $row->agency_name;
+                return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
@@ -39,6 +39,11 @@ class BudgetVoucherDataTable extends DataTable
             })
             ->addColumn('action', function ($module) {
                 return view('budgetplan::budgetVoucher.action', ['module' => $module]);
+            })
+            ->editColumn('is_archived', function ($module) {
+                $notes = ($module->is_archived == 2) ? '<button class="btn btn-sm btn-outline-success">បានបញ្ចប់</button>' : '<button class="btn btn-sm btn-outline-primary">កំពុងធ្វើ</button>';
+
+                return $notes;
             })
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
@@ -61,8 +66,7 @@ class BudgetVoucherDataTable extends DataTable
                     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
                 }
             })
-            ->rawColumns(['soft_delete', 'txtDescription','attachments'])
-            ->setRowId('id');
+            ->rawColumns(['soft_delete', 'txtDescription', 'attachments', 'agency', 'is_archived']);
     }
 
     /**
@@ -85,6 +89,16 @@ class BudgetVoucherDataTable extends DataTable
         // ===== FIXED CONDITION =====
         $model->where('budget_vouchers.ministry_id', $id);
 
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('is_archived', 2);
+            }
+        } else {
+            $model->where('is_archived', 2);
+        }
+
         // ===== SELECT =====
         $model->select([
             'budget_vouchers.id',
@@ -96,6 +110,8 @@ class BudgetVoucherDataTable extends DataTable
             'budget_vouchers.txtDescription',
             'budget_vouchers.budget',
             'budget_vouchers.legalNumber',
+            'budget_vouchers.legalName',
+            'budget_vouchers.is_archived',
             'expense_types.name_kh',
             'budget_vouchers.attachments',
             'budget_vouchers.date',
@@ -123,6 +139,7 @@ class BudgetVoucherDataTable extends DataTable
                 d.agency     = $("#agency").val();
                 d.no    = $("#no").val();
                 d.accountSub = $("#accountSub").val();
+                  d.cboStatus = $("#cboStatus").val();
                 }',
             ])
             ->initComplete('function () {
@@ -144,6 +161,7 @@ class BudgetVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::make('legalNumber')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legalName')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
@@ -152,6 +170,8 @@ class BudgetVoucherDataTable extends DataTable
             Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
+
+            Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

@@ -6,9 +6,11 @@ use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
 use App\Exports\BeginExport;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\BeginMandate;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Cluster;
@@ -200,11 +202,12 @@ class BudgetVoucherController extends Controller
     {
         $validated = $request->validate([
             'legalNumber' =>  'required',
+            'legalName' =>  'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
             'budget'          => 'required|numeric|min:0',
-            'cboExpenseType'       => 'required',
+            'cboExpenseType'  => 'required',
             'attachments'     => 'nullable|array',
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
             'date'            => 'required|date',
@@ -226,6 +229,22 @@ class BudgetVoucherController extends Controller
                     ->translate('en')
                     ->option('timeout', 2000)
                     ->error('មិនមានទិន្ន័យ', 'បញ្ហា')
+                    ->flash();
+
+                return back()->withInput();
+            }
+
+            $budgetMandate = BudgetMandate::where('legalNumber', $validated['legalNumber'])
+                ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('no', $validated['no'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if (!$budgetMandate) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្ន័យធានាចំណាយ', 'បញ្ហា')
                     ->flash();
 
                 return back()->withInput();
@@ -257,12 +276,15 @@ class BudgetVoucherController extends Controller
             BudgetVoucher::create([
                 'ministry_id'    => $ministry->id,
                 'legalNumber'      => $validated['legalNumber'],
+                'legalName'      => $validated['legalName'],
                 'agency_id'      => $validated['cboAgency'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no'             => $validated['no'],
                 'txtDescription' => strip_tags($validated['txtDescription']),
                 'budget'         => $applyValue,
                 'expense_type_id'      => $validated['cboExpenseType'],
+                'status' => 'done',
+                'is_archived' => 2,
                 'attachments'    => json_encode($stored),
                 'date'           => $validated['date'],
             ]);
@@ -277,6 +299,11 @@ class BudgetVoucherController extends Controller
 
             $beginVoucher->apply = $lastVoucher?->budget ?? 0;
             $beginVoucher->save();
+
+            $budgetMandate->update([
+                'status' => 'done',
+                'is_archived' => 2,
+            ]);
 
             DB::commit();
             flash()
@@ -356,6 +383,7 @@ class BudgetVoucherController extends Controller
     {
         $validated = $request->validate([
             'legalNumber' =>  'required',
+            'legalName' =>  'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
@@ -411,6 +439,7 @@ class BudgetVoucherController extends Controller
             $voucher->update([
                 'ministry_id'    => $ministry->id,
                 'legalNumber'    => $validated['legalNumber'],
+                'legalName'    => $validated['legalName'],
                 'agency_id'      => $validated['cboAgency'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no' => $beginCredit->no,
