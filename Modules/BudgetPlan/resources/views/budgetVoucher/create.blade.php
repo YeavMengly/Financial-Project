@@ -54,6 +54,14 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.name') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            type="text" class="form-control" name="legalName" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
@@ -258,7 +266,7 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const subAccountSelect = document.getElementById('cboSubAccount');
             const programInput = document.getElementById('programInput');
@@ -293,7 +301,7 @@
 
             });
         });
-    </script>
+    </script> --}}
     <script>
         $(document).ready(function() {
             const element = document.getElementById('cboAgency');

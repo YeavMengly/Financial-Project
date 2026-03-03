@@ -23,6 +23,9 @@ class BudgetVoucher extends Model
         'budget',
         'expense_type_id',
         'legalNumber',
+        'legalName',
+        'status',
+        'is_archived',
         'txtDescription',
         'attachments',
         'date'

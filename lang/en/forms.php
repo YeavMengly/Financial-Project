@@ -74,7 +74,8 @@ return [
     'source' => 'ប្រភព',
     'total.price' => 'តម្លៃ​សរុប',
 
-    'legal.number' => 'លេខកិច្ចសន្យា',
+    'legal.number' => 'លេខសម្គាល់សំណើ',
+    'legal.name' => 'ឈ្មោះសំណើ',
     'title.entity' => 'អង្គភាព',
     'location.number' => 'លេខទីតាំង',
     'invoice' => 'វិក្ក័យបត្រ',

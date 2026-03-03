@@ -48,6 +48,15 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.name') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            type="text" class="form-control" name="legalName"
+                                            value="{{ old('legalName', $module->legalName) }}" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
