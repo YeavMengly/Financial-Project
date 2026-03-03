@@ -12,15 +12,17 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
+                    {{ __('menus.material.entry') }}
                 </h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
-                            </li>
+
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.material') }}</a></li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.entry') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
+                            </li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -51,7 +53,7 @@
                                     </div>
                                 </div>
 
-                                 <div class="col-xl-4 col-md-6">
+                                <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="stock_number">{{ __('forms.stock.number') }}</label>
                                         <input type="text" name="stock_number" required class="form-control"
@@ -175,8 +177,7 @@
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="source">{{ __('forms.source') }}</label>
-                                        <input type="text" name="source" required
-                                            class="form-control"
+                                        <input type="text" name="source" required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('source')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -239,7 +240,7 @@
                                     <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
-                                    href="{{ route('duelEntry.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('materialEntry.index', $params) }}">{{ __('buttons.back') }}</a>
 
                             </div>
                         </form>

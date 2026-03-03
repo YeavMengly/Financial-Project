@@ -15,17 +15,18 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"> {{ __('menus.material') }}</li>
-                        <li class="breadcrumb-item">{{ __('menus.entry') }}</li>
-                    </ol>
+                    {{ __('menus.material.entry') }}
+
                 </h4>
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.material') }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $ministry->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.entry') }}</a>
+                            </li>
+                            <li class="breadcrumb-item active">{{ $ministry->year }}
+                            </li>
                         </ol>
                     </div>
                 </div>

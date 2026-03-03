@@ -38,18 +38,22 @@ class BudgetVoucherLoanDataTable extends DataTable
             ->addColumn('editorial', function ($row) {
                 return number_format($row->editorial ?? 0);
             })
-            ->addColumn('soft_delete', function ($module) {
-                return is_null($module->deleted_at)
+            ->editColumn('soft_delete', function ($soft_delete) {
+                return is_null($soft_delete->deleted_at)
                     ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
+            ->editColumn('txtDescription', function ($row) {
+                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
+            })
+            ->rawColumns(['soft_delete', 'txtDescription', 'agency'])
             ->addColumn("dateTime", function ($module) {
                 return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('loanbudget::voucher.action', ['module' => $module]);
             })
-            ->rawColumns(['soft_delete', 'agency']);
+            ->setRowId('id');
     }
 
     /**
@@ -97,6 +101,7 @@ class BudgetVoucherLoanDataTable extends DataTable
             'budget_voucher_loans.additional_increase',
             'budget_voucher_loans.decrease',
             'budget_voucher_loans.editorial',
+            'budget_voucher_loans.txtDescription',
             'budget_voucher_loans.created_at'
         ]);
 
@@ -167,6 +172,7 @@ class BudgetVoucherLoanDataTable extends DataTable
             Column::make('decrease')->title(__('tables.th.decrease'))->width(80)->addClass('align-middle'),
             Column::make('editorial')->title(__('tables.th.editorial'))->width(80)->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)

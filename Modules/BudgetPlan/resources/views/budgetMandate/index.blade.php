@@ -37,6 +37,14 @@
             <div class="card">
                 <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
@@ -200,11 +208,11 @@
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('agencyNumber');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboTodoSelect = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodoSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើស កំណត់ចំណាំ', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });

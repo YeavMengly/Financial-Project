@@ -133,6 +133,7 @@ class BudgetMandateController extends Controller
     {
         $validated = $request->validate([
             'legalNumber' =>  'required',
+            'legalName' =>  'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
@@ -190,11 +191,14 @@ class BudgetMandateController extends Controller
             BudgetMandate::create([
                 'ministry_id'    => $ministry->id,
                 'legalNumber'      => $validated['legalNumber'],
+                'legalName'      => $validated['legalName'],
                 'agency_id'      => $validated['cboAgency'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no'             => $validated['no'],
                 'txtDescription' => strip_tags($validated['txtDescription']),
                 'budget'         => $applyValue,
+                'status' => 'todo',
+                'is_archived' => 1,
                 'expense_type_id'      => $validated['cboExpenseType'],
                 'attachments'    => json_encode($stored),
                 'date'           => $validated['date'],
@@ -291,6 +295,7 @@ class BudgetMandateController extends Controller
 
         $validated = $request->validate([
             'legalNumber' =>  'required',
+            'legalName' =>  'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
@@ -345,6 +350,7 @@ class BudgetMandateController extends Controller
             $mandate->update([
                 'ministry_id'    => $ministry->id,
                 'legalNumber'    => $validated['legalNumber'],
+                'legalName'    => $validated['legalName'],
                 'agency_id'      => $validated['cboAgency'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no' => $beginCredit->no,

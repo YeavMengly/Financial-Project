@@ -6,8 +6,8 @@ use App\DataTables\Material\InitialMaterialEntryDataTable;
 use App\DataTables\Material\MaterialEntryDataTable;
 use App\Exports\Material\MaterialEntriesExport;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Agency;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Agency;
+use App\Models\Content\Ministry;
 use App\Models\Material\MaterialEntry;
 use App\Models\UnitType;
 use Illuminate\Http\Request;
@@ -156,17 +156,113 @@ class MaterialEntryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit($params, $id)
     {
-        return view('material::edit');
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
+        $module = MaterialEntry::where('id', decode_params($id))
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        return view(
+            'material::materialEntry.edit',
+            [
+                'params' => $params,
+                'unitType' => $unitType,
+                'ministry' => $ministry,
+                'module' => $module
+            ]
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $params, $id)
     {
-        //
+        $validated = $request->validate([
+            'company_name'  => 'required|string|max:255',
+            'stock_number'  => 'required',
+            'stock_name'    => 'required|string|max:255',
+            'user_entry'    => 'required|string|max:255',
+            'p_code'    => 'required|string|max:255',
+            'p_name'    => 'required|string|max:255',
+            'p_year'    => 'required|string|max:255',
+            'title'    => 'required|string|max:255',
+            'unit'          => 'required',
+            'quantity'      => 'required',
+            'price'         => 'required',
+            'note'          => 'nullable|string|max:10000',
+            'date_entry'    => 'required|date',
+            'source'    => 'required|string|max:255',
+            'note'         => 'nullable|string|max:10000',
+            'refer'         => 'nullable|string|max:10000',
+            'file'          => 'nullable|array',
+            'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $unitType = UnitType::where('id', $validated['unit'])->first();
+            $materialTotal = (int)$validated['quantity'] * (float)$validated['price'];
+            $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
+
+            $materialEntry = MaterialEntry::where('id', $id)
+                ->where('ministry_id', $ministry->id)
+                ->first();
+            $paths = [];
+            if ($request->hasFile('file')) {
+                foreach ($request->file('file') as $file) {
+                    if ($file->isValid()) {
+                        $stored[] = $file->store('materialEntry', 'public');
+                    }
+                }
+            }
+
+            $materialEntry->update([
+                'ministry_id'  => $ministry->id,
+                'company_name' => $validated['company_name'],
+                'stock_number' => $validated['stock_number'],
+                'stock_name'   => $validated['stock_name'],
+                'user_entry'   => $validated['user_entry'],
+                'p_code'   => $validated['p_code'],
+                'p_name'   => $validated['p_name'],
+                'p_year'   => $validated['p_year'],
+                'title'   => $validated['title'],
+                'unit'         => $unitType->name,
+                'quantity'     => $validated['quantity'],
+                'price'        => $validated['price'],
+                'total_price'   => $materialTotal,
+                'source'        => $validated['source'],
+                'note'        => strip_tags($validated['note']),
+                'refer'        => strip_tags($validated['refer']),
+                'date_entry'   => $dateEntry,
+                'file'         => json_encode($paths),
+            ]);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+            return redirect()->route('materialEntry.index', $params);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('materialEntry.index', $params);
+        }
     }
 
     /**
@@ -182,50 +278,15 @@ class MaterialEntryController extends Controller
 
         try {
             $ministryId = decode_params($params);
-
-            // $loan = BudgetVoucherLoan::where('ministry_id', $ministryId)->get();
-
-            // // Base query: full BeginVoucher models
-            // $query = BeginVoucher::where('account_sub_id', $loan->account_sub_id)
-            //     ->where('ministry_id', $ministryId);
             $query = MaterialEntry::query()
                 // ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
                 ->where('material_entries.ministry_id', $ministryId)
                 ->select(
                     'material_entries.*',
-                    // 'budget_voucher_loans.internal_increase',
-                    // 'budget_voucher_loans.unexpected_increase',
-                    // 'budget_voucher_loans.additional_increase',
-                    // 'budget_voucher_loans.total_increase',
-                    // 'budget_voucher_loans.decrease',
-                    // 'budget_voucher_loans.editorial'
                 );
 
             // Apply filters...
             $data = $query->get();
-
-
-
-            // Apply the same filters as in DataTable::query()
-            // if ($request->filled('agency')) {
-            //     $query->where('agency_id', $request->agency);
-            // }
-
-            // if ($request->filled('account')) {
-            //     $query->where('account_id', $request->account);
-            // }
-
-            // if ($request->filled('accountSub')) {
-            //     $query->where('account_sub_id', $request->accountSub);
-            // }
-
-            // if ($request->filled('no')) {
-            //     $query->where('no', 'like', "%{$request->no}%");
-            // }
-
-            // if ($request->filled('txtDescription')) {
-            //     $query->where('txtDescription', 'like', "%{$request->txtDescription}%");
-            // }
 
             $query->orderBy('created_at', 'DESC');
 

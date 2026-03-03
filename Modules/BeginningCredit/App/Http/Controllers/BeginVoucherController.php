@@ -262,8 +262,6 @@ class BeginVoucherController extends Controller
                 ->where('agency_id', $validatedData['cboAgency'])
                 ->sum('budget');
 
-            // dd($currentApplyTotal);
-
             $early_balance     = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
             $deadline_balance  = $early_balance + $currentApplyTotal;
             $credit            = $new_credit_status - $deadline_balance;
@@ -405,7 +403,7 @@ class BeginVoucherController extends Controller
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);
-        dd($validatedData);
+
         DB::beginTransaction();
         try {
             $ministry = Ministry::where('id', decode_params($params))->first();

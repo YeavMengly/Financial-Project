@@ -20,6 +20,9 @@ return new class extends Migration
             $table->decimal('budget', 15, 2)->default(0);
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legalNumber');
+            $table->string('legalName');
+            $table->enum('status', ['todo', 'done'])->default('todo');
+            $table->integer('is_archived')->default(1);
             $table->text('txtDescription');
             $table->json('attachments')->nullable();
             $table->date('date');
