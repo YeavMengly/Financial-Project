@@ -205,8 +205,9 @@ class DashboardController extends Controller
         });
 
         $chapterLabels = $chapters->pluck('no')->map(fn($n) => " $n");
-        // dd($chapterLabels);
+        //  dd($chapters);
         $finLawData    = $chapters->pluck('fin_law');
+        $remainData    = $chapters->pluck('remain');
 
         $account = Account::where('ministries.year', $year)
             ->join('ministries', 'accounts.ministry_id', '=', 'ministries.id')
@@ -271,6 +272,8 @@ class DashboardController extends Controller
         $direct_Payment = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
         // $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
         // $pre_Financing = round($budgetVouchers->where('expense_type_id', '5')->sum('budget'), 2);
+        $totalCount = $budgetMandate->where('expense_type_id', '1')->count();
+        $totalCountDir = $budgetVouchers->where('expense_type_id', '3')->count();
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
@@ -343,6 +346,7 @@ class DashboardController extends Controller
             'chapters' => $chapters,
             'chapterLabels' => $chapterLabels,
             'finLawData' => $finLawData,
+            'remainData' => $remainData,
             'accounts' => $accounts,
             'expenditure_Guarantee' => $expenditure_Guarantee,
             //'advance_Payment' => $advance_Payment,
@@ -355,6 +359,8 @@ class DashboardController extends Controller
            // 'percent_procurement' => $percent_procurement,
            // 'percent_pre_Financing' => $percent_pre_Financing,
             // 'taskType' => $taskType,
+            'totalCount'=> $totalCount,
+            'totalCountDir'=>$totalCountDir,
             'expenseType' => $expenseType,
         ]);
     }
