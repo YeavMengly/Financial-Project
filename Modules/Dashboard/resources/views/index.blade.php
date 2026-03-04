@@ -350,7 +350,7 @@
         </div>
 
     </div>
-   
+
     <div class="row">
         <div class="col-xl-6">
             <!-- card -->
@@ -379,7 +379,7 @@
 
                     <div class="row align-items-center">
                         <div class="col-sm">
-                            <div id="wallet-balance" data-colors='["#1890ff", "#52c41a", "#faad14"]' class="apex-charts">
+                            <div id="wallet-balance" data-colors='["#d91b1b", "#52c41a", "#faad14"]' class="apex-charts">
                             </div>
                         </div>
                         <div class="col-sm align-self-center">
@@ -392,7 +392,7 @@
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($total_fin_law) }}
+                                            {{ number_format($total_fin_law) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
@@ -401,11 +401,11 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#52c41a"></i>
-                                        {{ __('tables.th.deadline_balance') }}
+                                        បាន/កំពុង {{ __('tables.th.apply') }}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($total_deadline_balance) }}
+                                            {{ number_format($total_deadline_balance) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
@@ -413,12 +413,12 @@
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#1890ff"></i>
-                                        {{ __('tables.th.credit') }}
+                                            style="color:#d91b1b"></i>
+                                        {{ __('tables.th.deadline_balance') }}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($total_credit) }}
+                                            {{ number_format($total_credit) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
@@ -447,7 +447,13 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#faad14"></i>
-                                        ធានាចំណាយ
+                                        <span class="me-3">ធានាចំណាយ </span>
+                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            {{ $totalCountArch }}
+                                        </button>
+                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            - {{ $totalCountDir }}
+                                        </button>
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -471,7 +477,10 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#2200ff"></i>
-                                        ទូទាត់ត្រង់
+                                        <span class="me-3">ទូទាត់ត្រង់ </span>
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            {{ $totalCountDir }}
+                                        </button>
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -479,19 +488,19 @@
                                         </span>
                                     </h6>
                                 </div>
-                                {{-- <div class="mt-4 pt-2">
+                                <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#e81a2c"></i>
-                                        លទ្ធកម្ម
+                                      នៅសល់
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($procurement) }} រៀល
+                                         0 រៀល
                                         </span>
                                     </h6>
                                 </div>
-                                <div class="mt-4 pt-2">
+                                {{-- <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#fde50c"></i>
@@ -510,12 +519,15 @@
             </div>
             <!-- end card -->
         </div>
+
     </div>
 
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
+                data-program-id="{{ $program->id }}"
+                data-program-title="{{ __('menus.program') }} {{ $program->no }}">
                 <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -523,26 +535,12 @@
                                 <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
-                            {{-- select expanseType --}}
-                            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
-                                action="{{ url()->current() }}">
-                                <div class="flex-shrink-0">
-                                    <select class="form-select-sm" name="expenseType" id="expenseType">
-                                        <option selected="">ប្រភេទចំណាយ </option>
-                                        @foreach ($expenseType as $et)
-                                            <option value="{{ $et->id }}"
-                                                {{ ($expenseType ?? '') === $et ? 'selected' : '' }}>
-                                                {{ $et->name_kh }}
-                                            </option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-                            </form>
-
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
                                     {{ $program->total_records }}
+                                </button>
+                                <button type="button" class="btn btn-soft-danger btn-sm">
+                                    - 0
                                 </button>
                             </div>
                         </div>
@@ -573,9 +571,7 @@
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
                             </small>
                         </div>
-                        <span class="badge bg-success-subtle text-success program-card" role="button"
-                            data-program-id="{{ $program->id }}"
-                            data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
+                        <span class="badge bg-success-subtle text-success" role="button" style="cursor:pointer;">
                             Click to view details
                         </span>
                     </div>
@@ -583,8 +579,8 @@
             </div>
         @endforeach
     </div>
-     {{-- chapter ,account --}}
-    <div class=" ">
+    {{-- chapter ,account --}}
+    <div class="row">
         <div class="card">
             <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
                 action="{{ url()->current() }}">
@@ -609,8 +605,7 @@
                                     <th>{{ __('tables.th.fin_law') }}</th>
                                     <th>{{ __('tables.th.deadline_balance') }}</th>
                                     <th>{{ __('tables.th.remaining_credit') }}</th>
-
-                                    <th></th>
+                                    <th>បន្ថែម</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody">
@@ -960,7 +955,7 @@
 
         });
     </script>
-     <script>
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
 
             var chartDataCreditStatus = @json($chartDataCreditStatus);
@@ -1372,8 +1367,8 @@
                 ],
 
                 labels: [
-                    "{{ __('tables.th.credit') }}",
                     "{{ __('tables.th.deadline_balance') }}",
+                    "បាន/កំពុង{{ __('tables.th.apply') }}",
                     "{{ __('tables.th.financeLaw') }}"
                 ],
 
@@ -1447,7 +1442,7 @@
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
                     "ទូទាត់ត្រង់",
-                    // "លទ្ធកម្ម",
+                     "នៅសល់",
                     // "បើកផ្ដល់មុន",
                 ],
 
@@ -1500,11 +1495,16 @@
     {{-- barchart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('en-US').format(value) + " ៛";
+            }
 
             const el = document.querySelector("#bar_chart");
             const colors = JSON.parse(el.getAttribute("data-colors"));
             const label = @json($chapterLabels).map(item => 'ជំពូក' + item);;
             const finLawData = @json($finLawData);
+            const remainData = @json($remainData);
+            const deadlineData = @json($deadlineData);
             // console.log('finLawData:', finLawData);
             const options = {
                 chart: {
@@ -1516,8 +1516,14 @@
                 },
                 colors: colors,
                 series: [{
-                    name: "សរុប",
-                    data: finLawData
+                    name: "",
+                    data: finLawData.map((value, index) => ({
+                        x: label[index],
+                        y: value,
+                        remain: remainData[index],
+                        deadline: deadlineData[index]
+                    })),
+
                 }],
                 xaxis: {
                     categories: label
@@ -1535,20 +1541,37 @@
                 yaxis: {
                     labels: {
                         formatter: function(value) {
-                            return value.toLocaleString() + " ៛";
+                            return formatCurrency(value);
                         }
                     }
                 },
                 tooltip: {
                     y: {
-                        formatter: function(value) {
-                            return value.toLocaleString() + " ៛";
+                        formatter: function(value, opts) {
+                            const remain =
+                                opts.w.config.series[0].data[opts.dataPointIndex].remain;
+                            const deadline =
+                                opts.w.config.series[0].data[opts.dataPointIndex].deadline;
+
+                            return "សរុប: " + formatCurrency(value) +
+                                "<br>អនុវត្ដ: " + formatCurrency(remain) +
+                                "<br>នៅសល់: " + formatCurrency(deadline);
+                        }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        formatter: function(value, opts) {
+                            const remain =
+                                opts.w.config.series[0].data[opts.dataPointIndex].remain;
+                            const deadline =
+                                opts.w.config.series[0].data[opts.dataPointIndex].deadline;
+
+                            return formatCurrency(value) + "\n(" +
+                                formatCurrency(remain) + "\n("
+                            formatCurrency(deadline) + ")";
                         }
                     }
                 }
-                // grid: {
-                //     strokeDashArray: 4
-                // }
             };
 
             new ApexCharts(el, options).render();
@@ -1648,9 +1671,9 @@
                                 html += `
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
-                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()}</td>
-                                        <td>${Number(subs.apply ?? 0).toLocaleString()}</td>
-                                        <td>${Number(subs.credit ?? 0).toLocaleString()}</td>
+                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
                                     </tr>
                                 `;
                             });

@@ -62,7 +62,7 @@ return [
     'th.applying' => 'ស្នើសុំលើកនេះ',
     'th.apply' => 'អនុវត្ត',
     'th.remaining_credit' => 'ឥណទាននៅសល់',
-    'th.deadline_balance' => 'សម.ចុងគ្រា',
+    'th.deadline_balance' => 'សមតុល្យចុងគ្រា',
 
     'th.internal' => 'កើនផ្ទៃក្នុង',
     'th.unexpected'  => 'មិនបានគ្រោងទុក',
