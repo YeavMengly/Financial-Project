@@ -3,6 +3,7 @@
 namespace App\Models\Content;
 
 use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,6 +46,14 @@ class Agency extends Model
     public function beginVoucher()
     {
         return $this->hasMany(BeginVoucher::class, 'agency_id', 'id');
+    }
+
+    /**
+     * Get the budgetMandate this agency belongs to.
+     */
+    public function budgetMandate()
+    {
+        return $this->hasMany(BudgetMandate::class, 'agency_id', 'id');
     }
 
     /* -----------------------------------------------------------------

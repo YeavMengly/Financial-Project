@@ -4,6 +4,7 @@ namespace App\DataTables\Budget;
 
 use App\Models\BeginCredit\InitialBudget;
 use App\Models\BudgetPlan\BudgetMandate;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
@@ -33,6 +34,8 @@ class BudgetMandateDataTable extends DataTable
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
+
                 return $active;
             })
             ->editColumn('name_kh', function ($row) {
@@ -45,9 +48,6 @@ class BudgetMandateDataTable extends DataTable
                 $notes = ($module->is_archived == 2) ? '<button class="btn btn-sm btn-outline-success">បានបញ្ចប់</button>' : '<button class="btn btn-sm btn-outline-primary">កំពុងធ្វើ</button>';
 
                 return $notes;
-            })
-            ->editColumn('txtDescription', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
             })
             ->editColumn('attachments', function ($row) {
                 if (!$row->attachments) {
@@ -67,8 +67,7 @@ class BudgetMandateDataTable extends DataTable
                     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
                 }
             })
-            ->rawColumns(['txtDescription', 'attachments', 'agency', 'is_archived'])
-            ->setRowId('id');
+            ->rawColumns(['description', 'attachments', 'agency', 'is_archived', 'soft_delete']);
     }
 
     /**
@@ -80,6 +79,28 @@ class BudgetMandateDataTable extends DataTable
         $id = decode_params($params);
 
         $model = $model->newQuery();
+
+        if ($request->cboStatus) {
+            if ($request->cboStatus == '2') {
+                $model->where('budget_mandates.deleted_at', null);
+            } elseif ($request->cboStatus == '3') {
+                $model->where('budget_mandates.deleted_at', '!=', null);
+            } else {
+                $model->withTrashed();
+            }
+        } else {
+            $model->where('budget_mandates.deleted_at', null);
+        }
+
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('is_archived', 2);
+            }
+        } else {
+            $model->where('is_archived', 1);
+        }
 
         $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
@@ -93,16 +114,6 @@ class BudgetMandateDataTable extends DataTable
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
 
-        if ($request->cboTodo) {
-            if ($request->cboTodo == 2) {
-                $model->where('is_archived', 1);
-            } elseif ($request->cboTodo == 3) {
-                $model->where('is_archived', 2);
-            }
-        } else {
-            $model->where('is_archived', 1);
-        }
-
         // ===== SELECT =====
         $model->select([
             'budget_mandates.id',
@@ -111,15 +122,17 @@ class BudgetMandateDataTable extends DataTable
             'agencies.name AS agency_name',
             'account_subs.no as account_sub_no',
             'budget_mandates.no',
-            'budget_mandates.txtDescription',
             'budget_mandates.budget',
-            'budget_mandates.legalNumber',
-            'budget_mandates.legalName',
+            'budget_mandates.legal_number',
+            'budget_mandates.legal_name',
             'budget_mandates.is_archived',
             'expense_types.name_kh',
+            'budget_mandates.description',
             'budget_mandates.attachments',
-            'budget_mandates.date',
-            'budget_mandates.created_at'
+            'budget_mandates.transaction_date',
+            'budget_mandates.request_date',
+            'budget_mandates.created_at',
+            'budget_mandates.deleted_at'
         ]);
 
         $model->orderByDesc('budget_mandates.created_at');
@@ -143,6 +156,7 @@ class BudgetMandateDataTable extends DataTable
                 d.agency     = $("#agency").val();
                 d.no    = $("#no").val();
                 d.accountSub = $("#accountSub").val();
+                d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
                 }',
             ])
@@ -164,18 +178,21 @@ class BudgetMandateDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('legalNumber')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
-            Column::make('legalName')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
+            Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
+
+            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
-            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
+            Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
+            Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 
-            Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

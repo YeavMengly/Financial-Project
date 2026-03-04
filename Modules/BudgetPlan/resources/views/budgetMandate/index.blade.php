@@ -45,6 +45,15 @@
                                 <option value="3">បានបញ្ចប់</option>
                             </select>
                         </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
+                            </select>
+                        </div>
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
