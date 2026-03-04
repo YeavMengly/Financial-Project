@@ -47,6 +47,8 @@ return [
     'th.budget' => 'ថវិកា',
     'th.type' => 'ប្រភេទ',
     'th.date' => 'កាលបរិច្ឆេទ',
+    'th.date.transaction' => 'កាលបរិច្ឆេទកិច្ចបញ្ជីការ',
+    'th.date.request' => 'កាលបរិច្ឆេទបង្កើតសំណើ',
     'th.legal.number' => 'លេខសំណើ',
     'th.legal.name' => 'ឈ្មោះសំណើ',
 

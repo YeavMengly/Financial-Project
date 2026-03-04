@@ -20,6 +20,8 @@ return [
     'zip_file' => 'Zip File',
     'date' => 'ថ្ងៃខែឆ្នាំ',
     'select_date' => 'ជ្រើសរើស ថ្ងៃខែឆ្នាំ',
+    'select_transaction_date' => 'ជ្រើសរើស កាលបរិច្ឆេទកិច្ចបញ្ជីការ',
+    'select_request_date' => 'ជ្រើសរើស កាលបរិច្ឆេទបង្កើតសំណើ',
     'search...' => 'ស្វែងរក...',
     'document.title' => 'ចំណងជើង ឯកសារ',
     'document.year' => 'ឆ្នាំ ឯកសារ',
