@@ -75,16 +75,6 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <div class="form-check">
-                                        <input type="checkbox" name="status" value="1" class="form-check-input"
-                                            checked>
-                                        <label class="form-check-label">Active</label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>

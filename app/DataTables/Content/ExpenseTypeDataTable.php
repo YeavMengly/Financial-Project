@@ -94,7 +94,7 @@ class ExpenseTypeDataTable extends DataTable
             Column::make('name_en')->title(__('tables.th.name.en'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::computed('status')
-                ->title(__('tables.th.status'))
+                ->title(__('Task'))
                 ->width(100)
                 ->addClass('text-center align-middle'),
 

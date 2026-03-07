@@ -44,7 +44,7 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.number') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
@@ -54,9 +54,9 @@
                                             placeholder="{{ __('forms.legal.number') }}" name="legalNumber"
                                             tabindex="2" />
                                     </div>
-                                </div>
+                                </div> --}}
 
-                                {{-- <div class="col-lg-4 col-md-6">
+                                <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
                                             {{ __('forms.legal.number') }}
@@ -65,7 +65,7 @@
                                             required data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($budgetMandate as $item)
-                                                <option value="{{ $item->ilegal_numberd }}">
+                                                <option value="{{ $item->legal_number }}">
                                                     {{ $item->legal_number }}
                                                 </option>
                                             @endforeach
@@ -74,7 +74,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div> --}}
+                                </div>
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">

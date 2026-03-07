@@ -32,6 +32,8 @@ class BudgetMandate extends Model
         'no',
         'budget',
         'expense_type_id',
+        'legal_id',
+        'payment_voucher_number',
         'legal_number',
         'legal_name',
         'status',
@@ -39,13 +41,15 @@ class BudgetMandate extends Model
         'description',
         'attachments',
         'transaction_date',
-        'request_date'
+        'request_date',
+        'legal_date',
     ];
 
     protected $casts = [
         'attachments' => 'array',
         'transaction_date' => 'date',
         'request_date' => 'date',
+        'legal_date' => 'date',
     ];
 
     /* -----------------------------------------------------------------

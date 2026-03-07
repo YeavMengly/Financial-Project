@@ -42,7 +42,6 @@ class MinistryController extends Controller
             'title' => ['required', 'string'],
             'refer' => ['required', 'string'],
             'name' => ['required', 'string'],
-            'status' => ['nullable', 'boolean'], // ✅ ADD
         ], [
             'year.unique' => 'ឆ្នាំនេះត្រូវបានបញ្ចូលរួចហើយ។',
         ]);
@@ -54,7 +53,8 @@ class MinistryController extends Controller
             Ministry::create([
                 ...$validateData,
                 'no' => '32',
-                'status' => $request->has('status') ? 1 : 0, // ✅ DEFAULT ACTIVE
+                'status'           => 'todo',
+                'is_archived'      => 1,
             ]);
 
             DB::commit();
@@ -104,7 +104,7 @@ class MinistryController extends Controller
             'title' => ['required', 'string'],
             'refer' => ['required', 'string'],
             'name' => ['required', 'string'],
-            'status' => ['nullable', 'boolean'], // ✅ ADD
+            'cboTaks' => '',
         ], [
             'year.unique' => 'ឆ្នាំនេះត្រូវបានបញ្ចូលរួចហើយ។',
         ]);
@@ -118,7 +118,8 @@ class MinistryController extends Controller
             $validateData['name'] = strip_tags($validateData['name']);
             $ministry->update([
                 ...$validateData,
-                'status' => $request->has('status') ? 1 : 0, // ✅ IMPORTANT
+                'status' => 'todo',
+                'is_archived' => ($request->cboTaks == '3') ? '2' : '1',
             ]);
 
             DB::commit();

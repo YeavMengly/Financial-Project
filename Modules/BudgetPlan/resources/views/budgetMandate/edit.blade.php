@@ -39,6 +39,17 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.id') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                            type="number" class="form-control" placeholder="{{ __('forms.legal.id') }}"
+                                            name="legalID" value="{{ old('legalID', $module->legal_id) }}" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.number') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             type="text" class="form-control" name="legalNumber"
@@ -55,25 +66,6 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
-                                        <select class="form-control" id="cboAgency" name="cboAgency" required>
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $item)
-                                                <option value="{{ $item->id }}"
-                                                    {{ $item->id == $module->agency_id ? 'selected' : '' }}>
-                                                    {{ $item->no }} - {{ $item->name ?? 'មិនមានទិន្ន័យ' }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div> --}}
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboProgram" class="form-label font-size-13 text-muted">
@@ -155,7 +147,6 @@
                                                     data-program="{{ $bv->no }}"
                                                     {{ old('cboSubAccount', $module->account_sub_id) == $bv->account_sub_id ? 'selected' : '' }}>
                                                     {{ $bv->account_sub_id }}
-                                                    {{-- - {{ $bv->no }} --}}
                                                 </option>
                                             @endforeach
                                         </select>

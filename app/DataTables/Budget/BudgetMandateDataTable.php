@@ -123,6 +123,8 @@ class BudgetMandateDataTable extends DataTable
             'account_subs.no as account_sub_no',
             'budget_mandates.no',
             'budget_mandates.budget',
+            'budget_mandates.legal_id',
+            'budget_mandates.payment_voucher_number AS pvn',
             'budget_mandates.legal_number',
             'budget_mandates.legal_name',
             'budget_mandates.is_archived',
@@ -131,6 +133,7 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.attachments',
             'budget_mandates.transaction_date',
             'budget_mandates.request_date',
+            'budget_mandates.legal_date',
             'budget_mandates.created_at',
             'budget_mandates.deleted_at'
         ]);
@@ -180,6 +183,8 @@ class BudgetMandateDataTable extends DataTable
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
 
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
+            Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
             Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
@@ -189,6 +194,8 @@ class BudgetMandateDataTable extends DataTable
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
+            Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
+
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 
