@@ -22,6 +22,7 @@ return [
     'select_date' => 'ជ្រើសរើស ថ្ងៃខែឆ្នាំ',
     'select_transaction_date' => 'ជ្រើសរើស កាលបរិច្ឆេទកិច្ចបញ្ជីការ',
     'select_request_date' => 'ជ្រើសរើស កាលបរិច្ឆេទបង្កើតសំណើ',
+    'select_legal_date' => 'ជ្រើសរើស កាលបរិច្ឆេទលិខិត',
     'search...' => 'ស្វែងរក...',
     'document.title' => 'ចំណងជើង ឯកសារ',
     'document.year' => 'ឆ្នាំ ឯកសារ',
@@ -76,6 +77,7 @@ return [
     'source' => 'ប្រភព',
     'total.price' => 'តម្លៃ​សរុប',
 
+    'legal.id' => 'លេខលិខិត',
     'legal.number' => 'លេខសម្គាល់សំណើ',
     'legal.name' => 'ឈ្មោះសំណើ',
     'title.entity' => 'អង្គភាព',

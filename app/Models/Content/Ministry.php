@@ -28,6 +28,7 @@ class Ministry extends Model
         'refer',
         'name',
         'status',
+        'is_archived'
     ];
 
     protected $casts = [

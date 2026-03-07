@@ -44,6 +44,7 @@ return [
     'budget.plan' => 'ចុះបញ្ជី',
     'initial.voucher' => 'កម្រងសលាកបត្រ',
     'initial.mandate' => 'កម្រងអាណត្តិ',
+    'procurement' => 'លទ្ធកម្ម',
     'budget.control.voucher' => 'សលាកបត្រ',
     'budget.control.mandate' => 'អាណត្តិ',
     'voucher' => 'សលាកបត្រ',
@@ -60,6 +61,7 @@ return [
 
     'check.control.general'   => 'ពិនិត្យរបាយការណ៍',
     'check.control.guarantee' => 'ធានាចំណាយ',
+    'expenditure.guarantee' => 'ធានាចំណាយ',
     'check.control.summary' => 'របាយការណ៍សង្ខេប',
 
     'library' => 'Media Library',

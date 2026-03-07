@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('no');
             $table->decimal('budget', 15, 2)->default(0);
             $table->unsignedBigInteger('expense_type_id');
+            $table->string('legal_id');
             $table->string('legal_number', 100);
             $table->string('legal_name');
             $table->enum('status', ['todo', 'done'])->default('todo');
@@ -30,6 +31,7 @@ return new class extends Migration
             $table->json('attachments')->nullable();
             $table->date('transaction_date');
             $table->date('request_date');
+            $table->date('legal_date');
             $table->timestamps();
             $table->softDeletes();
         });
