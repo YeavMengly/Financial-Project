@@ -15,7 +15,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.budget.control.voucher') }}
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.payment') }}
                 </h4>
 
                 <div class="page-title-right">
@@ -37,6 +37,15 @@
             <div class="card">
                 <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2">កំពុងធ្វើ</option>
+                                <option value="3" selected>បានបញ្ចប់</option>
+                            </select>
+                        </div>
+
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>

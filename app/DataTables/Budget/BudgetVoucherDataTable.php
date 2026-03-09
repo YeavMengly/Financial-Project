@@ -3,6 +3,7 @@
 namespace App\DataTables\Budget;
 
 use App\Models\BudgetPlan\BudgetVoucher;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -25,13 +26,15 @@ class BudgetVoucherDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('agency', function ($row) {
-                return $row->agency_no . ' - ' . $row->agency_name;
+                return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
+
                 return $active;
             })
             ->editColumn('name_kh', function ($row) {
@@ -40,8 +43,10 @@ class BudgetVoucherDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('budgetplan::budgetVoucher.action', ['module' => $module]);
             })
-            ->editColumn('txtDescription', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
+            ->editColumn('is_archived', function ($module) {
+                $notes = ($module->is_archived == 2) ? '<button class="btn btn-sm btn-outline-success">បានបញ្ចប់</button>' : '<button class="btn btn-sm btn-outline-primary">កំពុងធ្វើ</button>';
+
+                return $notes;
             })
             ->editColumn('attachments', function ($row) {
                 if (!$row->attachments) {
@@ -61,8 +66,7 @@ class BudgetVoucherDataTable extends DataTable
                     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
                 }
             })
-            ->rawColumns(['soft_delete', 'txtDescription','attachments'])
-            ->setRowId('id');
+            ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
 
     /**
@@ -74,6 +78,28 @@ class BudgetVoucherDataTable extends DataTable
         $id = decode_params($params);
 
         $model = $model->newQuery();
+
+        if ($request->cboStatus) {
+            if ($request->cboStatus == '2') {
+                $model->where('budget_vouchers.deleted_at', null);
+            } elseif ($request->cboStatus == '3') {
+                $model->where('budget_vouchers.deleted_at', '!=', null);
+            } else {
+                $model->withTrashed();
+            }
+        } else {
+            $model->where('budget_vouchers.deleted_at', null);
+        }
+
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('is_archived', 2);
+            }
+        } else {
+            $model->where('is_archived', 2);
+        }
 
         $model->leftJoin('account_subs', function ($join) use ($id) {
             $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
@@ -93,13 +119,17 @@ class BudgetVoucherDataTable extends DataTable
             'agencies.name AS agency_name',
             'account_subs.no as account_sub_no',
             'budget_vouchers.no',
-            'budget_vouchers.txtDescription',
             'budget_vouchers.budget',
-            'budget_vouchers.legalNumber',
+            'budget_vouchers.legal_number',
+            'budget_vouchers.legal_name',
+            'budget_vouchers.is_archived',
             'expense_types.name_kh',
+            'budget_vouchers.description',
             'budget_vouchers.attachments',
-            'budget_vouchers.date',
-            'budget_vouchers.created_at'
+            'budget_vouchers.transaction_date',
+            'budget_vouchers.request_date',
+            'budget_vouchers.created_at',
+            'budget_vouchers.deleted_at'
         ]);
 
         $model->orderByDesc('budget_vouchers.created_at');
@@ -120,9 +150,11 @@ class BudgetVoucherDataTable extends DataTable
             ])
             ->ajax([
                 'data' => 'function(d) {
-                d.agency     = $("#agency").val();
-                d.no    = $("#no").val();
-                d.accountSub = $("#accountSub").val();
+                    d.agency     = $("#agency").val();
+                    d.no    = $("#no").val();
+                    d.accountSub = $("#accountSub").val();
+                    d.cboTodo = $("#cboTodo").val();
+                    d.cboStatus = $("#cboStatus").val();
                 }',
             ])
             ->initComplete('function () {
@@ -143,15 +175,21 @@ class BudgetVoucherDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('legalNumber')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
+
+            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            Column::make('date')->title(__('tables.th.date'))->width(80)->addClass('align-middle'),
-            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
+            Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
+            Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
+
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];

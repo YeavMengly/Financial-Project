@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// routes
 use Modules\BudgetPlan\App\Http\Controllers\BudgetVoucherController;
 
 Route::middleware('PermissionCheck')
@@ -21,21 +20,13 @@ Route::controller(BudgetVoucherController::class)->group(function () {
     Route::post('voucher/{params}/store', 'store')->name('budgetVoucher.store');
     Route::post('voucher/{params}/update/{id}', 'update')->name('budgetVoucher.update');
     Route::get('voucher/{params}/export', 'export')->name('budgetVoucher.export');
+
+    // These routes are for ajax request
+    Route::get('voucher/get-by-program/program-subs', 'getByProgramId')->name('budgetVoucher.by.program_sub');
+    Route::get('voucher/get-by-program/agencies', 'getByAgency')->name('budgetVoucher.by.agency');
+    Route::get('voucher/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetVoucher.by.cluster');
+    // These routes are for edit page ajax request
+    Route::get('voucher/edit-by-program/program-subs', 'editByProgramId')->name('budgetVoucher.edit.program_sub');
+    Route::get('voucher/edit-by-program/agencies', 'editByAgency')->name('budgetVoucher.edit.agency');
+    Route::get('voucher/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetVoucher.edit.cluster');
 });
-
-// Route::get('/begin-voucher/by-program/program-subs', [BudgetVoucherController::class, 'getProgram'])
-//     ->name('budgetVoucher.by.program_sub');
-
-// Route::get('/begin-voucher/by-program/agencies', [BudgetVoucherController::class, 'getAgency'])
-//     ->name('budgetVoucher.by.agency');
-
-// Route::get('/begin-voucher/by-program-sub/clusters', [BudgetVoucherController::class, 'getProgramSub'])
-//     ->name('budgetVoucher.by.cluster');
-
-// Route::get('/begin-voucher/data', [BudgetVoucherController::class, 'getBeginVoucher'])
-//     ->name('beginVoucher.getData');
-
-// Route::post(
-//     '/budget-voucher/early-balance/{params}',
-//     [BudgetVoucherController::class, 'getEarlyBalance']
-// )->name('budgetVoucher.getEarlyBalance');
