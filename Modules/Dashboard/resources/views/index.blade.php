@@ -88,6 +88,10 @@
         #tableBody td {
             font-size: small;
         }
+
+        .cardhover:hover {
+            background-color: #fdf9f9;
+        }
     </style>
 @endsection
 
@@ -338,7 +342,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         {{-- bar chart --}}
         <div class="col-xl-6">
@@ -348,9 +351,7 @@
                 </div>
             </div>
         </div>
-
     </div>
-
     <div class="row">
         <div class="col-xl-6">
             <!-- card -->
@@ -396,7 +397,6 @@
                                         </span>
                                     </h6>
                                 </div>
-
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
@@ -409,7 +409,6 @@
                                         </span>
                                     </h6>
                                 </div>
-
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
@@ -447,12 +446,31 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#faad14"></i>
-                                        <span class="me-3">ធានាចំណាយ </span>
+                                        <span class="me-3">{{ __('menus.check.control.guarantee') }}</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
                                             {{ $totalCountArch }}
                                         </button>
                                         <button type="button" class="btn btn-soft-danger btn-sm mb-3">
-                                            - {{ $totalCountDir }}
+                                            {{ $totalCountDir }}
+                                        </button>
+                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                            type="button">
+                                            <span class="dropdown">
+                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    នៅសល់
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
+                                                    style="min-width:250px;">
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                        <i class="mdi mdi-circle"
+                                                            style="color:#c0341e; font-size:10px;"></i>
+                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                            {{ number_format($totalExpend) }} រៀល</h6>
+                                                    </div>
+                                                </div>
+                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -461,25 +479,32 @@
                                         </span>
                                     </h6>
                                 </div>
-                                {{-- <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#52c41a"></i>
-                                        បុរេប្រទាន
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($advance_Payment) }}​ ​រៀល
-                                        </span>
-                                    </h6>
-                                </div> --}}
-                                <div class="mt-4 pt-2">
+                                <div class="mt-10 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#2200ff"></i>
                                         <span class="me-3">ទូទាត់ត្រង់ </span>
                                         <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                             {{ $totalCountDir }}
+                                        </button>
+                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                            type="button">
+                                            <span class="dropdown w-100">
+                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    នៅសល់
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
+                                                    style="min-width:250px;">
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                        <i class="mdi mdi-circle"
+                                                            style="color:#c0341e; font-size:10px;"></i>
+                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                            {{ number_format($totalDir) }} រៀល</h6>
+                                                    </div>
+                                                </div>
+                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -488,30 +513,6 @@
                                         </span>
                                     </h6>
                                 </div>
-                                <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#e81a2c"></i>
-                                      នៅសល់
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                         0 រៀល
-                                        </span>
-                                    </h6>
-                                </div>
-                                {{-- <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#fde50c"></i>
-                                        បើកផ្ដល់មុន
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($pre_Financing) }} រៀល
-                                        </span>
-                                    </h6>
-                                </div> --}}
                             </div>
                         </div>
                     </div>
@@ -519,7 +520,6 @@
             </div>
             <!-- end card -->
         </div>
-
     </div>
 
     {{-- Program Data Info --}}
@@ -536,15 +536,17 @@
                                 </div>
                             </div>
                             <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
+                                <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
                                 </button>
+                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
+                                    {{ $program->total_record_mandate }}
+                                </button>
                                 <button type="button" class="btn btn-soft-danger btn-sm">
-                                    - 0
+                                    {{ $program->total_record_voucher }}
                                 </button>
                             </div>
                         </div>
-
                         <div class="row text-center g-2">
                             <div class="col-4 border-end">
                                 <span class="text-muted font-size-12 d-block">ច្បាប់ហិរញ្ញវត្ថុ</span>
@@ -552,20 +554,17 @@
                                     class="counter-value mb-0 text-primary">{{ number_format($program->fin_law) }}</span>
                                 <small class="text-muted">រៀល</small>
                             </div>
-
                             <div class="col-4 border-end">
                                 <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
                                 <span class="counter-value mb-0 text-success">{{ number_format($program->apply) }}</span>
                                 <small class="text-muted">រៀល</small>
                             </div>
-
                             <div class="col-4">
                                 <span class="text-muted font-size-12 d-block">នៅសល់</span>
                                 <span class="counter-value mb-0 text-danger">{{ number_format($program->credit) }}</span>
                                 <small class="text-muted">រៀល</small>
                             </div>
                         </div>
-
                         <div class="mt-3 text-center">
                             <small class="text-muted d-block">
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
@@ -613,7 +612,6 @@
                                     <tr data-chapter="{{ $acc->no }}">
                                         <td class="text-center">{{ $acc->no }}</td>
                                         <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
-
                                         <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
                                         <td>
@@ -755,7 +753,8 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyDieselRemain, 2) }} <span
+                                                class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1359,21 +1358,17 @@
                     type: "donut",
                     height: 260
                 },
-
                 series: [
                     {{ round($percent_credit, 2) }},
                     {{ round($percent_deadline_balance, 2) }},
                     {{ round($percent_fin_law, 2) }}
                 ],
-
                 labels: [
                     "{{ __('tables.th.deadline_balance') }}",
                     "បាន/កំពុង{{ __('tables.th.apply') }}",
                     "{{ __('tables.th.financeLaw') }}"
                 ],
-
                 colors: colors,
-
                 plotOptions: {
                     pie: {
                         donut: {
@@ -1381,7 +1376,6 @@
                         }
                     }
                 },
-
                 dataLabels: {
                     enabled: true,
                     formatter: function(val) {
@@ -1396,16 +1390,13 @@
                         enabled: false
                     }
                 },
-
                 stroke: {
                     width: 0
                 },
-
                 legend: {
                     position: "bottom",
                     show: true // 👈 image has no legend under donut
                 },
-
                 tooltip: {
                     y: {
                         formatter: function(val) {
@@ -1414,7 +1405,6 @@
                     }
                 }
             };
-
             new ApexCharts(el, options).render();
         });
     </script>
@@ -1430,24 +1420,18 @@
                     type: "donut",
                     height: 260
                 },
-
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
-
                     {{ round($percent_direct_Payment, 2) }},
-
                 ],
-
                 labels: [
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
                     "ទូទាត់ត្រង់",
-                     "នៅសល់",
+                    // "នៅសល់",
                     // "បើកផ្ដល់មុន",
                 ],
-
                 colors: colors,
-
                 plotOptions: {
                     pie: {
                         donut: {
@@ -1455,7 +1439,6 @@
                         }
                     }
                 },
-
                 dataLabels: {
                     enabled: true,
                     formatter: function(val) {
@@ -1470,16 +1453,13 @@
                         enabled: false
                     }
                 },
-
                 stroke: {
                     width: 0
                 },
-
                 legend: {
                     position: "bottom",
                     show: true // 👈 image has no legend under donut
                 },
-
                 tooltip: {
                     y: {
                         formatter: function(val) {
@@ -1488,24 +1468,42 @@
                     }
                 }
             };
-
             new ApexCharts(el, options).render();
         });
     </script>
     {{-- barchart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+
             function formatCurrency(value) {
                 return new Intl.NumberFormat('en-US').format(value) + " ៛";
             }
 
             const el = document.querySelector("#bar_chart");
             const colors = JSON.parse(el.getAttribute("data-colors"));
-            const label = @json($chapterLabels).map(item => 'ជំពូក' + item);;
-            const finLawData = @json($finLawData);
-            const remainData = @json($remainData);
-            const deadlineData = @json($deadlineData);
-            // console.log('finLawData:', finLawData);
+
+            let chapterLabels = @json($chapterLabels);
+            let finLawData = @json($finLawData);
+            let remainData = @json($remainData);
+            let deadlineData = @json($deadlineData);
+
+            // combine data
+            let combined = chapterLabels.map((label, index) => ({
+                label: label,
+                finLaw: finLawData[index],
+                remain: remainData[index],
+                deadline: deadlineData[index]
+            }));
+
+            // sort big → small by chapter label
+            combined.sort((a, b) => b.label - a.label);
+
+            // rebuild arrays after sorting
+            const label = combined.map(item => 'ជំពូក' + item.label);
+            const sortedFinLaw = combined.map(item => item.finLaw);
+            const sortedRemain = combined.map(item => item.remain);
+            const sortedDeadline = combined.map(item => item.deadline);
+
             const options = {
                 chart: {
                     type: "bar",
@@ -1517,22 +1515,20 @@
                 colors: colors,
                 series: [{
                     name: "",
-                    data: finLawData.map((value, index) => ({
+                    data: sortedFinLaw.map((value, index) => ({
                         x: label[index],
                         y: value,
-                        remain: remainData[index],
-                        deadline: deadlineData[index]
-                    })),
-
+                        remain: sortedRemain[index],
+                        deadline: sortedDeadline[index]
+                    }))
                 }],
                 xaxis: {
                     categories: label
                 },
                 plotOptions: {
                     bar: {
-                        borderRadius: 4,
-                        columnWidth: "50%",
-                        // distributed: true
+                        borderRadius: 2,
+                        columnWidth: "60%"
                     }
                 },
                 dataLabels: {
@@ -1548,35 +1544,75 @@
                 tooltip: {
                     y: {
                         formatter: function(value, opts) {
-                            const remain =
-                                opts.w.config.series[0].data[opts.dataPointIndex].remain;
-                            const deadline =
-                                opts.w.config.series[0].data[opts.dataPointIndex].deadline;
+                            const remain = opts.w.config.series[0].data[opts.dataPointIndex].remain;
+                            const deadline = opts.w.config.series[0].data[opts.dataPointIndex].deadline;
 
                             return "សរុប: " + formatCurrency(value) +
                                 "<br>អនុវត្ដ: " + formatCurrency(remain) +
                                 "<br>នៅសល់: " + formatCurrency(deadline);
                         }
-                    },
-                    dataLabels: {
-                        enabled: true,
-                        formatter: function(value, opts) {
-                            const remain =
-                                opts.w.config.series[0].data[opts.dataPointIndex].remain;
-                            const deadline =
-                                opts.w.config.series[0].data[opts.dataPointIndex].deadline;
-
-                            return formatCurrency(value) + "\n(" +
-                                formatCurrency(remain) + "\n("
-                            formatCurrency(deadline) + ")";
+                    }
+                },
+                // responsive for mobile
+                responsive: [{
+                    breakpoint: 992,
+                    options: {
+                        chart: {
+                            height: 300
+                        },
+                        plotOptions: {
+                            bar: {
+                                columnWidth: "60%"
+                            }
                         }
                     }
-                }
+                }, {
+                    breakpoint: 768,
+                    options: {
+                        chart: {
+                            height: 280
+                        },
+                        xaxis: {
+                            labels: {
+                                rotate: -45,
+                                style: {
+                                    fontSize: "10px"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 260
+                        },
+                        plotOptions: {
+                            bar: {
+                                columnWidth: "70%"
+                            }
+                        },
+                        xaxis: {
+                            labels: {
+                                rotate: -45,
+                                style: {
+                                    fontSize: "9px"
+                                }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: "9px"
+                                }
+                            }
+                        }
+                    }
+                }]
             };
 
             new ApexCharts(el, options).render();
         });
-        // 
     </script>
     {{-- search Chapter --}}
     <script>
@@ -1696,76 +1732,4 @@
                 });
             });
         });
-    </script>
-
-    <script>
-        // document.addEventListener("DOMContentLoaded", function() {
-
-        //     const options = {
-        //         chart: {
-        //             type: 'bar',
-        //             height: 260,
-        //             toolbar: {
-        //                 show: false,
-        //                 color: '#1e90ff',
-        //             }
-        //         },
-        //         series: [{
-        //             name: 'Fin Law',
-        //             data: @json($finLawData),
-        //             color: '#1e90ff'
-        //         }],
-        //         // xaxis: {
-        //         //     categories: @json($chapterLabels)
-        //         // }
-
-        //         xaxis: {
-        //             categories: @json($finLawData),
-        //             labels: {
-        //                 style: {
-        //                     fontSize: '12px'
-        //                 }
-        //             }
-        //         },
-
-        //         plotOptions: {
-        //             bar: {
-        //                 horizontal: true,
-        //                 barHeight: '65%',
-        //                 borderRadius: 3
-        //             }
-        //         },
-
-        //         colors: ['#1e90ff'],
-
-        //         dataLabels: {
-        //             enabled: false,
-        //         },
-
-        //         grid: {
-        //             strokeDashArray: 4,
-        //             xaxis: {
-        //                 lines: {
-        //                     show: true
-        //                 }
-        //             },
-        //             yaxis: {
-        //                 lines: {
-        //                     show: false
-        //                 }
-        //             }
-        //         },
-
-        //         tooltip: {
-        //             y: {
-        //                 formatter: val => val.toLocaleString()
-        //             }
-        //         }
-        //     };
-
-        //     new ApexCharts(
-        //         document.querySelector("#chapter-bar"),
-        //         options
-        //     ).render();
-        // });
     </script>

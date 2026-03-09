@@ -150,19 +150,45 @@ class DashboardController extends Controller
             ->select('programs.*', 'ministries.year')
             ->orderBy('no')
             ->get();
+        // total count pro
+        $totalProgaramVoucher = DB::table('budget_vouchers')
+            ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
+            ->groupBy('budget_vouchers.program_id')
+            ->selectRaw('
+        budget_vouchers.program_id,
+        COUNT(*) AS total_record_voucher
+    ')
+            ->get()
+            ->keyBy('program_id');
 
-        $programs = $data->map(function ($data) use ($programTotals) {
+        // dd($totalProgaramVoucher);
+        $totalProgaramMandate = DB::table('budget_mandates')
+            ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
+            ->groupBy('budget_mandates.program_id')
+            ->selectRaw('
+        budget_mandates.program_id,
+        COUNT(*) AS total_record_mandate
+    ')
+            ->get()
+            ->keyBy('program_id');
+        //  dd($totalProgaramMandate,$totalProgaramVoucher);
+        $programs = $data->map(function ($data) use ($programTotals, $totalProgaramVoucher, $totalProgaramMandate) {
             $total = $programTotals[$data->id] ?? null;
+            $totalVoucher = $totalProgaramVoucher[$data->id] ?? null;
+            $totalMandate = $totalProgaramMandate[$data->id] ?? null;
+
             $data->fin_law        = $total->fin_law        ?? 0;
             $data->apply          = $total->apply          ?? 0;
             $data->remain         = $total->remain         ?? 0;
             $data->credit         = $total->credit         ?? 0;
+            $data->total_record_voucher  = $totalVoucher->total_record_voucher  ?? 0;
+            $data->total_record_mandate  = $totalMandate->total_record_mandate  ?? 0;
             $data->total_records  = $total->total_records  ?? 0;
             $data->percent        = $data->fin_law > 0 ? ($data->apply / $data->fin_law) * 100 : 0;
             return $data;
         });
 
-
+        // dd($programs);
 
         $chapters = Chapter::where('ministries.year', $year)
             ->join('ministries', 'chapters.ministry_id', '=', 'ministries.id')
@@ -194,7 +220,7 @@ class DashboardController extends Controller
             $chapter->apply         = $total->apply ?? 0;
             $chapter->remain        = $total->remain ?? 0;
             $chapter->credit        = $total->credit ?? 0;
-             $chapter->deadline_balance        = $total->deadline_balance ?? 0;
+            $chapter->deadline_balance        = $total->deadline_balance ?? 0;
             $chapter->total_records = $total->total_records ?? 0;
 
             // example percentage
@@ -274,7 +300,7 @@ class DashboardController extends Controller
         $direct_Payment = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
         // $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
         // $pre_Financing = round($budgetVouchers->where('expense_type_id', '5')->sum('budget'), 2);
-         
+
         $totalCountArch = $budgetMandate->where('is_archived', '1')->count();
         $totalCountDir = $budgetVouchers->where('is_archived', '2')->count();
 
@@ -290,10 +316,10 @@ class DashboardController extends Controller
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
         // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-        $expenseType = ExpenseType::all();
+        $totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
+        $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
 
-
-        // dd($taskType);
+        //   dd($totalExpend );
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
@@ -341,6 +367,7 @@ class DashboardController extends Controller
             'materialCount' => $materialCount,
             'programs' => $programs,
             'programTotals' => $programTotals,
+            'totalProgaramMandate' => $totalProgaramMandate,
 
             'percent_credit'           => round($percent_credit, 2),
             'percent_deadline_balance' => round($percent_deadline_balance, 2),
@@ -351,7 +378,7 @@ class DashboardController extends Controller
             'chapterLabels' => $chapterLabels,
             'finLawData' => $finLawData,
             'remainData' => $remainData,
-            'deadlineData'=>$deadlineData,
+            'deadlineData' => $deadlineData,
             'accounts' => $accounts,
             'expenditure_Guarantee' => $expenditure_Guarantee,
             //'advance_Payment' => $advance_Payment,
@@ -366,7 +393,8 @@ class DashboardController extends Controller
             // 'taskType' => $taskType,
             'totalCountArch' => $totalCountArch,
             'totalCountDir' => $totalCountDir,
-            'expenseType' => $expenseType,
+            'totalExpend' => $totalExpend,
+            'totalDir' => $totalDir
         ]);
     }
 
@@ -489,7 +517,7 @@ class DashboardController extends Controller
 
     public function getAccountSubs($accountId)
     {
-        // 1️⃣ Get account subs
+        // 1️⃣ Get program subs
         $accountSubs = AccountSub::where('account_id', $accountId)
             ->select('id', 'no', 'name')
             ->get();
