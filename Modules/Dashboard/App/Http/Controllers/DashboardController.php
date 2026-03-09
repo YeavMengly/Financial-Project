@@ -284,7 +284,7 @@ class DashboardController extends Controller
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
-        //exp_guarantee
+       //exp_guarantee
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->select('budget_mandates.*')
@@ -315,6 +315,12 @@ class DashboardController extends Controller
         $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
         // $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
+       // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+       // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
+        $expenseType = ExpenseType::all();
+            
+       
+      // dd($taskType);
         // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
         $totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
