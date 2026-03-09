@@ -2,11 +2,8 @@
 @section('css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- preloader css -->
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
@@ -31,7 +28,6 @@
     </div>
 
     <div id="flashMessage"></div>
-
     <!-- end page title -->
     <div class="row">
         <div class="col-12"></div>
@@ -44,6 +40,39 @@
                             @csrf
 
                             <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.id') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                            type="number" class="form-control" placeholder="{{ __('forms.legal.id') }}"
+                                            name="legalID" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="legalDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                        <input type="text" id="legalDate" name="legalDate" class="form-control"
+                                            placeholder="{{ __('forms.select_legal_date') }}" required
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        {{-- <label>{{ __('forms.legal.id') }}</label> --}}
+                                        <label>លេខសលាកប័ត្រ</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                            type="number" class="form-control"
+                                            placeholder="{{ __('forms.payment.voucher.number') }}" name="paymentVoucher"
+                                            tabindex="2" />
+                                    </div>
+                                </div>
+
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.number') }}</label>
@@ -313,6 +342,19 @@
                 altFormat: 'd/m/Y', // pretty display for users
                 allowInput: true,
                 defaultDate: requestDateInput.value || null
+            });
+        }
+    </script>
+
+    <script>
+        const legalDateInput = document.getElementById('legalDate');
+        if (legalDateInput) {
+            flatpickr(legalDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: legalDateInput.value || null
             });
         }
     </script>

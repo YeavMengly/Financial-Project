@@ -24,19 +24,26 @@
         </div>
     </div>
     <!-- end page title -->
-    {{-- <div class="row">
+    <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="year">{{ __('menus.account') }}</label>
-                            <select class="form-control" name="year" id="year" required>
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($ministries as $ms)
-                                    <option value="{{ $ms->id }}" {{ request('year') == $ms->id ? 'selected' : '' }}>
-                                        {{ $ms->year }}</option>
-                                @endforeach
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
                             </select>
                         </div>
 
@@ -47,7 +54,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">

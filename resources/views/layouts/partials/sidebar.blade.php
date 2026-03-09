@@ -80,6 +80,18 @@
 
                         @if (hasPermission('ministries.index'))
                             <li>
+                                <a href="{{ route('initialMandate.index') }}"
+                                    class="{{ Request::routeIs('initialMandate.*') ? 'active' : '' }}">
+                                    <i data-feather="file-plus"></i>
+                                    <span data-key="t-budget-control-mandate">
+                                        {{ __('menus.expenditure.guarantee') }}
+                                    </span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if (hasPermission('ministries.index'))
+                            <li>
                                 <a href="{{ route('initialVoucher.index') }}"
                                     class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
@@ -93,12 +105,11 @@
 
                         @if (hasPermission('ministries.index'))
                             <li>
-                                <a href="{{ route('initialMandate.index') }}"
-                                    class="{{ Request::routeIs('initialMandate.*') ? 'active' : '' }}">
+                                <a href="{{ url('maintenance') }}"
+                                    class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-mandate">
-                                        {{-- {{ __('menus.initial.mandate') }} --}}
-                                        ធានាចំណាយ
+                                    <span data-key="t-budget-control-procurement">
+                                        {{ __('menus.procurement') }}
                                     </span>
                                 </a>
                             </li>

@@ -31,7 +31,7 @@ class BudgetVoucherDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
             })
-             ->editColumn('soft_delete', function ($soft_delete) {
+            ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
 
@@ -66,7 +66,7 @@ class BudgetVoucherDataTable extends DataTable
                     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
                 }
             })
-            ->rawColumns(['soft_delete', 'txtDescription', 'attachments', 'agency', 'is_archived']);
+            ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
 
     /**

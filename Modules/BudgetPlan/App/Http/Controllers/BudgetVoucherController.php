@@ -216,7 +216,8 @@ class BudgetVoucherController extends Controller
             ->orderBy('begin_vouchers.account_sub_id')
             ->get();
 
-        $budgetMandate = BudgetMandate::where("is_archived", "!=", 2)->get();
+        $budgetMandate = BudgetMandate::where("is_archived", "!=", 2)
+            ->orderBy('legal_number', 'asc')->get();
 
         return view('budgetplan::budgetVoucher.create')
             ->with('accountSub', $accountSub)
@@ -267,11 +268,10 @@ class BudgetVoucherController extends Controller
         ]);
     }
 
-
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'legalNumber' =>   'required',
+            'cboLegalNumber' =>   'required',
             'legalName' =>  'required',
             'cboProgram'       => 'required',
             'cboProgramSub'       => 'required',
@@ -312,7 +312,7 @@ class BudgetVoucherController extends Controller
                 return back()->withInput();
             }
 
-            $budgetMandate = BudgetMandate::where('legal_number', $validated['legalNumber'])
+            $budgetMandate = BudgetMandate::where('legal_number', $validated['cboLegalNumber'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('no', $validated['no'])
                 ->where('program_id', $validated['cboProgram'])
@@ -364,7 +364,7 @@ class BudgetVoucherController extends Controller
                 'no'             => $validated['no'],
                 'budget'         => $applyValue,
                 'expense_type_id'      => $validated['cboExpenseType'],
-                'legal_number'      => $validated['legalNumber'],
+                'legal_number'      => $validated['cboLegalNumber'],
                 'legal_name'      => $validated['legalName'],
                 'status' => 'done',
                 'is_archived' => 2,

@@ -49,9 +49,11 @@ return [
     'th.date' => 'កាលបរិច្ឆេទ',
     'th.date.transaction' => 'កាលបរិច្ឆេទកិច្ចបញ្ជីការ',
     'th.date.request' => 'កាលបរិច្ឆេទបង្កើតសំណើ',
+    'th.date.legal' => 'កាលបរិច្ឆេទលិខិត',
+    'th.legal.id' => 'លេខលិខិត',
     'th.legal.number' => 'លេខសំណើ',
     'th.legal.name' => 'ឈ្មោះសំណើ',
-
+    'th.pvn' => 'លេខសលាកប័ត្រ',
     'th.fin_law' => 'ឥណទានអនុម័ត',
     'th.current_loan' => 'ឥណទានបច្ចុប្បន្ន',
     'th.credit_movement' => 'ចលនាឥណទាន',

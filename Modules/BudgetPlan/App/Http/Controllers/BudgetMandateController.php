@@ -35,7 +35,7 @@ class BudgetMandateController extends Controller
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
-        $expenseType = ExpenseType::all();
+        $expenseType = ExpenseType::where('id', 1)->get();
         $agency = Agency::all();
         $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
 
@@ -268,6 +268,8 @@ class BudgetMandateController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
+            'legalID' =>   'required',
+            'paymentVoucher' => 'required',
             'legalNumber' =>   'required',
             'legalName' =>  'required',
             'cboProgram'       => 'required',
@@ -283,6 +285,7 @@ class BudgetMandateController extends Controller
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
+            'legalDate'            => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -332,23 +335,26 @@ class BudgetMandateController extends Controller
             }
 
             BudgetMandate::create([
-                'ministry_id'    => $ministry->id,
-                'agency_id'      => $validated['cboAgency'],
-                'program_id'      => $validated['cboProgram'],
-                'program_sub_id'      => $validated['cboProgramSub'],
-                'cluster_id'      => $validated['cboCluster'],
-                'account_sub_id' => $validated['cboSubAccount'],
-                'no'             => $validated['no'],
-                'budget'         => $applyValue,
-                'expense_type_id'      => $validated['cboExpenseType'],
-                'legal_number'      => $validated['legalNumber'],
-                'legal_name'      => $validated['legalName'],
-                'status' => 'todo',
-                'is_archived' => 1,
-                'description' => strip_tags($validated['txtDescription']),
-                'attachments'    => json_encode($stored),
-                'transaction_date'           => $validated['transactionDate'],
-                'request_date'           => $validated['requestDate'],
+                'ministry_id'      => $ministry->id,
+                'agency_id'        => $validated['cboAgency'],
+                'program_id'       => $validated['cboProgram'],
+                'program_sub_id'   => $validated['cboProgramSub'],
+                'cluster_id'       => $validated['cboCluster'],
+                'account_sub_id'   => $validated['cboSubAccount'],
+                'no'               => $validated['no'],
+                'budget'           => $applyValue,
+                'expense_type_id'  => $validated['cboExpenseType'],
+                'legal_id'         => $validated['legalID'],
+                'payment_voucher_number'         => $validated['paymentVoucher'],
+                'legal_number'     => $validated['legalNumber'],
+                'legal_name'       => $validated['legalName'],
+                'status'           => 'todo',
+                'is_archived'      => 1,
+                'description'      => strip_tags($validated['txtDescription']),
+                'attachments'      => json_encode($stored),
+                'transaction_date' => $validated['transactionDate'],
+                'request_date'     => $validated['requestDate'],
+                'legal_date'     => $validated['legalDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginMandate);
@@ -408,10 +414,18 @@ class BudgetMandateController extends Controller
 
         $module = BudgetMandate::where('id', $id)
             ->where('ministry_id', $ministry->id)
+            ->where('is_archived', 1)
             ->first();
 
+        if (!$module) {
+            flash()->translate('en')->option('timeout', 2000)
+                ->warning('ទិន្ន័យបានបញ្ចប់', 'Task')->flash();
+            return back()->withInput();
+        }
+
         $program     = Program::where('ministry_id', $ministry->id)->get();
-        $programId   = Program::findOrFail($module->program_id);
+        $programId   = Program::where('ministry_id', $ministry->id)
+            ->findOrFail($module->program_id);
         $programSub  = ProgramSub::where('ministry_id', $ministry->id)
             ->where('program_id', $module->program_id)->get();
 
@@ -451,6 +465,7 @@ class BudgetMandateController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
+            'legalID' =>   'required',
             'legalNumber' =>   'required',
             'legalName' =>  'required',
             'cboProgram'       => 'required',
@@ -523,6 +538,7 @@ class BudgetMandateController extends Controller
                 'no'             => $beginCredit->no,
                 'budget'         => $applyValue,
                 'expense_type_id'      => $validated['cboExpenseType'],
+                'legal_id'      => $validated['legalID'],
                 'legal_number'      => $validated['legalNumber'],
                 'legal_name'      => $validated['legalName'],
                 'status' => 'todo',
