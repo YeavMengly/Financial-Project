@@ -483,7 +483,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#2200ff"></i>
-                                        <span class="me-3">ទូទាត់ត្រង់ </span>
+                                        <span class="me-3">ទូទាត់ </span>
                                         <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                             {{ $totalCountDir }}
                                         </button>
@@ -1180,6 +1180,9 @@
                                     '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
+                            // else {
+                            //     console.log(data)
+                            // }
 
                             // Build HTML grid
                             let html = '<div class="row g-2">';
@@ -1204,8 +1207,14 @@
                                         </div>
 
                                         <div class="ms-auto">
-                                            <button type="button" class="btn btn-soft-primary btn-sm">
+                                            <button type="button" class="btn btn-soft-info btn-sm">
                                                 ${sub.total_records ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-primary btn-sm">
+                                                ${sub.total_record_sub_mandate ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-danger btn-sm">
+                                                ${sub.total_record_sub_voucher ?? 0}
                                             </button>
                                         </div>
                                     </div>
@@ -1427,7 +1436,7 @@
                 labels: [
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
-                    "ទូទាត់ត្រង់",
+                    "ទូទាត់",
                     // "នៅសល់",
                     // "បើកផ្ដល់មុន",
                 ],
