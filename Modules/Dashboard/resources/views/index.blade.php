@@ -351,7 +351,6 @@
                 </div>
             </div>
         </div>
-<<<<<<< HEAD
 
     </div>
     {{-- chapter ,account --}}
@@ -418,8 +417,6 @@
             <!-- end card body -->
         </div>
         <!-- end card -->
-=======
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
     </div>
     <div class="row">
         <div class="col-xl-6">
@@ -582,7 +579,6 @@
                                         </span>
                                     </h6>
                                 </div>
-<<<<<<< HEAD
                                 {{-- <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
@@ -607,8 +603,6 @@
                                         </span>
                                     </h6>
                                 </div> --}}
-=======
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                             </div>
                         </div>
                     </div>
@@ -621,13 +615,7 @@
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
-<<<<<<< HEAD
             <div class="col-xl-3 col-lg-4 col-md-6">
-=======
-            <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
-                data-program-id="{{ $program->id }}"
-                data-program-title="{{ __('menus.program') }} {{ $program->no }}">
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                 <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -635,7 +623,6 @@
                                 <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
-<<<<<<< HEAD
                             {{-- select expanseType --}}
                             <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
                                 action="{{ url()->current() }}">
@@ -653,8 +640,6 @@
                                 </div>
                             </form>
 
-=======
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
@@ -690,13 +675,9 @@
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
                             </small>
                         </div>
-<<<<<<< HEAD
                         <span class="badge bg-success-subtle text-success program-card" role="button"
                             data-program-id="{{ $program->id }}"
                             data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
-=======
-                        <span class="badge bg-success-subtle text-success" role="button" style="cursor:pointer;">
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                             Click to view details
                         </span>
                     </div>
@@ -1548,23 +1529,15 @@
                 },
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
-<<<<<<< HEAD
 
                     {{ round($percent_direct_Payment, 2) }},
 
-=======
-                    {{ round($percent_direct_Payment, 2) }},
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                 ],
                 labels: [
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
                     "ទូទាត់ត្រង់",
-<<<<<<< HEAD
                     // "លទ្ធកម្ម",
-=======
-                    // "នៅសល់",
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                     // "បើកផ្ដល់មុន",
                 ],
                 colors: colors,
@@ -1843,15 +1816,9 @@
                                 html += `
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
-<<<<<<< HEAD
                                         <td>${Number(subs.fin_law ?? 0).toLocaleString()}</td>
                                         <td>${Number(subs.apply ?? 0).toLocaleString()}</td>
                                         <td>${Number(subs.credit ?? 0).toLocaleString()}</td>
-=======
-                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
-                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
-                                        <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
->>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                                     </tr>
                                 `;
                             });
