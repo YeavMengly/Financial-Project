@@ -351,6 +351,73 @@
                 </div>
             </div>
         </div>
+
+    </div>
+    {{-- chapter ,account --}}
+    <div class=" ">
+        <div class="card">
+            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
+                action="{{ url()->current() }}">
+                <div class="flex-shrink-0">
+                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
+                        <option selected="">ជំពូក</option>
+                        @foreach ($chapterLabels as $ch)
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                                {{ $ch }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+            <div class="card-body">
+                <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll">
+                        <table class="table table-bordered table-striped table-hover align-middle  ">
+                            <thead class=" text-center table-light sticky-header">
+                                <tr>
+                                    <th>{{ __('tables.th.account') }}</th>
+                                    <th>{{ __('tables.th.fin_law') }}</th>
+                                    <th>{{ __('tables.th.deadline_balance') }}</th>
+                                    <th>{{ __('tables.th.remaining_credit') }}</th>
+
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @forelse ($accounts as $acc)
+                                    <tr data-chapter="{{ $acc->no }}">
+                                        <td class="text-center">{{ $acc->no }}</td>
+                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
+
+                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td>
+                                            <div class="dropdown text-center account-card"
+                                                data-account-id="{{ $acc->id }}"
+                                                data-account-title="គណនី {{ $acc->no }}">
+                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    <i class="mdi mdi-dots-vertical"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            No accounts found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
+
     </div>
     <div class="row">
         <div class="col-xl-6">
@@ -525,6 +592,7 @@
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
+            <div class="col-xl-3 col-lg-4 col-md-6">
             <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
                 data-program-id="{{ $program->id }}"
                 data-program-title="{{ __('menus.program') }} {{ $program->no }}">
@@ -570,6 +638,9 @@
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
                             </small>
                         </div>
+                        <span class="badge bg-success-subtle text-success program-card" role="button"
+                            data-program-id="{{ $program->id }}"
+                            data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
                         <span class="badge bg-success-subtle text-success" role="button" style="cursor:pointer;">
                             Click to view details
                         </span>
@@ -1716,9 +1787,9 @@
                                 html += `
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
-                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
-                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
-                                        <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()}</td>
+                                        <td>${Number(subs.apply ?? 0).toLocaleString()}</td>
+                                        <td>${Number(subs.credit ?? 0).toLocaleString()}</td>
                                     </tr>
                                 `;
                             });
