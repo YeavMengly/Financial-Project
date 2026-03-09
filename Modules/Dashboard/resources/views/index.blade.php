@@ -351,72 +351,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
-    {{-- chapter ,account --}}
-    <div class=" ">
-        <div class="card">
-            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
-                action="{{ url()->current() }}">
-                <div class="flex-shrink-0">
-                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
-                        <option selected="">ជំពូក</option>
-                        @foreach ($chapterLabels as $ch)
-                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
-                                {{ $ch }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </form>
-            <div class="card-body">
-                <div class=" " data-simplebar style="max-height: 380px;">
-                    <div class="table-responsive table-scroll">
-                        <table class="table table-bordered table-striped table-hover align-middle  ">
-                            <thead class=" text-center table-light sticky-header">
-                                <tr>
-                                    <th>{{ __('tables.th.account') }}</th>
-                                    <th>{{ __('tables.th.fin_law') }}</th>
-                                    <th>{{ __('tables.th.deadline_balance') }}</th>
-                                    <th>{{ __('tables.th.remaining_credit') }}</th>
-
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                @forelse ($accounts as $acc)
-                                    <tr data-chapter="{{ $acc->no }}">
-                                        <td class="text-center">{{ $acc->no }}</td>
-                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
-
-                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
-                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
-                                        <td>
-                                            <div class="dropdown text-center account-card"
-                                                data-account-id="{{ $acc->id }}"
-                                                data-account-title="គណនី {{ $acc->no }}">
-                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    <i class="mdi mdi-dots-vertical"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">
-                                            No accounts found
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <!-- end card body -->
-        </div>
-        <!-- end card -->
     </div>
     <div class="row">
         <div class="col-xl-6">
@@ -549,7 +483,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#2200ff"></i>
-                                        <span class="me-3">ទូទាត់ត្រង់ </span>
+                                        <span class="me-3">ទូទាត់ </span>
                                         <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                             {{ $totalCountDir }}
                                         </button>
@@ -579,30 +513,6 @@
                                         </span>
                                     </h6>
                                 </div>
-                                {{-- <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#e81a2c"></i>
-                                        លទ្ធកម្ម
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($procurement) }} រៀល
-                                        </span>
-                                    </h6>
-                                </div>
-                                <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#fde50c"></i>
-                                        បើកផ្ដល់មុន
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($pre_Financing) }} រៀល
-                                        </span>
-                                    </h6>
-                                </div> --}}
                             </div>
                         </div>
                     </div>
@@ -615,7 +525,9 @@
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
-            <div class="col-xl-3 col-lg-4 col-md-6">
+            <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
+                data-program-id="{{ $program->id }}"
+                data-program-title="{{ __('menus.program') }} {{ $program->no }}">
                 <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -623,23 +535,6 @@
                                 <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
-                            {{-- select expanseType --}}
-                            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
-                                action="{{ url()->current() }}">
-                                <div class="flex-shrink-0">
-                                    <select class="form-select-sm" name="expenseType" id="expenseType">
-                                        <option selected="">ប្រភេទចំណាយ </option>
-                                        @foreach ($expenseType as $et)
-                                            <option value="{{ $et->id }}"
-                                                {{ ($expenseType ?? '') === $et ? 'selected' : '' }}>
-                                                {{ $et->name_kh }}
-                                            </option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-                            </form>
-
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
@@ -675,9 +570,7 @@
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
                             </small>
                         </div>
-                        <span class="badge bg-success-subtle text-success program-card" role="button"
-                            data-program-id="{{ $program->id }}"
-                            data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
+                        <span class="badge bg-success-subtle text-success" role="button" style="cursor:pointer;">
                             Click to view details
                         </span>
                     </div>
@@ -1287,6 +1180,9 @@
                                     '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
+                            // else {
+                            //     console.log(data)
+                            // }
 
                             // Build HTML grid
                             let html = '<div class="row g-2">';
@@ -1311,8 +1207,14 @@
                                         </div>
 
                                         <div class="ms-auto">
-                                            <button type="button" class="btn btn-soft-primary btn-sm">
+                                            <button type="button" class="btn btn-soft-info btn-sm">
                                                 ${sub.total_records ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-primary btn-sm">
+                                                ${sub.total_record_sub_mandate ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-danger btn-sm">
+                                                ${sub.total_record_sub_voucher ?? 0}
                                             </button>
                                         </div>
                                     </div>
@@ -1529,15 +1431,13 @@
                 },
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
-
                     {{ round($percent_direct_Payment, 2) }},
-
                 ],
                 labels: [
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
-                    "ទូទាត់ត្រង់",
-                    // "លទ្ធកម្ម",
+                    "ទូទាត់",
+                    // "នៅសល់",
                     // "បើកផ្ដល់មុន",
                 ],
                 colors: colors,
@@ -1816,9 +1716,9 @@
                                 html += `
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
-                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()}</td>
-                                        <td>${Number(subs.apply ?? 0).toLocaleString()}</td>
-                                        <td>${Number(subs.credit ?? 0).toLocaleString()}</td>
+                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
                                     </tr>
                                 `;
                             });
