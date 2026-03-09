@@ -395,11 +395,6 @@ class DashboardController extends Controller
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
             // 'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
-           // 'percent_procurement' => $percent_procurement,
-           // 'percent_pre_Financing' => $percent_pre_Financing,
-            // 'taskType' => $taskType,
-            'expenseType' => $expenseType,
- 
             // 'percent_procurement' => $percent_procurement,
             // 'percent_pre_Financing' => $percent_pre_Financing,
             // 'taskType' => $taskType,
@@ -553,7 +548,6 @@ class DashboardController extends Controller
         return response()->json($clusters);
     }
 
-    
     public function getAccountSubs($accountId)
     {
         // 1️⃣ Get program subs
@@ -576,7 +570,7 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('account_sub_id');
 
-        // 3️⃣ Merge totals into program sub
+        // 3️⃣ Merge totals into account subs
         $accountSubs = $accountSubs->map(function ($subs) use ($accountSubTotals) {
             $total = $accountSubTotals->get($subs->id);
 

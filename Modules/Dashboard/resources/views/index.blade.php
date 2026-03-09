@@ -580,30 +580,6 @@
                                         </span>
                                     </h6>
                                 </div>
-                                {{-- <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#e81a2c"></i>
-                                        លទ្ធកម្ម
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($procurement) }} រៀល
-                                        </span>
-                                    </h6>
-                                </div>
-                                <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#fde50c"></i>
-                                        បើកផ្ដល់មុន
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($pre_Financing) }} រៀល
-                                        </span>
-                                    </h6>
-                                </div> --}}
                             </div>
                         </div>
                     </div>
@@ -627,22 +603,6 @@
                                 <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
-                            {{-- select expanseType --}}
-                            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
-                                action="{{ url()->current() }}">
-                                <div class="flex-shrink-0">
-                                    <select class="form-select-sm" name="expenseType" id="expenseType">
-                                        <option selected="">ប្រភេទចំណាយ </option>
-                                        @foreach ($expenseType as $et)
-                                            <option value="{{ $et->id }}"
-                                                {{ ($expenseType ?? '') === $et ? 'selected' : '' }}>
-                                                {{ $et->name_kh }}
-                                            </option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-                            </form>
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
@@ -1542,13 +1502,12 @@
                 },
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
-
                     {{ round($percent_direct_Payment, 2) }},
                 ],
                 labels: [
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
-                    "ទូទាត់ត្រង់",
+                    "ទូទាត់",
                     // "នៅសល់",
                     // "បើកផ្ដល់មុន",
                 ],
