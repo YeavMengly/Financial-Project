@@ -195,7 +195,11 @@ class BudgetVoucherController extends Controller
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-        $expenseType = ExpenseType::where('id', 3)->get();
+        $expenseType = ExpenseType::where('id', 3)
+            ->orWhere('id', 4)
+            ->orWhere('id', 5)
+            ->orWhere('id', 6)
+            ->orWhere('id', 7)->get();
 
         $beginVoucher = BeginVoucher::query()
             ->join('account_subs', function ($join) use ($ministry) {
@@ -300,7 +304,6 @@ class BudgetVoucherController extends Controller
                 ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
-
 
             if (!$beginVoucher) {
                 flash()

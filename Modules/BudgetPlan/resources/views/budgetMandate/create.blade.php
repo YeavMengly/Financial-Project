@@ -13,12 +13,13 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.mandate') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.guarantee') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.mandate') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">
+                                    {{ __('menus.expenditure.guarantee') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -62,8 +63,7 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        {{-- <label>{{ __('forms.legal.id') }}</label> --}}
-                                        <label>លេខសលាកប័ត្រ</label>
+                                        <label>{{ __('forms.payment.voucher') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
@@ -93,24 +93,6 @@
                                             name="legalName" tabindex="2" />
                                     </div>
                                 </div>
-
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $item)
-                                                <option value="{{ $item->id }}">
-                                                    {{ $item->no }} -
-                                                    {{ $item->name ?? 'មិនមានទិន្ន័យ' }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -178,7 +160,6 @@
                                     </div>
                                 </div>
 
-
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboSubAccount" class="form-label font-size-13 text-muted">
@@ -187,27 +168,16 @@
 
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
+
                                             @foreach ($beginMandate as $bv)
-                                                <option value="{{ $bv->account_sub_id }}"
-                                                    data-program="{{ $bv->mandate_no }}">
-                                                    {{ $bv->account_sub_id }} - {{ $bv->mandate_no }}
+                                                <option value="{{ $bv->account_sub_id }}">
+                                                    {{ $bv->account_sub_id }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                {{-- Sub Account Number --}}
-                                <div class="col-xl-4 col-md-6 d-none">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input type="number" min="0" name="no" id="programInput" readonly
-                                            placeholder="xxxxxxx" required class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                    </div>
-                                </div>
 
-                                {{-- Program Code (auto-filled from JS) --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="budget">{{ __('forms.budget') }}</label>
@@ -216,7 +186,6 @@
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
                                 </div>
-
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -231,7 +200,6 @@
                                         </select>
                                     </div>
                                 </div>
-
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -260,9 +228,8 @@
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
                                     </div>
                                 </div>
-
-
                             </div>
+
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
@@ -392,7 +359,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
             const subAccount = document.getElementById('cboSubAccount');
-            const programInput = document.getElementById('programInput'); // readonly "no"
+            // const programInput = document.getElementById('programInput'); // readonly "no"
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
@@ -423,10 +390,6 @@
                 placeholderValue: 'ជ្រើសរើស',
                 searchPlaceholderValue: 'ស្វែងរក...'
             });
-            // initChoicesOnce(document.getElementById('cboAgency'), {
-            //     placeholder: true,
-            //     placeholderValue: 'ស្វែងរក...'
-            // });
             initChoicesOnce(subAccount, {
                 placeholder: true,
                 placeholderValue: 'ស្វែងរក...'
@@ -442,35 +405,52 @@
             }
 
             // fetch numbers
-            async function fetchEarlyBalance(accountSubId, noVal) {
-                if (!accountSubId || !noVal) {
+            async function fetchEarlyBalance() {
+
+                const programId = document.getElementById('cboProgram').value;
+                const programSubId = document.getElementById('cboProgramSub').value;
+                const clusterId = document.getElementById('cboCluster').value;
+                const accountSubId = document.getElementById('cboSubAccount').value;
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
                     resetNumbers();
                     return;
                 }
+
                 const url = new URL(earlyEP, window.location.origin);
+
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
                 url.searchParams.set('account_sub_id', accountSubId);
-                url.searchParams.set('no', noVal);
 
                 try {
+
                     const res = await fetch(url.toString(), {
                         headers: {
                             'Accept': 'application/json'
                         }
                     });
+
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data?.message || 'Early-balance error');
 
                     setText('fin_law', data.fin_law);
                     setText('credit_movement', data.credit_movement);
                     setText('new_credit_status', data.new_credit_status);
                     setText('credit', data.credit);
                     setText('deadline_balance', data.deadline_balance);
+
                     recomputeRemaining();
+
                 } catch (err) {
                     console.error(err);
                     resetNumbers();
                 }
             }
+            document.getElementById('cboProgram').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboProgramSub').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboCluster').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboSubAccount').addEventListener('change', fetchEarlyBalance);
 
             subAccount?.addEventListener('change', function() {
                 const opt = this.options[this.selectedIndex];
@@ -478,6 +458,7 @@
                 const programNo = opt ? (opt.getAttribute('data-program') || '') : '';
 
                 if (programInput) programInput.value = programNo;
+
                 fetchEarlyBalance(subId, programNo);
             });
 
@@ -508,38 +489,6 @@
             });
         });
     </script>
-
-    {{-- <script>
-        $(document).ready(function() {
-            const element = document.getElementById('cboAgency');
-            let choicesInstance = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false,
-            });
-
-            $('#cboAgency').on('change', function() {
-                const selected = $(this).val();
-                let message = '';
-
-                switch (selected) {
-                    case '1':
-                        message = 'You selected Choice 1';
-                        break;
-                    case '2':
-                        message = 'You selected Choice 2';
-                        break;
-                    case '3':
-                        message = 'You selected Choice 3';
-                        break;
-                    default:
-                        message = '';
-                }
-                $('#resultDisplay').text(message);
-            });
-        });
-    </script> --}}
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
