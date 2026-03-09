@@ -62,6 +62,7 @@ return [
     'check.control.general'   => 'ពិនិត្យរបាយការណ៍',
     'check.control.guarantee' => 'ធានាចំណាយ',
     'expenditure.guarantee' => 'ធានាចំណាយ',
+    'payment' => 'ទូទាត់',
     'check.control.summary' => 'របាយការណ៍សង្ខេប',
 
     'library' => 'Media Library',

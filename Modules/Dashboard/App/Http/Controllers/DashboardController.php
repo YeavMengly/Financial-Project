@@ -274,7 +274,7 @@ class DashboardController extends Controller
         $direct_Payment = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
         // $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
         // $pre_Financing = round($budgetVouchers->where('expense_type_id', '5')->sum('budget'), 2);
-         
+
         $totalCountArch = $budgetMandate->where('is_archived', '1')->count();
         $totalCountDir = $budgetVouchers->where('is_archived', '2')->count();
 
