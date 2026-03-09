@@ -2,6 +2,9 @@
 
 namespace App\Models\BeginCredit;
 
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
+use App\Models\Content\Ministry;
 use App\Models\Loans\BudgetMandateLoan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

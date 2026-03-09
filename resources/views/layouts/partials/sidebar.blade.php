@@ -96,14 +96,13 @@
                                     class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
                                     <span data-key="t-budget-control-voucher">
-                                        {{-- {{ __('menus.initial.voucher') }} --}}
-                                        ទូទាត់
+                                        {{ __('menus.payment') }}
                                     </span>
                                 </a>
                             </li>
                         @endif
 
-                        @if (hasPermission('ministries.index'))
+                        {{-- @if (hasPermission('ministries.index'))
                             <li>
                                 <a href="{{ url('maintenance') }}"
                                     class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
@@ -113,7 +112,7 @@
                                     </span>
                                 </a>
                             </li>
-                        @endif
+                        @endif --}}
                     </ul>
                 </li>
 
