@@ -13,7 +13,7 @@
                 <h4 class="mb-sm-0 font-size-18">{{ __('buttons.edit') }}</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('menus.voucher') }}</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('menus.payment') }}</a></li>
                         <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                     </ol>
                 </div>

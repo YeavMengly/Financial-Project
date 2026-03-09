@@ -11,9 +11,6 @@ Route::middleware('PermissionCheck')
         Route::get('mandate/{params}/create', 'create')->name('budgetMandate.create');
         Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');
         Route::get('mandate/{params}/destroy/{id}', 'destroy')->name('budgetMandate.destroy');
-
-        Route::get('Mandate/{params}/early-balance', 'getEarlyBalance')
-            ->name('budgetMandate.getEarlyBalance');
     });
 
 Route::controller(BudgetMandateController::class)->group(function () {
@@ -29,4 +26,11 @@ Route::controller(BudgetMandateController::class)->group(function () {
     Route::get('mandate/edit-by-program/program-subs', 'editByProgramId')->name('budgetMandate.edit.program_sub');
     Route::get('mandate/edit-by-program/agencies', 'editByAgency')->name('budgetMandate.edit.agency');
     Route::get('mandate/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetMandate.edit.cluster');
+
+
+    Route::get('mandate/{params}/get-early-balance', 'getEarlyBalance')
+        ->name('budgetMandate.getEarlyBalance');
+
+    Route::get('mandate/{params}/edit-early-balance', 'editEarlyBalance')
+        ->name('budgetMandate.editEarlyBalance');
 });
