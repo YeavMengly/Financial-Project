@@ -88,6 +88,10 @@
         #tableBody td {
             font-size: small;
         }
+
+        .cardhover:hover {
+            background-color: #fdf9f9;
+        }
     </style>
 @endsection
 
@@ -179,7 +183,7 @@
                     <div class="row align-items-center">
                         <div class="d-flex flex-wrap align-items-center mb-4 w-100">
                             <span class="text-muted lh-4 d-block text-truncate">
-                                {{ __('tables.th.total.increase') }}
+                                {{ __('tables.th.credit_movement') }}
                             </span>
                             <div class="ms-auto">
                                 <button type="button" class="btn btn-soft-primary btn-sm">
@@ -198,6 +202,42 @@
 
                         <div class="col-6">
                             <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_total_increase) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.new_credit_status') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $loanCount }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_new_credit_status }}">
+                                    {{ number_format($total_new_credit_status) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="col-6">
+                            <div id="mini-chart9" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
 
@@ -302,7 +342,6 @@
             </div>
         </div>
     </div>
-
     <div class="row">
         {{-- bar chart --}}
         <div class="col-xl-6">
@@ -312,6 +351,7 @@
                 </div>
             </div>
         </div>
+<<<<<<< HEAD
 
     </div>
     {{-- chapter ,account --}}
@@ -378,6 +418,8 @@
             <!-- end card body -->
         </div>
         <!-- end card -->
+=======
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
     </div>
     <div class="row">
         <div class="col-xl-6">
@@ -407,7 +449,7 @@
 
                     <div class="row align-items-center">
                         <div class="col-sm">
-                            <div id="wallet-balance" data-colors='["#1890ff", "#52c41a", "#faad14"]' class="apex-charts">
+                            <div id="wallet-balance" data-colors='["#d91b1b", "#52c41a", "#faad14"]' class="apex-charts">
                             </div>
                         </div>
                         <div class="col-sm align-self-center">
@@ -420,33 +462,31 @@
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($total_fin_law) }}
+                                            {{ number_format($total_fin_law) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
-
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#52c41a"></i>
+                                        បាន/កំពុង {{ __('tables.th.apply') }}
+                                    </p>
+                                    <h6>
+                                        <span class="text-muted font-size-14 fw-normal">
+                                            {{ number_format($total_deadline_balance) }} រៀល
+                                        </span>
+                                    </h6>
+                                </div>
+                                <div class="mt-4 pt-2">
+                                    <p class="mb-2">
+                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
+                                            style="color:#d91b1b"></i>
                                         {{ __('tables.th.deadline_balance') }}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($total_deadline_balance) }}
-                                        </span>
-                                    </h6>
-                                </div>
-
-                                <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#1890ff"></i>
-                                        {{ __('tables.th.credit') }}
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($total_credit) }}
+                                            {{ number_format($total_credit) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
@@ -475,7 +515,32 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#faad14"></i>
-                                        ធានាចំណាយ
+                                        <span class="me-3">{{ __('menus.check.control.guarantee') }}</span>
+                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            {{ $totalCountArch }}
+                                        </button>
+                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            {{ $totalCountDir }}
+                                        </button>
+                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                            type="button">
+                                            <span class="dropdown">
+                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    នៅសល់
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
+                                                    style="min-width:250px;">
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                        <i class="mdi mdi-circle"
+                                                            style="color:#c0341e; font-size:10px;"></i>
+                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                            {{ number_format($totalExpend) }} រៀល</h6>
+                                                    </div>
+                                                </div>
+                                            </span>
+                                        </button>
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -483,23 +548,33 @@
                                         </span>
                                     </h6>
                                 </div>
-                                {{-- <div class="mt-4 pt-2">
-                                    <p class="mb-2">
-                                        <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#52c41a"></i>
-                                        បុរេប្រទាន
-                                    </p>
-                                    <h6>
-                                        <span class="text-muted font-size-14 fw-normal">
-                                            {{ number_format($advance_Payment) }}​ ​រៀល
-                                        </span>
-                                    </h6>
-                                </div> --}}
-                                <div class="mt-4 pt-2">
+                                <div class="mt-10 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
                                             style="color:#2200ff"></i>
-                                        ទូទាត់ត្រង់
+                                        <span class="me-3">ទូទាត់ត្រង់ </span>
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            {{ $totalCountDir }}
+                                        </button>
+                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                            type="button">
+                                            <span class="dropdown w-100">
+                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    នៅសល់
+                                                </a>
+                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
+                                                    style="min-width:250px;">
+                                                    <div
+                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                        <i class="mdi mdi-circle"
+                                                            style="color:#c0341e; font-size:10px;"></i>
+                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                            {{ number_format($totalDir) }} រៀល</h6>
+                                                    </div>
+                                                </div>
+                                            </span>
+                                        </button>
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -507,6 +582,7 @@
                                         </span>
                                     </h6>
                                 </div>
+<<<<<<< HEAD
                                 {{-- <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
@@ -531,6 +607,8 @@
                                         </span>
                                     </h6>
                                 </div> --}}
+=======
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                             </div>
                         </div>
                     </div>
@@ -543,7 +621,13 @@
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
+<<<<<<< HEAD
             <div class="col-xl-3 col-lg-4 col-md-6">
+=======
+            <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
+                data-program-id="{{ $program->id }}"
+                data-program-title="{{ __('menus.program') }} {{ $program->no }}">
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                 <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
@@ -551,6 +635,7 @@
                                 <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
+<<<<<<< HEAD
                             {{-- select expanseType --}}
                             <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
                                 action="{{ url()->current() }}">
@@ -568,13 +653,20 @@
                                 </div>
                             </form>
 
+=======
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                             <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
+                                <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
+                                </button>
+                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
+                                    {{ $program->total_record_mandate }}
+                                </button>
+                                <button type="button" class="btn btn-soft-danger btn-sm">
+                                    {{ $program->total_record_voucher }}
                                 </button>
                             </div>
                         </div>
-
                         <div class="row text-center g-2">
                             <div class="col-4 border-end">
                                 <span class="text-muted font-size-12 d-block">ច្បាប់ហិរញ្ញវត្ថុ</span>
@@ -582,34 +674,98 @@
                                     class="counter-value mb-0 text-primary">{{ number_format($program->fin_law) }}</span>
                                 <small class="text-muted">រៀល</small>
                             </div>
-
                             <div class="col-4 border-end">
                                 <span class="text-muted font-size-12 d-block">អនុវត្ត</span>
                                 <span class="counter-value mb-0 text-success">{{ number_format($program->apply) }}</span>
                                 <small class="text-muted">រៀល</small>
                             </div>
-
                             <div class="col-4">
                                 <span class="text-muted font-size-12 d-block">នៅសល់</span>
                                 <span class="counter-value mb-0 text-danger">{{ number_format($program->credit) }}</span>
                                 <small class="text-muted">រៀល</small>
                             </div>
                         </div>
-
                         <div class="mt-3 text-center">
                             <small class="text-muted d-block">
                                 អនុវត្ត: <strong>{{ number_format($program->percent, 2) }}%</strong>
                             </small>
                         </div>
+<<<<<<< HEAD
                         <span class="badge bg-success-subtle text-success program-card" role="button"
                             data-program-id="{{ $program->id }}"
                             data-program-title="{{ __('menus.program') }} {{ $program->no }}" style="cursor:pointer;">
+=======
+                        <span class="badge bg-success-subtle text-success" role="button" style="cursor:pointer;">
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                             Click to view details
                         </span>
                     </div>
                 </div>
             </div>
         @endforeach
+    </div>
+    {{-- chapter ,account --}}
+    <div class="row">
+        <div class="card">
+            <form id="chFilter" class="card-header align-items-center d-flex" method="GET"
+                action="{{ url()->current() }}">
+                <div class="flex-shrink-0">
+                    <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
+                        <option selected="">ជំពូក</option>
+                        @foreach ($chapterLabels as $ch)
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                                {{ $ch }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </form>
+            <div class="card-body">
+                <div class=" " data-simplebar style="max-height: 380px;">
+                    <div class="table-responsive table-scroll">
+                        <table class="table table-bordered table-striped table-hover align-middle  ">
+                            <thead class=" text-center table-light sticky-header">
+                                <tr>
+                                    <th>{{ __('tables.th.account') }}</th>
+                                    <th>{{ __('tables.th.fin_law') }}</th>
+                                    <th>{{ __('tables.th.deadline_balance') }}</th>
+                                    <th>{{ __('tables.th.remaining_credit') }}</th>
+                                    <th>បន្ថែម</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                @forelse ($accounts as $acc)
+                                    <tr data-chapter="{{ $acc->no }}">
+                                        <td class="text-center">{{ $acc->no }}</td>
+                                        <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td>
+                                            <div class="dropdown text-center account-card"
+                                                data-account-id="{{ $acc->id }}"
+                                                data-account-title="គណនី {{ $acc->no }}">
+                                                <a class="text-muted dropdown-toggle font-size-15" role="button"
+                                                    data-bs-toggle="dropdown" aria-haspopup="true">
+                                                    <i class="mdi mdi-dots-vertical"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">
+                                            No accounts found
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- end card body -->
+        </div>
+        <!-- end card -->
     </div>
 
     <div class="row">
@@ -723,7 +879,8 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyDieselRemain, 2) }} <span
+                                                class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -919,6 +1076,40 @@
             };
 
             var chart = new ApexCharts(document.querySelector("#mini-chart1"), options);
+            chart.render();
+
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            var chartDataCreditStatus = @json($chartDataCreditStatus);
+
+            function getChartColorsArray(id) {
+                var colors = document.getElementById(id).getAttribute("data-colors");
+                return JSON.parse(colors);
+            }
+
+            var options = {
+                chart: {
+                    type: 'line',
+                    height: 80,
+                    sparkline: {
+                        enabled: true
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                colors: getChartColorsArray("mini-chart9"),
+                series: [{
+                    name: "ស្ថានភាពឥណទានថ្មី",
+                    data: chartDataCreditStatus
+                }],
+            };
+
+            var chart = new ApexCharts(document.querySelector("#mini-chart9"), options);
             chart.render();
 
         });
@@ -1293,21 +1484,17 @@
                     type: "donut",
                     height: 260
                 },
-
                 series: [
                     {{ round($percent_credit, 2) }},
                     {{ round($percent_deadline_balance, 2) }},
                     {{ round($percent_fin_law, 2) }}
                 ],
-
                 labels: [
-                    "{{ __('tables.th.credit') }}",
                     "{{ __('tables.th.deadline_balance') }}",
+                    "បាន/កំពុង{{ __('tables.th.apply') }}",
                     "{{ __('tables.th.financeLaw') }}"
                 ],
-
                 colors: colors,
-
                 plotOptions: {
                     pie: {
                         donut: {
@@ -1315,7 +1502,6 @@
                         }
                     }
                 },
-
                 dataLabels: {
                     enabled: true,
                     formatter: function(val) {
@@ -1330,16 +1516,13 @@
                         enabled: false
                     }
                 },
-
                 stroke: {
                     width: 0
                 },
-
                 legend: {
                     position: "bottom",
                     show: true // 👈 image has no legend under donut
                 },
-
                 tooltip: {
                     y: {
                         formatter: function(val) {
@@ -1348,7 +1531,6 @@
                     }
                 }
             };
-
             new ApexCharts(el, options).render();
         });
     </script>
@@ -1364,24 +1546,28 @@
                     type: "donut",
                     height: 260
                 },
-
                 series: [
                     {{ round($percent_expenditure_Guarantee, 2) }},
+<<<<<<< HEAD
 
                     {{ round($percent_direct_Payment, 2) }},
 
+=======
+                    {{ round($percent_direct_Payment, 2) }},
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                 ],
-
                 labels: [
                     "ធានាចំណាយ",
                     // "បុរេប្រទាន",
                     "ទូទាត់ត្រង់",
+<<<<<<< HEAD
                     // "លទ្ធកម្ម",
+=======
+                    // "នៅសល់",
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                     // "បើកផ្ដល់មុន",
                 ],
-
                 colors: colors,
-
                 plotOptions: {
                     pie: {
                         donut: {
@@ -1389,7 +1575,6 @@
                         }
                     }
                 },
-
                 dataLabels: {
                     enabled: true,
                     formatter: function(val) {
@@ -1404,16 +1589,13 @@
                         enabled: false
                     }
                 },
-
                 stroke: {
                     width: 0
                 },
-
                 legend: {
                     position: "bottom",
                     show: true // 👈 image has no legend under donut
                 },
-
                 tooltip: {
                     y: {
                         formatter: function(val) {
@@ -1422,7 +1604,6 @@
                     }
                 }
             };
-
             new ApexCharts(el, options).render();
         });
     </script>
@@ -1430,11 +1611,35 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('en-US').format(value) + " ៛";
+            }
+
             const el = document.querySelector("#bar_chart");
             const colors = JSON.parse(el.getAttribute("data-colors"));
-            const label = @json($chapterLabels).map(item => 'ជំពូក' + item);;
-            const finLawData = @json($finLawData);
-            // console.log('finLawData:', finLawData);
+
+            let chapterLabels = @json($chapterLabels);
+            let finLawData = @json($finLawData);
+            let remainData = @json($remainData);
+            let deadlineData = @json($deadlineData);
+
+            // combine data
+            let combined = chapterLabels.map((label, index) => ({
+                label: label,
+                finLaw: finLawData[index],
+                remain: remainData[index],
+                deadline: deadlineData[index]
+            }));
+
+            // sort big → small by chapter label
+            combined.sort((a, b) => b.label - a.label);
+
+            // rebuild arrays after sorting
+            const label = combined.map(item => 'ជំពូក' + item.label);
+            const sortedFinLaw = combined.map(item => item.finLaw);
+            const sortedRemain = combined.map(item => item.remain);
+            const sortedDeadline = combined.map(item => item.deadline);
+
             const options = {
                 chart: {
                     type: "bar",
@@ -1445,17 +1650,21 @@
                 },
                 colors: colors,
                 series: [{
-                    name: "សរុប",
-                    data: finLawData
+                    name: "",
+                    data: sortedFinLaw.map((value, index) => ({
+                        x: label[index],
+                        y: value,
+                        remain: sortedRemain[index],
+                        deadline: sortedDeadline[index]
+                    }))
                 }],
                 xaxis: {
                     categories: label
                 },
                 plotOptions: {
                     bar: {
-                        borderRadius: 4,
-                        columnWidth: "50%",
-                        // distributed: true
+                        borderRadius: 2,
+                        columnWidth: "60%"
                     }
                 },
                 dataLabels: {
@@ -1464,25 +1673,82 @@
                 yaxis: {
                     labels: {
                         formatter: function(value) {
-                            return value.toLocaleString() + " ៛";
+                            return formatCurrency(value);
                         }
                     }
                 },
                 tooltip: {
                     y: {
-                        formatter: function(value) {
-                            return value.toLocaleString() + " ៛";
+                        formatter: function(value, opts) {
+                            const remain = opts.w.config.series[0].data[opts.dataPointIndex].remain;
+                            const deadline = opts.w.config.series[0].data[opts.dataPointIndex].deadline;
+
+                            return "សរុប: " + formatCurrency(value) +
+                                "<br>អនុវត្ដ: " + formatCurrency(remain) +
+                                "<br>នៅសល់: " + formatCurrency(deadline);
                         }
                     }
-                }
-                // grid: {
-                //     strokeDashArray: 4
-                // }
+                },
+                // responsive for mobile
+                responsive: [{
+                    breakpoint: 992,
+                    options: {
+                        chart: {
+                            height: 300
+                        },
+                        plotOptions: {
+                            bar: {
+                                columnWidth: "60%"
+                            }
+                        }
+                    }
+                }, {
+                    breakpoint: 768,
+                    options: {
+                        chart: {
+                            height: 280
+                        },
+                        xaxis: {
+                            labels: {
+                                rotate: -45,
+                                style: {
+                                    fontSize: "10px"
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 260
+                        },
+                        plotOptions: {
+                            bar: {
+                                columnWidth: "70%"
+                            }
+                        },
+                        xaxis: {
+                            labels: {
+                                rotate: -45,
+                                style: {
+                                    fontSize: "9px"
+                                }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: "9px"
+                                }
+                            }
+                        }
+                    }
+                }]
             };
 
             new ApexCharts(el, options).render();
         });
-        // 
     </script>
     {{-- search Chapter --}}
     <script>
@@ -1577,9 +1843,15 @@
                                 html += `
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
+<<<<<<< HEAD
                                         <td>${Number(subs.fin_law ?? 0).toLocaleString()}</td>
                                         <td>${Number(subs.apply ?? 0).toLocaleString()}</td>
                                         <td>${Number(subs.credit ?? 0).toLocaleString()}</td>
+=======
+                                        <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
+>>>>>>> 17adafe22c7a9b9b603677b40a9fe9b21343a075
                                     </tr>
                                 `;
                             });
@@ -1602,76 +1874,4 @@
                 });
             });
         });
-    </script>
-
-    <script>
-        // document.addEventListener("DOMContentLoaded", function() {
-
-        //     const options = {
-        //         chart: {
-        //             type: 'bar',
-        //             height: 260,
-        //             toolbar: {
-        //                 show: false,
-        //                 color: '#1e90ff',
-        //             }
-        //         },
-        //         series: [{
-        //             name: 'Fin Law',
-        //             data: @json($finLawData),
-        //             color: '#1e90ff'
-        //         }],
-        //         // xaxis: {
-        //         //     categories: @json($chapterLabels)
-        //         // }
-
-        //         xaxis: {
-        //             categories: @json($finLawData),
-        //             labels: {
-        //                 style: {
-        //                     fontSize: '12px'
-        //                 }
-        //             }
-        //         },
-
-        //         plotOptions: {
-        //             bar: {
-        //                 horizontal: true,
-        //                 barHeight: '65%',
-        //                 borderRadius: 3
-        //             }
-        //         },
-
-        //         colors: ['#1e90ff'],
-
-        //         dataLabels: {
-        //             enabled: false,
-        //         },
-
-        //         grid: {
-        //             strokeDashArray: 4,
-        //             xaxis: {
-        //                 lines: {
-        //                     show: true
-        //                 }
-        //             },
-        //             yaxis: {
-        //                 lines: {
-        //                     show: false
-        //                 }
-        //             }
-        //         },
-
-        //         tooltip: {
-        //             y: {
-        //                 formatter: val => val.toLocaleString()
-        //             }
-        //         }
-        //     };
-
-        //     new ApexCharts(
-        //         document.querySelector("#chapter-bar"),
-        //         options
-        //     ).render();
-        // });
     </script>

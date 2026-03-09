@@ -16,14 +16,17 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.budget.control.mandate') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">    {{ __('menus.expenditure.guarantee') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $data->year }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.budget.plan') }}</a>
+                            </li>
+
+                            <li class="breadcrumb-item active">{{ __('menus.check.control.guarantee') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -37,18 +40,21 @@
             <div class="card">
                 <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
-                        <!-- Sub Account Number -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($budgetMandate as $ts)
-                                    <option value="{{ $ts->account_sub_id }}"
-                                        {{ request('subAccountNumber') == $ts->account_sub_id ? 'selected' : '' }}>
-                                        {{ $ts->account_sub_id }} -
-                                        {{ $ts->no }}
-                                    </option>
-                                @endforeach
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
                             </select>
                         </div>
 
@@ -59,8 +65,23 @@
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($expenseType as $ts)
                                     <option value="{{ $ts->id }}"
-                                        {{ request('cboExpenseType') == $ts->name_kh ? 'selected' : '' }}>
+                                        {{ request('cboExpenseType') == $ts->name_kh ? 'selected' : '' }} selected>
                                         {{ $ts->name_kh }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Sub Account Number -->
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
+                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($budgetMandate as $ts)
+                                    <option value="{{ $ts->account_sub_id }}"
+                                        {{ request('subAccountNumber') == $ts->account_sub_id ? 'selected' : '' }}>
+                                        {{ $ts->account_sub_id }} -
+                                        {{ $ts->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -133,6 +154,8 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -193,18 +216,25 @@
     </script>
 
     {!! $dataTable->scripts() !!}
-
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('agencyNumber');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboTodoSelect = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodoSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើស កំណត់ចំណាំ', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatusSelect = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatusSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស ស្ថានភាព', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
@@ -216,7 +246,7 @@
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                searchPlaceholderValue: 'ជ្រើសរើស អនុគណនី', // Khmer search placeholder
                 shouldSort: false
             });
         });
@@ -237,8 +267,8 @@
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                placeholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer placeholder
+                searchPlaceholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer search placeholder
                 shouldSort: false
             });
         });

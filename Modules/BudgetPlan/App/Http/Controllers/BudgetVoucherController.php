@@ -6,9 +6,11 @@ use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
 use App\Exports\BeginExport;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\BeginMandate;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Cluster;
@@ -50,71 +52,138 @@ class BudgetVoucherController extends Controller
     }
 
     /**
-     * AJAX: Fetch program sub-options by program ID.
+     * AJAX: Fetch program sub-options by program ID request.
      */
-    // public function getProgram(Request $request)
-    // {
-    //     if ($request->program_id) {
-    //         $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
-    //             ->where('program_id', $request->program_id)
-    //             ->get();
+    public function getByProgramId(Request $request)
+    {
+        if ($request->program_id) {
+            $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
+                ->where('program_id', $request->program_id)
+                ->get();
 
-    //         $selectedId = $request->selected_id ?? null;
+            $selectedId = $request->selected_id ?? null;
 
-    //         $html = '';
-    //         foreach ($data as $d) {
-    //             $selected = $selectedId == $d->id ? 'selected' : '';
-    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
-    //         }
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
 
-    //         return response($html);
-    //     }
+            return response($html);
+        }
 
-    //     return response('');
-    // }
+        return response('');
+    }
 
-    // public function getAgency(Request $request)
-    // {
-    //     if ($request->program_id) {
-    //         $data = Agency::select('id', 'program_id', 'no', 'name')
-    //             ->where('program_id', $request->program_id)
-    //             ->get();
+    public function editByProgramId(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
 
-    //         $selectedId = $request->selected_id ?? null;
+        $data = ProgramSub::select('id', 'no', 'decription')
+            ->where('program_id', $request->program_id)
+            ->get();
 
-    //         $html = '';
-    //         foreach ($data as $d) {
-    //             $selected = $selectedId == $d->id ? 'selected' : '';
-    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
-    //         }
+        $selectedId = (string) $request->selected_id;
 
-    //         return response($html);
-    //     }
+        $html = '<option value="">ស្វែងរក...</option>';
 
-    //     return response('');
-    // }
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
 
-    // public function getProgramSub(Request $request)
-    // {
-    //     if ($request->program_sub_id) {
+        return response($html);
+    }
 
-    //         $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
-    //             ->where('program_sub_id', $request->program_sub_id)
-    //             ->get();
+    public function getByAgency(Request $request)
+    {
+        if ($request->program_id) {
+            $data = Agency::select('id', 'program_id', 'no', 'name')
+                ->where('program_id', $request->program_id)
+                ->get();
 
-    //         $selectedId = $request->selected_id ?? null;
+            $selectedId = $request->selected_id ?? null;
 
-    //         $html = '';
-    //         foreach ($data as $d) {
-    //             $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
-    //             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
-    //         }
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+            }
 
-    //         return response($html);
-    //     }
+            return response($html);
+        }
 
-    //     return response('');
-    // }
+        return response('');
+    }
+
+    public function editByAgency(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Agency::select('id', 'no', 'name')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+        }
+
+        return response($html);
+    }
+
+    public function getByProgramSubId(Request $request)
+    {
+        if ($request->program_sub_id) {
+
+            $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
+                ->where('program_sub_id', $request->program_sub_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByProgramSubId(Request $request)
+    {
+        if (!$request->program_sub_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Cluster::select('id', 'no', 'decription')
+            ->where('program_sub_id', $request->program_sub_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -126,7 +195,11 @@ class BudgetVoucherController extends Controller
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-        $expenseType = ExpenseType::all();
+        $expenseType = ExpenseType::where('id', 3)
+            ->orWhere('id', 4)
+            ->orWhere('id', 5)
+            ->orWhere('id', 6)
+            ->orWhere('id', 7)->get();
 
         $beginVoucher = BeginVoucher::query()
             ->join('account_subs', function ($join) use ($ministry) {
@@ -147,12 +220,16 @@ class BudgetVoucherController extends Controller
             ->orderBy('begin_vouchers.account_sub_id')
             ->get();
 
+        $budgetMandate = BudgetMandate::where("is_archived", "!=", 2)
+            ->orderBy('legal_number', 'asc')->get();
+
         return view('budgetplan::budgetVoucher.create')
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('expenseType', $expenseType)
             ->with('params', $params)
             ->with('beginVoucher', $beginVoucher)
+            ->with('budgetMandate', $budgetMandate)
             ->with('program', $program);
     }
 
@@ -195,20 +272,24 @@ class BudgetVoucherController extends Controller
         ]);
     }
 
-
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'legalNumber' =>  'required',
+            'cboLegalNumber' =>   'required',
+            'legalName' =>  'required',
+            'cboProgram'       => 'required',
+            'cboProgramSub'       => 'required',
+            'cboCluster'       => 'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
             'budget'          => 'required|numeric|min:0',
             'cboExpenseType'       => 'required',
+            'txtDescription'  => 'required',
             'attachments'     => 'nullable|array',
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
-            'date'            => 'required|date',
-            'txtDescription'  => 'required',
+            'transactionDate'            => 'required|date',
+            'requestDate'            => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -218,6 +299,9 @@ class BudgetVoucherController extends Controller
 
             $beginVoucher = BeginVoucher::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -226,6 +310,25 @@ class BudgetVoucherController extends Controller
                     ->translate('en')
                     ->option('timeout', 2000)
                     ->error('មិនមានទិន្ន័យ', 'បញ្ហា')
+                    ->flash();
+
+                return back()->withInput();
+            }
+
+            $budgetMandate = BudgetMandate::where('legal_number', $validated['cboLegalNumber'])
+                ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('no', $validated['no'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if (!$budgetMandate) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្ន័យធានាចំណាយ', 'បញ្ហា')
                     ->flash();
 
                 return back()->withInput();
@@ -256,15 +359,22 @@ class BudgetVoucherController extends Controller
 
             BudgetVoucher::create([
                 'ministry_id'    => $ministry->id,
-                'legalNumber'      => $validated['legalNumber'],
                 'agency_id'      => $validated['cboAgency'],
+                'program_id'      => $validated['cboProgram'],
+                'program_sub_id'      => $validated['cboProgramSub'],
+                'cluster_id'      => $validated['cboCluster'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no'             => $validated['no'],
-                'txtDescription' => strip_tags($validated['txtDescription']),
                 'budget'         => $applyValue,
                 'expense_type_id'      => $validated['cboExpenseType'],
+                'legal_number'      => $validated['cboLegalNumber'],
+                'legal_name'      => $validated['legalName'],
+                'status' => 'done',
+                'is_archived' => 2,
+                'description' => strip_tags($validated['txtDescription']),
                 'attachments'    => json_encode($stored),
-                'date'           => $validated['date'],
+                'transaction_date'           => $validated['transactionDate'],
+                'request_date'           => $validated['requestDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginVoucher);
@@ -272,11 +382,19 @@ class BudgetVoucherController extends Controller
             $beginVoucher->refresh();
             $lastVoucher = BudgetVoucher::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->latest()->first();
 
             $beginVoucher->apply = $lastVoucher?->budget ?? 0;
             $beginVoucher->save();
+
+            $budgetMandate->update([
+                'status' => 'done',
+                'is_archived' => 2,
+            ]);
 
             DB::commit();
             flash()
@@ -322,6 +440,11 @@ class BudgetVoucherController extends Controller
             ->where('ministry_id', $ministry->id)
             ->first();
 
+        $program     = Program::where('ministry_id', $ministry->id)->get();
+        $programId   = Program::findOrFail($module->program_id);
+        $programSub  = ProgramSub::where('ministry_id', $ministry->id)
+            ->where('program_id', $module->program_id)->get();
+
         $beginVoucher = BeginVoucher::query()
             ->join('account_subs', function ($join) use ($ministry) {
                 $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
@@ -344,6 +467,9 @@ class BudgetVoucherController extends Controller
         return view('budgetplan::budgetVoucher.edit')
             ->with('expenseType', $expenseType)
             ->with('agency', $agency)
+            ->with('program', $program)
+            ->with('programId', $programId)
+            ->with('programSub', $programSub)
             ->with('params', $params)
             ->with('beginVoucher', $beginVoucher)
             ->with('module', $module);
@@ -355,16 +481,21 @@ class BudgetVoucherController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
-            'legalNumber' =>  'required',
+            'legalNumber' =>   'required',
+            'legalName' =>  'required',
+            'cboProgram'       => 'required',
+            'cboProgramSub'       => 'required',
+            'cboCluster'       => 'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'no'              => 'required',
-            'budget'          => 'required|numeric|min:0',
+            'budget'          => 'numeric|min:0',
             'cboExpenseType'       => 'required',
+            'txtDescription'  => 'required',
             'attachments'     => 'nullable|array',
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
-            'date'            => 'required|date',
-            'txtDescription'  => 'required',
+            'transactionDate'            => 'required|date',
+            'requestDate'            => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -375,6 +506,9 @@ class BudgetVoucherController extends Controller
 
             $beginCredit = BeginVoucher::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('agency_id', $validated['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
@@ -410,15 +544,23 @@ class BudgetVoucherController extends Controller
 
             $voucher->update([
                 'ministry_id'    => $ministry->id,
-                'legalNumber'    => $validated['legalNumber'],
                 'agency_id'      => $validated['cboAgency'],
+                'program_id'      => $validated['cboProgram'],
+                'program_sub_id'      => $validated['cboProgramSub'],
+                'cluster_id'      => $validated['cboCluster'],
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no' => $beginCredit->no,
                 'budget' => $applyValue,
                 'expense_type_id' => $validated['cboExpenseType'],
-                'attachments' => json_encode($storedFilePaths),
+                'legal_number'    => $validated['legalNumber'],
+                'legal_name'    => $validated['legalName'],
+                'status' => 'done',
+                'is_archived' => 2,
                 'date' => $validated['date'],
-                'txtDescription' => strip_tags($validated['txtDescription']),
+                'description' => strip_tags($validated['txtDescription']),
+                'attachments' => json_encode($storedFilePaths),
+                'transaction_date'           => $validated['transactionDate'],
+                'request_date'           => $validated['requestDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginCredit);
@@ -426,6 +568,9 @@ class BudgetVoucherController extends Controller
             $beginCredit->refresh();
             $lastVoucher = BudgetVoucher::where('no', $validated['no'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['program_id'])
+                ->where('program_sub_id', $validated['program_sub_id'])
+                ->where('cluster_id', $validated['cluster_id'])
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastVoucher?->budget ?? 0;
             $beginCredit->save();
@@ -509,6 +654,9 @@ class BudgetVoucherController extends Controller
     {
         $newApplyTotal = BudgetVoucher::where('no', $beginVoucher->no)
             ->where('account_sub_id', $beginVoucher->account_sub_id)
+            ->where('program_id', $beginVoucher->program_id)
+            ->where('program_sub_id', $beginVoucher->program_sub_id)
+            ->where('cluster_id', $beginVoucher->cluster_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
 
@@ -528,6 +676,9 @@ class BudgetVoucherController extends Controller
     {
         $budgetVoucher = BudgetVoucher::where('no', $beginCredit->no)
             ->where('account_sub_id', $beginCredit->account_sub_id)
+            ->where('program_id', $beginCredit->program_id)
+            ->where('program_sub_id', $beginCredit->program_sub_id)
+            ->where('cluster_id', $beginCredit->cluster_id)
             ->get();
 
         if ($budgetVoucher->count() === 1) {

@@ -13,7 +13,7 @@
                 <h4 class="mb-sm-0 font-size-18">{{ __('buttons.edit') }}</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('menus.voucher') }}</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('menus.payment') }}</a></li>
                         <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                     </ol>
                 </div>
@@ -39,6 +39,15 @@
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         type="text" class="form-control" name="legalNumber"
                                         value="{{ old('legalNumber', $module->legalNumber) }}" tabindex="2" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.legal.name') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        type="text" class="form-control" name="legalName"
+                                        value="{{ old('legalName', $module->legalName) }}" tabindex="2" />
                                 </div>
                             </div>
 

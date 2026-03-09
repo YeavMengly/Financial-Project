@@ -11,8 +11,10 @@ use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetMandate;
+use App\Models\Content\Cluster;
 use App\Models\Content\ExpenseType;
 use App\Models\Content\Program;
+use App\Models\Content\ProgramSub;
 use App\Models\TaskType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +35,7 @@ class BudgetMandateController extends Controller
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
-        $expenseType = ExpenseType::all();
+        $expenseType = ExpenseType::where('id', 1)->get();
         $agency = Agency::all();
         $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
 
@@ -47,6 +49,140 @@ class BudgetMandateController extends Controller
     }
 
     /**
+     * AJAX: Fetch program sub-options by program ID request.
+     */
+    public function getByProgramId(Request $request)
+    {
+        if ($request->program_id) {
+            $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
+                ->where('program_id', $request->program_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByProgramId(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = ProgramSub::select('id', 'no', 'decription')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
+    }
+
+    public function getByAgency(Request $request)
+    {
+        if ($request->program_id) {
+            $data = Agency::select('id', 'program_id', 'no', 'name')
+                ->where('program_id', $request->program_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByAgency(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Agency::select('id', 'no', 'name')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+        }
+
+        return response($html);
+    }
+
+    public function getByProgramSubId(Request $request)
+    {
+        if ($request->program_sub_id) {
+
+            $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
+                ->where('program_sub_id', $request->program_sub_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByProgramSubId(Request $request)
+    {
+        if (!$request->program_sub_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Cluster::select('id', 'no', 'decription')
+            ->where('program_sub_id', $request->program_sub_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
+    }
+
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create($params)
@@ -56,7 +192,8 @@ class BudgetMandateController extends Controller
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-        $expenseType = ExpenseType::all();
+        $expenseType = ExpenseType::where('id', 1)->orWhere('id', 3)->orWhere('id', 4)
+            ->get();
 
         $beginMandate = BeginMandate::query()
             ->join('account_subs', function ($join) use ($ministry) {
@@ -92,36 +229,87 @@ class BudgetMandateController extends Controller
 
         $request->validate([
             'account_sub_id' => 'required',
-            'no'             => 'required'
+            'program_id'     => 'required',
+            'program_sub_id' => 'required',
+            'cluster_id'     => 'required',
         ]);
 
         $beginMandate = BeginMandate::with('loans')
             ->where('ministry_id', $ministryId)
+            ->where('program_id', $request->program_id)
+            ->where('program_sub_id', $request->program_sub_id)
+            ->where('cluster_id', $request->cluster_id)
             ->where('account_sub_id', $request->account_sub_id)
-            ->where('no', $request->no)
             ->first();
 
         if (!$beginMandate) {
             return response()->json([
-                'fin_law'            => 0,
-                'credit_movement'    => 0,
-                'new_credit_status'  => 0,
-                'credit'             => 0,
-                'deadline_balance'   => 0,
-                'exists'             => false,
+                'fin_law'           => 0,
+                'credit_movement'   => 0,
+                'new_credit_status' => 0,
+                'credit'            => 0,
+                'deadline_balance'  => 0,
+                'exists'            => false,
+                'message'           => 'No mandate data found for this selection.'
             ]);
         }
 
         $loan = $beginMandate->loans;
+
         $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
 
         return response()->json([
-            'fin_law'            => (float) ($beginMandate->fin_law ?? 0),
-            'credit_movement'    => (float) $credit_movement,
-            'new_credit_status'  => (float) ($beginMandate->new_credit_status ?? 0),
-            'credit'             => (float) ($beginMandate->credit ?? 0),
-            'deadline_balance'   => (float) ($beginMandate->deadline_balance ?? 0),
-            'exists'             => true,
+            'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
+            'credit_movement'   => (float) $credit_movement,
+            'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
+            'credit'            => (float) ($beginMandate->credit ?? 0),
+            'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
+            'exists'            => true,
+        ]);
+    }
+
+    public function editEarlyBalance(Request $request, $params)
+    {
+        $ministryId = decode_params($params);
+
+        $request->validate([
+            'account_sub_id' => 'required',
+            'program_id'     => 'required',
+            'program_sub_id' => 'required',
+            'cluster_id'     => 'required',
+        ]);
+
+        $beginMandate = BeginMandate::with('loans')
+            ->where('ministry_id', $ministryId)
+            ->where('program_id', $request->program_id)
+            ->where('program_sub_id', $request->program_sub_id)
+            ->where('cluster_id', $request->cluster_id)
+            ->where('account_sub_id', $request->account_sub_id)
+            ->first();
+
+        if (!$beginMandate) {
+            return response()->json([
+                'fin_law'           => 0,
+                'credit_movement'   => 0,
+                'new_credit_status' => 0,
+                'credit'            => 0,
+                'deadline_balance'  => 0,
+                'exists'            => false,
+                'message'           => 'No mandate data found for this selection.'
+            ]);
+        }
+
+        $loan = $beginMandate->loans;
+
+        $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+
+        return response()->json([
+            'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
+            'credit_movement'   => (float) $credit_movement,
+            'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
+            'credit'            => (float) ($beginMandate->credit ?? 0),
+            'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
+            'exists'            => true,
         ]);
     }
 
@@ -132,16 +320,23 @@ class BudgetMandateController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'legalNumber' =>  'required',
+            'legalID' =>   'required',
+            'paymentVoucher' => 'required',
+            'legalNumber' =>   'required',
+            'legalName' =>  'required',
+            'cboProgram'       => 'required',
+            'cboProgramSub'       => 'required',
+            'cboCluster'       => 'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
-            'no'              => 'required',
             'budget'          => 'required|numeric|min:0',
             'cboExpenseType'       => 'required',
+            'txtDescription'  => 'required',
             'attachments'     => 'nullable|array',
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
-            'date'            => 'required|date',
-            'txtDescription'  => 'required',
+            'transactionDate'            => 'required|date',
+            'requestDate'            => 'required|date',
+            'legalDate'            => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -149,8 +344,10 @@ class BudgetMandateController extends Controller
             $ministryId = decode_params($params);
             $ministry   = Ministry::where('id', $ministryId)->first();
 
-            $beginMandate = BeginMandate::where('no', $validated['no'])
-                ->where('account_sub_id', $validated['cboSubAccount'])
+            $beginMandate = BeginMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -188,23 +385,35 @@ class BudgetMandateController extends Controller
             }
 
             BudgetMandate::create([
-                'ministry_id'    => $ministry->id,
-                'legalNumber'      => $validated['legalNumber'],
-                'agency_id'      => $validated['cboAgency'],
-                'account_sub_id' => $validated['cboSubAccount'],
-                'no'             => $validated['no'],
-                'txtDescription' => strip_tags($validated['txtDescription']),
-                'budget'         => $applyValue,
-                'expense_type_id'      => $validated['cboExpenseType'],
-                'attachments'    => json_encode($stored),
-                'date'           => $validated['date'],
+                'ministry_id'      => $ministry->id,
+                'agency_id'        => $validated['cboAgency'],
+                'program_id'       => $validated['cboProgram'],
+                'program_sub_id'   => $validated['cboProgramSub'],
+                'cluster_id'       => $validated['cboCluster'],
+                'account_sub_id'   => $validated['cboSubAccount'],
+                'no'               => $beginMandate->no,
+                'budget'           => $applyValue,
+                'expense_type_id'  => $validated['cboExpenseType'],
+                'legal_id'         => $validated['legalID'],
+                'payment_voucher_number'         => $validated['paymentVoucher'],
+                'legal_number'     => $validated['legalNumber'],
+                'legal_name'       => $validated['legalName'],
+                'status'           => 'todo',
+                'is_archived'      => 1,
+                'description'      => strip_tags($validated['txtDescription']),
+                'attachments'      => json_encode($stored),
+                'transaction_date' => $validated['transactionDate'],
+                'request_date'     => $validated['requestDate'],
+                'legal_date'     => $validated['legalDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginMandate);
 
             $beginMandate->refresh();
-            $lastMandate = BudgetMandate::where('no', $validated['no'])
-                ->where('account_sub_id', $validated['cboSubAccount'])
+            $lastMandate = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('agency_id', $validated['cboAgency'])
                 ->latest()->first();
 
@@ -232,7 +441,6 @@ class BudgetMandateController extends Controller
         }
     }
 
-
     /**
      * Show the specified resource.
      */
@@ -250,11 +458,24 @@ class BudgetMandateController extends Controller
         $ministry = Ministry::where('id', decode_params($params))->first();
 
         $agency   = Agency::where('ministry_id', $ministry->id)->get();
-        $expenseType = ExpenseType::all();
+        $expenseType = ExpenseType::where('id', 1)->get();
 
         $module = BudgetMandate::where('id', $id)
             ->where('ministry_id', $ministry->id)
+            ->where('is_archived', 1)
             ->first();
+
+        if (!$module) {
+            flash()->translate('en')->option('timeout', 2000)
+                ->warning('ទិន្ន័យបានបញ្ចប់', 'Task')->flash();
+            return back()->withInput();
+        }
+
+        $program     = Program::where('ministry_id', $ministry->id)->get();
+        $programId   = Program::where('ministry_id', $ministry->id)
+            ->findOrFail($module->program_id);
+        $programSub  = ProgramSub::where('ministry_id', $ministry->id)
+            ->where('program_id', $module->program_id)->get();
 
         $beginMandate = BeginMandate::query()
             ->join('account_subs', function ($join) use ($ministry) {
@@ -278,6 +499,9 @@ class BudgetMandateController extends Controller
         return view('budgetplan::budgetMandate.edit')
             ->with('expenseType', $expenseType)
             ->with('agency', $agency)
+            ->with('program', $program)
+            ->with('programId', $programId)
+            ->with('programSub', $programSub)
             ->with('params', $params)
             ->with('beginMandate', $beginMandate)
             ->with('module', $module);
@@ -288,18 +512,22 @@ class BudgetMandateController extends Controller
      */
     public function update(Request $request, $params, $id)
     {
-
         $validated = $request->validate([
-            'legalNumber' =>  'required',
+            'legalID' =>   'required',
+            'paymentVoucher' => 'required',
+            'legalNumber' =>   'required',
+            'legalName' =>  'required',
+            'cboProgram'       => 'required',
+            'cboProgramSub'       => 'required',
+            'cboCluster'       => 'required',
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
-            'no'              => 'required',
-            'budget'          => 'required|numeric|min:0',
+            'budget'          => 'numeric|min:0',
             'cboExpenseType'       => 'required',
-            'attachments'     => 'nullable|array',
-            'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
-            'date'            => 'required|date',
             'txtDescription'  => 'required',
+            'transactionDate'            => 'required|date',
+            'requestDate'            => 'required|date',
+            'legalDate'            => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -308,9 +536,10 @@ class BudgetMandateController extends Controller
             $mandate = BudgetMandate::where('id', $id)
                 ->where('ministry_id', $ministry->id)->first();
 
-            $beginCredit = BeginMandate::where('no', $validated['no'])
-                ->where('account_sub_id', $validated['cboSubAccount'])
-                ->where('agency_id', $validated['cboAgency'])
+            $beginCredit = BeginMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -344,22 +573,32 @@ class BudgetMandateController extends Controller
 
             $mandate->update([
                 'ministry_id'    => $ministry->id,
-                'legalNumber'    => $validated['legalNumber'],
                 'agency_id'      => $validated['cboAgency'],
+                'program_id'      => $validated['cboProgram'],
+                'program_sub_id'      => $validated['cboProgramSub'],
+                'cluster_id'      => $validated['cboCluster'],
                 'account_sub_id' => $validated['cboSubAccount'],
-                'no' => $beginCredit->no,
-                'budget' => $applyValue,
-                'expense_type_id' => $validated['cboExpenseType'],
-                'attachments' => json_encode($storedFilePaths),
-                'date' => $validated['date'],
-                'txtDescription' => strip_tags($validated['txtDescription']),
+                'no'             => $beginCredit->no,
+                'budget'         => $applyValue,
+                'expense_type_id'      => $validated['cboExpenseType'],
+                'legal_id'      => $validated['legalID'],
+                'legal_number'      => $validated['legalNumber'],
+                'legal_name'      => $validated['legalName'],
+                'status' => 'todo',
+                'is_archived' => 1,
+                'description' => strip_tags($validated['txtDescription']),
+                'attachments'    => json_encode($storedFilePaths),
+                'transaction_date'           => $validated['transactionDate'],
+                'request_date'           => $validated['requestDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginCredit);
 
             $beginCredit->refresh();
-            $lastMandater = BudgetMandate::where('no', $validated['no'])
-                ->where('account_sub_id', $validated['cboSubAccount'])
+            $lastMandater = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastMandater?->budget ?? 0;
             $beginCredit->save();
@@ -392,7 +631,6 @@ class BudgetMandateController extends Controller
     public function destroy($params, $id)
     {
         $id = decode_params($id);
-        // $params = decode_params($params);
         $ministry   = Ministry::where('id', decode_params($params))->first();
         $mandate = BudgetMandate::where('id', $id)
             ->where('ministry_id', $ministry->id)
@@ -414,8 +652,7 @@ class BudgetMandateController extends Controller
         $mandate->delete();
 
         // Recalculate related data
-        $beginCredit = BeginMandate::where('no', $mandate->no)
-            ->where('account_sub_id', $mandate->account_sub_id)
+        $beginCredit = BeginMandate::where('account_sub_id', $mandate->account_sub_id)
             ->where('ministry_id', $mandate->ministry_id)
             ->first();
 
@@ -434,8 +671,10 @@ class BudgetMandateController extends Controller
 
     private function recalculateAndSaveReport(BeginMandate $beginMandate)
     {
-        $newApplyTotal = BudgetMandate::where('no', $beginMandate->no)
-            ->where('account_sub_id', $beginMandate->account_sub_id)
+        $newApplyTotal = BudgetMandate::where('account_sub_id', $beginMandate->account_sub_id)
+            ->where('program_id', $beginMandate->program_id)
+            ->where('program_sub_id', $beginMandate->program_sub_id)
+            ->where('cluster_id', $beginMandate->cluster_id)
             ->latest('created_at')
             ->value('budget') ?? 0;
 
@@ -453,8 +692,10 @@ class BudgetMandateController extends Controller
 
     private function calculateEarlyBalance($data)
     {
-        $budgetMandate = BudgetMandate::where('no', $data->no)
-            ->where('account_sub_id', $data->account_sub_id)
+        $budgetMandate = BudgetMandate::where('account_sub_id', $data->account_sub_id)
+            ->where('program_id', $data->program_id)
+            ->where('program_sub_id', $data->program_sub_id)
+            ->where('cluster_id', $data->cluster_id)
             ->get();
 
         if ($budgetMandate->count() === 1) {

@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-             <h4 class="mb-sm-0 font-size-18">{{ __('menus.create.year') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.create.year') }}</h4>
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
@@ -76,14 +76,16 @@
 
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
-                                    <div class="form-check">
-                                        <input type="checkbox" name="status" value="1" class="form-check-input"
-                                            {{ old('status', $data->status) ? 'checked' : '' }}>
-                                        <label class="form-check-label">
-                                            Active
-                                        </label>
-                                    </div>
-                                </div>
+                                    <label>{{ __('forms.notes.task') }}</label>
+                                    <select class="form-select" name="cboTaks" required tabindex="3">
+                                        <option value="2" @if ($data->is_archived == 1) selected @endif>
+                                            កំពុងធ្វើ
+                                        </option>
+                                        <option value="3" @if ($data->is_archived == 2) selected @endif>
+                                            បានបញ្ចប់
+                                        </option>
+                                    </select>
+                                </div> Hey Cortana clock Powerpoint Clover Visual Studio
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
