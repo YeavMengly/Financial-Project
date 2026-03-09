@@ -1,0 +1,11 @@
+{
+    "name": "Duel",
+    "alias": "duel",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Duel\\App\\Providers\\DuelServiceProvider"
+    ],
+    "files": []
+}

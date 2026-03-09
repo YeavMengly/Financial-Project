@@ -29,32 +29,28 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="cbochapterNum">{{ __('menus.account') }}</label>
-                            {{-- <input type="text" class="form-control" name="chapterNum" required
-                                data-pristine-required-message="{{ __('messages.required') }}"
-                                placeholder="{{ __('menus.year') }}" /> --}}
-                            <select class="form-control" name="task_type" id="task_type" required
-                                data-pristine-required-message="{{ __('messages.required') }}">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($ministry as $ts)
-                                    <option value="{{ $ts->year }}">{{ $ts->year }}</option>
-                                @endforeach
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
                             </select>
                         </div>
 
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            @if (hasPermission('budget-voucher.create'))
-                                {{-- <div class="mb-4"> --}}
-                                <a class="btn btn-light waves-effect waves-light" href=""><i
-                                        class="bx bx-download me-1"></i>
-                                    {{ __('buttons.download') }}</a>
-                                {{-- </div> --}}
-                            @endif
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -67,7 +63,6 @@
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>

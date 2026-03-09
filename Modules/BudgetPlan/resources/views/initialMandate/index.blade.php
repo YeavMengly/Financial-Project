@@ -23,37 +23,32 @@
             </div>
         </div>
     </div>
-    <!-- end page title -->
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="year">{{ __('menus.account') }}</label>
-                            <select class="form-control" name="year" id="year" required>
-                                <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($initialVoucher as $ts)
-                                    <option value="{{ $ts->year }}"
-                                        {{ request('year') == $ts->year ? 'selected' : '' }}>{{ $ts->year }}</option>
-                                @endforeach --}}
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
                             </select>
                         </div>
 
-
-
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
+                            </select>
+                        </div>
 
                         <div class="col-sm-3">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            @if (hasPermission('budget-voucher.create'))
-                                {{-- <div class="mb-4"> --}}
-                                <a class="btn btn-light waves-effect waves-light" href=""><i
-                                        class="bx bx-download me-1"></i>
-                                    {{ __('buttons.download') }}</a>
-                                {{-- </div> --}}
-                            @endif
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -63,7 +58,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                  
+
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
@@ -113,22 +108,4 @@
         }
     </script>
     {!! $dataTable->scripts() !!}
-
-
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
-    <!-- Custom logic for BeginCredit loading -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('year');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-    </script>
 @endsection

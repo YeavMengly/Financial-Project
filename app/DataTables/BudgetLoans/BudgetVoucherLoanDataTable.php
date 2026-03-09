@@ -20,36 +20,40 @@ class BudgetVoucherLoanDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            ->editColumn('agency', function ($row) {
-                return $row->agency_no . ' - ' . $row->agency_name;
+            ->addColumn('agency', function ($row) {
+                return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
-            ->editColumn('internal_increase', function ($row) {
+            ->addColumn('internal_increase', function ($row) {
                 return number_format($row->internal_increase ?? 0);
             })
-            ->editColumn('unexpected_increase', function ($row) {
+            ->addColumn('unexpected_increase', function ($row) {
                 return number_format($row->unexpected_increase ?? 0);
             })
-            ->editColumn('additional_increase', function ($row) {
+            ->addColumn('additional_increase', function ($row) {
                 return number_format($row->additional_increase ?? 0);
             })
-            ->editColumn('decrease', function ($row) {
+            ->addColumn('decrease', function ($row) {
                 return number_format($row->decrease ?? 0);
             })
-            ->editColumn('editorial', function ($row) {
+            ->addColumn('editorial', function ($row) {
                 return number_format($row->editorial ?? 0);
             })
-            ->editColumn('soft_delete', function ($module) {
-                return is_null($module->deleted_at)
+            ->editColumn('soft_delete', function ($soft_delete) {
+                return is_null($soft_delete->deleted_at)
                     ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
+            ->editColumn('txtDescription', function ($row) {
+                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
+            })
+            ->rawColumns(['soft_delete', 'txtDescription', 'agency'])
             ->addColumn("dateTime", function ($module) {
                 return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($module) {
                 return view('loanbudget::voucher.action', ['module' => $module]);
             })
-            ->rawColumns(['soft_delete', 'action']);
+            ->setRowId('id');
     }
 
     /**
@@ -60,49 +64,50 @@ class BudgetVoucherLoanDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
-            ->leftJoin('agencies', 'budget_voucher_loans.agency_id', '=', 'agencies.id')
-            ->select([
-                'budget_voucher_loans.id',
-                'budget_voucher_loans.ministry_id',
-                'agencies.no as agency_no',
-                'agencies.name as agency_name',
-                'budget_voucher_loans.account_sub_id',
-                'budget_voucher_loans.no',
-                'budget_voucher_loans.internal_increase',
-                'budget_voucher_loans.unexpected_increase',
-                'budget_voucher_loans.additional_increase',
-                'budget_voucher_loans.decrease',
-                'budget_voucher_loans.editorial',
-                'budget_voucher_loans.created_at'
-            ])
-            ->where('budget_voucher_loans.ministry_id', $id);
+        $model = $model->newQuery();
 
-        if ($request->filled('cboAgency')) {
-            $query->where('budget_voucher_loans.agency_id', $request->cboAgency);
+        $model->leftJoin('agencies', 'budget_voucher_loans.agency_id', '=', 'agencies.id');
+
+        // ===== FILTERS =====
+
+        if ($request->cboAgency) {
+            $model->where('budget_voucher_loans.agency_id', $request->cboAgency);
         }
 
-        if ($request->filled('subAccountNumber')) {
-            $query->where('budget_voucher_loans.account_sub_id', $request->subAccountNumber);
+        if ($request->subAccountNumber) {
+            $model->where('budget_voucher_loans.account_sub_id', $request->subAccountNumber);
         }
 
-        if ($request->filled('program')) {
-            $query->where('budget_voucher_loans.no', $request->program);
+        if ($request->start_date) {
+            $model->whereDate('budget_voucher_loans.created_at', '>=', $request->start_date);
         }
 
-        if ($request->filled('description')) {
-            $query->where('budget_voucher_loans.txtDescription', 'LIKE', '%' . $request->description . '%');
+        if ($request->end_date) {
+            $model->whereDate('budget_voucher_loans.created_at', '<=', $request->end_date);
         }
+        // ===== FIXED CONDITION =====
+        $model->where('budget_voucher_loans.ministry_id', $id);
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('budget_voucher_loans.created_at', '>=', $request->start_date);
-        }
+        // ===== SELECT =====
+        $model->select([
+            'budget_voucher_loans.id',
+            'budget_voucher_loans.ministry_id',
+            'agencies.no as agency_no',
+            'agencies.name as agency_name',
+            'budget_voucher_loans.account_sub_id',
+            'budget_voucher_loans.no',
+            'budget_voucher_loans.internal_increase',
+            'budget_voucher_loans.unexpected_increase',
+            'budget_voucher_loans.additional_increase',
+            'budget_voucher_loans.decrease',
+            'budget_voucher_loans.editorial',
+            'budget_voucher_loans.txtDescription',
+            'budget_voucher_loans.created_at'
+        ]);
 
-        if ($request->filled('end_date')) {
-            $query->whereDate('budget_voucher_loans.created_at', '<=', $request->end_date);
-        }
+        $model->orderBy('budget_voucher_loans.created_at', 'DESC');
 
-        return $query->orderBy('budget_voucher_loans.created_at', 'DESC');
+        return $model;
     }
 
     /**
@@ -111,15 +116,40 @@ class BudgetVoucherLoanDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('budgetvoucherloan_-table')
-            ->columns($this->getColumns())
-            ->minifiedAjax()
-            ->orderBy(2, 'asc')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
                 ],
-            ]);
+            ])
+            ->ajax([
+                'data' => 'function(d) {
+                    d.cboAgency = $("#cboAgency").val();
+                    d.subAccountNumber = $("#subAccountNumber").val();
+                }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#budgetvoucherloan-table").DataTable().ajax.reload();
+                });
+                var tr = document.createElement("tr");
+                var columns = this.api().init().columns;
+                this.api().columns().every(function (index) {
+                    var column = this;
+                    var td = document.createElement("td");
+                    if (columns[index] && columns[index].searchable) {
+                        var input = document.createElement("input");
+                        input.className = "form-control form-control-sm";
+                        $(input).on("change", function () {
+                            column.search($(this).val(), false, false, true).draw();
+                        }).appendTo(td);
+                    }
+                    $(td).appendTo(tr);
+                });
+                $(".table-responsive table thead").append(tr);
+            }')
+            ->setTableId('budgetvoucherloan-table')
+            ->columns($this->getColumns());
     }
 
     /**
@@ -142,6 +172,7 @@ class BudgetVoucherLoanDataTable extends DataTable
             Column::make('decrease')->title(__('tables.th.decrease'))->width(80)->addClass('align-middle'),
             Column::make('editorial')->title(__('tables.th.editorial'))->width(80)->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)

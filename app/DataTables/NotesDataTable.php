@@ -23,8 +23,8 @@ class NotesDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">'.__('buttons.active').'</span>' : '<span class="badge bg-danger">'.__('buttons.deleted').'</span>';
-                $active = $active.'<br />'.Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
+                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
+                $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
 
                 return $active;
             })
@@ -128,14 +128,18 @@ class NotesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::computed('DT_RowIndex',
-                __('tables.th.no'))->width(30)->addClass('text-center align-middle')->orderable(false),
+            Column::computed(
+                'DT_RowIndex',
+                __('tables.th.no')
+            )->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::make('title')->title(__('tables.th.notes'))->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
-            Column::computed('action',
-                __('tables.th.action'))->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
+            Column::computed(
+                'action',
+                __('tables.th.action')
+            )->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];
     }
 
@@ -144,6 +148,6 @@ class NotesDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Notes_'.date('YmdHis');
+        return 'Notes_' . date('YmdHis');
     }
 }

@@ -15,7 +15,9 @@
                 @if (hasPermission('ministries.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('ministries.restore', encode_params($module->id)) }}', 2)"
-                        class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
+                        class="dropdown-item">
+                        <i class="bx bx-undo"></i> {{ __('buttons.restore') }}
+                    </a>
                 @endif
             @endif
         </ul>

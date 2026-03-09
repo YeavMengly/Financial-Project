@@ -12,5 +12,10 @@
     "General": true,
     "InitialBudget": true,
     "InitialChapter": true,
-    "InitialBudgetVoucher": true
+    "InitialBudgetVoucher": true,
+    "Material": true,
+    "Duel": true,
+    "Water": true,
+    "Electric": true,
+    "Content": true
 }

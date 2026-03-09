@@ -25,25 +25,25 @@ class BudgetMandateLoanDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            ->editColumn('agency', function ($row) {
-                return $row->agency_no . ' - ' . $row->agency_name;
+            ->addColumn('agency', function ($row) {
+                return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
-            ->editColumn('internal_increase', function ($row) {
+            ->addColumn('internal_increase', function ($row) {
                 return number_format($row->internal_increase ?? 0);
             })
-            ->editColumn('unexpected_increase', function ($row) {
+            ->addColumn('unexpected_increase', function ($row) {
                 return number_format($row->unexpected_increase ?? 0);
             })
-            ->editColumn('additional_increase', function ($row) {
+            ->addColumn('additional_increase', function ($row) {
                 return number_format($row->additional_increase ?? 0);
             })
-            ->editColumn('decrease', function ($row) {
+            ->addColumn('decrease', function ($row) {
                 return number_format($row->decrease ?? 0);
             })
-            ->editColumn('editorial', function ($row) {
+            ->addColumn('editorial', function ($row) {
                 return number_format($row->editorial ?? 0);
             })
-            ->editColumn('soft_delete', function ($module) {
+            ->addColumn('soft_delete', function ($module) {
                 return is_null($module->deleted_at)
                     ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
@@ -54,7 +54,7 @@ class BudgetMandateLoanDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('loanbudget::mandate.action', ['module' => $module]);
             })
-            ->rawColumns(['soft_delete', 'action']);
+            ->rawColumns(['soft_delete', 'agency']);
     }
 
     /**
@@ -65,50 +65,50 @@ class BudgetMandateLoanDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
-            ->leftJoin('agencies', 'budget_mandate_loans.agency_id', '=', 'agencies.id')
-            ->select([
-                'budget_mandate_loans.id',
-                'budget_mandate_loans.ministry_id',
-                'agencies.no as agency_no',
-                'agencies.name as agency_name',
-                'budget_mandate_loans.account_sub_id',
-                'budget_mandate_loans.no',
-                'budget_mandate_loans.internal_increase',
-                'budget_mandate_loans.unexpected_increase',
-                'budget_mandate_loans.additional_increase',
-                'budget_mandate_loans.decrease',
-                'budget_mandate_loans.editorial',
-                'budget_mandate_loans.created_at'
-            ])
-            ->where('budget_mandate_loans.ministry_id', $id);
+        $model = $model->newQuery();
 
-        // 🔍 Apply filters from the form
-        if ($request->filled('cboAgency')) {
-            $query->where('budget_mandate_loans.agency_id', $request->cboAgency);
+        $model->leftJoin('agencies', 'budget_mandate_loans.agency_id', '=', 'agencies.id');
+
+        // ===== FILTERS =====
+
+        if ($request->cboAgency) {
+            $model->where('budget_mandate_loans.agency_id', $request->cboAgency);
         }
 
-        if ($request->filled('subAccountNumber')) {
-            $query->where('budget_mandate_loans.account_sub_id', $request->subAccountNumber);
+        if ($request->subAccountNumber) {
+            $model->where('budget_mandate_loans.account_sub_id', $request->subAccountNumber);
         }
 
-        if ($request->filled('program')) {
-            $query->where('budget_mandate_loans.no', $request->program);
+        if ($request->start_date) {
+            $model->whereDate('budget_mandate_loans.created_at', '>=', $request->start_date);
         }
 
-        if ($request->filled('description')) {
-            $query->where('budget_mandate_loans.txtDescription', 'LIKE', '%' . $request->description . '%');
+        if ($request->end_date) {
+            $model->whereDate('budget_mandate_loans.created_at', '<=', $request->end_date);
         }
 
-        if ($request->filled('start_date')) {
-            $query->whereDate('budget_mandate_loans.created_at', '>=', $request->start_date);
-        }
+        // ===== FIXED CONDITION =====
+        $model->where('budget_mandate_loans.ministry_id', $id);
 
-        if ($request->filled('end_date')) {
-            $query->whereDate('budget_mandate_loans.created_at', '<=', $request->end_date);
-        }
+        // ===== SELECT =====
+        $model->select([
+            'budget_mandate_loans.id',
+            'budget_mandate_loans.ministry_id',
+            'agencies.no as agency_no',
+            'agencies.name as agency_name',
+            'budget_mandate_loans.account_sub_id',
+            'budget_mandate_loans.no',
+            'budget_mandate_loans.internal_increase',
+            'budget_mandate_loans.unexpected_increase',
+            'budget_mandate_loans.additional_increase',
+            'budget_mandate_loans.decrease',
+            'budget_mandate_loans.editorial',
+            'budget_mandate_loans.created_at'
+        ]);
 
-        return $query->orderBy('budget_mandate_loans.created_at', 'DESC');
+        $model->orderBy('budget_mandate_loans.created_at', 'DESC');
+
+        return $model;
     }
 
     /**
@@ -117,14 +117,40 @@ class BudgetMandateLoanDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('budgetmandateloan-table')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
-            ->columns($this->getColumns())
-            ->orderBy(2, 'ASC');
+            ->ajax([
+                'data' => 'function(d) {
+                    d.cboAgency = $("#cboAgency").val();
+                    d.subAccountNumber = $("#subAccountNumber").val();
+                }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#budgetmandateloan-table").DataTable().ajax.reload();
+                });
+                var tr = document.createElement("tr");
+                var columns = this.api().init().columns;
+                this.api().columns().every(function (index) {
+                    var column = this;
+                    var td = document.createElement("td");
+                    if (columns[index] && columns[index].searchable) {
+                        var input = document.createElement("input");
+                        input.className = "form-control form-control-sm";
+                        $(input).on("change", function () {
+                            column.search($(this).val(), false, false, true).draw();
+                        }).appendTo(td);
+                    }
+                    $(td).appendTo(tr);
+                });
+                $(".table-responsive table thead").append(tr);
+            }')
+            ->setTableId('budgetmandateloan-table')
+            ->columns($this->getColumns());
     }
 
     /**
@@ -137,7 +163,7 @@ class BudgetMandateLoanDataTable extends DataTable
                 ->width(30)
                 ->addClass('text-center align-middle')
                 ->orderable(false),
-                
+
             Column::make('agency')->title(__('tables.th.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
