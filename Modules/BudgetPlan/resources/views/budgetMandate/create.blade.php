@@ -171,7 +171,7 @@
 
                                             @foreach ($accountSub as $bv)
                                                 <option value="{{ $bv->no }}">
-                                                    {{ $bv->no }}-{{ $bv->no }}
+                                                    {{ $bv->no }}-{{ $bv->name }}
                                                 </option>
                                             @endforeach
                                         </select>
