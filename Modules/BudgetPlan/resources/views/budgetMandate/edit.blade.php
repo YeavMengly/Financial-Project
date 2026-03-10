@@ -165,10 +165,10 @@
                                             class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginMandate as $bv)
-                                                <option value="{{ $bv->account_sub_id }}"
-                                                    {{ old('cboSubAccount', $module->account_sub_id) == $bv->account_sub_id ? 'selected' : '' }}>
-                                                    {{ $bv->account_sub_id }}
+                                            @foreach ($accountSub as $bv)
+                                                <option value="{{ $bv->no }}"
+                                                    {{ old('cboSubAccount', $module->account_sub_id) == $bv->no ? 'selected' : '' }}>
+                                                    {{ $bv->no }}-{{ $bv->name }}
                                                 </option>
                                             @endforeach
                                         </select>

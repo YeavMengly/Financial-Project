@@ -169,9 +169,9 @@
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
 
-                                            @foreach ($beginMandate as $bv)
-                                                <option value="{{ $bv->account_sub_id }}">
-                                                    {{ $bv->account_sub_id }}
+                                            @foreach ($accountSub as $bv)
+                                                <option value="{{ $bv->no }}">
+                                                    {{ $bv->no }}-{{ $bv->no }}
                                                 </option>
                                             @endforeach
                                         </select>
