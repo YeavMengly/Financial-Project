@@ -459,6 +459,7 @@ class BudgetMandateController extends Controller
 
         $agency   = Agency::where('ministry_id', $ministry->id)->get();
         $expenseType = ExpenseType::where('id', 1)->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         $module = BudgetMandate::where('id', $id)
             ->where('ministry_id', $ministry->id)
@@ -498,6 +499,7 @@ class BudgetMandateController extends Controller
 
         return view('budgetplan::budgetMandate.edit')
             ->with('expenseType', $expenseType)
+            ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('program', $program)
             ->with('programId', $programId)
