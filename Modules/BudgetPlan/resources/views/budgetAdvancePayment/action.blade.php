@@ -1,4 +1,4 @@
-@if (hasPermission('budgetMandate.edit') or hasPermission('budgetMandate.destroy'))
+@if (hasPermission('budgetAdvancePayment.edit') or hasPermission('budgetAdvancePayment.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
@@ -6,23 +6,23 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('budgetMandate.edit'))
-                    <a href="{{ route('budgetMandate.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                @if (hasPermission('budgetAdvancePayment.edit'))
+                    <a href="{{ route('budgetAdvancePayment.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit') }}
                     </a>
                 @endif
-                @if (hasPermission('budgetMandate.destroy'))
+                @if (hasPermission('budgetAdvancePayment.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetMandate.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
+                        onclick="confirm('{{ route('budgetAdvancePayment.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item">
                         <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
                     </a>
                 @endif
             @else
-                @if (hasPermission('budgetMandate.destroy'))
+                @if (hasPermission('budgetAdvancePayment.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetMandate.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
+                        onclick="confirm('{{ route('budgetAdvancePayment.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item">
                         <i class="bx bx-undo"></i> {{ __('buttons.restore') }}
                     </a>

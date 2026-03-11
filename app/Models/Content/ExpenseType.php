@@ -2,6 +2,7 @@
 
 namespace App\Models\Content;
 
+use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,6 +25,15 @@ class ExpenseType extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    /**
+     * Get the beginVoucher under this ministry.
+     */
+    public function budgetMandate()
+    {
+        return $this->hasMany(BudgetMandate::class, 'expense_type_id', 'id');
+    }
+
 
     /**
      * ✅ Spatie Activity Log Options

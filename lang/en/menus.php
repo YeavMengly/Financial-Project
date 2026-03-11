@@ -63,6 +63,7 @@ return [
     'check.control.guarantee' => 'ធានាចំណាយ',
     'expenditure.guarantee' => 'ធានាចំណាយ',
     'payment' => 'ទូទាត់',
+    'advance.payment' => 'បុរេប្រទាន',
     'check.control.summary' => 'របាយការណ៍សង្ខេប',
 
     'library' => 'Media Library',
