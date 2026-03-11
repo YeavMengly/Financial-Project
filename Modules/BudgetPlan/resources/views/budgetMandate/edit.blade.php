@@ -190,7 +190,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboExpenseType"
                                             class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
@@ -207,7 +207,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">

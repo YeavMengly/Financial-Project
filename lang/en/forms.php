@@ -79,7 +79,7 @@ return [
 
     'legal.id' => 'លេខលិខិត',
     'payment.voucher' => 'លេខសលាកប័ត្រ',
-    'legal.number' => 'លេខសម្គាល់សំណើ',
+    'legal.number' => 'លេខសម្គាល់សំណើ​ ( PO FMIS )',
     'legal.name' => 'ឈ្មោះសំណើ',
     'title.entity' => 'អង្គភាព',
     'location.number' => 'លេខទីតាំង',

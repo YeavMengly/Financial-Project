@@ -2,7 +2,7 @@
 
 namespace App\DataTables\Budget;
 
-use App\Models\BeginCredit\InitialBudget;
+use App\Models\BudgetAdvancePayment;
 use App\Models\BudgetPlan\BudgetMandate;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
@@ -15,7 +15,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class BudgetMandateDataTable extends DataTable
+class BudgetAdvancePaymentDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -42,7 +42,7 @@ class BudgetMandateDataTable extends DataTable
                 return $row->name_kh ?? '-';
             })
             ->addColumn('action', function ($module) {
-                return view('budgetplan::budgetMandate.action', ['module' => $module]);
+                return view('budgetplan::budgetAdvancePayment.action', ['module' => $module]);
             })
             ->editColumn('is_archived', function ($module) {
                 $notes = ($module->is_archived == 2) ? '<button class="btn btn-sm btn-outline-success">បានបញ្ចប់</button>' : '<button class="btn btn-sm btn-outline-primary">កំពុងធ្វើ</button>';
@@ -96,11 +96,14 @@ class BudgetMandateDataTable extends DataTable
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
                 $model->where('budget_mandates.is_archived', 1);
+                $model->where('budget_mandates.expense_type_id', 2);
             } elseif ($request->cboTodo == 3) {
                 $model->where('budget_mandates.is_archived', 2);
+                $model->where('budget_mandates.expense_type_id', 2);
             }
         } else {
             $model->where('budget_mandates.is_archived', 1);
+            $model->where('budget_mandates.expense_type_id', 2);
         }
 
         $model->from('budget_mandates')
@@ -114,7 +117,7 @@ class BudgetMandateDataTable extends DataTable
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
-        $model->where('budget_mandates.expense_type_id', 1);
+        $model->where('budget_mandates.expense_type_id', 2);
 
         // ===== SELECT =====
         $model->select([
@@ -169,12 +172,13 @@ class BudgetMandateDataTable extends DataTable
             ->initComplete('function () {
                 $("#filter").submit(function(event) {
                     event.preventDefault();
-                    $("#budgetmandate-table").DataTable().ajax.reload();
+                    $("#budgetadvancepayment-table").DataTable().ajax.reload();
                 });
             }')
-            ->setTableId('budgetmandate-table')
+            ->setTableId('budgetadvancepayment-table')
             ->columns($this->getColumns());
     }
+
 
     /**
      * Get the dataTable columns definition.
@@ -213,6 +217,6 @@ class BudgetMandateDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'BudgetMandate_' . date('YmdHis');
+        return 'BudgetAdvancePayment_' . date('YmdHis');
     }
 }

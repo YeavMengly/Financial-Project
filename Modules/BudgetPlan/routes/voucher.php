@@ -19,6 +19,7 @@ Route::middleware('PermissionCheck')
 Route::controller(BudgetVoucherController::class)->group(function () {
     Route::post('voucher/{params}/store', 'store')->name('budgetVoucher.store');
     Route::post('voucher/{params}/update/{id}', 'update')->name('budgetVoucher.update');
+    Route::get('voucher/{params}/restore/{id}', 'restore')->name('budgetVoucher.restore');
     Route::get('voucher/{params}/export', 'export')->name('budgetVoucher.export');
 
     // These routes are for ajax request
@@ -29,4 +30,7 @@ Route::controller(BudgetVoucherController::class)->group(function () {
     Route::get('voucher/edit-by-program/program-subs', 'editByProgramId')->name('budgetVoucher.edit.program_sub');
     Route::get('voucher/edit-by-program/agencies', 'editByAgency')->name('budgetVoucher.edit.agency');
     Route::get('voucher/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetVoucher.edit.cluster');
+
+
+    // Route::get('voucher/get-by-expense/legal-number', 'getByExpenseId')->name('budgetVoucher.by.expense_type_id');
 });
