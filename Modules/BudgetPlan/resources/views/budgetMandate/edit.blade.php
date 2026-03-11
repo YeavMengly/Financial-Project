@@ -165,10 +165,10 @@
                                             class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginMandate as $bv)
-                                                <option value="{{ $bv->account_sub_id }}"
-                                                    {{ old('cboSubAccount', $module->account_sub_id) == $bv->account_sub_id ? 'selected' : '' }}>
-                                                    {{ $bv->account_sub_id }}
+                                            @foreach ($accountSub as $bv)
+                                                <option value="{{ $bv->no }}"
+                                                    {{ old('cboSubAccount', $module->account_sub_id) == $bv->no ? 'selected' : '' }}>
+                                                    {{ $bv->no }}-{{ $bv->name }}
                                                 </option>
                                             @endforeach
                                         </select>
@@ -190,7 +190,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboExpenseType"
                                             class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
@@ -207,7 +207,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">

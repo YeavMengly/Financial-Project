@@ -18,11 +18,11 @@
                     </a>
                 @endif
             @else
-                {{-- @if (hasPermission('budgetVoucher.destroy'))
+                @if (hasPermission('budgetVoucher.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetVoucher.restore', encode_params($module->id)) }}', 2)"
+                        onclick="confirm('{{ route('budgetVoucher.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
-                @endif --}}
+                @endif
             @endif
         </ul>
     </div>

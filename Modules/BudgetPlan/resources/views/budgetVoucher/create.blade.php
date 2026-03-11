@@ -44,17 +44,24 @@
                             @csrf
 
                             <div class="row">
+
+
                                 {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.legal.number') }}</label>
-                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="number" class="form-control"
-                                            placeholder="{{ __('forms.legal.number') }}" name="legalNumber"
-                                            tabindex="2" />
+                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.legal.number') }}
+                                        </label>
+                                        <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cboLegalNumber')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div> --}}
+
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -83,27 +90,6 @@
                                             type="text" class="form-control" name="legalName" tabindex="2" />
                                     </div>
                                 </div>
-
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $item)
-                                                <option value="{{ $item->id }}">
-                                                    {{ $item->no }} -
-                                                    {{ $item->name ?? 'មិនមានទិន្ន័យ' }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboAgency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -235,7 +221,6 @@
                                         @enderror
                                     </div>
                                 </div>
-
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -720,4 +705,21 @@
 
         });
     </script>
+
+    {{-- <script>
+        $('#cboExpenseType').change(function() {
+            var expenseTypeId = $(this).val();
+            $.ajax({
+                url: '{!! route('budgetVoucher.by.expense_type_id') !!}',
+                type: 'get',
+                global: false,
+                data: {
+                    expense_type_id: expenseTypeId
+                },
+                success: function(data) {
+                    $('#cboLegalNumber').html(data);
+                }
+            });
+        });
+    </script> --}}
 @endsection

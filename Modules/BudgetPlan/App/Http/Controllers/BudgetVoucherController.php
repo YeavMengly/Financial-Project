@@ -38,7 +38,9 @@ class BudgetVoucherController extends Controller
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
-        $expenseType = ExpenseType::all();
+        $expenseType = ExpenseType::where('id', 1)
+            ->orWhere('id', 2)
+            ->get();
         $agency = Agency::all();
         $budgetVoucher = BudgetVoucher::where('ministry_id', $data->id)->get();
 
@@ -184,7 +186,28 @@ class BudgetVoucherController extends Controller
         return response($html);
     }
 
+    // public function getByExpenseId(Request $request)
+    // {
+    //     if ($request->expense_type_id) {
 
+    //         $data = BudgetMandate::select('id', 'expense_type_id')
+    //             // ->where('expense_type_id', $request->expense_type_id)
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+
+    //         foreach ($data as $d) {
+    //             $selected = $selectedId == $d->id ? 'selected' : '';
+    //             $html .= "<option value='{$d->id}' {$selected}>{$d->id} - {$d->decription}</option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
     /**
      * Show the form for creating a new resource.
      */
@@ -195,11 +218,9 @@ class BudgetVoucherController extends Controller
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-        $expenseType = ExpenseType::where('id', 3)
-            ->orWhere('id', 4)
-            ->orWhere('id', 5)
-            ->orWhere('id', 6)
-            ->orWhere('id', 7)->get();
+        $expenseType = ExpenseType::where('id', 1)
+            ->orWhere('id', 2)
+            ->get();
 
         $beginVoucher = BeginVoucher::query()
             ->join('account_subs', function ($join) use ($ministry) {
@@ -305,7 +326,26 @@ class BudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
+            $beginMandate = BeginMandate::where('no', $validated['no'])
+                ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+
             if (!$beginVoucher) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្ន័យ', 'បញ្ហា')
+                    ->flash();
+
+                return back()->withInput();
+            }
+
+            if (!$beginMandate) {
                 flash()
                     ->translate('en')
                     ->option('timeout', 2000)
@@ -637,17 +677,19 @@ class BudgetVoucherController extends Controller
         return redirect()->route('budgetVoucher.index', $params);
     }
 
-    public function restore($params)
+    public function restore($params, $id)
     {
-        $id = decode_params($params);
-        $beginCredit = BeginVoucher::withTrashed()->find($id);
+        $pid = decode_params($id);
 
-        if ($beginCredit) {
-            $beginCredit->restore();
-            flash()->success(__('messages.restore_success'))->flash();
-        }
+        BudgetVoucher::withTrashed()->whereKey($pid)->restore();
 
-        return redirect()->route('budgetplan.index');
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('budgetVoucher.index', $params);
     }
 
     private function recalculateAndSaveReport(BeginVoucher $beginVoucher)
