@@ -192,8 +192,9 @@ class BudgetVoucherController extends Controller
 
             $data = BudgetMandate::select('id', 'legal_number')
                 ->where('expense_type_id', $request->expense_type_id)
-                ->where('is_archived', 1)->get();
-
+                ->where('is_archived', 1)
+                ->where('status', 'todo')
+                ->get();
 
             $selectedId = $request->selected_id ?? null;
 
@@ -221,10 +222,11 @@ class BudgetVoucherController extends Controller
 
         // if ($request->expense_type_id) {
 
-        $data = BudgetVoucher::select('id', 'legal_number')
+        $data = BudgetMandate::select('id', 'legal_number')
             ->where('expense_type_id', $request->expense_type_id)
-            ->where('is_archived', 2)->get();
-
+            ->where('is_archived', 2)
+            ->where('status', 'done')
+            ->get();
         $selectedId = (string) $request->selected_id;
 
         $html = '<option value="">ស្វែងរក...</option>';

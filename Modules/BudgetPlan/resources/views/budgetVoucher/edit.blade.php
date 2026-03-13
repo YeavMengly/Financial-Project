@@ -953,7 +953,7 @@
                 if (!expenseTypeId) return;
 
                 $.ajax({
-                    url: "{{ route('budgetVoucher.by.expense_type_id') }}",
+                    url: "{{ route('budgetVoucher.edit.expense_type_id') }}",
                     type: "GET",
                     data: {
                         expense_type_id: expenseTypeId,
