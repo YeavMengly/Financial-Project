@@ -436,7 +436,7 @@
                 <div class="card-body">
                     <div class="row align-items-center">
                         {{-- pre_Financing --}}
-                        <div class="col-sm align-self-center">
+                        <div class="col-sm align-self-center text-center">
                             <div class="mt-4 mt-sm-0">
                                 <div>
                                     <p class="mb-2">
