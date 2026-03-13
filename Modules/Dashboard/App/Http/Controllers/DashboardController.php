@@ -291,20 +291,24 @@ class DashboardController extends Controller
             ->where('ministries.year', $year)
             ->get();
         $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
-        // $advance_Payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
-        $direct_Payment = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
+        $advance_Payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
+
+        $direct_Payment = $budgetVouchers->where('expense_type_id', '6')->pluck('budget');
+        $payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
         // $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
-        // $pre_Financing = $budgetVouchers->where('expense_type_id', '5')->pluck('budget');
-        //$taskType = $budgetVouchers->where('expense_type_id', '2')->pluck('budget')->toArray();
+        // $pre_Financing = $budgetMandate->where('expense_type_id', '5')->pluck('budget');     
         $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
-        // $advance_Payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
-        $direct_Payment = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
-        // $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
-        // $pre_Financing = round($budgetVouchers->where('expense_type_id', '5')->sum('budget'), 2);
+        $advance_Payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
+        $direct_Payment = round($budgetVouchers->where('expense_type_id', '6')->sum('budget'), 2);
+        $payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
+        // $procurement = round($budgetVouchers->where('expeonse_type_id', '4')->sum('budget'), 2);
+        //$pre_Financing = round($budgetMandate->where('expense_type_id', '5')->sum('budget'), 2);
 
-        $totalCountArch = $budgetMandate->where('is_archived', '1')->count();
-        $totalCountDir = $budgetVouchers->where('is_archived', '2')->count();
-
+        $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->count();
+        $totalCountDir = $budgetVouchers->where('expense_type_id', '6')->where('is_archived', '2')->count();
+        $totalCountAdvance   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', '1')->count();
+        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived',' 2')->count();
+       
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
@@ -313,20 +317,22 @@ class DashboardController extends Controller
 
         $total_fin_law       = $budgetReport->sum('fin_law');
         $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
-        // $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
+        $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
+        $percent_Payment = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
        // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
-       // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-        $expenseType = ExpenseType::all();
-            
+        //$percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
        
-      // dd($taskType);
+      // dd($totalCountArch);
         // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-        $totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
+        //$totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
         $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
+        //$totalAdvanPayment = $total_fin_law > 0 ? $total_fin_law - $advance_Payment : 0;
+        $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
+        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ( $expenditure_Guarantee + $advance_Payment ) : 0;
 
-        //   dd($totalExpend );
+        //   dd($total_fin_law );
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
@@ -387,21 +393,28 @@ class DashboardController extends Controller
             'remainData' => $remainData,
             'deadlineData' => $deadlineData,
             'accounts' => $accounts,
+            
             'expenditure_Guarantee' => $expenditure_Guarantee,
-            //'advance_Payment' => $advance_Payment,
+            'advance_Payment' => $advance_Payment,
             'direct_Payment' => $direct_Payment,
+            'payment' => $payment,
             // 'procurement' => $procurement,
-            // 'pre_Financing' => $pre_Financing,
+           // 'pre_Financing' => $pre_Financing,
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
-            // 'percent_advance_Payment' => $percent_advance_Payment,
+            'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
+            'percent_Payment' => $percent_Payment,
             // 'percent_procurement' => $percent_procurement,
-            // 'percent_pre_Financing' => $percent_pre_Financing,
-            // 'taskType' => $taskType,
+            //'percent_pre_Financing' => $percent_pre_Financing,
             'totalCountArch' => $totalCountArch,
             'totalCountDir' => $totalCountDir,
-            'totalExpend' => $totalExpend,
-            'totalDir' => $totalDir
+            //'totalExpend' => $totalExpend,
+            'totalDir' => $totalDir,
+            'totalPayment' => $totalPayment,
+            //'totalAdvanPayment' => $totalAdvanPayment,
+            'totalCountAdvance' => $totalCountAdvance,
+            'totalCountPayment' => $totalCountPayment,
+            'totalFinLaw' => $totalFinLaw
         ]);
     }
 
