@@ -2,11 +2,8 @@
 @section('css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-
-    <!-- preloader css -->
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
@@ -16,12 +13,13 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.payment') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.advance.payment') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.payment') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">
+                                    {{ __('menus.advance.payment') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -31,7 +29,6 @@
     </div>
 
     <div id="flashMessage"></div>
-
     <!-- end page title -->
     <div class="row">
         <div class="col-12"></div>
@@ -39,37 +36,52 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('budgetVoucher.store', $params) }}"
+                        <form id="pristine-valid-example" action="{{ route('budgetAdvancePayment.store', $params) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
+
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboExpenseType"
-                                            class="form-label text-muted">{{ __('forms.expense.type') }}</label>
-                                        <select id="cboExpenseType" class="form-select" name="cboExpenseType" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($expenseType as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name_kh }}</option>
-                                            @endforeach
-                                        </select>
+                                        <label>{{ __('forms.legal.id') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                            type="number" class="form-control" placeholder="{{ __('forms.legal.id') }}"
+                                            name="legalID" tabindex="2" />
                                     </div>
                                 </div>
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.legal.number') }}
-                                        </label>
-                                        <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                        </select>
+                                        <label for="legalDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                        <input type="text" id="legalDate" name="legalDate" class="form-control"
+                                            placeholder="{{ __('forms.select_legal_date') }}" required
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                    </div>
+                                </div>
 
-                                        @error('cboLegalNumber')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.payment.voucher') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                            type="number" class="form-control"
+                                            placeholder="{{ __('forms.payment.voucher.number') }}" name="paymentVoucher"
+                                            tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.number') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                            type="number" class="form-control"
+                                            placeholder="{{ __('forms.legal.number') }}" name="legalNumber"
+                                            tabindex="2" />
                                     </div>
                                 </div>
 
@@ -77,7 +89,8 @@
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.name') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            type="text" class="form-control" name="legalName" tabindex="2" />
+                                            type="text" class="form-control" placeholder="{{ __('forms.legal.name') }}"
+                                            name="legalName" tabindex="2" />
                                     </div>
                                 </div>
 
@@ -165,18 +178,28 @@
                                     </div>
                                 </div>
 
-                                {{-- Program Code (auto-filled from JS) --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="budget">{{ __('forms.budget') }}</label>
                                         <input type="number" min="0" name="budget" id="budget" required
-                                            class="form-control"
+                                            class="form-control" placeholder="{{ __('forms.budget') }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('budget')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
+
+                                {{-- <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboExpenseType"
+                                            class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
+                                        <select class="form-control" name="cboExpenseType" id="cboExpenseType" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($expenseType as $ts)
+                                                <option value="{{ $ts->id }}">{{ $ts->name_kh }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -203,22 +226,15 @@
                                         <input type="file" id="fileInput" name="attachments[]" class="form-control"
                                             accept=".pdf,.doc,.docx" multiple />
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
-                                        @error('attachments.*')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
-
-
                             </div>
+
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
                                     <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required
                                         data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                    @error('txtDescription')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
@@ -228,7 +244,7 @@
                                     {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
-                                    href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('budgetAdvancePayment.index', $params) }}">{{ __('buttons.back') }}</a>
 
                             </div>
                         </form>
@@ -271,8 +287,6 @@
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script>
         const transactionDateInput = document.getElementById('transactionDate');
         if (transactionDateInput) {
@@ -285,6 +299,7 @@
             });
         }
     </script>
+
     <script>
         const requestDateInput = document.getElementById('requestDate');
         if (requestDateInput) {
@@ -299,34 +314,18 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('pristine-valid-example');
-            const pristine = new Pristine(form);
-
-            form.addEventListener('submit', function(e) {
-                if (!pristine.validate()) {
-                    e.preventDefault();
-                }
+        const legalDateInput = document.getElementById('legalDate');
+        if (legalDateInput) {
+            flatpickr(legalDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: legalDateInput.value || null
             });
-        });
-    </script>
-    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            $('#vDescription').summernote({
-                height: 150,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['color', ['color']],
-                ]
-            });
-        });
+        }
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
     <script>
         // ---------- helpers ----------
         function initChoicesOnce(selectEl, opts = {}) {
@@ -364,7 +363,7 @@
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
-            const earlyEP = "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}";
+            const earlyEP = "{{ route('budgetAdvancePayment.getEarlyBalance', ['params' => $params]) }}";
 
             // Pristine
             if (form) {
@@ -386,6 +385,11 @@
                 });
             }
 
+            // Choices — once per element
+            // initChoicesOnce(document.getElementById('cboExpenseType'), {
+            //     placeholderValue: 'ជ្រើសរើស',
+            //     searchPlaceholderValue: 'ស្វែងរក...'
+            // });
             initChoicesOnce(subAccount, {
                 placeholder: true,
                 placeholderValue: 'ស្វែងរក...'
@@ -461,6 +465,7 @@
             budgetInput?.addEventListener('input', recomputeRemaining);
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -484,7 +489,6 @@
             });
         });
     </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -554,7 +558,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.by.program_sub') }}",
+                    url: "{{ route('budgetAdvancePayment.by.program_sub') }}",
                     data: {
                         program_id: programId
                     },
@@ -573,7 +577,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.by.agency') }}",
+                    url: "{{ route('budgetAdvancePayment.by.agency') }}",
                     data: {
                         program_id: programId
                     },
@@ -592,7 +596,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.by.cluster') }}",
+                    url: "{{ route('budgetAdvancePayment.by.cluster') }}",
                     data: {
                         program_sub_id: programSubId
                     },
@@ -616,134 +620,6 @@
             $('#cboProgramSub').on('change', function() {
                 const programSubId = $(this).val();
                 handleProgramSubChangeForCluster(programSubId);
-            });
-
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboExpenseType');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script>
-    {{-- <script>
-        let cboLegalChoices;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboLegalNumber');
-
-            cboLegalChoices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-
-        $('#cboExpenseType').change(function() {
-            var expenseTypeId = $(this).val();
-
-            $.ajax({
-                url: '{!! route('budgetVoucher.by.expense_type_id') !!}',
-                type: 'get',
-                global: false,
-                data: {
-                    expense_type_id: expenseTypeId
-                },
-                success: function(data) {
-
-                    // remove old choices
-                    cboLegalChoices.clearChoices();
-
-                    // append new options
-                    cboLegalChoices.setChoices(
-                        $(data).map(function() {
-                            return {
-                                value: $(this).val(),
-                                label: $(this).text(),
-                                selected: false
-                            };
-                        }).get(),
-                        'value',
-                        'label',
-                        true
-                    );
-                }
-            });
-        });
-    </script> --}}
-
-    <script>
-        let cboLegalChoices;
-
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const element = document.getElementById('cboLegalNumber');
-
-            cboLegalChoices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-
-        });
-
-        $('#cboExpenseType').on('change', function() {
-
-            var expenseTypeId = $(this).val();
-
-            /* ===== Reset cboLegalNumber ===== */
-            cboLegalChoices.clearStore(); // remove selected item
-            cboLegalChoices.clearChoices(); // remove all options
-
-            // add default option
-            cboLegalChoices.setChoices([{
-                value: '',
-                label: 'ស្វែងរក...',
-                selected: true,
-                disabled: true
-            }], 'value', 'label', true);
-
-            if (!expenseTypeId) return;
-
-            /* ===== Load new options ===== */
-            $.ajax({
-                url: "{{ route('budgetVoucher.by.expense_type_id') }}",
-                type: 'GET',
-                data: {
-                    expense_type_id: expenseTypeId
-                },
-                success: function(data) {
-
-                    let options = [];
-
-                    $(data).filter('option').each(function() {
-                        options.push({
-                            value: $(this).val(),
-                            label: $(this).text()
-                        });
-                    });
-
-                    cboLegalChoices.clearChoices();
-
-                    cboLegalChoices.setChoices(
-                        options,
-                        'value',
-                        'label',
-                        true
-                    );
-
-                }
             });
 
         });

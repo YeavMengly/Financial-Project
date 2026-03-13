@@ -187,7 +187,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboExpenseType"
                                             class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
@@ -199,7 +199,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -386,10 +386,10 @@
             }
 
             // Choices — once per element
-            initChoicesOnce(document.getElementById('cboExpenseType'), {
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...'
-            });
+            // initChoicesOnce(document.getElementById('cboExpenseType'), {
+            //     placeholderValue: 'ជ្រើសរើស',
+            //     searchPlaceholderValue: 'ស្វែងរក...'
+            // });
             initChoicesOnce(subAccount, {
                 placeholder: true,
                 placeholderValue: 'ស្វែងរក...'

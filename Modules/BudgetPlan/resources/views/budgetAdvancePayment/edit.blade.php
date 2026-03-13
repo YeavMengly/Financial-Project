@@ -9,12 +9,12 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.guarantee') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.advance.payment') }}</h4>
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript:void(0)">
-                                {{ __('menus.expenditure.guarantee') }}</a></li>
+                                {{ __('menus.advance.payment') }}</a></li>
                         <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                     </ol>
                 </div>
@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <div>
                         <form id="pristine-valid-example"
-                            action="{{ route('budgetMandate.update', ['params' => $params, 'id' => $module->id]) }}"
+                            action="{{ route('budgetAdvancePayment.update', ['params' => $params, 'id' => $module->id]) }}"
                             method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
                             @csrf
 
@@ -247,7 +247,7 @@
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
                                 <a class="btn btn-dark"
-                                    href="{{ route('budgetMandate.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('budgetAdvancePayment.index', $params) }}">{{ __('buttons.back') }}</a>
                             </div>
                         </form>
 
@@ -350,7 +350,7 @@
             const cboSubAccount = document.getElementById('cboSubAccount');
             const budgetInput = document.getElementById('budget');
 
-            const ENDPOINT = "{{ route('budgetMandate.editEarlyBalance', ['params' => $params]) }}";
+            const ENDPOINT = "{{ route('budgetAdvancePayment.editEarlyBalance', ['params' => $params]) }}";
 
             function toNumber(v) {
                 v = (v || '').toString().replace(/,/g, '');
@@ -559,7 +559,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetMandate.edit.program_sub') }}",
+                    url: "{{ route('budgetAdvancePayment.edit.program_sub') }}",
                     data: {
                         program_id: programId,
                         selected_id: selectedId
@@ -578,7 +578,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetMandate.edit.agency') }}",
+                    url: "{{ route('budgetAdvancePayment.edit.agency') }}",
                     data: {
                         program_id: programId,
                         selected_id: selectedId
@@ -597,7 +597,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetMandate.edit.cluster') }}",
+                    url: "{{ route('budgetAdvancePayment.edit.cluster') }}",
                     data: {
                         program_sub_id: programSubId,
                         selected_id: selectedId

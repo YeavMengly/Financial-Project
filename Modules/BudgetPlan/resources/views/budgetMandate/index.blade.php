@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">    {{ __('menus.expenditure.guarantee') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.guarantee') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -59,7 +59,7 @@
                         </div>
 
                         <!-- Task Type -->
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label class="visually-hidden" for="cboExpenseType">{{ __('menus.task') }}</label>
                             <select class="form-control" name="cboExpenseType" id="cboExpenseType">
                                 <option value="">{{ __('forms.search...') }}</option>
@@ -70,7 +70,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">

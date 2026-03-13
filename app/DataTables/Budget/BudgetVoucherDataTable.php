@@ -78,6 +78,7 @@ class BudgetVoucherDataTable extends DataTable
         $id = decode_params($params);
 
         $model = $model->newQuery();
+        $model->withTrashed();
 
         if ($request->cboStatus) {
             if ($request->cboStatus == '2') {
@@ -93,12 +94,12 @@ class BudgetVoucherDataTable extends DataTable
 
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
-                $model->where('is_archived', 1);
+                $model->where('budget_vouchers.is_archived', 1);
             } elseif ($request->cboTodo == 3) {
-                $model->where('is_archived', 2);
+                $model->where('budget_vouchers.is_archived', 2);
             }
         } else {
-            $model->where('is_archived', 2);
+            $model->where('budget_vouchers.is_archived', 2);
         }
 
         $model->leftJoin('account_subs', function ($join) use ($id) {
@@ -107,6 +108,16 @@ class BudgetVoucherDataTable extends DataTable
         })->from('budget_vouchers');
         $model->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_vouchers.expense_type_id', '=', 'expense_types.id');
+
+        if ($request->cboExpenseType) {
+            if ($request->cboExpenseType == 2) {
+                $model->where('budget_vouchers.expense_type_id', 1);
+            } elseif ($request->cboExpenseType == 3) {
+                $model->where('budget_vouchers.expense_type_id', 2);
+            }
+        } else {
+            $model->where('budget_vouchers.expense_type_id', 1);
+        }
 
         // ===== FIXED CONDITION =====
         $model->where('budget_vouchers.ministry_id', $id);
@@ -123,6 +134,7 @@ class BudgetVoucherDataTable extends DataTable
             'budget_vouchers.legal_number',
             'budget_vouchers.legal_name',
             'budget_vouchers.is_archived',
+            'budget_vouchers.expense_type_id',
             'expense_types.name_kh',
             'budget_vouchers.description',
             'budget_vouchers.attachments',
@@ -155,6 +167,7 @@ class BudgetVoucherDataTable extends DataTable
                     d.accountSub = $("#accountSub").val();
                     d.cboTodo = $("#cboTodo").val();
                     d.cboStatus = $("#cboStatus").val();
+                      d.cboExpenseType = $("#cboExpenseType").val();
                 }',
             ])
             ->initComplete('function () {
