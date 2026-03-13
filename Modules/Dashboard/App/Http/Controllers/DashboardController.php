@@ -305,7 +305,7 @@ class DashboardController extends Controller
         //$pre_Financing = round($budgetMandate->where('expense_type_id', '5')->sum('budget'), 2);
 
         $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountDir = $budgetVouchers->where('expense_type_id', '6')->where('is_archived', '2')->where('status', 'done')->count();
+        $totalCountDir = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
         $totalCountAdvance   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
         $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived',' 2')->where('status', 'done')->count();
        
