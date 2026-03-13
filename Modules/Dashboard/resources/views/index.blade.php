@@ -444,7 +444,7 @@
                                             style="color:#1fad12"></i>
                                         <span class="me-3">បុរេប្រទាន</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
-                                           {{ $totalAdvanceCount }}
+                                           {{ $totalCountAdvance }}
                                         </button>
                                         <button type="button" class="btn btn-soft-danger btn-sm mb-3">
                                             {{ $totalCountPayment }}
@@ -463,7 +463,7 @@
                                                         <i class="mdi mdi-circle"
                                                             style="color:#c0341e; font-size:10px;"></i>
                                                         <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalAdvanPayment) }} រៀល</h6>
+                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
                                                     </div>
                                                 </div>
                                             </span>
@@ -544,7 +544,7 @@
                                                         <i class="mdi mdi-circle"
                                                             style="color:#c0341e; font-size:10px;"></i>
                                                         <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalExpend) }} រៀល</h6>
+                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
                                                     </div>
                                                 </div>
                                             </span>
