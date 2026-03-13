@@ -12,8 +12,10 @@ Route::middleware('PermissionCheck')
         Route::get('voucher/{params}/edit/{id}', 'edit')->name('budgetVoucher.edit');
         Route::get('voucher/{params}/destroy/{id}', 'destroy')->name('budgetVoucher.destroy');
 
-        Route::get('voucher/{params}/early-balance', 'getEarlyBalance')
+        Route::get('voucher/{params}/get-early-balance', 'getEarlyBalance')
             ->name('budgetVoucher.getEarlyBalance');
+        Route::get('voucher/{params}/edit-early-balance', 'editEarlyBalance')
+            ->name('budgetVoucher.editEarlyBalance');
     });
 
 Route::controller(BudgetVoucherController::class)->group(function () {
@@ -26,11 +28,11 @@ Route::controller(BudgetVoucherController::class)->group(function () {
     Route::get('voucher/get-by-program/program-subs', 'getByProgramId')->name('budgetVoucher.by.program_sub');
     Route::get('voucher/get-by-program/agencies', 'getByAgency')->name('budgetVoucher.by.agency');
     Route::get('voucher/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetVoucher.by.cluster');
+    Route::get('voucher/get-by-expense/legal-number', 'getByExpenseId')->name('budgetVoucher.by.expense_type_id');
+
     // These routes are for edit page ajax request
     Route::get('voucher/edit-by-program/program-subs', 'editByProgramId')->name('budgetVoucher.edit.program_sub');
     Route::get('voucher/edit-by-program/agencies', 'editByAgency')->name('budgetVoucher.edit.agency');
     Route::get('voucher/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetVoucher.edit.cluster');
-
-
-    // Route::get('voucher/get-by-expense/legal-number', 'getByExpenseId')->name('budgetVoucher.by.expense_type_id');
+    Route::get('voucher/edit-by-expense/legal-number', 'editByExpenseId')->name('budgetVoucher.by.expense_type_id');
 });

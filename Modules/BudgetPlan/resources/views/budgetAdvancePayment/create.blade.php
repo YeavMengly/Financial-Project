@@ -363,7 +363,7 @@
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
-            const earlyEP = "{{ route('budgetMandate.getEarlyBalance', ['params' => $params]) }}";
+            const earlyEP = "{{ route('budgetAdvancePayment.getEarlyBalance', ['params' => $params]) }}";
 
             // Pristine
             if (form) {
@@ -558,7 +558,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetMandate.by.program_sub') }}",
+                    url: "{{ route('budgetAdvancePayment.by.program_sub') }}",
                     data: {
                         program_id: programId
                     },
@@ -577,7 +577,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetMandate.by.agency') }}",
+                    url: "{{ route('budgetAdvancePayment.by.agency') }}",
                     data: {
                         program_id: programId
                     },
@@ -596,7 +596,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetMandate.by.cluster') }}",
+                    url: "{{ route('budgetAdvancePayment.by.cluster') }}",
                     data: {
                         program_sub_id: programSubId
                     },

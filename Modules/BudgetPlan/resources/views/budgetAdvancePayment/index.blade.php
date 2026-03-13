@@ -120,7 +120,8 @@
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('budgetAdvancePayment.create', $params) }}"><i class="bx bx-plus me-1"></i>
+                                    href="{{ route('budgetAdvancePayment.create', $params) }}"><i
+                                        class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>

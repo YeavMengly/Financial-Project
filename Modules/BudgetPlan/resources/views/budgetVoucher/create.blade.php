@@ -42,11 +42,22 @@
                         <form id="pristine-valid-example" action="{{ route('budgetVoucher.store', $params) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
-
                             <div class="row">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboExpenseType"
+                                            class="form-label text-muted">{{ __('forms.expense.type') }}</label>
+                                        <select id="cboExpenseType" class="form-select" name="cboExpenseType" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($expenseType as $item)
+                                                <option value="{{ $item->id }}">{{ $item->name_kh }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
 
-
-                                {{-- <div class="col-lg-4 col-md-6">
+                                <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
                                             {{ __('forms.legal.number') }}
@@ -56,27 +67,6 @@
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
 
-                                        @error('cboLegalNumber')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div> --}}
-
-
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.legal.number') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="cboLegalNumber" name="cboLegalNumber"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($budgetMandate as $item)
-                                                <option value="{{ $item->legal_number }}">
-                                                    {{ $item->legal_number }}
-                                                </option>
-                                            @endforeach
-                                        </select>
                                         @error('cboLegalNumber')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
@@ -157,38 +147,21 @@
                                     </div>
                                 </div>
 
-
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.sub.account') }}
                                         </label>
-                                        <select class="form-control" data-trigger id="cboSubAccount" name="cboSubAccount"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
+
+                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginVoucher as $bv)
-                                                <option value="{{ $bv->account_sub_id }}"
-                                                    data-program="{{ $bv->voucher_no }}">
-                                                    {{ $bv->account_sub_id }} - {{ $bv->voucher_no }}
+
+                                            @foreach ($accountSub as $bv)
+                                                <option value="{{ $bv->no }}">
+                                                    {{ $bv->no }}-{{ $bv->name }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('cboSubAccount')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                {{-- Sub Account Number --}}
-                                <div class="col-xl-4 col-md-6 d-none">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input type="number" min="0" name="no" id="programInput" readonly
-                                            placeholder="xxxxxxx" required class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('no')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -200,23 +173,6 @@
                                             class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('budget')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboExpenseType"
-                                            class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
-                                        <select class="form-control" name="cboExpenseType" id="cboExpenseType" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($expenseType as $ts)
-                                                <option value="{{ $ts->id }}">{{ $ts->name_kh }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('cboExpenseType')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -371,55 +327,6 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const subAccountSelect = document.getElementById('cboSubAccount');
-            const programInput = document.getElementById('programInput');
-            const budgetInput = document.getElementById('budget');
-            const programHidden = document.getElementById('programHiddenInput');
-
-            if (typeof Choices !== 'undefined') {
-                new Choices(subAccountSelect, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    shouldSort: false,
-                    placeholderValue: '',
-                    searchPlaceholderValue: 'ជ្រើសរើស...'
-                });
-            }
-
-            // ✅ Handle SubAccount selection change
-            subAccountSelect.addEventListener('change', function() {
-                const selectedOption = subAccountSelect.options[subAccountSelect.selectedIndex];
-                const subAccountId = this.value;
-                const programCode = selectedOption.getAttribute('data-program');
-
-                // Set program code in the input field
-                if (programInput) {
-                    programInput.value = programCode;
-                }
-
-                // If using a hidden input field to store program
-                if (programHidden) {
-                    programHidden.value = programCode;
-                }
-
-            });
-        });
-    </script> --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboLegalNumber');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script>
-
     <script>
         // ---------- helpers ----------
         function initChoicesOnce(selectEl, opts = {}) {
@@ -453,7 +360,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
             const subAccount = document.getElementById('cboSubAccount');
-            const programInput = document.getElementById('programInput'); // readonly "no"
+            // const programInput = document.getElementById('programInput'); // readonly "no"
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
@@ -479,15 +386,6 @@
                 });
             }
 
-            // Choices — once per element
-            initChoicesOnce(document.getElementById('cboExpenseType'), {
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...'
-            });
-            // initChoicesOnce(document.getElementById('cboAgency'), {
-            //     placeholder: true,
-            //     placeholderValue: 'ស្វែងរក...'
-            // });
             initChoicesOnce(subAccount, {
                 placeholder: true,
                 placeholderValue: 'ស្វែងរក...'
@@ -503,35 +401,52 @@
             }
 
             // fetch numbers
-            async function fetchEarlyBalance(accountSubId, noVal) {
-                if (!accountSubId || !noVal) {
+            async function fetchEarlyBalance() {
+
+                const programId = document.getElementById('cboProgram').value;
+                const programSubId = document.getElementById('cboProgramSub').value;
+                const clusterId = document.getElementById('cboCluster').value;
+                const accountSubId = document.getElementById('cboSubAccount').value;
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
                     resetNumbers();
                     return;
                 }
+
                 const url = new URL(earlyEP, window.location.origin);
+
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
                 url.searchParams.set('account_sub_id', accountSubId);
-                url.searchParams.set('no', noVal);
 
                 try {
+
                     const res = await fetch(url.toString(), {
                         headers: {
                             'Accept': 'application/json'
                         }
                     });
+
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data?.message || 'Early-balance error');
 
                     setText('fin_law', data.fin_law);
                     setText('credit_movement', data.credit_movement);
                     setText('new_credit_status', data.new_credit_status);
                     setText('credit', data.credit);
                     setText('deadline_balance', data.deadline_balance);
+
                     recomputeRemaining();
+
                 } catch (err) {
                     console.error(err);
                     resetNumbers();
                 }
             }
+            document.getElementById('cboProgram').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboProgramSub').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboCluster').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboSubAccount').addEventListener('change', fetchEarlyBalance);
 
             subAccount?.addEventListener('change', function() {
                 const opt = this.options[this.selectedIndex];
@@ -539,13 +454,13 @@
                 const programNo = opt ? (opt.getAttribute('data-program') || '') : '';
 
                 if (programInput) programInput.value = programNo;
+
                 fetchEarlyBalance(subId, programNo);
             });
 
             budgetInput?.addEventListener('input', recomputeRemaining);
         });
     </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -706,9 +621,36 @@
         });
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboExpenseType');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
     {{-- <script>
+        let cboLegalChoices;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboLegalNumber');
+
+            cboLegalChoices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
         $('#cboExpenseType').change(function() {
             var expenseTypeId = $(this).val();
+
             $.ajax({
                 url: '{!! route('budgetVoucher.by.expense_type_id') !!}',
                 type: 'get',
@@ -717,9 +659,93 @@
                     expense_type_id: expenseTypeId
                 },
                 success: function(data) {
-                    $('#cboLegalNumber').html(data);
+
+                    // remove old choices
+                    cboLegalChoices.clearChoices();
+
+                    // append new options
+                    cboLegalChoices.setChoices(
+                        $(data).map(function() {
+                            return {
+                                value: $(this).val(),
+                                label: $(this).text(),
+                                selected: false
+                            };
+                        }).get(),
+                        'value',
+                        'label',
+                        true
+                    );
                 }
             });
         });
     </script> --}}
+
+    <script>
+        let cboLegalChoices;
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const element = document.getElementById('cboLegalNumber');
+
+            cboLegalChoices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+
+        });
+
+        $('#cboExpenseType').on('change', function() {
+
+            var expenseTypeId = $(this).val();
+
+            /* ===== Reset cboLegalNumber ===== */
+            cboLegalChoices.clearStore(); // remove selected item
+            cboLegalChoices.clearChoices(); // remove all options
+
+            // add default option
+            cboLegalChoices.setChoices([{
+                value: '',
+                label: 'ស្វែងរក...',
+                selected: true,
+                disabled: true
+            }], 'value', 'label', true);
+
+            if (!expenseTypeId) return;
+
+            /* ===== Load new options ===== */
+            $.ajax({
+                url: "{{ route('budgetVoucher.by.expense_type_id') }}",
+                type: 'GET',
+                data: {
+                    expense_type_id: expenseTypeId
+                },
+                success: function(data) {
+
+                    let options = [];
+
+                    $(data).filter('option').each(function() {
+                        options.push({
+                            value: $(this).val(),
+                            label: $(this).text()
+                        });
+                    });
+
+                    cboLegalChoices.clearChoices();
+
+                    cboLegalChoices.setChoices(
+                        options,
+                        'value',
+                        'label',
+                        true
+                    );
+
+                }
+            });
+
+        });
+    </script>
 @endsection
