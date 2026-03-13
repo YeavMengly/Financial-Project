@@ -707,18 +707,18 @@
             cboLegalChoices.clearChoices(); // remove all options
 
             // add default option
-            cboLegalChoices.setChoices([{
-                value: '',
-                label: 'ស្វែងរក...',
-                selected: true,
-                disabled: true
-            }], 'value', 'label', true);
+            // cboLegalChoices.setChoices([{
+            //     value: '',
+            //     label: 'ស្វែងរក...',
+            //     selected: true,
+            //     disabled: true
+            // }], 'value', 'label', true);
 
             if (!expenseTypeId) return;
 
             /* ===== Load new options ===== */
             $.ajax({
-                url: "{{ route('budgetVoucher.by.expense_type_id') }}",
+                url: "{{ route('budgetVoucher.get.expense_type_id') }}",
                 type: 'GET',
                 data: {
                     expense_type_id: expenseTypeId
