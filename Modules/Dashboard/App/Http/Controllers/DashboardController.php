@@ -293,13 +293,13 @@ class DashboardController extends Controller
         $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
         $advance_Payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
 
-        $direct_Payment = $budgetVouchers->where('expense_type_id', '6')->pluck('budget');
+        $direct_Payment = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
         $payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
         // $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
         // $pre_Financing = $budgetMandate->where('expense_type_id', '5')->pluck('budget');     
         $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
         $advance_Payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
-        $direct_Payment = round($budgetVouchers->where('expense_type_id', '6')->sum('budget'), 2);
+        $direct_Payment = round($budgetVouchers->where('expense_type_id', '1')->sum('budget'), 2);
         $payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
         // $procurement = round($budgetVouchers->where('expeonse_type_id', '4')->sum('budget'), 2);
         //$pre_Financing = round($budgetMandate->where('expense_type_id', '5')->sum('budget'), 2);
