@@ -95,4 +95,5 @@ return [
     'status' => 'ស្ថានភាព',
     'active' => 'សកម្ម',
     'inactive' => 'មិនសកម្ម',
+    'expense.type' => 'ប្រភេទចំណាយ',
 ];
