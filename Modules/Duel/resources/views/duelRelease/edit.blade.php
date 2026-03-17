@@ -40,203 +40,168 @@
                             @csrf
 
                             <div class="row">
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="row">
 
-                                {{-- STOCK NUMBER --}}
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="stock_number" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.stock.number') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="dropStockNumber" name="stock_number"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($duelEntry as $stock)
-                                                <option value="{{ $stock }}"
-                                                    {{ old('stock_number', $duelRelease->stock_number) == $stock ? 'selected' : '' }}>
-                                                    {{ $stock }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('stock_number')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
+                                        {{-- STOCK NUMBER --}}
+                                        <div class="col-lg-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="stock_number" class="form-label font-size-13 text-muted">
+                                                    {{ __('forms.stock.number') }}
+                                                </label>
+                                                <select class="form-control" data-trigger id="dropStockNumber"
+                                                    name="stock_number" required
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+                                                    <option value="">{{ __('forms.search...') }}</option>
+                                                    @foreach ($duelEntry as $stock)
+                                                        <option value="{{ $stock }}"
+                                                            {{ old('stock_number', $duelRelease->stock_number) == $stock ? 'selected' : '' }}>
+                                                            {{ $stock }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('stock_number')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- ITEM NAME --}}
+                                        <div class="col-lg-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="item_name" class="form-label font-size-13 text-muted">
+                                                    {{ __('forms.item.name') }}
+                                                </label>
+                                                {{-- <select id="cboDuel" class="form-select" name="item_name" required
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+                                                    <option value="">{{ __('forms.search...') }}</option>
+                                                    <option value="{{ $duelRelease->item_name }}"
+                                                        {{ $duelRelease->item_name == $duelType->id ? 'selected' : '' }}>
+                                                        {{ old('item_name', $duelType->name_km) }}
+                                                    </option>
+                                                </select> --}}
+                                                <select id="cboDuel" class="form-select" name="item_name" required>
+                                                    <option value="">{{ __('forms.search...') }}</option>
+                                                    @foreach ($duelType as $type)
+                                                        <option value="{{ $type->id }}"
+                                                            {{ $type->id == $duelRelease->item_name ? 'selected' : '' }}>
+                                                            {{ $type->name_km }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('item_name')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- QUANTITY REQUEST --}}
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="quantity_request">{{ __('forms.quantity.request') }}</label>
+                                                <input type="number" min="0" name="quantity_request" required
+                                                    class="form-control"
+                                                    value="{{ old('quantity_request', $duelRelease->quantity_request) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('quantity_request')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- AGENCY --}}
+                                        <div class="col-lg-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="agency" class="form-label font-size-13 text-muted">
+                                                    {{ __('forms.agency') }}
+                                                </label>
+                                                <select class="form-control" data-trigger id="dropAgency" name="agency"
+                                                    required
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+                                                    <option value="">{{ __('forms.search...') }}</option>
+                                                    @foreach ($agency as $item)
+                                                        <option value="{{ $item->id }}"
+                                                            {{ old('agency', $duelRelease->agency) == $item->id ? 'selected' : '' }}>
+                                                            {{ $item->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('agency')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- RECEIPT NUMBER --}}
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
+                                                <input type="text" name="receipt_number" required class="form-control"
+                                                    value="{{ old('receipt_number', $duelRelease->receipt_number) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('receipt_number')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- USER REQUEST --}}
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="user_request">{{ __('forms.user.request') }}</label>
+                                                <input type="text" name="user_request" required class="form-control"
+                                                    value="{{ old('user_request', $duelRelease->user_request) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('user_request')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        {{-- DATE RELEASE --}}
+                                        <div class="col-lg-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
+                                                <input type="text" id="datepicker-basic" name="date_release"
+                                                    class="form-control" placeholder="{{ __('forms.select_date') }}"
+                                                    required value="{{ old('date_release', $duelRelease->date_release) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('date_release')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="col-xl-6 col-md-6">
+                                    <div class="row">
 
-                                {{-- ITEM NAME --}}
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="item_name" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.item.name') }}
-                                        </label>
-                                        <select id="cboDuel" class="form-select" name="item_name" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            {{-- ✅ Show current value so it is selected on load --}}
-                                            @if (old('item_name', $duelRelease->item_name))
-                                                <option value="{{ old('item_name', $duelRelease->item_name) }}" selected>
-                                                    {{ old('item_name', $duelRelease->item_name) }}
-                                                </option>
-                                            @endif
-                                        </select>
-                                        @error('item_name')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
+                                        {{-- REFER --}}
+                                        <div class="col-md-12">
+                                            <div class="form-group mb-3">
+                                                <label for="vRefer">{{ __('forms.refer') }}</label>
+                                                <textarea name="refer" id="vRefer" rows="5" class="form-control" required
+                                                    data-pristine-required-message="{{ __('messages.required') }}">{{ old('refer', $duelRelease->refer) }}</textarea>
+                                                @error('refer')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
 
-                                {{-- UNIT --}}
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="unit" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.unit') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="dropUnit" name="unit" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($unitType as $item)
-                                                <option value="{{ $item->id }}"
-                                                    {{ old('unit', $duelRelease->unit) == $item->id ? 'selected' : '' }}>
-                                                    {{ $item->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('unit')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- AGENCY --}}
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="agency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="dropAgency" name="agency" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $item)
-                                                <option value="{{ $item->id }}"
-                                                    {{ old('agency', $duelRelease->agency) == $item->id ? 'selected' : '' }}>
-                                                    {{ $item->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('agency')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- RECEIPT NUMBER --}}
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
-                                        <input type="text" name="receipt_number" required class="form-control"
-                                            value="{{ old('receipt_number', $duelRelease->receipt_number) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('receipt_number')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- USER REQUEST --}}
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="user_request">{{ __('forms.user.request') }}</label>
-                                        <input type="text" name="user_request" required class="form-control"
-                                            value="{{ old('user_request', $duelRelease->user_request) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('user_request')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- QUANTITY REQUEST --}}
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="quantity_request">{{ __('forms.quantity.request') }}</label>
-                                        <input type="number" min="0" name="quantity_request" required
-                                            class="form-control"
-                                            value="{{ old('quantity_request', $duelRelease->quantity_request) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('quantity_request')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- DATE RELEASE --}}
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
-                                        <input type="text" id="datepicker-basic" name="date_release"
-                                            class="form-control" placeholder="{{ __('forms.select_date') }}" required
-                                            value="{{ old('date_release', $duelRelease->date_release) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('date_release')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- TITLE --}}
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="title">{{ __('forms.title') }}</label>
-                                        <input type="text" name="title" required class="form-control"
-                                            value="{{ old('title', $duelRelease->title) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('title')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                {{-- FILE (optional new upload) --}}
-                                <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="file">{{ __('forms.file') }}</label>
-                                        <input type="file" id="fileInput" name="file[]" class="form-control"
-                                            accept=".pdf,.doc,.docx" multiple />
-                                        <small class="form-text text-muted">
-                                            Allowed types: PDF, DOC, DOCX
-                                            {{-- You can show note like: {{ __('forms.leave_empty_keep_old_file') }} --}}
-                                        </small>
-                                        @error('file')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
+                                        {{-- NOTE --}}
+                                        <div class="col-md-12">
+                                            <div class="form-group mb-3">
+                                                <label for="vNote">{{ __('forms.note') }}</label>
+                                                <textarea name="note" id="vNote" rows="5" class="form-control" required
+                                                    data-pristine-required-message="{{ __('messages.required') }}">{{ old('note', $duelRelease->note) }}</textarea>
+                                                @error('note')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {{-- REFER --}}
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="vRefer">{{ __('forms.refer') }}</label>
-                                    <textarea name="refer" id="vRefer" rows="5" class="form-control" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">{{ old('refer', $duelRelease->refer) }}</textarea>
-                                    @error('refer')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            {{-- NOTE --}}
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="vNote">{{ __('forms.note') }}</label>
-                                    <textarea name="note" id="vNote" rows="5" class="form-control" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">{{ old('note', $duelRelease->note) }}</textarea>
-                                    @error('note')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary" id="insertToTableBtn">
                                     {{ __('buttons.save') }}
@@ -322,8 +287,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const dropUnit = document.getElementById('dropUnit');
-            const dropUnitChoice = new Choices(dropUnit, {
+            const cboDuel = document.getElementById('cboDuel');
+            const cboDuelChoice = new Choices(cboDuel, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើស', // Khmer placeholder

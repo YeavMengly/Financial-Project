@@ -24,7 +24,16 @@ class DuelEntriesExport
         $id     = decode_params($params);
 
         // Use passed data or load by ministry_id
-        $entries = $this->data ?: DuelEntry::where('ministry_id', $id)->get();
+        $entries = DuelEntry::select(
+            'duel_entries.*',
+            'duel_types.name_km',
+            'unit_types.name'
+        )
+            ->leftJoin('duel_types', 'duel_entries.item_name', '=', 'duel_types.id')
+            ->leftJoin('unit_types', 'duel_entries.unit', '=', 'unit_types.id')
+
+            ->where('duel_entries.ministry_id', $id)
+            ->get();
         $first   = $entries->first();
 
         $templatePath = public_path('duel_entries_template.xlsx');
@@ -113,8 +122,8 @@ class DuelEntriesExport
 
         foreach ($entries as $index => $item) {
             $sheet->setCellValue("A{$row}", $index + 1);
-            $sheet->setCellValue("B{$row}", $item->item_name);
-            $sheet->setCellValue("C{$row}", $item->unit);
+            $sheet->setCellValue("B{$row}", $item->name_km);
+            $sheet->setCellValue("C{$row}", $item->name);
             $sheet->setCellValue("D{$row}", $item->quantity);
             $sheet->setCellValue("E{$row}", $item->price);
             $sheet->setCellValue("F{$row}", $item->duel_total);

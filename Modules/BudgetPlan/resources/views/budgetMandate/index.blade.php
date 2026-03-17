@@ -58,30 +58,15 @@
                             </select>
                         </div>
 
-                        <!-- Task Type -->
-                        {{-- <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboExpenseType">{{ __('menus.task') }}</label>
-                            <select class="form-control" name="cboExpenseType" id="cboExpenseType">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($expenseType as $ts)
-                                    <option value="{{ $ts->id }}"
-                                        {{ request('cboExpenseType') == $ts->name_kh ? 'selected' : '' }} selected>
-                                        {{ $ts->name_kh }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div> --}}
-
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($budgetMandate as $ts)
-                                    <option value="{{ $ts->account_sub_id }}"
-                                        {{ request('subAccountNumber') == $ts->account_sub_id ? 'selected' : '' }}>
-                                        {{ $ts->account_sub_id }} -
-                                        {{ $ts->no }}
+                                @foreach ($accountSub as $as)
+                                    <option value="{{ $as->no }}"
+                                        {{ request('subAccountNumber') == $as->no ? 'selected' : '' }}>
+                                        {{ $as->no }}
                                     </option>
                                 @endforeach
                             </select>
