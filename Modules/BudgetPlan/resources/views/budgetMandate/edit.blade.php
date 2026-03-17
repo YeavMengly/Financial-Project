@@ -302,6 +302,7 @@
             });
         });
     </script>
+
     <script>
         const transactionDateInput = document.getElementById('transactionDate');
         if (transactionDateInput) {
@@ -350,7 +351,7 @@
             const cboSubAccount = document.getElementById('cboSubAccount');
             const budgetInput = document.getElementById('budget');
 
-            const ENDPOINT = "{{ route('budgetMandate.editEarlyBalance', ['params' => $params]) }}";
+            const ENDPOINT = "{{ route('budgetMandate.getEarlyBalance', ['params' => $params]) }}";
 
             function toNumber(v) {
                 v = (v || '').toString().replace(/,/g, '');
@@ -450,6 +451,200 @@
 
         });
     </script>
+    {{-- <script>
+        /* ---------- helpers ---------- */
+        function initChoicesOnce(selectEl, opts = {}) {
+            if (!selectEl) return null;
+            if (selectEl.dataset.choicesInit === '1') return null;
+            selectEl.dataset.choicesInit = '1';
+
+            return new Choices(selectEl, Object.assign({
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false
+            }, opts));
+        }
+
+        const n = v => (isNaN(+v) ? 0 : +v);
+
+        const fmt = v => n(v).toLocaleString('en-US', {
+            maximumFractionDigits: 2
+        });
+
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = fmt(val);
+        }
+
+        function resetNumbers() {
+            [
+                'fin_law',
+                'credit_movement',
+                'new_credit_status',
+                'credit',
+                'deadline_balance',
+                'applying',
+                'remaining_credit'
+            ].forEach(id => setText(id, 0));
+        }
+
+        function loadEditValues() {
+
+            if (!window.editData) return;
+
+            setText('fin_law', editData.fin_law);
+            setText('credit_movement', editData.credit_movement);
+            setText('new_credit_status', editData.new_credit_status);
+            setText('credit', editData.credit);
+            setText('deadline_balance', editData.deadline_balance);
+            setText('applying', editData.applying);
+
+            const remaining = editData.credit - editData.applying;
+            setText('remaining_credit', remaining);
+        }
+
+        /* ---------- init when DOM ready ---------- */
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const form = document.getElementById('pristine-valid-example');
+
+            const cboProgram = document.getElementById('cboProgram');
+            const cboProgramSub = document.getElementById('cboProgramSub');
+            const cboCluster = document.getElementById('cboCluster');
+            const cboSubAccount = document.getElementById('cboSubAccount');
+
+            const budgetInput = document.getElementById('budget');
+
+
+            const earlyEP = "{{ route('budgetMandate.editEarlyBalance', ['params' => $params]) }}";
+
+            /* ---------- Pristine validation ---------- */
+            if (form) {
+                const pristine = new Pristine(form);
+
+                form.addEventListener('submit', function(e) {
+                    if (!pristine.validate()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            /* ---------- Summernote ---------- */
+            if (window.jQuery) {
+                jQuery('#vDescription').summernote({
+                    height: 150,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['color', ['color']]
+                    ]
+                });
+            }
+
+            /* ---------- Choices ---------- */
+            initChoicesOnce(cboSubAccount, {
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...'
+            });
+
+            /* ---------- recompute remaining credit ---------- */
+            function recomputeRemaining() {
+
+                const apply = n(budgetInput?.value);
+
+                const credit = n(
+                    (document.getElementById('credit')?.textContent || '0')
+                    .replace(/,/g, '')
+                );
+
+                const deadline = n(
+                    (document.getElementById('deadline_balance')?.textContent || '0')
+                    .replace(/,/g, '')
+                );
+
+                setText('applying', apply);
+
+                const remaining = Math.max(credit - apply, 0);
+                setText('remaining_credit', remaining);
+
+                const newDeadline = Math.max(deadline - apply, 0);
+                setText('deadline_balance', newDeadline);
+
+                if (credit - apply < 0) {
+                    budgetInput.value = '';
+                }
+            }
+
+            /* ---------- fetch early balance ---------- */
+            async function fetchEarlyBalance() {
+
+                const programId = cboProgram?.value || '';
+                const programSubId = cboProgramSub?.value || '';
+                const clusterId = cboCluster?.value || '';
+                const accountSubId = cboSubAccount?.value || '';
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
+                    resetNumbers();
+                    return;
+                }
+
+                const url = new URL(earlyEP, window.location.origin);
+
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
+                url.searchParams.set('account_sub_id', accountSubId);
+
+                url.searchParams.set('mandate_id', "{{ $budgetMandate->id ?? '' }}");
+
+                try {
+
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        throw new Error(data?.message || 'Failed');
+                    }
+
+                    setText('fin_law', data.fin_law);
+                    setText('credit_movement', data.credit_movement);
+                    setText('new_credit_status', data.new_credit_status);
+                    setText('credit', data.credit);
+                    setText('deadline_balance', data.deadline_balance);
+
+                    recomputeRemaining();
+
+                } catch (err) {
+                    console.error(err);
+                    resetNumbers();
+                }
+            }
+
+            /* ---------- dropdown change events ---------- */
+            cboProgram?.addEventListener('change', fetchEarlyBalance);
+            cboProgramSub?.addEventListener('change', fetchEarlyBalance);
+            cboCluster?.addEventListener('change', fetchEarlyBalance);
+            cboSubAccount?.addEventListener('change', fetchEarlyBalance);
+
+            /* ---------- budget input change ---------- */
+            budgetInput?.addEventListener('input', recomputeRemaining);
+
+            /* ---------- IMPORTANT: Load balances when editing ---------- */
+            setTimeout(() => {
+
+                fetchEarlyBalance(); // load existing balances
+                recomputeRemaining(); // recompute using saved budget
+
+            }, 150);
+
+        });
+    </script> --}}
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -504,6 +699,7 @@
             });
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

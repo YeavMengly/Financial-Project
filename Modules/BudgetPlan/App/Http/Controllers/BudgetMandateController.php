@@ -44,12 +44,14 @@ class BudgetMandateController extends Controller
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
         $expenseType = ExpenseType::where('id', 1)->get();
+        $accountSub = AccountSub::where('ministry_id', $data->id)->get();
         $agency = Agency::all();
         $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
 
         return $dataTable->render('budgetplan::budgetMandate.index', [
             'data' => $data,
             'params' => $params,
+            'accountSub' => $accountSub,
             'expenseType' => $expenseType,
             'agency' => $agency,
             'budgetMandate' => $budgetMandate
@@ -329,6 +331,50 @@ class BudgetMandateController extends Controller
         ]);
     }
 
+    // public function editEarlyBalance(Request $request, $params)
+    // {
+    //     $ministryId = decode_params($params);
+
+    //     $request->validate([
+    //         'account_sub_id' => 'required',
+    //         'program_id'     => 'required',
+    //         'program_sub_id' => 'required',
+    //         'cluster_id'     => 'required',
+    //     ]);
+
+    //     $beginMandate = BeginMandate::with('loans')
+    //         ->where('ministry_id', $ministryId)
+    //         ->where('program_id', $request->program_id)
+    //         ->where('program_sub_id', $request->program_sub_id)
+    //         ->where('cluster_id', $request->cluster_id)
+    //         ->where('account_sub_id', $request->account_sub_id)
+    //         ->first();
+
+    //     if (!$beginMandate) {
+    //         return response()->json([
+    //             'fin_law'           => 0,
+    //             'credit_movement'   => 0,
+    //             'new_credit_status' => 0,
+    //             'credit'            => 0,
+    //             'deadline_balance'  => 0,
+    //             'exists'            => false,
+    //             'message'           => 'No mandate data found for this selection.'
+    //         ]);
+    //     }
+
+    //     $loan = $beginMandate->loans;
+
+    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+
+    //     return response()->json([
+    //         'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
+    //         'credit_movement'   => (float) $credit_movement,
+    //         'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
+    //         'credit'            => (float) ($beginMandate->credit ?? 0),
+    //         'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
+    //         'exists'            => true,
+    //     ]);
+    // }
     public function editEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
@@ -350,27 +396,26 @@ class BudgetMandateController extends Controller
 
         if (!$beginMandate) {
             return response()->json([
-                'fin_law'           => 0,
-                'credit_movement'   => 0,
+                'fin_law' => 0,
+                'credit_movement' => 0,
                 'new_credit_status' => 0,
-                'credit'            => 0,
-                'deadline_balance'  => 0,
-                'exists'            => false,
-                'message'           => 'No mandate data found for this selection.'
+                'credit' => 0,
+                'deadline_balance' => 0,
+                'exists' => false
             ]);
         }
 
         $loan = $beginMandate->loans;
 
-        $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+        $creditMovement = ($loan->total_increase ?? 0) - ($loan->decrease ?? 0);
 
         return response()->json([
             'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
-            'credit_movement'   => (float) $credit_movement,
+            'credit_movement'   => (float) $creditMovement,
             'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
             'credit'            => (float) ($beginMandate->credit ?? 0),
             'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
-            'exists'            => true,
+            'exists'            => true
         ]);
     }
 
@@ -624,6 +669,7 @@ class BudgetMandateController extends Controller
             return back()->withInput();
         }
     }
+
     /**
      * Show the specified resource.
      */
