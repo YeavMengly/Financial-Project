@@ -153,6 +153,8 @@ class DashboardController extends Controller
             ->get();
         // total count pro
         $totalProgaramVoucher = DB::table('budget_vouchers')
+            ->where('budget_vouchers.is_archived', 2)
+            ->where('budget_vouchers.status', 'done')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_id')
             ->selectRaw('
@@ -164,6 +166,8 @@ class DashboardController extends Controller
 
         // dd($totalProgaramVoucher);
         $totalProgaramMandate = DB::table('budget_mandates')
+            ->where('budget_mandates.is_archived', 1)
+            ->where('budget_mandates.status', 'todo')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_id')
             ->selectRaw('
@@ -284,7 +288,7 @@ class DashboardController extends Controller
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
-       //exp_guarantee
+        //exp_guarantee
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->select('budget_mandates.*')
@@ -307,8 +311,8 @@ class DashboardController extends Controller
         $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
         $totalCountDir = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
         $totalCountAdvance   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived',' 2')->where('status', 'done')->count();
-       
+        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
+
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
@@ -320,17 +324,17 @@ class DashboardController extends Controller
         $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
         $percent_Payment = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
-       // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+        // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         //$percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-       
-      // dd($totalCountArch);
+
+        // dd($totalCountArch);
         // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
         //$totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
         $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
         //$totalAdvanPayment = $total_fin_law > 0 ? $total_fin_law - $advance_Payment : 0;
         $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
-        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ( $expenditure_Guarantee + $advance_Payment ) : 0;
+        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment) : 0;
 
         //   dd($total_fin_law );
         return view('dashboard::index', [
@@ -393,13 +397,13 @@ class DashboardController extends Controller
             'remainData' => $remainData,
             'deadlineData' => $deadlineData,
             'accounts' => $accounts,
-            
+
             'expenditure_Guarantee' => $expenditure_Guarantee,
             'advance_Payment' => $advance_Payment,
             'direct_Payment' => $direct_Payment,
             'payment' => $payment,
             // 'procurement' => $procurement,
-           // 'pre_Financing' => $pre_Financing,
+            // 'pre_Financing' => $pre_Financing,
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
             'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
@@ -473,9 +477,11 @@ class DashboardController extends Controller
         ')
             ->get()
             ->keyBy('program_sub_id');
-            // dd($programSubTotals);
+        // dd($programSubTotals);
         // total count pro
         $totalProSubVoucher = DB::table('budget_vouchers')
+            ->where('budget_vouchers.is_archived', 2)
+            ->where('budget_vouchers.status', 'done')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_sub_id')
             ->selectRaw('
@@ -487,6 +493,8 @@ class DashboardController extends Controller
 
         //  dd($programSubTotals);
         $totalProSubMandate = DB::table('budget_mandates')
+            ->where('budget_mandates.is_archived', 1)
+            ->where('budget_mandates.status', 'todo')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_sub_id')
             ->selectRaw('
