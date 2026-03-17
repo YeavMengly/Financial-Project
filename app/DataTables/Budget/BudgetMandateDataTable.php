@@ -103,10 +103,22 @@ class BudgetMandateDataTable extends DataTable
             $model->where('budget_mandates.is_archived', 1);
         }
 
+
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('budget_mandates.is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('budget_mandates.is_archived', 2);
+            }
+        } else {
+            $model->where('budget_mandates.is_archived', 1);
+        }
+
+
         $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
                 $join->on('budget_mandates.account_sub_id', '=', 'account_subs.no')
-                    ->where('account_subs.ministry_id', '=', $id);
+                    ->where('account_subs.ministry_id', $id);
             });
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');

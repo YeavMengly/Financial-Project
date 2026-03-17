@@ -29,7 +29,10 @@ class DuelEntryController extends Controller
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
         $duelType = DuelType::all();
-        $unitType = UnitType::where('name', 'លីត្រ')->get();
+        $unitType = UnitType::where('id', 2)->get();
+
+        // dd($unitType);
+
         $duelEntry = DuelEntry::where('id', $id)
             ->where('ministry_id', $ministry->id)->get();
 
@@ -47,9 +50,10 @@ class DuelEntryController extends Controller
      */
     public function create($params)
     {
-        $unitType = UnitType::where('name', 'លីត្រ')->get();
-        $duelType = DuelType::all();
         $id   = decode_params($params);
+
+        $duelType = DuelType::all();
+        $unitType = UnitType::where('id', 2)->get();
         $ministry = Ministry::where('id', $id)->first();
 
         return view('duel::duelEntry.create')
@@ -67,13 +71,11 @@ class DuelEntryController extends Controller
         $validated = $request->validate([
             'company_name'  => 'required|string|max:255',
             'stock_number'  => 'required',
-            'stock_name'    => 'required|string|max:255',
             'user_entry'    => 'required|string|max:255',
-            'item_name'     => 'required',
-            'title'    => 'required|string|max:255',
-            'unit'          => 'required',
-            'quantity'      => 'required',
-            'price'         => 'required',
+            'title'         => 'required|string|max:255',
+            'item_name.*' => 'required',
+            'quantity.*'  => 'required|numeric',
+            'price.*'     => 'required|numeric',
             'note'          => 'nullable|string|max:10000',
             'date_entry'    => 'required|date',
             'refer'         => 'nullable|string|max:10000',
@@ -87,9 +89,6 @@ class DuelEntryController extends Controller
 
         try {
             $ministry = Ministry::where('id', $id)->first();
-            $duelType = DuelType::where('id', $validated['item_name'])->first();
-            $unitType = UnitType::where('id', $validated['unit'])->first();
-            $duelTotal = (int)$validated['quantity'] * (float)$validated['price'];
             $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
 
             $paths = [];
@@ -101,24 +100,30 @@ class DuelEntryController extends Controller
                 }
             }
 
-            DuelEntry::create([
-                'ministry_id'  => $ministry->id,
-                'item_name'    => $duelType->name_km,
-                'company_name' => $validated['company_name'],
-                'stock_number' => $validated['stock_number'],
-                'stock_name'   => $validated['stock_name'],
-                'user_entry'   => $validated['user_entry'],
-                'unit'         => $unitType->name,
-                'title'   => $validated['title'],
-                'quantity'     => $validated['quantity'],
-                'price'        => $validated['price'],
-                'duel_total'   => $duelTotal,
-                'note'         => strip_tags($validated['note'] ?? ''),
-                'refer'        => strip_tags($validated['refer']),
-                'date_entry'   => $dateEntry,
-                'source'   => $validated['source'],
-                'file'         => json_encode($paths),
-            ]);
+            foreach ($request->item_name as $index => $item) {
+
+                DuelEntry::create([
+                    'ministry_id'   => $ministry->id,
+                    'item_name'     => $request->item_name[$index],
+                    'company_name'  => $validated['company_name'],
+                    'stock_number'  =>  $validated['stock_number'],
+                    'stock_name'    => 'ក្រសួងការងារ និងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
+                    'user_entry'    =>  $validated['user_entry'],
+                    'unit'          => 2,
+                    'title'         => $validated['title'],
+
+                    'quantity'      => $request->quantity[$index],
+                    'price'         => $request->price[$index],
+
+                    'duel_total'    => $request->quantity[$index] * $request->price[$index],
+
+                    'note'          =>  strip_tags($validated['note'] ?? ''),
+                    'refer'         => strip_tags($validated['refer']),
+                    'date_entry'    => $dateEntry,
+                    'source'        => $validated['source'],
+                    'file'         => json_encode($paths),
+                ]);
+            }
 
             DB::commit();
 
@@ -180,11 +185,11 @@ class DuelEntryController extends Controller
         $validated = $request->validate([
             'company_name'  => 'required|string|max:255',
             'stock_number'  => 'required',
-            'stock_name'    => 'required|string|max:255',
+            // 'stock_name'    => 'required|string|max:255',
             'user_entry'    => 'required|string|max:255',
             'item_name'     => 'required',
             'title'    => 'required|string|max:255',
-            'unit'          => 'required',
+            // 'unit'          => 'required',
             'quantity'      => 'required',
             'price'         => 'required',
             'note'          => 'nullable|string|max:10000',
@@ -198,8 +203,6 @@ class DuelEntryController extends Controller
         DB::beginTransaction();
         try {
             $ministry = Ministry::where('id', decode_params($params))->first();
-            $duelType = DuelType::where('id', $validated['item_name'])->first();
-            $unitType = UnitType::where('id', $validated['unit'])->first();
             $duelTotal = (int)$validated['quantity'] * (float)$validated['price'];
             $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
 
@@ -218,12 +221,12 @@ class DuelEntryController extends Controller
             if ($duelEntry) {
                 $duelEntry->update([
                     'ministry_id'  => $ministry->id,
-                    'item_name'    => $duelType->name_km,
+                    'item_name'    => $validated['item_name'],
                     'company_name' => $validated['company_name'],
                     'stock_number' => $validated['stock_number'],
-                    'stock_name'   => $validated['stock_name'],
+                    'stock_name'   => 'ក្រសួងការងារ និងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
                     'user_entry'   => $validated['user_entry'],
-                    'unit'         => $unitType->name,
+                    'unit'         => 2,
                     'title'   => $validated['title'],
                     'quantity'     => $validated['quantity'],
                     'price'        => $validated['price'],
@@ -264,8 +267,8 @@ class DuelEntryController extends Controller
      */
     public function destroy($params, $id)
     {
-        //
         $id = decode_params($id);
+
         $ministry = Ministry::where('id', decode_params($params))->first();
         $duelEntry = DuelEntry::where('id', $id)
             ->where('ministry_id', $ministry->id)->first();

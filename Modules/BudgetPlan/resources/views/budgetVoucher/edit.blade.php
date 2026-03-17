@@ -518,6 +518,9 @@
     </script>
     <script>
         const transactionDateInput = document.getElementById('transactionDate');
+        const requestDateInput = document.getElementById('requestDate');
+        const legalDateInput = document.getElementById('legalDate');
+
         if (transactionDateInput) {
             flatpickr(transactionDateInput, {
                 dateFormat: 'Y-m-d', // value submitted to backend
@@ -527,10 +530,7 @@
                 defaultDate: transactionDateInput.value || null
             });
         }
-    </script>
 
-    <script>
-        const requestDateInput = document.getElementById('requestDate');
         if (requestDateInput) {
             flatpickr(requestDateInput, {
                 dateFormat: 'Y-m-d', // value submitted to backend
@@ -540,10 +540,7 @@
                 defaultDate: requestDateInput.value || null
             });
         }
-    </script>
 
-    <script>
-        const legalDateInput = document.getElementById('legalDate');
         if (legalDateInput) {
             flatpickr(legalDateInput, {
                 dateFormat: 'Y-m-d', // value submitted to backend
@@ -555,7 +552,117 @@
         }
     </script>
 
-    <script>
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const cboProgram = document.getElementById('cboProgram');
+            const cboProgramSub = document.getElementById('cboProgramSub');
+            const cboCluster = document.getElementById('cboCluster');
+            const cboSubAccount = document.getElementById('cboSubAccount');
+            const budgetInput = document.getElementById('budget');
+
+            const ENDPOINT = "{{ route('budgetVoucher.editEarlyBalance', ['params' => $params]) }}";
+
+            function toNumber(v) {
+                v = (v || '').toString().replace(/,/g, '');
+                return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+            }
+
+            function formatNumber(v) {
+                return toNumber(v).toLocaleString('en-US', {
+                    maximumFractionDigits: 2
+                });
+            }
+
+            function setText(id, val) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = formatNumber(val);
+            }
+
+            function resetBalances() {
+                ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying',
+                    'remaining_credit'
+                ]
+                .forEach(id => setText(id, 0));
+            }
+
+            function recomputeRemaining() {
+                const apply = toNumber(budgetInput?.value);
+                const credit = toNumber(document.getElementById('credit')?.textContent);
+                const deadline = toNumber(document.getElementById('deadline_balance')?.textContent);
+
+                setText('applying', apply);
+                setText('remaining_credit', Math.max(credit - apply, 0));
+                setText('deadline_balance', Math.max(deadline - apply, 0));
+            }
+
+            function getSelections() {
+                return {
+                    programId: cboProgram?.value || '',
+                    programSubId: cboProgramSub?.value || '',
+                    clusterId: cboCluster?.value || '',
+                    accountSubId: cboSubAccount?.value || ''
+                };
+            }
+
+            async function loadBalances() {
+                const {
+                    programId,
+                    programSubId,
+                    clusterId,
+                    accountSubId
+                } = getSelections();
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
+                    resetBalances();
+                    return;
+                }
+
+                try {
+                    const url = new URL(ENDPOINT, window.location.origin);
+                    url.searchParams.set('program_id', programId);
+                    url.searchParams.set('program_sub_id', programSubId);
+                    url.searchParams.set('cluster_id', clusterId);
+                    url.searchParams.set('account_sub_id', accountSubId);
+
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data?.message || 'Failed to load balances');
+
+                    // Update table
+                    setText('fin_law', data.fin_law);
+                    setText('credit_movement', data.credit_movement);
+                    setText('new_credit_status', data.new_credit_status);
+                    setText('credit', data.credit);
+                    setText('deadline_balance', data.deadline_balance);
+
+                    recomputeRemaining();
+
+                } catch (err) {
+                    console.error(err);
+                    resetBalances();
+                }
+            }
+
+            // Load table on page load
+            loadBalances();
+
+            // Optional: reload table if user changes any dropdown
+            [cboProgram, cboProgramSub, cboCluster, cboSubAccount].forEach(el => {
+                el?.addEventListener('change', loadBalances);
+            });
+
+            // Update remaining budget live
+            budgetInput?.addEventListener('input', recomputeRemaining);
+
+        });
+    </script> --}}
+
+      <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             const cboProgram = document.getElementById('cboProgram');
@@ -664,6 +771,7 @@
 
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -852,6 +960,7 @@
             });
         });
     </script>
+
     {{-- <script>
         let cboLegalChoices;
 
@@ -920,6 +1029,7 @@
             });
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

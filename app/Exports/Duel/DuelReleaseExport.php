@@ -126,17 +126,26 @@ class DuelReleaseExport
             // 2) Decide which block to fill: EA, DO, or MO
             //    👉 Adjust this to your actual column / relationship
             //    e.g. $typeCode = $item->duelType->code; or $item->type; etc.
-            $typeCode = strtoupper($item->type ?? 'EA'); // <-- CHANGE 'type' to your real field
+            $typeMap = [
+                1 => 'EA',
+                2 => 'DO',
+                3 => 'MO'
+            ];
+
+            $typeCode = $typeMap[$item->item_name] ?? 'EA';
 
             // map type → columns
-            $map = [
+            $columnMap = [
                 'EA' => ['E', 'F', 'G'],
                 'DO' => ['H', 'I', 'J'],
                 'MO' => ['K', 'L', 'M'],
             ];
 
+            $cols = $columnMap[$typeCode] ?? $columnMap['EA'];
+
+            [$colTotal, $colReq, $colRemain] = $cols;
             // default to EA if unknown
-            $cols = $map[$typeCode] ?? $map['EA'];
+            $cols = $columnMap[$typeCode] ?? $columnMap['EA'];
 
             [$colTotal, $colReq, $colRemain] = $cols;
 
@@ -147,12 +156,19 @@ class DuelReleaseExport
 
             // 4) Sum per type (optional – used in footer)
             $sumValue = (float) $item->duel_total;
-            if ($typeCode === 'EA') {
-                $totalEA += $sumValue;
-            } elseif ($typeCode === 'DO') {
-                $totalDO += $sumValue;
-            } elseif ($typeCode === 'MO') {
-                $totalMO += $sumValue;
+
+            switch ($typeCode) {
+                case 'EA':
+                    $totalEA += $sumValue;
+                    break;
+
+                case 'DO':
+                    $totalDO += $sumValue;
+                    break;
+
+                case 'MO':
+                    $totalMO += $sumValue;
+                    break;
             }
 
             // 5) Apply border + alignment for the whole detail row

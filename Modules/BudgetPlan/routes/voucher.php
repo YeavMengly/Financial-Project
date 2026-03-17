@@ -14,6 +14,7 @@ Route::middleware('PermissionCheck')
 
         Route::get('voucher/{params}/get-early-balance', 'getEarlyBalance')
             ->name('budgetVoucher.getEarlyBalance');
+
         Route::get('voucher/{params}/edit-early-balance', 'editEarlyBalance')
             ->name('budgetVoucher.editEarlyBalance');
     });
