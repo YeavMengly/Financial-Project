@@ -8,6 +8,7 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -41,57 +42,20 @@
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
 
+
+                        <!-- Start Date -->
                         <div class="col-sm-3">
-                            <label for="companyName" class="form-label font-size-13 text-muted">
-                                {{ __('forms.company.name') }}
-                            </label>
-                            <select class="form-control" name="company_name" id="companyName">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($duelEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('company_name') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->company_name }}
-                                    </option>
-                                @endforeach --}}
-                            </select>
+                            <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
+                            <input type="text" id="start_date" name="start_date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('start_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
                         <div class="col-sm-3">
-                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                {{ __('forms.user.entry') }}
-                            </label>
-                            <select class="form-control" name="user_entry" id="userEntry">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($duelEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('user_entry') == $item->user_entry ? 'selected' : '' }}>
-                                        {{ $item->user_entry }}
-                                    </option>
-                                @endforeach --}}
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label for="unit" class="form-label font-size-13 text-muted">
-                                {{ __('forms.unit') }}
-                            </label>
-                            <select class="form-control" name="unit" id="unit">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($duelEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('unit') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->unit }}
-                                    </option>
-                                @endforeach --}}
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label for="stock_number" class="form-label font-size-13 text-muted">
-                                {{ __('forms.stock.number') }}
-                            </label>
-                            <input type="text" class="form-control" name="stock_number"
-                                value="{{ request('stock_number') }}" />
+                            <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
+                            <input type="text" id="end_date" name="end_date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
@@ -146,6 +110,7 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -183,37 +148,26 @@
 
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const companyName = document.getElementById('companyName');
-            const companyNameChoices = new Choices(companyName, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        if (startDateInput) {
+            flatpickr(startDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: startDateInput.value || null
             });
-        });
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const userEntry = document.getElementById('userEntry');
-            const userEntryChoices = new Choices(userEntry, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
+        if (endDateInput) {
+            flatpickr(endDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: endDateInput.value || null
             });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const unit = document.getElementById('unit');
-            const unitChoices = new Choices(unit, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
+        }
     </script>
 @endsection

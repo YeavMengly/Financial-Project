@@ -41,7 +41,7 @@
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
 
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label for="companyName" class="form-label font-size-13 text-muted">
                                 {{ __('forms.company.name') }}
                             </label>
@@ -54,9 +54,9 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label for="item_name" class="form-label font-size-13 text-muted">
                                 {{ __('forms.user.entry') }}
                             </label>
@@ -69,30 +69,30 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-3">
-                            <label for="unit" class="form-label font-size-13 text-muted">
+                            {{-- <label for="unit" class="form-label font-size-13 text-muted">
                                 {{ __('forms.unit') }}
-                            </label>
+                            </label> --}}
                             <select class="form-control" name="unit" id="unit">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($duelEntry as $item)
+                                @foreach ($unitType as $item)
                                     <option value="{{ $item->id }}"
-                                        {{ request('unit') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->unit }}
+                                        {{ request('unit') == $item->id ? 'selected' : '' }} selected>
+                                        {{ $item->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label for="stock_number" class="form-label font-size-13 text-muted">
                                 {{ __('forms.stock.number') }}
                             </label>
                             <input type="text" class="form-control" name="stock_number"
                                 value="{{ request('stock_number') }}" />
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 

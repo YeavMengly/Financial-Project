@@ -219,14 +219,12 @@ class BudgetVoucherController extends Controller
             return response('<option value="">ស្វែងរក...</option>');
         }
 
-
-        // if ($request->expense_type_id) {
-
         $data = BudgetMandate::select('id', 'legal_number')
             ->where('expense_type_id', $request->expense_type_id)
             ->where('is_archived', 2)
             ->where('status', 'done')
             ->get();
+
         $selectedId = (string) $request->selected_id;
 
         $html = '<option value="">ស្វែងរក...</option>';
@@ -554,6 +552,8 @@ class BudgetVoucherController extends Controller
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         $module = BudgetVoucher::where('id', $id)
+            ->where('is_archived', 2)
+            ->where('status', 'done')
             ->where('ministry_id', $ministry->id)
             ->first();
 
@@ -612,19 +612,19 @@ class BudgetVoucherController extends Controller
             'budget'          => 'required|numeric|min:0',
             'cboExpenseType'       => 'required',
             'txtDescription'  => 'required',
-            // 'attachments'     => 'nullable|array',
-            // 'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
         ]);
-
-        // dd($validated);
 
         DB::beginTransaction();
         try {
             $ministry = Ministry::where('id', decode_params($params))->first();
             $voucher = BudgetVoucher::where('id', $id)
-                ->where('ministry_id', $ministry->id)->first();
+                ->where('ministry_id', $ministry->id)
+                ->where('expense_type_id', $validated['cboExpenseType'])
+                ->where('is_archived', 1)
+                ->where('status', 'todo')
+                ->first();
 
             $beginCredit = BeginVoucher::where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])

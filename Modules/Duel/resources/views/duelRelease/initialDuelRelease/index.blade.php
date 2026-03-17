@@ -17,7 +17,7 @@
 
                 <div class="page-title-right">
                     <div class="page-title-right">
-                         <ol class="breadcrumb m-0">
+                        <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item active">{{ __('menus.duel') }}</li>
                         </ol>
                     </div>
@@ -26,6 +26,37 @@
         </div>
     </div>
     <!-- end page title -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
