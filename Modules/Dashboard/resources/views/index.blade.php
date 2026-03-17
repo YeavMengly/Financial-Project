@@ -729,8 +729,8 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងសាំង</span>
-                        <div class="ms-auto d-flex align-items-center gap-2">
-                            <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
+                        <div class="ms-auto d-flex align-items-center gap-1">
+                            {{-- <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
                                 @foreach (request()->except('item_name') as $k => $v)
                                     <input type="hidden" name="{{ $k }}" value="{{ $v }}">
                                 @endforeach
@@ -744,17 +744,23 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </form>
+                            </form> --}}
+                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                {{ $totalFuel }}
+                            </button>
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                {{ $totalFuelRelease }}
+                            </button>
                         </div>
                     </div>
                     <div class="row align-items-center">
-                        <div class="col-7">
+                        <div class="col-12">
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="p-2 rounded bg-success-subtle">
                                         <small class="text-muted d-block">{{ __('menus.entry') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyFuel ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyFuel ?? 0) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -763,7 +769,7 @@
                                     <div class="p-2 rounded bg-danger-subtle">
                                         <small class="text-muted d-block">{{ __('menus.release') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyFuelRelease ?? 0, 2) }} <span
+                                            {{ number_format($qtyFuelRelease ?? 0) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -773,7 +779,7 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyFuelRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyFuelRemain) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -800,7 +806,7 @@
                 <div class="card-body">
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងម៉ាស៊ូត</span>
-                        <div class="ms-auto d-flex align-items-center gap-2">
+                        <div class="ms-auto d-flex align-items-center gap-1">
                             {{-- <span>
                                 <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
                                     <input type="hidden" name=" " value=" ">
@@ -815,16 +821,19 @@
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalDiesel }}
                             </button>
+                             <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                {{ $totalDieselRelease }}
+                            </button>
                         </div>
                     </div>
                     <div class="row align-items-center g-2">
-                        <div class="col-7">
+                        <div class="col-12">
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="p-2 rounded bg-success-subtle">
                                         <small class="text-muted d-block">{{ __('menus.entry') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDiesel ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyDiesel ?? 0) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -832,7 +841,7 @@
                                     <div class="p-2 rounded bg-danger-subtle">
                                         <small class="text-muted d-block">{{ __('menus.release') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRelease ?? 0, 2) }} <span
+                                            {{ number_format($qtyDieselRelease ?? 0) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -841,7 +850,7 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRemain, 2) }} <span
+                                            {{ number_format($qtyDieselRemain) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -867,7 +876,7 @@
                 <div class="card-body">
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate"> ប្រេងម៉ាស៊ីន</span>
-                        <div class="ms-auto d-flex align-items-center gap-2">
+                        <div class="ms-auto d-flex align-items-center gap-1">
                             {{-- <span>
                                 <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
                                     <input type="hidden" name=" " value=" ">
@@ -882,16 +891,19 @@
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalOil }}
                             </button>
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                {{ $totalOilRelease }}
+                            </button>
                         </div>
                     </div>
                     <div class="row align-items-center g-2">
-                        <div class="col-7">
+                        <div class="col-12">
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="p-2 rounded bg-success-subtle">
                                         <small class="text-muted d-block">{{ __('menus.entry') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyOil ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyOil ?? 0) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -899,7 +911,7 @@
                                     <div class="p-2 rounded bg-danger-subtle">
                                         <small class="text-muted d-block">{{ __('menus.release') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyOilRelease ?? 0, 2) }} <span
+                                            {{ number_format($qtyOilRelease ?? 0) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -908,7 +920,7 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyOilRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyOilRemain) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>

@@ -82,17 +82,17 @@ class DashboardController extends Controller
 
         $totalsByItem = $duelEntries->groupBy('item_name')->map(fn($rows) => $rows->sum('quantity'));
 
-        $qtyFuel   = $totalsByItem['ប្រេងសាំង'] ?? 0;
-        $qtyDiesel = $totalsByItem['ប្រេងម៉ាស៊ូត'] ?? 0;
-        $qtyOil    = $totalsByItem['ប្រេងម៉ាស៊ីន'] ?? 0;
+        $qtyFuel   = $totalsByItem['1'] ?? 0;
+        $qtyDiesel = $totalsByItem['2'] ?? 0;
+        $qtyOil    = $totalsByItem['3'] ?? 0;
 
-        $chartDataFuel   = $duelEntries->where('item_name', 'ប្រេងសាំង')->pluck('quantity')->toArray();
-        $chartDataDiesel = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ូត')->pluck('quantity')->toArray();
-        $chartDataOil    = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ីន')->pluck('quantity')->toArray();
+        $chartDataFuel   = $duelEntries->where('item_name', 1)->pluck('quantity')->toArray();
+        $chartDataDiesel = $duelEntries->where('item_name', 2)->pluck('quantity')->toArray();
+        $chartDataOil    = $duelEntries->where('item_name', 3)->pluck('quantity')->toArray();
 
-        $totalFuel   = $duelEntries->where('item_name', 'ប្រេងសាំង')->count();
-        $totalDiesel = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ូត')->count();
-        $totalOil    = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ីន')->count();
+        $totalFuel   = $duelEntries->where('item_name', 1)->count();
+        $totalDiesel = $duelEntries->where('item_name', 2)->count();
+        $totalOil    = $duelEntries->where('item_name', 3)->count();
 
         // Duel Release
         $duelReleases = DB::table('duel_releases')
@@ -105,17 +105,17 @@ class DashboardController extends Controller
             ->groupBy('item_name')
             ->map(fn($rows) => $rows->sum('quantity_request'));
 
-        $qtyFuelRelease   = $totalsReleaseByItem['ប្រេងសាំង'] ?? 0;
-        $qtyDieselRelease = $totalsReleaseByItem['ប្រេងម៉ាស៊ូត'] ?? 0;
-        $qtyOilRelease    = $totalsReleaseByItem['ប្រេងម៉ាស៊ីន'] ?? 0;
+        $qtyFuelRelease   = $totalsReleaseByItem[1] ?? 0;
+        $qtyDieselRelease = $totalsReleaseByItem[2] ?? 0;
+        $qtyOilRelease    = $totalsReleaseByItem[3] ?? 0;
 
-        $chartReleaseFuel   = $duelReleases->where('item_name', 'ប្រេងសាំង')->pluck('quantity_request')->toArray();
-        $chartReleaseDiesel = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ូត')->pluck('quantity_request')->toArray();
-        $chartReleaseOil    = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ីន')->pluck('quantity_request')->toArray();
+        $chartReleaseFuel   = $duelReleases->where('item_name', 1)->pluck('quantity_request')->toArray();
+        $chartReleaseDiesel = $duelReleases->where('item_name', 2)->pluck('quantity_request')->toArray();
+        $chartReleaseOil    = $duelReleases->where('item_name', 3)->pluck('quantity_request')->toArray();
 
-        $totalFuelRelease   = $duelReleases->where('item_name', 'ប្រេងសាំង')->count();
-        $totalDieselRelease = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ូត')->count();
-        $totalOilRelease    = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ីន')->count();
+        $totalFuelRelease   = $duelReleases->where('item_name', 1)->count();
+        $totalDieselRelease = $duelReleases->where('item_name', 2)->count();
+        $totalOilRelease    = $duelReleases->where('item_name', 3)->count();
 
 
         $totalEntry   = $duelEntries->count();
@@ -378,6 +378,9 @@ class DashboardController extends Controller
             'qtyDieselRelease' => $qtyDieselRelease,
             'qtyOilRelease' => $qtyOilRelease,
             'itemOptions' => $itemOptions,
+            'totalFuelRelease' => $totalFuelRelease,
+            'totalDieselRelease' => $totalDieselRelease,
+            'totalOilRelease' => $totalOilRelease,
 
             'total_quantity' => $total_quantity,
             'chartTotalquantity' => $chartTotalquantity,
