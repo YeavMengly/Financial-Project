@@ -82,17 +82,17 @@ class DashboardController extends Controller
 
         $totalsByItem = $duelEntries->groupBy('item_name')->map(fn($rows) => $rows->sum('quantity'));
 
-        $qtyFuel   = $totalsByItem['ប្រេងសាំង'] ?? 0;
-        $qtyDiesel = $totalsByItem['ប្រេងម៉ាស៊ូត'] ?? 0;
-        $qtyOil    = $totalsByItem['ប្រេងម៉ាស៊ីន'] ?? 0;
+        $qtyFuel   = $totalsByItem['1'] ?? 0;
+        $qtyDiesel = $totalsByItem['2'] ?? 0;
+        $qtyOil    = $totalsByItem['3'] ?? 0;
 
-        $chartDataFuel   = $duelEntries->where('item_name', 'ប្រេងសាំង')->pluck('quantity')->toArray();
-        $chartDataDiesel = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ូត')->pluck('quantity')->toArray();
-        $chartDataOil    = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ីន')->pluck('quantity')->toArray();
+        $chartDataFuel   = $duelEntries->where('item_name', 1)->pluck('quantity')->toArray();
+        $chartDataDiesel = $duelEntries->where('item_name', 2)->pluck('quantity')->toArray();
+        $chartDataOil    = $duelEntries->where('item_name', 3)->pluck('quantity')->toArray();
 
-        $totalFuel   = $duelEntries->where('item_name', 'ប្រេងសាំង')->count();
-        $totalDiesel = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ូត')->count();
-        $totalOil    = $duelEntries->where('item_name', 'ប្រេងម៉ាស៊ីន')->count();
+        $totalFuel   = $duelEntries->where('item_name', 1)->count();
+        $totalDiesel = $duelEntries->where('item_name', 2)->count();
+        $totalOil    = $duelEntries->where('item_name', 3)->count();
 
         // Duel Release
         $duelReleases = DB::table('duel_releases')
@@ -105,17 +105,17 @@ class DashboardController extends Controller
             ->groupBy('item_name')
             ->map(fn($rows) => $rows->sum('quantity_request'));
 
-        $qtyFuelRelease   = $totalsReleaseByItem['ប្រេងសាំង'] ?? 0;
-        $qtyDieselRelease = $totalsReleaseByItem['ប្រេងម៉ាស៊ូត'] ?? 0;
-        $qtyOilRelease    = $totalsReleaseByItem['ប្រេងម៉ាស៊ីន'] ?? 0;
+        $qtyFuelRelease   = $totalsReleaseByItem[1] ?? 0;
+        $qtyDieselRelease = $totalsReleaseByItem[2] ?? 0;
+        $qtyOilRelease    = $totalsReleaseByItem[3] ?? 0;
 
-        $chartReleaseFuel   = $duelReleases->where('item_name', 'ប្រេងសាំង')->pluck('quantity_request')->toArray();
-        $chartReleaseDiesel = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ូត')->pluck('quantity_request')->toArray();
-        $chartReleaseOil    = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ីន')->pluck('quantity_request')->toArray();
+        $chartReleaseFuel   = $duelReleases->where('item_name', 1)->pluck('quantity_request')->toArray();
+        $chartReleaseDiesel = $duelReleases->where('item_name', 2)->pluck('quantity_request')->toArray();
+        $chartReleaseOil    = $duelReleases->where('item_name', 3)->pluck('quantity_request')->toArray();
 
-        $totalFuelRelease   = $duelReleases->where('item_name', 'ប្រេងសាំង')->count();
-        $totalDieselRelease = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ូត')->count();
-        $totalOilRelease    = $duelReleases->where('item_name', 'ប្រេងម៉ាស៊ីន')->count();
+        $totalFuelRelease   = $duelReleases->where('item_name', 1)->count();
+        $totalDieselRelease = $duelReleases->where('item_name', 2)->count();
+        $totalOilRelease    = $duelReleases->where('item_name', 3)->count();
 
 
         $totalEntry   = $duelEntries->count();
@@ -153,6 +153,8 @@ class DashboardController extends Controller
             ->get();
         // total count pro
         $totalProgaramVoucher = DB::table('budget_vouchers')
+            ->where('budget_vouchers.is_archived', 2)
+            ->where('budget_vouchers.status', 'done')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_id')
             ->selectRaw('
@@ -164,6 +166,8 @@ class DashboardController extends Controller
 
         // dd($totalProgaramVoucher);
         $totalProgaramMandate = DB::table('budget_mandates')
+            ->where('budget_mandates.is_archived', 1)
+            ->where('budget_mandates.status', 'todo')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_id')
             ->selectRaw('
@@ -284,7 +288,7 @@ class DashboardController extends Controller
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
-       //exp_guarantee
+        //exp_guarantee
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->select('budget_mandates.*')
@@ -307,8 +311,8 @@ class DashboardController extends Controller
         $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
         $totalCountDir = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
         $totalCountAdvance   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived',' 2')->where('status', 'done')->count();
-       
+        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
+
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
@@ -320,17 +324,17 @@ class DashboardController extends Controller
         $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
         $percent_Payment = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
-       // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+        // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         //$percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-       
-      // dd($totalCountArch);
+
+        // dd($totalCountArch);
         // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
         //$totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
         $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
         //$totalAdvanPayment = $total_fin_law > 0 ? $total_fin_law - $advance_Payment : 0;
         $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
-        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ( $expenditure_Guarantee + $advance_Payment ) : 0;
+        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment) : 0;
 
         //   dd($total_fin_law );
         return view('dashboard::index', [
@@ -374,6 +378,9 @@ class DashboardController extends Controller
             'qtyDieselRelease' => $qtyDieselRelease,
             'qtyOilRelease' => $qtyOilRelease,
             'itemOptions' => $itemOptions,
+            'totalFuelRelease' => $totalFuelRelease,
+            'totalDieselRelease' => $totalDieselRelease,
+            'totalOilRelease' => $totalOilRelease,
 
             'total_quantity' => $total_quantity,
             'chartTotalquantity' => $chartTotalquantity,
@@ -393,13 +400,13 @@ class DashboardController extends Controller
             'remainData' => $remainData,
             'deadlineData' => $deadlineData,
             'accounts' => $accounts,
-            
+
             'expenditure_Guarantee' => $expenditure_Guarantee,
             'advance_Payment' => $advance_Payment,
             'direct_Payment' => $direct_Payment,
             'payment' => $payment,
             // 'procurement' => $procurement,
-           // 'pre_Financing' => $pre_Financing,
+            // 'pre_Financing' => $pre_Financing,
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
             'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
@@ -473,9 +480,11 @@ class DashboardController extends Controller
         ')
             ->get()
             ->keyBy('program_sub_id');
-            // dd($programSubTotals);
+        // dd($programSubTotals);
         // total count pro
         $totalProSubVoucher = DB::table('budget_vouchers')
+            ->where('budget_vouchers.is_archived', 2)
+            ->where('budget_vouchers.status', 'done')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_sub_id')
             ->selectRaw('
@@ -487,6 +496,8 @@ class DashboardController extends Controller
 
         //  dd($programSubTotals);
         $totalProSubMandate = DB::table('budget_mandates')
+            ->where('budget_mandates.is_archived', 1)
+            ->where('budget_mandates.status', 'todo')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_sub_id')
             ->selectRaw('

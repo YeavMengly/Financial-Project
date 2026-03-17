@@ -351,7 +351,7 @@
                 </div>
             </div>
         </div>
-          <div class="col-xl-6">
+        <div class="col-xl-6">
             <!-- card -->
             <div class="card card-h-100">
                 <!-- card body -->
@@ -434,9 +434,9 @@
             <div class="card card-h-100">
                 <!-- card body -->
                 <div class="card-body">
-                    <div class="row align-items-center">
+                    <div class="row align-items-center text-center">
                         {{-- pre_Financing --}}
-                        <div class="col-sm align-self-center text-center">
+                        <div class="col-sm align-self-center ">
                             <div class="mt-4 mt-sm-0">
                                 <div>
                                     <p class="mb-2">
@@ -444,7 +444,7 @@
                                             style="color:#1fad12"></i>
                                         <span class="me-3">បុរេប្រទាន</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
-                                           {{ $totalCountAdvance }}
+                                            {{ $totalCountAdvance }}
                                         </button>
                                         <button type="button" class="btn btn-soft-danger btn-sm mb-3">
                                             {{ $totalCountPayment }}
@@ -481,7 +481,7 @@
                                             style="color:#f6ff00"></i>
                                         <span class="me-3">ទូទាត់ </span>
                                         <button type="button" class="btn btn-soft-primary btn-sm mb-3">
-                                           {{ $totalCountPayment }}
+                                            {{ $totalCountPayment }}
                                         </button>
                                         <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
                                             type="button">
@@ -497,7 +497,7 @@
                                                         <i class="mdi mdi-circle"
                                                             style="color:#c0341e; font-size:10px;"></i>
                                                         <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                          {{ number_format($totalPayment) }} 
+                                                            {{ number_format($totalPayment) }}
                                                             រៀល</h6>
                                                     </div>
                                                 </div>
@@ -506,7 +506,7 @@
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
-                                           {{number_format($payment)}} រៀល
+                                            {{ number_format($payment) }} រៀល
                                         </span>
                                     </h6>
                                 </div>
@@ -729,8 +729,8 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងសាំង</span>
-                        <div class="ms-auto d-flex align-items-center gap-2">
-                            <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
+                        <div class="ms-auto d-flex align-items-center gap-1">
+                            {{-- <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
                                 @foreach (request()->except('item_name') as $k => $v)
                                     <input type="hidden" name="{{ $k }}" value="{{ $v }}">
                                 @endforeach
@@ -744,17 +744,23 @@
                                         </option>
                                     @endforeach
                                 </select>
-                            </form>
+                            </form> --}}
+                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                {{ $totalFuel }}
+                            </button>
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                {{ $totalFuelRelease }}
+                            </button>
                         </div>
                     </div>
                     <div class="row align-items-center">
-                        <div class="col-7">
+                        <div class="col-12">
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="p-2 rounded bg-success-subtle">
                                         <small class="text-muted d-block">{{ __('menus.entry') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyFuel ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyFuel ?? 0) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -763,7 +769,7 @@
                                     <div class="p-2 rounded bg-danger-subtle">
                                         <small class="text-muted d-block">{{ __('menus.release') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyFuelRelease ?? 0, 2) }} <span
+                                            {{ number_format($qtyFuelRelease ?? 0) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -773,7 +779,7 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyFuelRemain, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyFuelRemain) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -800,20 +806,34 @@
                 <div class="card-body">
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងម៉ាស៊ូត</span>
-                        <div class="ms-auto">
-                            <button type="button" class="btn btn-soft-primary btn-sm">
+                        <div class="ms-auto d-flex align-items-center gap-1">
+                            {{-- <span>
+                                <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
+                                    <input type="hidden" name=" " value=" ">
+                                    <select name="item_name" class="form-select form-select-sm"
+                                        onchange="this.form.submit()">
+                                        <option value="">
+                                            ប្រភេទ
+                                        </option>
+                                    </select>
+                                </form>
+                            </span> --}}
+                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalDiesel }}
+                            </button>
+                             <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                {{ $totalDieselRelease }}
                             </button>
                         </div>
                     </div>
                     <div class="row align-items-center g-2">
-                        <div class="col-7">
+                        <div class="col-12">
                             <div class="row g-2">
                                 <div class="col-6">
                                     <div class="p-2 rounded bg-success-subtle">
                                         <small class="text-muted d-block">{{ __('menus.entry') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDiesel ?? 0, 2) }} <span class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyDiesel ?? 0) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -821,7 +841,7 @@
                                     <div class="p-2 rounded bg-danger-subtle">
                                         <small class="text-muted d-block">{{ __('menus.release') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRelease ?? 0, 2) }} <span
+                                            {{ number_format($qtyDieselRelease ?? 0) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -830,7 +850,7 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRemain, 2) }} <span
+                                            {{ number_format($qtyDieselRemain) }} <span
                                                 class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
@@ -848,9 +868,76 @@
                 </div>
             </div>
         </div>
-
-
-        <div class="col-xl-2 col-md-6">
+        @php
+            $qtyOilRemain = max(($qtyOil ?? 0) - ($qtyOilRelease ?? 0), 0);
+        @endphp
+        <div class="col-xl-3 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center mb-3 w-100">
+                        <span class="text-muted lh-4 d-block text-truncate"> ប្រេងម៉ាស៊ីន</span>
+                        <div class="ms-auto d-flex align-items-center gap-1">
+                            {{-- <span>
+                                <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
+                                    <input type="hidden" name=" " value=" ">
+                                    <select name="item_name" class="form-select form-select-sm"
+                                        onchange="this.form.submit()">
+                                        <option value="">
+                                            ប្រភេទ
+                                        </option>
+                                    </select>
+                                </form>
+                            </span> --}}
+                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                {{ $totalOil }}
+                            </button>
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                {{ $totalOilRelease }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row align-items-center g-2">
+                        <div class="col-12">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-success-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.entry') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyOil ?? 0) }} <span class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded bg-danger-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.release') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyOilRelease ?? 0) }} <span
+                                                class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="p-2 rounded bg-primary-subtle">
+                                        <small class="text-muted d-block">{{ __('menus.remain') }}</small>
+                                        <div class="fw-semibold">
+                                            {{ number_format($qtyOilRemain) }} <span class="text-muted">លីត្រ</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div id="dieselDonutChart" class="apex-charts"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap mt-2">
+                        <span class="badge bg-info-subtle text-info">Entry vs Release</span>
+                        <span class="ms-1 text-muted font-size-13">{{ $year ?? '' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="row align-items-center">
@@ -887,7 +974,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-xl-2 col-md-6">
             <!-- card -->
