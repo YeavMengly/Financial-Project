@@ -662,7 +662,7 @@
         });
     </script> --}}
 
-      <script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             const cboProgram = document.getElementById('cboProgram');

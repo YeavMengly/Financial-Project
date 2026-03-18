@@ -5,8 +5,8 @@ namespace Modules\Material\App\Http\Controllers;
 use App\DataTables\Material\InitialMaterialReleaseDataTable;
 use App\DataTables\Material\MaterialReleaseDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Agency;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Agency;
+use App\Models\Content\Ministry;
 use App\Models\Material\MaterialRelease;
 use Illuminate\Http\Request;
 
