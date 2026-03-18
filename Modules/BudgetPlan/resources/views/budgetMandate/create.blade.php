@@ -359,6 +359,145 @@
             });
         });
     </script>
+     <script>
+        // ---------- helpers ----------
+        function initChoicesOnce(selectEl, opts = {}) {
+            if (!selectEl) return null;
+            if (selectEl.dataset.choicesInit === '1') return null; // our own guard
+            selectEl.dataset.choicesInit = '1';
+            return new Choices(selectEl, Object.assign({
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false
+            }, opts));
+        }
+        const n = v => (isNaN(+v) ? 0 : +v);
+        const fmt = v => n(v).toLocaleString('en-US', {
+            maximumFractionDigits: 2
+        });
+
+        function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = fmt(val);
+        }
+
+        function resetNumbers() {
+            ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying',
+                'remaining_credit'
+            ]
+            .forEach(id => setText(id, 0));
+        }
+
+        // ---------- init once DOM ready ----------
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+            const subAccount = document.getElementById('cboSubAccount');
+            // const programInput = document.getElementById('programInput'); // readonly "no"
+            const budgetInput = document.getElementById('budget');
+
+            // named route -> correct URL always
+            const earlyEP = "{{ route('budgetMandate.getEarlyBalance', ['params' => $params]) }}";
+
+            // Pristine
+            if (form) {
+                const pristine = new Pristine(form);
+                form.addEventListener('submit', (e) => {
+                    if (!pristine.validate()) e.preventDefault();
+                });
+            }
+
+            // Summernote
+            if (window.jQuery) {
+                jQuery('#vDescription').summernote({
+                    height: 150,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['color', ['color']]
+                    ]
+                });
+            }
+
+            // Choices — once per element
+            // initChoicesOnce(document.getElementById('cboExpenseType'), {
+            //     placeholderValue: 'ជ្រើសរើស',
+            //     searchPlaceholderValue: 'ស្វែងរក...'
+            // });
+            initChoicesOnce(subAccount, {
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...'
+            });
+
+            // compute remaining credit
+            function recomputeRemaining() {
+                const apply = n(budgetInput?.value);
+                const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
+                setText('applying', apply);
+                setText('remaining_credit', Math.max(credit - apply, 0));
+                if (credit - apply < 0) budgetInput.value = '';
+            }
+
+            // fetch numbers
+            async function fetchEarlyBalance() {
+
+                const programId = document.getElementById('cboProgram').value;
+                const programSubId = document.getElementById('cboProgramSub').value;
+                const clusterId = document.getElementById('cboCluster').value;
+                const accountSubId = document.getElementById('cboSubAccount').value;
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
+                    resetNumbers();
+                    return;
+                }
+
+                const url = new URL(earlyEP, window.location.origin);
+
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
+                url.searchParams.set('account_sub_id', accountSubId);
+
+                try {
+
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await res.json();
+
+                    setText('fin_law', data.fin_law);
+                    setText('credit_movement', data.credit_movement);
+                    setText('new_credit_status', data.new_credit_status);
+                    setText('credit', data.credit);
+                    setText('deadline_balance', data.deadline_balance);
+
+                    recomputeRemaining();
+
+                } catch (err) {
+                    console.error(err);
+                    resetNumbers();
+                }
+            }
+            document.getElementById('cboProgram').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboProgramSub').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboCluster').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboSubAccount').addEventListener('change', fetchEarlyBalance);
+
+            subAccount?.addEventListener('change', function() {
+                const opt = this.options[this.selectedIndex];
+                const subId = this.value || '';
+                const programNo = opt ? (opt.getAttribute('data-program') || '') : '';
+
+                if (programInput) programInput.value = programNo;
+
+                fetchEarlyBalance(subId, programNo);
+            });
+
+            budgetInput?.addEventListener('input', recomputeRemaining);
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
