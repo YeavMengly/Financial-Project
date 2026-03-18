@@ -104,14 +104,25 @@ class BudgetMandateDataTable extends DataTable
         }
 
 
-        if ($request->cboTodo) {
-            if ($request->cboTodo == 2) {
-                $model->where('budget_mandates.is_archived', 1);
-            } elseif ($request->cboTodo == 3) {
-                $model->where('budget_mandates.is_archived', 2);
-            }
-        } else {
-            $model->where('budget_mandates.is_archived', 1);
+        // ===== SEARCH FILTER =====
+        if ($request->filled('subAccountNumber')) {
+            $model->where('account_subs.no', $request->subAccountNumber);
+        }
+
+        if ($request->filled('agency')) {
+            $model->where('agencies.no', 'like', '%' . $request->agency . '%');
+        }
+
+        if ($request->filled('legal_number')) {
+            $model->where('budget_mandates.legal_number', 'like', '%' . $request->legal_number . '%');
+        }
+
+        if ($request->filled('keyword')) {
+            $model->where(function ($q) use ($request) {
+                $q->where('budget_mandates.no', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('budget_mandates.description', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('budget_mandates.legal_name', 'like', '%' . $request->keyword . '%');
+            });
         }
 
 
@@ -173,7 +184,7 @@ class BudgetMandateDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.no    = $("#no").val();
-                d.accountSub = $("#accountSub").val();
+                d.subAccountNumber  = $("#subAccountNumber").val(); // ✅ FIXED
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
                 }',

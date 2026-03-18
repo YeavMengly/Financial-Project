@@ -258,4 +258,9 @@
             });
         });
     </script>
+    <script>
+        $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
+            $('#budgetmandate-table').DataTable().ajax.reload();
+        });
+    </script>
 @endsection
