@@ -78,7 +78,7 @@
 
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
-                                                <label for="quantity_request">{{ __('forms.quantity.request') }}</label>
+                                                <label for="quantity_request">{{ __('forms.quantity.request') }} / លីត្រ</label>
                                                 <input type="text" name="quantity_request" required class="form-control"
                                                     data-pristine-required-message="{{ __('messages.required') }}" />
                                                 @error('quantity_request')
