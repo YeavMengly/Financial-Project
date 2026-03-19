@@ -39,6 +39,7 @@ class BeginMandate extends Model
         'credit',
         'law_average',
         'law_correction',
+        'expense_type_id'
     ];
     /* -----------------------------------------------------------------
      |  Relationships

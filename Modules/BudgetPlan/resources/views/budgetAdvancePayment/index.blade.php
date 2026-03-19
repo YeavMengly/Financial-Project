@@ -58,16 +58,14 @@
                             </select>
                         </div>
 
-                        <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($budgetMandate as $ts)
-                                    <option value="{{ $ts->account_sub_id }}"
-                                        {{ request('subAccountNumber') == $ts->account_sub_id ? 'selected' : '' }}>
-                                        {{ $ts->account_sub_id }} -
-                                        {{ $ts->no }}
+                                @foreach ($accountSub as $as)
+                                    <option value="{{ $as->no }}"
+                                        {{ request('subAccountNumber') == $as->no ? 'selected' : '' }}>
+                                        {{ $as->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -77,7 +75,7 @@
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="date" class="form-control"
-                                placeholder="{{ __('forms.select_date') }}" name="start_date"
+                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" name="start_date"
                                 value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
@@ -86,7 +84,7 @@
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="date" class="form-control"
-                                placeholder="{{ __('forms.select_date') }}" name="end_date"
+                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}" name="end_date"
                                 value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
@@ -99,7 +97,7 @@
                             {{-- Export --}}
 
                             <a href="{{ route(
-                                'budgetMandate.export',
+                                'budgetAdvancePayment.exportAdvancePayment',
                                 array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
                             ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
@@ -258,6 +256,11 @@
                 searchPlaceholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer search placeholder
                 shouldSort: false
             });
+        });
+    </script>
+    <script>
+        $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
+            $('#budgetadvancepayment-table').DataTable().ajax.reload();
         });
     </script>
 @endsection

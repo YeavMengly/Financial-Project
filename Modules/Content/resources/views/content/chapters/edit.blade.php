@@ -11,7 +11,7 @@
                             <li class="breadcrumb-item"><a
                                     href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $ministry->year }}</span></a>
                             </li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.chapters') }}</a>
                             </li>
@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('chapters.update', ['params' => $params, 'id' => $module->id]) }}"
+                        action="{{ route('chapters.update', ['params' => $params, 'id' => $chapter->id]) }}"
                         autocomplete="off">
                         @csrf
                         <div class="row">
