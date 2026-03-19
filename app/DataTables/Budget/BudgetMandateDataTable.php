@@ -96,11 +96,14 @@ class BudgetMandateDataTable extends DataTable
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
                 $model->where('budget_mandates.is_archived', 1);
+                $model->where('budget_mandates.expense_type_id', 1);
             } elseif ($request->cboTodo == 3) {
                 $model->where('budget_mandates.is_archived', 2);
+                $model->where('budget_mandates.expense_type_id', 1);
             }
         } else {
             $model->where('budget_mandates.is_archived', 1);
+            $model->where('budget_mandates.expense_type_id', 1);
         }
 
 
