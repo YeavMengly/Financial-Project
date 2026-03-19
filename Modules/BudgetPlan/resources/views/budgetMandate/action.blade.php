@@ -20,13 +20,13 @@
                     </a>
                 @endif
             @else
-                {{-- @if (hasPermission('budgetMandate.destroy'))
+                @if (hasPermission('budgetMandate.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetMandate.restore', encode_params($module->id)) }}', 2)"
+                        onclick="confirm('{{ route('budgetMandate.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item">
                         <i class="bx bx-undo"></i> {{ __('buttons.restore') }}
                     </a>
-                @endif --}}
+                @endif
             @endif
         </ul>
     </div>

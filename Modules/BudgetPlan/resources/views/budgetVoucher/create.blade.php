@@ -1,20 +1,27 @@
 @extends('layouts.master')
 @section('css')
-    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- preloader css -->
+    <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">
-                </h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.payment') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.voucher') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.payment') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -23,6 +30,9 @@
         </div>
     </div>
 
+    <div id="flashMessage"></div>
+
+    <!-- end page title -->
     <div class="row">
         <div class="col-12"></div>
         <div class="col-12">
@@ -35,18 +45,101 @@
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label for="cboExpenseType"
+                                            class="form-label text-muted">{{ __('forms.expense.type') }}</label>
+                                        <select id="cboExpenseType" class="form-select" name="cboExpenseType" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($expenseType as $item)
+                                                <option value="{{ $item->id }}">{{ $item->name_kh }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.legal.number') }}
+                                        </label>
+                                        <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cboLegalNumber')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.name') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            type="text" class="form-control" name="legalName" tabindex="2" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboProgram" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program') }}
+                                        </label>
+                                        <select class="form-select" id="cboProgram" name="cboProgram" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($program as $p)
+                                                <option value="{{ $p->id }}">
+                                                    {{ $p->no }}-
+                                                    {{ $p->title }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('cboProgram')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program.sub') }}
+                                        </label>
+                                        <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+                                        @error('cboProgramSub')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.cluster') }}
+                                        </label>
+                                        <select id="cboCluster" class="form-select" name="cboCluster" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cboCluster')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
-                                        <select class="form-control" data-trigger id="cboAgency" name="cboAgency" required
+                                        <select id="cboAgency" class="form-select" name="cboAgency" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($agency as $item)
-                                                <option value="{{ $item->id }}">
-                                                    {{ $item->no }} -
-                                                    {{ $item->name ?? 'មិនមានទិន្ន័យ' }}
-                                                </option>
-                                            @endforeach
                                         </select>
                                         @error('cboAgency')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -62,35 +155,17 @@
 
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginVoucher as $bv)
-                                                <option value="{{ $bv->account_sub_id }}"
-                                                    data-program="{{ $bv->no }}">
-                                                    {{ $bv->account_sub_id }} - {{ $bv->no }}
 
+                                            @foreach ($accountSub as $bv)
+                                                <option value="{{ $bv->no }}">
+                                                    {{ $bv->no }}-{{ $bv->name }}
                                                 </option>
                                             @endforeach
                                         </select>
-
-
-                                        @error('cboSubAccount')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6 d-none">
-                                    <div class="form-group mb-3">
-                                        <label for="no"
-                                            class="form-label font-size-13 text-muted">{{ __('forms.cluster.act') }}</label>
-                                        <input type="number" min="0" name="no" id="programInput" readonly
-                                            placeholder="xxxxxxx" required class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('no')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
+                                {{-- Program Code (auto-filled from JS) --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="budget">{{ __('forms.budget') }}</label>
@@ -105,30 +180,20 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="task_type"
-                                            class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
-                                        <select class="form-control" name="task_type" id="task_type" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($taskType as $ts)
-                                                <option value="{{ $ts->id }}">{{ $ts->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('task_type')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
+                                        <label for="transactionDate"
+                                            class="form-label">{{ __('forms.select_date') }}</label>
+                                        <input type="text" id="transactionDate" name="transactionDate"
+                                            class="form-control" placeholder="{{ __('forms.select_transaction_date') }}"
+                                            required data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
                                 </div>
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="example-datetime-local-input">{{ __('forms.select_date') }}</label>
-                                        <input type="date" name="date" id="example-datetime-local-input" required
-                                            class="form-control"
+                                        <label for="requestDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                        <input type="text" id="requestDate" name="requestDate" class="form-control"
+                                            placeholder="{{ __('forms.select_request_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('date')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
                                     </div>
                                 </div>
 
@@ -143,8 +208,9 @@
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
 
+
+                            </div>
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
@@ -155,12 +221,11 @@
                                     @enderror
                                 </div>
                             </div>
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                                    {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
                                     href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
@@ -205,7 +270,63 @@
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
+    <script>
+        const transactionDateInput = document.getElementById('transactionDate');
+        if (transactionDateInput) {
+            flatpickr(transactionDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: transactionDateInput.value || null
+            });
+        }
+    </script>
+    <script>
+        const requestDateInput = document.getElementById('requestDate');
+        if (requestDateInput) {
+            flatpickr(requestDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: requestDateInput.value || null
+            });
+        }
+    </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+            const pristine = new Pristine(form);
+
+            form.addEventListener('submit', function(e) {
+                if (!pristine.validate()) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#vDescription').summernote({
+                height: 150,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['color', ['color']],
+                ]
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
     <script>
         // ---------- helpers ----------
         function initChoicesOnce(selectEl, opts = {}) {
@@ -239,7 +360,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
             const subAccount = document.getElementById('cboSubAccount');
-            const programInput = document.getElementById('programInput'); // readonly "no"
+            // const programInput = document.getElementById('programInput'); // readonly "no"
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
@@ -265,15 +386,6 @@
                 });
             }
 
-            // Choices — once per element
-            initChoicesOnce(document.getElementById('task_type'), {
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...'
-            });
-            initChoicesOnce(document.getElementById('cboAgency'), {
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...'
-            });
             initChoicesOnce(subAccount, {
                 placeholder: true,
                 placeholderValue: 'ស្វែងរក...'
@@ -289,35 +401,52 @@
             }
 
             // fetch numbers
-            async function fetchEarlyBalance(accountSubId, noVal) {
-                if (!accountSubId || !noVal) {
+            async function fetchEarlyBalance() {
+
+                const programId = document.getElementById('cboProgram').value;
+                const programSubId = document.getElementById('cboProgramSub').value;
+                const clusterId = document.getElementById('cboCluster').value;
+                const accountSubId = document.getElementById('cboSubAccount').value;
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
                     resetNumbers();
                     return;
                 }
+
                 const url = new URL(earlyEP, window.location.origin);
+
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
                 url.searchParams.set('account_sub_id', accountSubId);
-                url.searchParams.set('no', noVal);
 
                 try {
+
                     const res = await fetch(url.toString(), {
                         headers: {
                             'Accept': 'application/json'
                         }
                     });
+
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data?.message || 'Early-balance error');
 
                     setText('fin_law', data.fin_law);
                     setText('credit_movement', data.credit_movement);
                     setText('new_credit_status', data.new_credit_status);
                     setText('credit', data.credit);
                     setText('deadline_balance', data.deadline_balance);
+
                     recomputeRemaining();
+
                 } catch (err) {
                     console.error(err);
                     resetNumbers();
                 }
             }
+            document.getElementById('cboProgram').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboProgramSub').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboCluster').addEventListener('change', fetchEarlyBalance);
+            document.getElementById('cboSubAccount').addEventListener('change', fetchEarlyBalance);
 
             subAccount?.addEventListener('change', function() {
                 const opt = this.options[this.selectedIndex];
@@ -325,10 +454,298 @@
                 const programNo = opt ? (opt.getAttribute('data-program') || '') : '';
 
                 if (programInput) programInput.value = programNo;
+
                 fetchEarlyBalance(subId, programNo);
             });
 
             budgetInput?.addEventListener('input', recomputeRemaining);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboProgram');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboSubAccount');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========= Choices Instances =========
+            let programSubChoices = new Choices('#cboProgramSub', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let agencyChoices = new Choices('#cboAgency', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            let clusterChoices = new Choices('#cboCluster', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            // ========= Helpers =========
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        // optional: keep empty if error
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            // ========= Script 1: Program -> ProgramSub =========
+            function handleProgramChangeForProgramSub(programId) {
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetVoucher.by.program_sub') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => {
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+            }
+
+            // ========= Script 2: Program -> Agency =========
+            function handleProgramChangeForAgency(programId) {
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetVoucher.by.agency') }}",
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => {
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            }
+
+            // ========= Script 3: ProgramSub -> Cluster =========
+            function handleProgramSubChangeForCluster(programSubId) {
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetVoucher.by.cluster') }}",
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => {
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            }
+
+            // ========= Events =========
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                // when program changes -> always clear cluster too
+                handleProgramChangeForProgramSub(programId);
+                handleProgramChangeForAgency(programId);
+                handleProgramSubChangeForCluster(null); // reset cluster
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+                handleProgramSubChangeForCluster(programSubId);
+            });
+
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboExpenseType');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    {{-- <script>
+        let cboLegalChoices;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboLegalNumber');
+
+            cboLegalChoices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        $('#cboExpenseType').change(function() {
+            var expenseTypeId = $(this).val();
+
+            $.ajax({
+                url: '{!! route('budgetVoucher.by.expense_type_id') !!}',
+                type: 'get',
+                global: false,
+                data: {
+                    expense_type_id: expenseTypeId
+                },
+                success: function(data) {
+
+                    // remove old choices
+                    cboLegalChoices.clearChoices();
+
+                    // append new options
+                    cboLegalChoices.setChoices(
+                        $(data).map(function() {
+                            return {
+                                value: $(this).val(),
+                                label: $(this).text(),
+                                selected: false
+                            };
+                        }).get(),
+                        'value',
+                        'label',
+                        true
+                    );
+                }
+            });
+        });
+    </script> --}}
+
+    <script>
+        let cboLegalChoices;
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const element = document.getElementById('cboLegalNumber');
+
+            cboLegalChoices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+
+        });
+
+        $('#cboExpenseType').on('change', function() {
+
+            var expenseTypeId = $(this).val();
+
+            /* ===== Reset cboLegalNumber ===== */
+            cboLegalChoices.clearStore(); // remove selected item
+            cboLegalChoices.clearChoices(); // remove all options
+
+            // add default option
+            // cboLegalChoices.setChoices([{
+            //     value: '',
+            //     label: 'ស្វែងរក...',
+            //     selected: true,
+            //     disabled: true
+            // }], 'value', 'label', true);
+
+            if (!expenseTypeId) return;
+
+            /* ===== Load new options ===== */
+            $.ajax({
+                url: "{{ route('budgetVoucher.get.expense_type_id') }}",
+                type: 'GET',
+                data: {
+                    expense_type_id: expenseTypeId
+                },
+                success: function(data) {
+
+                    let options = [];
+
+                    $(data).filter('option').each(function() {
+                        options.push({
+                            value: $(this).val(),
+                            label: $(this).text()
+                        });
+                    });
+
+                    cboLegalChoices.clearChoices();
+
+                    cboLegalChoices.setChoices(
+                        options,
+                        'value',
+                        'label',
+                        true
+                    );
+
+                }
+            });
+
         });
     </script>
 @endsection

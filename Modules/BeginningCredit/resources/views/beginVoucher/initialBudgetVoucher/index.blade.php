@@ -7,7 +7,6 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -19,7 +18,7 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.initial.voucher') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.credit') }}</a>
                             </li>
                         </ol>
                     </div>
@@ -28,20 +27,27 @@
         </div>
     </div>
     <!-- end page title -->
+
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="year">{{ __('menus.year') }}</label>
-                            <select class="form-control" name="year" id="year" required>
-                                <option value="">{{ __('forms.search...') }}</option>
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
 
-                                @foreach ($module as $md)
-                                    <option value="{{ $md->id }}" {{ request('year') == $md->id ? 'selected' : '' }}>
-                                        {{ $md->year }}</option>
-                                @endforeach
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
                             </select>
                         </div>
 
@@ -60,7 +66,6 @@
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>
@@ -106,20 +111,4 @@
         }
     </script>
     {!! $dataTable->scripts() !!}
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-
-    <!-- Custom logic for BeginCredit loading -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('year');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-    </script>
 @endsection

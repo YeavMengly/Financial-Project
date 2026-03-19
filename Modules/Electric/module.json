@@ -1,0 +1,11 @@
+{
+    "name": "Electric",
+    "alias": "electric",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Electric\\App\\Providers\\ElectricServiceProvider"
+    ],
+    "files": []
+}

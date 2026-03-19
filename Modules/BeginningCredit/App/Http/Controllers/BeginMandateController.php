@@ -5,14 +5,14 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 use App\DataTables\AnnualOpen\InitialBudgetMandateDataTable;
 use App\DataTables\BeginMandateDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\AccountSub;
-use App\Models\BeginCredit\Agency;
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginCreditMandate;
 use App\Models\BeginCredit\BeginMandate;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetMandate;
-use App\Models\Program;
-use App\Models\ProgramSub;
+use App\Models\Content\Program;
+use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -178,7 +178,11 @@ class BeginMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('beginMandate.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('beginMandate.index', $params);
+            }
+
+            return redirect()->route('beginMandate.create', $params);
         } catch (\Exception $e) {
 
             DB::rollBack();

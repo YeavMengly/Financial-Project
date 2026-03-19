@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('ministries', function (Blueprint $table) {
             $table->id();
             $table->integer('no');
-            $table->string('year')->unique();
+            $table->unsignedBigInteger("year");
             $table->string('title');
             $table->string('refer');
             $table->string('name');
+            $table->enum('status', ['todo', 'done'])->default('todo');
+            $table->integer('is_archived')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

@@ -8,6 +8,7 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -54,46 +55,31 @@
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($accountSub as $item)
                                     <option value="{{ $item->no }}">
-                                        {{ $item->no }}-
-                                        {{ $item->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="program">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="program" id="program">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($voucherLoan as $item)
-                                    <option value="{{ $item->id }}">
                                         {{ $item->no }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <!-- Description -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="description">{{ __('menus.description') }}</label>
-                            <input type="text" class="form-control" name="description"
-                                value="{{ request('description') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
-
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
-                            <input type="date" class="form-control" name="start_date"
-                                value="{{ request('start_date') }}" />
+                            <input type="text" id="start_date" name="date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" name="start_date"
+                                value="{{ request('start_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
                         <!-- End Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
-                            <input type="date" class="form-control" name="end_date" value="{{ request('end_date') }}" />
+                            <input type="text" id="end_date" name="date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" name="end_date"
+                                value="{{ request('end_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
                             <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
                             <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
@@ -179,7 +165,7 @@
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
@@ -190,32 +176,34 @@
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
         });
+    </script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script>
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        if (startDateInput) {
+            flatpickr(startDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: startDateInput.value || null
+            });
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('program');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
+        if (endDateInput) {
+            flatpickr(endDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: endDateInput.value || null
             });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('task_type');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
+        }
     </script>
 @endsection

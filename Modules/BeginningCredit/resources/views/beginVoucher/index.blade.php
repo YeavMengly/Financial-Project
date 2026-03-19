@@ -17,7 +17,6 @@
                 <h4 class="mb-sm-0 font-size-18">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"> {{ __('menus.credit') }}</li>
-                        <li class="breadcrumb-item">{{ __('menus.initial.voucher') }}</li>
                     </ol>
                 </h4>
                 <div class="page-title-right">
@@ -32,7 +31,7 @@
             </div>
         </div>
     </div>
-    <!-- end page title -->
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -51,11 +50,23 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <select class="form-control" name="accountSub" id="accountSub">
+                            <select class="form-control" name="chapter" id="chapter">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($accountSub as $as)
+                                @foreach ($chapter as $ch)
+                                    <option value="{{ $ch->no }}"
+                                        {{ request('chapter') == $ch->no ? 'selected' : '' }}>
+                                        {{ $ch->no }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <select class="form-control" name="account" id="account">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($account as $as)
                                     <option value="{{ $as->no }}"
-                                        {{ request('accountSub') == $as->id ? 'selected' : '' }}>
+                                        {{ request('account') == $as->no ? 'selected' : '' }}>
                                         {{ $as->no }}
                                     </option>
                                 @endforeach
@@ -63,23 +74,35 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" name="no" value="{{ request('no') }}"
-                                placeholder="{{ __('menus.cluster') }}" />
+                            <select class="form-control" name="accountSub" id="accountSub">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($accountSub as $as)
+                                    <option value="{{ $as->no }}"
+                                        {{ request('accountSub') == $as->no ? 'selected' : '' }}>
+                                        {{ $as->no }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="txtDescription"
-                                value="{{ request('txtDescription') }}" placeholder="{{ __('menus.description') }}" />
-                        </div>
+                        <div class="col-sm-3 d-flex align-items-center gap-2">
+                            <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
+                                <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
+                            </button>
 
-                        <div class="col-sm-3">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger ms-2" style="width: 80px;">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                                <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
+                            </a>
+
+                            <a href="{{ route(
+                                'beginVoucher.export',
+                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                            ) }}"
+                                class="btn btn-success d-flex align-items-center px-3">
+                                <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -151,33 +174,44 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const agencyNumber = document.getElementById('agency');
-            const agencyNumberChoices = new Choices(agencyNumber, {
+            const agency = document.getElementById('agency');
+            const agencyChoices = new Choices(agency, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសអង្គភាព',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const subAccountNumber = document.getElementById('accountSub');
-            const subAccountNumberChoices = new Choices(subAccountNumber, {
+            const chapter = document.getElementById('chapter');
+            const chapterChoices = new Choices(chapter, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសជំពូក',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const program = document.getElementById('program');
-            const programChoices = new Choices(program, {
+            const account = document.getElementById('account');
+            const accountChoices = new Choices(account, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountSub = document.getElementById('accountSub');
+            const accountSubChoices = new Choices(accountSub, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
@@ -185,21 +219,6 @@
 
         document.getElementById('btnReset').addEventListener('click', function() {
             document.getElementById('filter').reset();
-        });
-
-        $('#cboCategory').change(function() {
-            var cateId = $(this).val();
-            $.ajax({
-                url: '{!! route('document.by.category_id') !!}',
-                type: 'get',
-                global: false,
-                data: {
-                    cate_id: cateId
-                },
-                success: function(data) {
-                    $('#cboCategorySub').html(data);
-                }
-            });
         });
     </script>
 @endsection

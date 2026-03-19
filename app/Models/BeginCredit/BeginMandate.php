@@ -2,6 +2,9 @@
 
 namespace App\Models\BeginCredit;
 
+use App\Models\Content\AccountSub;
+use App\Models\Content\Agency;
+use App\Models\Content\Ministry;
 use App\Models\Loans\BudgetMandateLoan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +16,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class BeginMandate extends Model
 {
-       use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity;
 
     protected $fillable = [
         'ministry_id',
@@ -23,6 +26,7 @@ class BeginMandate extends Model
         'chapter_id',
         'account_id',
         'account_sub_id',
+        'cluster_id',
         'no',
         'txtDescription',
         'fin_law',
@@ -68,10 +72,10 @@ class BeginMandate extends Model
     /**
      * Get the loans this beginMandate belongs to.
      */
-    // public function loans()
-    // {
-    //     return $this->belongsTo(BudgetMandateLoan::class, 'account_sub_id', 'id');
-    // }
+    public function loans()
+    {
+        return $this->hasOne(BudgetMandateLoan::class, 'account_sub_id', 'id');
+    }
 
     /* -----------------------------------------------------------------
      |  Activity Log Configuration
@@ -115,8 +119,7 @@ class BeginMandate extends Model
     {
         $agent = new Agent();
         $browser = $agent->browser();
-
-        $activity->default_field = "{$this->subAccountNumber}";
+        $activity->default_field = "{$this->name}";
         $activity->log_name = trans('menus.beginning.credit');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();
