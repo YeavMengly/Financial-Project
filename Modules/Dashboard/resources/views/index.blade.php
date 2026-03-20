@@ -378,7 +378,7 @@
 
                     <div class="row align-items-center">
                         <div class="col-sm">
-                            <div id="wallet-balance" data-colors='["#d91b1b", "#52c41a", "#faad14"]' class="apex-charts">
+                            <div id="wallet-balance" data-colors='["#310ef5","#fae605","#d91b1b" ]' class="apex-charts">
                             </div>
                         </div>
                         <div class="col-sm align-self-center">
@@ -386,7 +386,7 @@
                                 <div>
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#faad14"></i>
+                                            style="color:#310ef5"></i>
                                         {{ __('tables.th.financeLaw') }}
                                     </p>
                                     <h6>
@@ -398,7 +398,7 @@
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#52c41a"></i>
+                                            style="color:#fae605"></i>
                                         បាន/កំពុង {{ __('tables.th.apply') }}
                                     </p>
                                     <h6>
@@ -513,7 +513,7 @@
                             </div>
                         </div>
                         <div class="col-sm">
-                            <div id="Expense-Type" data-colors='["#faad14","#2200ff","#1fad12" ,"#f6ff00" ]'
+                            <div id="Expense-Type" data-colors='["#1fad12" ,"#f6ff00","#faad14","#2200ff"]'
                                 class="apex-charts">
                             </div>
                         </div>
@@ -1532,14 +1532,14 @@
                     height: 260
                 },
                 series: [
+                    {{ round($percent_fin_law, 2) }},
                     {{ round($percent_credit, 2) }},
                     {{ round($percent_deadline_balance, 2) }},
-                    {{ round($percent_fin_law, 2) }}
                 ],
                 labels: [
-                    "{{ __('tables.th.deadline_balance') }}",
+                    "{{ __('tables.th.financeLaw') }}",
                     "បាន/កំពុង{{ __('tables.th.apply') }}",
-                    "{{ __('tables.th.financeLaw') }}"
+                    "{{ __('tables.th.deadline_balance') }}",
                 ],
                 colors: colors,
                 plotOptions: {
@@ -1594,15 +1594,15 @@
                     height: 260
                 },
                 series: [
+                    {{ round($percent_advance_Payment, 2) }},
+                    {{ round($percent_Payment, 2) }},
                     {{ round($percent_expenditure_Guarantee, 2) }},
                     {{ round($percent_direct_Payment, 2) }},
-                    {{ round($percent_advance_Payment, 2) }},
-                    {{ round($percent_Payment, 2) }}
                 ],
                 labels: [
-                    "ធានាចំណាយ",
-                    "ទូទាត់",
                     "បុរេប្រទាន",
+                    "ទូទាត់",
+                    "ធានាចំណាយ",
                     "ទូទាត់",
                     // "បើកផ្ដល់មុន",
                 ],

@@ -121,7 +121,7 @@
 
                             <a href="{{ route(
                                 'budgetVoucher.export',
-                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription','cboExpenseType','subAccountNumber'])),
                             ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
