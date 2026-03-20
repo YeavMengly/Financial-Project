@@ -893,6 +893,7 @@ class BudgetMandateController extends Controller
                 ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastMandater?->budget ?? 0;
+            $beginCredit->expense_type_id = $lastMandater?->expense_type_id ?? 0;
             $beginCredit->save();
 
             DB::commit();
@@ -1010,6 +1011,7 @@ class BudgetMandateController extends Controller
                 ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastMandater?->budget ?? 0;
+            $beginCredit->expense_type_id = $lastMandater?->expense_type_id ?? 0;
             $beginCredit->save();
 
             DB::commit();
