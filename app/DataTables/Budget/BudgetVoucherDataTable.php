@@ -102,6 +102,11 @@ class BudgetVoucherDataTable extends DataTable
             $model->where('budget_vouchers.is_archived', 2);
         }
 
+        if ($request->cboAccountSub) {
+            $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+        }
+
+
         $model->leftJoin('account_subs', function ($join) use ($id) {
             $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
                 ->where('account_subs.ministry_id', '=', $id);
@@ -162,12 +167,10 @@ class BudgetVoucherDataTable extends DataTable
             ])
             ->ajax([
                 'data' => 'function(d) {
-                    d.agency     = $("#agency").val();
-                    d.no    = $("#no").val();
-                    d.accountSub = $("#accountSub").val();
                     d.cboTodo = $("#cboTodo").val();
                     d.cboStatus = $("#cboStatus").val();
-                      d.cboExpenseType = $("#cboExpenseType").val();
+                    d.cboExpenseType = $("#cboExpenseType").val();
+                    d.cboAccountSub = $("#cboAccountSub").val();
                 }',
             ])
             ->initComplete('function () {

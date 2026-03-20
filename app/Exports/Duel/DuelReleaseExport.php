@@ -45,13 +45,13 @@ class DuelReleaseExport
             ' ឆ្នាំ ' . $currentYear;
 
         // stock_number at A4
-        if ($first) {
-            $sheet->setCellValue(
-                'A7',
-                'ការិយាល័យផ្គត់ផ្គង់' .
-                    ($first->stock_number ?? '')
-            );
-        }
+        // if ($first) {
+        //     $sheet->setCellValue(
+        //         'A7',
+        //         'ការិយាល័យផ្គត់ផ្គង់' .
+        //             ($first->stock_number ?? '')
+        //     );
+        // }
 
         // big centered date text at row 8
         $row = 8;
@@ -172,7 +172,7 @@ class DuelReleaseExport
             }
 
             // 5) Apply border + alignment for the whole detail row
-            $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
                 'font' => [
                     'size' => 9,
                 ],
@@ -207,7 +207,7 @@ class DuelReleaseExport
         $sheet->setCellValue("J{$row}", $totalDO);
         $sheet->setCellValue("M{$row}", $totalMO);
 
-        $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
+        $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 9,
@@ -235,17 +235,17 @@ class DuelReleaseExport
         |   G–H → ឆ្មាំឃ្លាំង
         |--------------------------------------------------------
         */
-        // $row += 2;
+        $row += 2;
 
-        // $sheet->mergeCells("A{$row}:B{$row}");
-        // $sheet->mergeCells("C{$row}:D{$row}");
-        // $sheet->mergeCells("E{$row}:F{$row}");
-        // $sheet->mergeCells("G{$row}:H{$row}");
+        $sheet->mergeCells("A{$row}:B{$row}");
+        $sheet->mergeCells("C{$row}:D{$row}");
+        $sheet->mergeCells("E{$row}:F{$row}");
+        $sheet->mergeCells("G{$row}:H{$row}");
 
-        // $sheet->setCellValue("A{$row}", 'ប្រធាននាយកដ្ឋាន ');
-        // $sheet->setCellValue("C{$row}", 'ប្រធានការិយាល័យ ');
-        // $sheet->setCellValue("E{$row}", 'អ្នកប្រគល់ ');
-        // $sheet->setCellValue("G{$row}", 'ឆ្មាំឃ្លាំង ');
+        $sheet->setCellValue("A{$row}", 'ប្រធាននាយកដ្ឋាន ');
+        $sheet->setCellValue("C{$row}", 'ប្រធានការិយាល័យ ');
+        $sheet->setCellValue("E{$row}", 'អ្នកប្រគល់ ');
+        $sheet->setCellValue("G{$row}", 'ឆ្មាំឃ្លាំង ');
 
         $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
             'font' => [

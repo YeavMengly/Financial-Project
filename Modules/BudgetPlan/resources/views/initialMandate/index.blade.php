@@ -14,10 +14,9 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">    {{ __('menus.expenditure.guarantee') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.guarantee') }}</h4>
 
                 <div class="page-title-right">
-
                 </div>
 
             </div>
@@ -30,7 +29,7 @@
                     <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
-                            <select class="form-control" id="cboTodo" name="cboTodo">
+                            <select class="form-select" id="cboTodo" name="cboTodo">
                                 <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
                                 <option value="2" selected>កំពុងធ្វើ</option>
                                 <option value="3">បានបញ្ចប់</option>
@@ -74,6 +73,8 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -106,6 +107,36 @@
                 });
             }
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: '',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: '',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+
+    <script>
+        $('#cboTodo, #cboStatus').on('change keyup', function() {
+            $('#initialmandate-table').DataTable().ajax.reload();
+        });
     </script>
     {!! $dataTable->scripts() !!}
 @endsection

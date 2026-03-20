@@ -8,7 +8,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.cluster') }}
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.content.cluster') }}
                 </h4>
 
                 <div class="page-title-right">
@@ -18,7 +18,8 @@
                             </li>
                             <li class="breadcrumb-item active"><a href="javascript: void(0);">{{ __('menus.credit') }}</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.cluster') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.cluster') }}</a>
+                            </li>
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>
                     </div>

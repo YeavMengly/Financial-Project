@@ -146,8 +146,8 @@
                                             <thead>
                                                 <tr>
                                                     <th>{{ __('forms.item.name') }}</th>
-                                                    <th width="240">{{ __('forms.quantity') }} / លីត្រ</th>
-                                                    <th width="240">{{ __('forms.price') }}​/ លីត្រ</th>
+                                                    <th width="240">{{ __('forms.quantity') }} (លីត្រ)</th>
+                                                    <th width="240">{{ __('forms.price') }} (លីត្រ)</th>
                                                     <th width="80">Action</th>
                                                 </tr>
                                             </thead>
