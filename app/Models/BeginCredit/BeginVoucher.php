@@ -43,6 +43,7 @@ class BeginVoucher extends Model
         'credit',
         'law_average',
         'law_correction',
+        'expense_type_id'
     ];
     protected $dates = ['deleted_at'];
 
