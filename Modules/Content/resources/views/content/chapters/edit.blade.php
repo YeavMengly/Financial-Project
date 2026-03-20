@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.chapters') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.content.chapters') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -11,9 +11,9 @@
                             <li class="breadcrumb-item"><a
                                     href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $ministry->year }}</span></a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.chapters') }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.chapters') }}</a>
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>
@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('chapters.update', ['params' => $params, 'id' => $module->id]) }}"
+                        action="{{ route('chapters.update', ['params' => $params, 'id' => $chapter->id]) }}"
                         autocomplete="off">
                         @csrf
                         <div class="row">

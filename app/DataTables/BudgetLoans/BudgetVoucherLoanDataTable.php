@@ -74,8 +74,8 @@ class BudgetVoucherLoanDataTable extends DataTable
             $model->where('budget_voucher_loans.agency_id', $request->cboAgency);
         }
 
-        if ($request->subAccountNumber) {
-            $model->where('budget_voucher_loans.account_sub_id', $request->subAccountNumber);
+        if ($request->cboAccountSub) {
+            $model->where('budget_voucher_loans.account_sub_id', $request->cboAccountSub);
         }
 
         if ($request->start_date) {
@@ -124,7 +124,7 @@ class BudgetVoucherLoanDataTable extends DataTable
             ->ajax([
                 'data' => 'function(d) {
                     d.cboAgency = $("#cboAgency").val();
-                    d.subAccountNumber = $("#subAccountNumber").val();
+                    d.cboAccountSub = $("#cboAccountSub").val();
                 }',
             ])
             ->initComplete('function () {

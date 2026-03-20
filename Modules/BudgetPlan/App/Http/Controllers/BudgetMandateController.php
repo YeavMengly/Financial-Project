@@ -62,12 +62,14 @@ class BudgetMandateController extends Controller
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
         $expenseType = ExpenseType::where('id', 1)->get();
+        $accountSub = AccountSub::where('ministry_id', $data->id)->get();
         $agency = Agency::all();
         $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
 
         return $dataTable->render('budgetplan::budgetAdvancePayment.index', [
             'data' => $data,
             'params' => $params,
+            'accountSub' => $accountSub,
             'expenseType' => $expenseType,
             'agency' => $agency,
             'budgetMandate' => $budgetMandate
@@ -523,6 +525,7 @@ class BudgetMandateController extends Controller
                 ->latest()->first();
 
             $beginMandate->apply = $lastMandate?->budget ?? 0;
+            $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
             $beginMandate->save();
 
             DB::commit();
@@ -647,6 +650,7 @@ class BudgetMandateController extends Controller
                 ->latest()->first();
 
             $beginMandate->apply = $lastMandate?->budget ?? 0;
+            $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
             $beginMandate->save();
 
             DB::commit();
@@ -1256,43 +1260,41 @@ class BudgetMandateController extends Controller
     public function export(Request $request, $params)
     {
         try {
+
             $ministryId = decode_params($params);
 
-            $query = BeginMandate::query()
-                ->leftJoin('budget_mandate_loans', 'begin_mandates.account_sub_id', '=', 'budget_mandate_loans.account_sub_id')
-                ->where('begin_mandates.ministry_id', $ministryId)
-                ->select(
-                    'begin_mandates.*',
-                    'budget_mandate_loans.internal_increase as loan_internal_increase',
-                    'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
-                    'budget_mandate_loans.additional_increase as loan_additional_increase',
-                    'budget_mandate_loans.total_increase as loan_total_increase',
-                    'budget_mandate_loans.decrease as loan_decrease',
-                    'budget_mandate_loans.editorial as loan_editorial'
-                );
+            $query =  BeginMandate::query();
 
+            $query->leftJoin('budget_mandate_loans', 'begin_mandates.account_sub_id', '=', 'budget_mandate_loans.account_sub_id');
+            $query->leftJoin('budget_mandates', 'begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id');
+
+            $query->where('begin_mandates.ministry_id', $ministryId);
+            $query->where('budget_mandates.ministry_id', $ministryId);
+
+            $query->where('begin_mandates.expense_type_id', 1);
+            $query->where('budget_mandates.expense_type_id', 1);
+
+            $query->where('budget_mandates.status', 'todo');
+            $query->where('budget_mandates.is_archived', 1);
+
+            $query->select(
+                'begin_mandates.*',
+                'budget_mandate_loans.internal_increase as loan_internal_increase',
+                'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
+                'budget_mandate_loans.additional_increase as loan_additional_increase',
+                'budget_mandate_loans.total_increase as loan_total_increase',
+                'budget_mandate_loans.decrease as loan_decrease',
+                'budget_mandate_loans.editorial as loan_editorial',
+
+                'budget_mandates.budget',
+                'budget_mandates.expense_type_id',
+                'begin_mandates.expense_type_id'
+            );
 
             // === Filters (PREFIX table name!) ===
-            if ($request->filled('agency')) {
-                $query->where('begin_mandates.agency_id', $request->agency);
-            }
-
-            if ($request->filled('account')) {
-                $query->where('begin_mandates.account_id', $request->account);
-            }
-
             if ($request->filled('accountSub')) {
                 $query->where('begin_mandates.account_sub_id', $request->accountSub);
             }
-
-            if ($request->filled('no')) {
-                $query->where('begin_mandates.no', 'like', "%{$request->no}%");
-            }
-
-            if ($request->filled('txtDescription')) {
-                $query->where('begin_mandates.txtDescription', 'like', "%{$request->txtDescription}%");
-            }
-
             $query->orderBy('begin_mandates.created_at', 'DESC');
 
             $data = $query->get();
@@ -1306,7 +1308,7 @@ class BudgetMandateController extends Controller
                 flash()
                     ->translate('en')
                     ->option('timeout', 2000)
-                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+                    ->error('មិនមានទិន្នន័យធានាចំណាយទេ!', 'បញ្ហា')
                     ->flash();
 
                 return redirect()->route('budgetMandate.index', $params);
@@ -1327,6 +1329,81 @@ class BudgetMandateController extends Controller
                 ->flash();
 
             return redirect()->route('budgetMandate.index', $params);
+        }
+    }
+
+    public function exportAdvancePayment(Request $request, $params)
+    {
+        try {
+
+            $ministryId = decode_params($params);
+
+            $query =  BeginMandate::query();
+
+            $query->leftJoin('budget_mandate_loans', 'begin_mandates.account_sub_id', '=', 'budget_mandate_loans.account_sub_id');
+            $query->leftJoin('budget_mandates', 'begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id');
+
+            $query->where('begin_mandates.ministry_id', $ministryId);
+            $query->where('budget_mandates.ministry_id', $ministryId);
+
+            $query->where('begin_mandates.expense_type_id', 2);
+            $query->where('budget_mandates.expense_type_id', 2);
+
+            $query->where('budget_mandates.status', 'todo');
+            $query->where('budget_mandates.is_archived', 1);
+
+            $query->select(
+                'begin_mandates.*',
+                'budget_mandate_loans.internal_increase as loan_internal_increase',
+                'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
+                'budget_mandate_loans.additional_increase as loan_additional_increase',
+                'budget_mandate_loans.total_increase as loan_total_increase',
+                'budget_mandate_loans.decrease as loan_decrease',
+                'budget_mandate_loans.editorial as loan_editorial',
+
+                'budget_mandates.budget',
+                'budget_mandates.expense_type_id',
+                'begin_mandates.expense_type_id'
+            );
+
+            // === Filters (PREFIX table name!) ===
+            if ($request->filled('accountSub')) {
+                $query->where('begin_mandates.account_sub_id', $request->accountSub);
+            }
+            $query->orderBy('begin_mandates.created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported BeginMandate Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យបុរេប្រទានទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('budgetAdvancePayment.index', $params);
+            }
+
+            $export = new BeginMandateExport($data, $ministryId);
+
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetAdvancePayment.index', $params);
         }
     }
 }

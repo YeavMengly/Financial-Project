@@ -113,16 +113,33 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
     <!-- Custom logic for BeginCredit loading -->
-    <script>
+     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('task_type');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
                 searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        $('#cboTodo, #cboStatus').on('change keyup', function() {
+            $('#initialvoucherloan-table').DataTable().ajax.reload();
         });
     </script>
 @endsection

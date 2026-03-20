@@ -5,7 +5,7 @@ namespace Modules\Water\App\Http\Controllers;
 use App\DataTables\Water\InitialWaterEntityDataTable;
 use App\DataTables\Water\WaterEntityDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\Province;
 use App\Models\Water\WaterEntity;
 use Illuminate\Http\RedirectResponse;

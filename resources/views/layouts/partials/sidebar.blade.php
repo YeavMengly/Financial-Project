@@ -67,8 +67,10 @@
                     $budgetPlanActive =
                         Request::routeIs('initialVoucher.*') ||
                         Request::routeIs('initialMandate.*') ||
+                        Request::routeIs('initialAdvancePayment.*') ||
                         Request::routeIs('budgetVoucher.*') ||
-                        Request::routeIs('budgetMandate.*');
+                        Request::routeIs('budgetMandate.*') ||
+                        Request::routeIs('budgetAdvancePayment.*');
                 @endphp
                 <li class="{{ $budgetPlanActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
@@ -365,7 +367,7 @@
                         <a href="{{ route('initialChapter.index') }}"
                             class="{{ Request::routeIs('initialChapter.*') ? 'active' : '' }}">
                             <i data-feather="book"></i>
-                            <span>{{ __('menus.chapters') }}</span>
+                            <span>{{ __('menus.content.chapters') }}</span>
                         </a>
                     </li>
                 @endif
@@ -395,7 +397,7 @@
                         <a href="{{ route('initialProgram.index') }}"
                             class="{{ Request::routeIs('initialProgram.*') ? 'active' : '' }}">
                             <i data-feather="layers"></i>
-                            <span>{{ __('menus.program') }}</span>
+                            <span>{{ __('menus.content.program') }}</span>
                         </a>
                     </li>
                 @endif
@@ -405,7 +407,7 @@
                         <a href="{{ route('initialAgency.index') }}"
                             class="{{ Request::routeIs('initialAgency.*') ? 'active' : '' }}">
                             <i data-feather="layers"></i>
-                            <span>{{ __('menus.agency') }}</span>
+                            <span>{{ __('menus.content.agency') }}</span>
                         </a>
                     </li>
                 @endif
@@ -415,7 +417,7 @@
                         <a href="{{ route('expenseType.index') }}"
                             class="{{ Request::routeIs('expenseType.*') ? 'active' : '' }}">
                             <i data-feather="layers" title="expense_ty"></i>
-                            <span data-key="t-dashboard">{{ __('menus.expense.type') }}</span>
+                            <span data-key="t-dashboard">{{ __('menus.content.expense.type') }}</span>
                         </a>
                     </li>
                 @endif
