@@ -50,8 +50,8 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
+                            <label class="visually-hidden" for="cboAccountSub">{{ __('menus.sub.account') }}</label>
+                            <select class="form-control" name="cboAccountSub" id="cboAccountSub">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($accountSub as $item)
                                     <option value="{{ $item->no }}">
@@ -161,8 +161,8 @@
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('cboAgency');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboAgency = document.getElementById('cboAgency');
+            const cboAgencyChoices = new Choices(cboAgency, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
@@ -172,8 +172,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('subAccountNumber');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboAccountSub = document.getElementById('cboAccountSub');
+            const cboAccountSubChoices = new Choices(cboAccountSub, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
@@ -205,5 +205,11 @@
                 defaultDate: endDateInput.value || null
             });
         }
+    </script>
+
+    <script>
+        $('#cboAccountSub, #cboAgency').on('change keyup', function() {
+            $('#budgetvoucherloan-table').DataTable().ajax.reload();
+        });
     </script>
 @endsection

@@ -32,7 +32,7 @@
                     <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
-                            <select class="form-control" id="cboTodo" name="cboTodo">
+                            <select class="form-select" id="cboTodo" name="cboTodo">
                                 <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
                                 <option value="2" selected>កំពុងធ្វើ</option>
                                 <option value="3">បានបញ្ចប់</option>
@@ -124,6 +124,35 @@
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        $('#cboTodo, #cboStatus').on('change keyup', function() {
+            $('#initialmandateloan-table').DataTable().ajax.reload();
         });
     </script>
 @endsection

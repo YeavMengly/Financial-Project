@@ -22,10 +22,10 @@
                             <li class="breadcrumb-item"><a
                                     href="javascript: void(0);"><span>{{ $ministry->year }}</span></a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.program') }}
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.program') }}
                                     <span>{{ $program->no }}</span></a>
                             </li>
-                            <li class="breadcrumb-item">{{ __('menus.program.sub') }}
+                            <li class="breadcrumb-item">{{ __('menus.content.program.sub') }}
                             </li>
                             <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>

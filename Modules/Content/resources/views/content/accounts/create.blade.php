@@ -5,7 +5,7 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
 
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.accounts') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.content.accounts') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -16,10 +16,10 @@
                             <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
                             </li>
                             <li class="breadcrumb-item"><a
-                                    href="javascript: void(0);"><span>{{ __('menus.chapters') }}</span>
+                                    href="javascript: void(0);"><span>{{ __('menus.content.chapters') }}</span>
                                     <span>{{ $chapter->no }}</span></a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.accounts') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.accounts') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>

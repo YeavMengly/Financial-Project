@@ -7,6 +7,7 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -76,6 +77,8 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -108,6 +111,35 @@
                 });
             }
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        $('#cboTodo, #cboStatus').on('change keyup', function() {
+            $('#initialduelrelease-table').DataTable().ajax.reload();
+        });
     </script>
     {!! $dataTable->scripts() !!}
 @endsection
