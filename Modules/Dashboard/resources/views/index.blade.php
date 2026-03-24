@@ -523,7 +523,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#faad14"></i>
-                                        <span class="me-3">{{ __('menus.check.control.guarantee') }}</span>
+                                        <span class="me-3">{{ __('menus.expenditure.guarantee') }}</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
                                             {{ $totalCountArch }}
                                         </button>
