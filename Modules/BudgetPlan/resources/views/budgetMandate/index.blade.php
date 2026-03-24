@@ -26,7 +26,7 @@
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.budget.plan') }}</a>
                             </li>
 
-                            <li class="breadcrumb-item active">{{ __('menus.check.control.guarantee') }}</li>
+                            <li class="breadcrumb-item active">{{ __('menus.expenditure.guarantee') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -75,7 +75,7 @@
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
-                            <input type="text" id="start_date" name="date" class="form-control"
+                            <input type="text" id="start_date" name="start_date" class="form-control"
                                 placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" name="start_date"
                                 value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
@@ -84,7 +84,7 @@
                         <!-- End Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
-                            <input type="text" id="end_date" name="date" class="form-control"
+                            <input type="text" id="end_date" name="end_date" class="form-control"
                                 placeholder="បញ្ចប់ {{ __('forms.select_date') }}" name="end_date"
                                 value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
@@ -99,7 +99,10 @@
 
                             <a href="{{ route(
                                 'budgetMandate.export',
-                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                                array_merge(
+                                    ['params' => $params],
+                                    request()->only(['cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                ),
                             ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
