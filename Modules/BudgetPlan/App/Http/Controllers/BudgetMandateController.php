@@ -44,7 +44,7 @@ class BudgetMandateController extends Controller
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
         $expenseType = ExpenseType::where('id', 1)->get();
-        $accountSub = AccountSub::where('ministry_id', $data->id)->get();
+        $accountSub = AccountSub::where('ministry_id', $data->id)->orderBy('no', 'asc')->get();
         $agency = Agency::all();
         $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
 
@@ -1281,23 +1281,39 @@ class BudgetMandateController extends Controller
 
             $query->select(
                 'begin_mandates.*',
-                'budget_mandate_loans.internal_increase as loan_internal_increase',
-                'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
-                'budget_mandate_loans.additional_increase as loan_additional_increase',
-                'budget_mandate_loans.total_increase as loan_total_increase',
-                'budget_mandate_loans.decrease as loan_decrease',
-                'budget_mandate_loans.editorial as loan_editorial',
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no',
+                'begin_mandates.txtDescription',
+                'begin_mandates.fin_law',
+                'begin_mandates.new_credit_status',
+                // 'begin_mandates.apply',
+                // 'budget_mandate_loans.internal_increase as loan_internal_increase',
+                // 'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
+                // 'budget_mandate_loans.additional_increase as loan_additional_increase',
+                // 'budget_mandate_loans.total_increase as loan_total_increase',
+                // 'budget_mandate_loans.decrease as loan_decrease',
+                // 'budget_mandate_loans.editorial as loan_editorial',
 
                 'budget_mandates.budget',
                 'budget_mandates.expense_type_id',
                 'begin_mandates.expense_type_id'
             );
 
+            // dd($query->get());
+
             // === Filters (PREFIX table name!) ===
-            if ($request->filled('accountSub')) {
-                $query->where('begin_mandates.account_sub_id', $request->accountSub);
+            if ($request->subAccountNumber) {
+                $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
+
+                $query->where('begin_mandates.expense_type_id', 1);
+                $query->where('budget_mandates.expense_type_id', 1);
+
+                $query->where('budget_mandates.status', 'todo');
+                $query->where('budget_mandates.is_archived', 1);
             }
-            $query->orderBy('begin_mandates.created_at', 'DESC');
+
+            // dd($query);
+            // $query->orderBy('begin_mandates.created_at', 'DESC');
 
             $data = $query->get();
 

@@ -31,6 +31,21 @@ class BudgetVoucherDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
             })
+            ->editColumn('transaction_date', function ($row) {
+                $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
+
+                return $active;
+            })
+            ->editColumn('request_date', function ($row) {
+                $active =  Carbon::parse($row->request_date)->format('Y-m-d');
+
+                return $active;
+            })
+            ->editColumn('legal_date', function ($row) {
+                $active =  Carbon::parse($row->legal_date)->format('Y-m-d');
+
+                return $active;
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
