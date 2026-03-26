@@ -604,12 +604,12 @@
         @foreach ($programs as $program)
             <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
                 data-program-id="{{ $program->id }}"
-                data-program-title="{{ __('menus.program') }} {{ $program->no }}">
+                data-program-title="{{ __('menus.content.program') }} {{ $program->no }}">
                 <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             <div class="text-truncate">
-                                <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
+                                <div class="text-muted small">{{ __('menus.content.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
                             <div class="ms-auto">
@@ -937,45 +937,6 @@
                 </div>
             </div>
         </div>
-        {{-- <div class="col-xl-2 col-md-6">
-            <div class="card card-h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                ប្រេងម៉ាស៊ីន
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{ $totalOil }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="{{ $qtyOil }}">
-                                    {{ number_format($qtyOil) }} <span>លីត្រ</span>
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="col-4">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="{{ $qtyOilRelease }}">
-                                    {{ number_format($qtyOilRelease) }} <span>លីត្រ</span>
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="text-nowrap">
-                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
-                        <span class="ms-1 text-muted font-size-13">Since last week</span>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-
         <div class="col-xl-2 col-md-6">
             <!-- card -->
             <div class="card card-h-100">
