@@ -514,6 +514,16 @@ class BudgetMandateController extends Controller
                 'legal_date'     => $validated['legalDate'],
             ]);
 
+            $expenseTypes = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('agency_id', $validated['cboAgency'])
+                ->pluck('expense_type_id')   // get only column
+                ->unique()                   // remove duplicate
+                ->values()                   // reset index
+                ->toArray();
+
             $this->recalculateAndSaveReport($beginMandate);
 
             $beginMandate->refresh();
@@ -525,7 +535,8 @@ class BudgetMandateController extends Controller
                 ->latest()->first();
 
             $beginMandate->apply = $lastMandate?->budget ?? 0;
-            $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
+            // $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
+            $beginMandate->expense_type_id = json_encode($expenseTypes);
             $beginMandate->save();
 
             DB::commit();
@@ -649,8 +660,20 @@ class BudgetMandateController extends Controller
                 ->where('agency_id', $validated['cboAgency'])
                 ->latest()->first();
 
+            $expenseTypes = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('agency_id', $validated['cboAgency'])
+                ->pluck('expense_type_id')   // get only column
+                ->unique()                   // remove duplicate
+                ->values()                   // reset index
+                ->toArray();                 // convert to array
+
             $beginMandate->apply = $lastMandate?->budget ?? 0;
-            $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
+            // $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
+            $beginMandate->expense_type_id = json_encode($expenseTypes);
+            $beginMandate->expense_type_id = $expenseTypes;
             $beginMandate->save();
 
             DB::commit();
@@ -1265,55 +1288,50 @@ class BudgetMandateController extends Controller
 
             $ministryId = decode_params($params);
 
-            $query =  BeginMandate::query();
+            $query = BeginMandate::query()
 
-            $query->leftJoin('budget_mandate_loans', 'begin_mandates.account_sub_id', '=', 'budget_mandate_loans.account_sub_id');
-            $query->leftJoin('budget_mandates', 'begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id');
+                ->leftJoin('budget_mandates', function ($join) {
+                    $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
+                        ->where('budget_mandates.status', 'todo')
+                        ->where('budget_mandates.is_archived', 1)
+                        ->where('budget_mandates.expense_type_id', 1);
+                })
 
-            $query->where('begin_mandates.ministry_id', $ministryId);
-            $query->where('budget_mandates.ministry_id', $ministryId);
+                ->where('begin_mandates.ministry_id', $ministryId)
+                ->where('begin_mandates.expense_type_id', 1)
 
-            $query->where('begin_mandates.expense_type_id', 1);
-            $query->where('budget_mandates.expense_type_id', 1);
+                ->select(
+                    'begin_mandates.account_sub_id',
+                    'begin_mandates.no',
+                    'begin_mandates.txtDescription',
+                    'begin_mandates.fin_law',
+                    'begin_mandates.new_credit_status',
+                    'begin_mandates.early_balance',
+                    'begin_mandates.apply',
+                )
 
-            $query->where('budget_mandates.status', 'todo');
-            $query->where('budget_mandates.is_archived', 1);
+                ->groupBy(
+                    'begin_mandates.account_sub_id',
+                    'begin_mandates.no',
+                    'begin_mandates.txtDescription',
+                    'begin_mandates.fin_law',
+                    'begin_mandates.new_credit_status',
+                    'begin_mandates.early_balance',
+                    'begin_mandates.apply'
+                );
 
-            $query->select(
-                'begin_mandates.*',
-                'begin_mandates.account_sub_id',
-                'begin_mandates.no',
-                'begin_mandates.txtDescription',
-                'begin_mandates.fin_law',
-                'begin_mandates.new_credit_status',
-                // 'begin_mandates.apply',
-                // 'budget_mandate_loans.internal_increase as loan_internal_increase',
-                // 'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
-                // 'budget_mandate_loans.additional_increase as loan_additional_increase',
-                // 'budget_mandate_loans.total_increase as loan_total_increase',
-                // 'budget_mandate_loans.decrease as loan_decrease',
-                // 'budget_mandate_loans.editorial as loan_editorial',
-
-                'budget_mandates.budget',
-                'budget_mandates.expense_type_id',
-                'begin_mandates.expense_type_id'
-            );
 
             // dd($query->get());
 
             // === Filters (PREFIX table name!) ===
-            if ($request->subAccountNumber) {
+            if ($request->filled('subAccountNumber')) {
                 $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
-
-                $query->where('begin_mandates.expense_type_id', 1);
-                $query->where('budget_mandates.expense_type_id', 1);
-
-                $query->where('budget_mandates.status', 'todo');
-                $query->where('budget_mandates.is_archived', 1);
             }
+            $query->where('budget_mandates.is_archived', 1);
+
 
             // dd($query);
-            // $query->orderBy('begin_mandates.created_at', 'DESC');
+            $query->orderBy('begin_mandates.created_at', 'DESC');
 
             $data = $query->get();
 
@@ -1356,39 +1374,44 @@ class BudgetMandateController extends Controller
 
             $ministryId = decode_params($params);
 
-            $query =  BeginMandate::query();
+            $query = BeginMandate::query()
 
-            $query->leftJoin('budget_mandate_loans', 'begin_mandates.account_sub_id', '=', 'budget_mandate_loans.account_sub_id');
-            $query->leftJoin('budget_mandates', 'begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id');
+                ->leftJoin('budget_mandates', function ($join) {
+                    $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
+                        ->where('budget_mandates.status', 'todo')
+                        ->where('budget_mandates.is_archived', 1)
+                        ->where('budget_mandates.expense_type_id', 2);
+                })
 
-            $query->where('begin_mandates.ministry_id', $ministryId);
-            $query->where('budget_mandates.ministry_id', $ministryId);
+                ->where('begin_mandates.ministry_id', $ministryId)
+                ->where('begin_mandates.expense_type_id', 2)
 
-            $query->where('begin_mandates.expense_type_id', 2);
-            $query->where('budget_mandates.expense_type_id', 2);
+                ->select(
+                    'begin_mandates.account_sub_id',
+                    'begin_mandates.no',
+                    'begin_mandates.txtDescription',
+                    'begin_mandates.fin_law',
+                    'begin_mandates.new_credit_status',
+                    'begin_mandates.early_balance',
+                    'begin_mandates.apply',
+                )
 
-            $query->where('budget_mandates.status', 'todo');
-            $query->where('budget_mandates.is_archived', 1);
+                ->groupBy(
+                    'begin_mandates.account_sub_id',
+                    'begin_mandates.no',
+                    'begin_mandates.txtDescription',
+                    'begin_mandates.fin_law',
+                    'begin_mandates.new_credit_status',
+                    'begin_mandates.early_balance',
+                    'begin_mandates.apply'
+                );
 
-            $query->select(
-                'begin_mandates.*',
-                'budget_mandate_loans.internal_increase as loan_internal_increase',
-                'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
-                'budget_mandate_loans.additional_increase as loan_additional_increase',
-                'budget_mandate_loans.total_increase as loan_total_increase',
-                'budget_mandate_loans.decrease as loan_decrease',
-                'budget_mandate_loans.editorial as loan_editorial',
-
-                'budget_mandates.budget',
-                'budget_mandates.expense_type_id',
-                'begin_mandates.expense_type_id'
-            );
 
             // === Filters (PREFIX table name!) ===
-            if ($request->filled('accountSub')) {
-                $query->where('begin_mandates.account_sub_id', $request->accountSub);
+            if ($request->filled('subAccountNumber')) {
+                $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
             }
-            $query->orderBy('begin_mandates.created_at', 'DESC');
+            $query->orderBy('begin_mandates.no', 'asc');
 
             $data = $query->get();
 
