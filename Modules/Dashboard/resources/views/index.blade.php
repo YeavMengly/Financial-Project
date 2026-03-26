@@ -993,7 +993,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        {{ __('menus.program.sub') }} <span id="clusterModalTitle"></span>
+                        {{ __('menus.content.program.sub') }} <span id="clusterModalTitle"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
