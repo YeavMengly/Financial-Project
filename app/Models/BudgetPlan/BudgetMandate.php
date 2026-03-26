@@ -50,8 +50,8 @@ class BudgetMandate extends Model
         'transaction_date' => 'date',
         'request_date' => 'date',
         'legal_date' => 'date',
+        'expense_type_id' => 'array',
     ];
-
     /* -----------------------------------------------------------------
      |  Relationships
      | -----------------------------------------------------------------

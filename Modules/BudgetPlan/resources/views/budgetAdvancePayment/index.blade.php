@@ -96,10 +96,11 @@
                             </a>
                             {{-- Export --}}
 
-                            <a href="{{ route(
-                                'budgetAdvancePayment.exportAdvancePayment',
-                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
-                            ) }}"
+                            <a id="btnExport"
+                                href="{{ route(
+                                    'budgetAdvancePayment.exportAdvancePayment',
+                                    array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                                ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
@@ -258,9 +259,24 @@
             });
         });
     </script>
+
     <script>
-        $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
+        $('#cboTodo, #cboStatus').on('change keyup', function() {
             $('#budgetadvancepayment-table').DataTable().ajax.reload();
+        });
+    </script>
+    <script>
+        $('#btnExport').on('click', function() {
+
+            let url = "{{ route('budgetAdvancePayment.exportAdvancePayment', ['params' => $params]) }}";
+
+            url += '?subAccountNumber=' + $('#subAccountNumber').val();
+            url += '&agency=' + $('#agency').val();
+            url += '&no=' + $('#no').val();
+            url += '&cboTodo=' + $('#cboTodo').val();
+            url += '&cboStatus=' + $('#cboStatus').val();
+
+            $(this).attr('href', url);
         });
     </script>
 @endsection
