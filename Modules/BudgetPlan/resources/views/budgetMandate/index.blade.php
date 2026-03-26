@@ -97,13 +97,14 @@
                             </a>
                             {{-- Export --}}
 
-                            <a href="{{ route(
-                                'budgetMandate.export',
-                                array_merge(
-                                    ['params' => $params],
-                                    request()->only(['cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
-                                ),
-                            ) }}"
+                            <a id="btnExport"
+                                href="{{ route(
+                                    'budgetMandate.export',
+                                    array_merge(
+                                        ['params' => $params],
+                                        request()->only(['cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                    ),
+                                ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
@@ -264,6 +265,21 @@
     <script>
         $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
             $('#budgetmandate-table').DataTable().ajax.reload();
+        });
+    </script>
+
+    <script>
+        $('#btnExport').on('click', function() {
+
+            let url = "{{ route('budgetMandate.export', ['params' => $params]) }}";
+
+            url += '?subAccountNumber=' + $('#subAccountNumber').val();
+            url += '&agency=' + $('#agency').val();
+            url += '&no=' + $('#no').val();
+            url += '&cboTodo=' + $('#cboTodo').val();
+            url += '&cboStatus=' + $('#cboStatus').val();
+
+            $(this).attr('href', url);
         });
     </script>
 @endsection

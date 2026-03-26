@@ -94,94 +94,94 @@ class BeginExport
             ->get()
             ->keyBy('no');
 
-        foreach ($grouped as $chapterNo => $accounts) {
+        // foreach ($grouped as $chapterNo => $accounts) {
 
-            $chapter = $chapterMap->get($chapterNo);
+        //     $chapter = $chapterMap->get($chapterNo);
 
-            $chapterTotals = $this->initTotals();
+        //     $chapterTotals = $this->initTotals();
 
-            $chapterRow = $row;
-            $sheet->setCellValue("A{$chapterRow}", $chapterNo);
-            $sheet->setCellValue("E{$chapterRow}", $chapter?->name);
-            $row++;
+        //     $chapterRow = $row;
+        //     $sheet->setCellValue("A{$chapterRow}", $chapterNo);
+        //     $sheet->setCellValue("E{$chapterRow}", $chapter?->name);
+        //     $row++;
 
-            foreach ($accounts as $accountNo => $subAccounts) {
+        //     foreach ($accounts as $accountNo => $subAccounts) {
 
-                $account = $accountMap->get($accountNo);
-                $accountTotals = $this->initTotals();
+        //         $account = $accountMap->get($accountNo);
+        //         $accountTotals = $this->initTotals();
 
-                $accountRow = $row;
-                $sheet->setCellValue("B{$accountRow}", $accountNo);
-                $sheet->setCellValue("E{$accountRow}", $account?->name);
-                $row++;
+        //         $accountRow = $row;
+        //         $sheet->setCellValue("B{$accountRow}", $accountNo);
+        //         $sheet->setCellValue("E{$accountRow}", $account?->name);
+        //         $row++;
 
-                foreach ($subAccounts as $accountSubNo => $items) {
+        //         foreach ($subAccounts as $accountSubNo => $items) {
 
-                    $accountSub = $accountSubMap->get($accountSubNo);
-                    $subTotals = $this->initTotals();
+        //             $accountSub = $accountSubMap->get($accountSubNo);
+        //             $subTotals = $this->initTotals();
 
-                    $subRow = $row;
-                    $sheet->setCellValue("C{$subRow}", $accountSubNo);
-                    $sheet->setCellValue("E{$subRow}", $accountSub?->name);
-                    $row++;
+        //             $subRow = $row;
+        //             $sheet->setCellValue("C{$subRow}", $accountSubNo);
+        //             $sheet->setCellValue("E{$subRow}", $accountSub?->name);
+        //             $row++;
 
-                    foreach ($items as $item) {
+        //             foreach ($items as $item) {
 
-                        $sheet->setCellValue("D{$row}", $item->no);
-                        $sheet->setCellValue("E{$row}", $item->txtDescription);
-                        $sheet->setCellValue("F{$row}", $item->fin_law);
-                        $sheet->setCellValue("G{$row}", $item->current_loan);
-                        $internal   = $item->loan_internal_increase   ?? 0;
-                        $unexpected = $item->loan_unexpected_increase ?? 0;
-                        $additional = $item->loan_additional_increase ?? 0;
-                        $totalInc   = $item->loan_total_increase      ?? ($internal + $unexpected + $additional);
-                        $decrease   = $item->loan_decrease            ?? 0;
-                        $editorial  = $item->loan_editorial           ?? 0;
+        //                 $sheet->setCellValue("D{$row}", $item->no);
+        //                 $sheet->setCellValue("E{$row}", $item->txtDescription);
+        //                 $sheet->setCellValue("F{$row}", $item->fin_law);
+        //                 $sheet->setCellValue("G{$row}", $item->current_loan);
+        //                 $internal   = $item->loan_internal_increase   ?? 0;
+        //                 $unexpected = $item->loan_unexpected_increase ?? 0;
+        //                 $additional = $item->loan_additional_increase ?? 0;
+        //                 $totalInc   = $item->loan_total_increase      ?? ($internal + $unexpected + $additional);
+        //                 $decrease   = $item->loan_decrease            ?? 0;
+        //                 $editorial  = $item->loan_editorial           ?? 0;
 
-                        $sheet->setCellValue("H{$row}", $internal);
-                        $sheet->setCellValue("I{$row}", $unexpected);
-                        $sheet->setCellValue("J{$row}", $additional);
-                        $sheet->setCellValue("K{$row}", $totalInc);
-                        $sheet->setCellValue("L{$row}", $decrease);
-                        $sheet->setCellValue("M{$row}", $editorial);
+        //                 $sheet->setCellValue("H{$row}", $internal);
+        //                 $sheet->setCellValue("I{$row}", $unexpected);
+        //                 $sheet->setCellValue("J{$row}", $additional);
+        //                 $sheet->setCellValue("K{$row}", $totalInc);
+        //                 $sheet->setCellValue("L{$row}", $decrease);
+        //                 $sheet->setCellValue("M{$row}", $editorial);
 
-                        $sheet->setCellValue("N{$row}", $item->new_credit_status);
-                        $sheet->setCellValue("O{$row}", $item->early_balance);
-                        $sheet->setCellValue("P{$row}", $item->apply);
-                        $sheet->setCellValue("Q{$row}", $item->deadline_balance);
-                        $sheet->setCellValue("R{$row}", $item->credit);
-                        $sheet->setCellValue("S{$row}", $item->law_average / 100);
-                        $sheet->setCellValue("T{$row}", $item->law_correction / 100);
-                        // $sheet->setCellValue("U{$row}", $item->agency_id);
-                        $values = [
-                            'fin_law'            => (float) $item->fin_law,
-                            'current_loan'       => (float) $item->current_loan,
-                            'internal_increase'  => (float) $internal,
-                            'unexpected_increase' => (float) $unexpected,
-                            'additional_increase' => (float) $additional,
-                            'total_increase'     => (float) $totalInc,
-                            'decrease'           => (float) $decrease,
-                            'editorial'          => (float) $editorial,
-                            'new_credit_status'  => (float) $item->new_credit_status,
-                            'early_balance'      => (float) $item->early_balance,
-                            'apply'              => (float) $item->apply,
-                            'deadline_balance'   => (float) $item->deadline_balance,
-                            'credit'             => (float) $item->credit,
-                            'law_average'        => (float) $item->law_average / 100,
-                            'law_correction'     => (float) $item->law_correction / 100,
-                        ];
-                        $this->addToTotals($subTotals,     $values);
-                        $this->addToTotals($accountTotals, $values);
-                        $this->addToTotals($chapterTotals, $values);
+        //                 $sheet->setCellValue("N{$row}", $item->new_credit_status);
+        //                 $sheet->setCellValue("O{$row}", $item->early_balance);
+        //                 $sheet->setCellValue("P{$row}", $item->apply);
+        //                 $sheet->setCellValue("Q{$row}", $item->deadline_balance);
+        //                 $sheet->setCellValue("R{$row}", $item->credit);
+        //                 $sheet->setCellValue("S{$row}", $item->law_average / 100);
+        //                 $sheet->setCellValue("T{$row}", $item->law_correction / 100);
+        //                 // $sheet->setCellValue("U{$row}", $item->agency_id);
+        //                 $values = [
+        //                     'fin_law'            => (float) $item->fin_law,
+        //                     'current_loan'       => (float) $item->current_loan,
+        //                     'internal_increase'  => (float) $internal,
+        //                     'unexpected_increase' => (float) $unexpected,
+        //                     'additional_increase' => (float) $additional,
+        //                     'total_increase'     => (float) $totalInc,
+        //                     'decrease'           => (float) $decrease,
+        //                     'editorial'          => (float) $editorial,
+        //                     'new_credit_status'  => (float) $item->new_credit_status,
+        //                     'early_balance'      => (float) $item->early_balance,
+        //                     'apply'              => (float) $item->apply,
+        //                     'deadline_balance'   => (float) $item->deadline_balance,
+        //                     'credit'             => (float) $item->credit,
+        //                     'law_average'        => (float) $item->law_average / 100,
+        //                     'law_correction'     => (float) $item->law_correction / 100,
+        //                 ];
+        //                 $this->addToTotals($subTotals,     $values);
+        //                 $this->addToTotals($accountTotals, $values);
+        //                 $this->addToTotals($chapterTotals, $values);
 
-                        $row++;
-                    }
-                    $this->writeTotalsRow($sheet, $subRow, $subTotals);
-                }
-                $this->writeTotalsRow($sheet, $accountRow, $accountTotals);
-            }
-            $this->writeTotalsRow($sheet, $chapterRow, $chapterTotals);
-        }
+        //                 $row++;
+        //             }
+        //             $this->writeTotalsRow($sheet, $subRow, $subTotals);
+        //         }
+        //         $this->writeTotalsRow($sheet, $accountRow, $accountTotals);
+        //     }
+        //     $this->writeTotalsRow($sheet, $chapterRow, $chapterTotals);
+        // }
 
         $totalsStyleArray = [
             'font' => [
