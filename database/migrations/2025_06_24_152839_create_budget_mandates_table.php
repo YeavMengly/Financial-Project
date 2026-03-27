@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cluster_id');
             $table->unsignedBigInteger('account_sub_id');
             $table->unsignedBigInteger('no');
+            $table->decimal('fin_law', 15, 0)->default(0);
             $table->decimal('budget', 15, 2)->default(0);
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legal_id');

@@ -88,8 +88,8 @@ class BeginMandateExport
                 $sheet->setCellValue("D{$row}", $item->txtDescription);
                 $sheet->setCellValue("E{$row}", $item->fin_law);
                 $sheet->setCellValue("F{$row}", $item->new_credit_status);
-                $sheet->setCellValue("G{$row}", $item->early_balance);
-                $sheet->setCellValue("H{$row}", $item->apply);
+                // $sheet->setCellValue("G{$row}", $item->early_balance);
+                $sheet->setCellValue("G{$row}", $item->apply);
 
                 $values = [
                     'fin_law'            => (float) $item->fin_law,
@@ -164,7 +164,7 @@ class BeginMandateExport
     {
         $sheet->setCellValue("E{$row}", $totals['fin_law']);
         $sheet->setCellValue("F{$row}", $totals['new_credit_status']);
-        $sheet->setCellValue("G{$row}", $totals['early_balance']);
-        $sheet->setCellValue("H{$row}", $totals['apply']);
+        // $sheet->setCellValue("G{$row}", $totals['early_balance']);
+        $sheet->setCellValue("G{$row}", $totals['apply']);
     }
 }
