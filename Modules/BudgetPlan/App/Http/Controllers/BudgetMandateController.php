@@ -30,7 +30,6 @@ class BudgetMandateController extends Controller
         return $dataTable->render('budgetplan::initialMandate.index');
     }
 
-
     public function getIndexAdvancePay(InitialAdvancePaymentDataTable $dataTable)
     {
         return $dataTable->render('budgetplan::initialAdvancePayment.index');
@@ -57,6 +56,7 @@ class BudgetMandateController extends Controller
             'budgetMandate' => $budgetMandate
         ]);
     }
+
     public function getIndexAdvancePayment(BudgetAdvancePaymentDataTable $dataTable, $params)
     {
         $id = decode_params($params);
@@ -75,7 +75,6 @@ class BudgetMandateController extends Controller
             'budgetMandate' => $budgetMandate
         ]);
     }
-
 
     /**
      * AJAX: Fetch program sub-options by program ID request.
@@ -499,6 +498,7 @@ class BudgetMandateController extends Controller
                 'cluster_id'       => $validated['cboCluster'],
                 'account_sub_id'   => $validated['cboSubAccount'],
                 'no'               => $beginMandate->no,
+                'fin_law'          => $beginMandate->fin_law,
                 'budget'           => $applyValue,
                 'expense_type_id'  => 1,
                 'legal_id'         => $validated['legalID'],
@@ -514,16 +514,6 @@ class BudgetMandateController extends Controller
                 'legal_date'     => $validated['legalDate'],
             ]);
 
-            $expenseTypes = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
-                ->where('program_id', $validated['cboProgram'])
-                ->where('program_sub_id', $validated['cboProgramSub'])
-                ->where('cluster_id', $validated['cboCluster'])
-                ->where('agency_id', $validated['cboAgency'])
-                ->pluck('expense_type_id')   // get only column
-                ->unique()                   // remove duplicate
-                ->values()                   // reset index
-                ->toArray();
-
             $this->recalculateAndSaveReport($beginMandate);
 
             $beginMandate->refresh();
@@ -536,7 +526,6 @@ class BudgetMandateController extends Controller
 
             $beginMandate->apply = $lastMandate?->budget ?? 0;
             // $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
-            $beginMandate->expense_type_id = json_encode($expenseTypes);
             $beginMandate->save();
 
             DB::commit();
@@ -634,6 +623,7 @@ class BudgetMandateController extends Controller
                 'program_sub_id'   => $validated['cboProgramSub'],
                 'cluster_id'       => $validated['cboCluster'],
                 'account_sub_id'   => $validated['cboSubAccount'],
+                'fin_law'               => $beginMandate->fin_law,
                 'no'               => $beginMandate->no,
                 'budget'           => $applyValue,
                 'expense_type_id'  => 2,
@@ -660,20 +650,8 @@ class BudgetMandateController extends Controller
                 ->where('agency_id', $validated['cboAgency'])
                 ->latest()->first();
 
-            $expenseTypes = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
-                ->where('program_id', $validated['cboProgram'])
-                ->where('program_sub_id', $validated['cboProgramSub'])
-                ->where('cluster_id', $validated['cboCluster'])
-                ->where('agency_id', $validated['cboAgency'])
-                ->pluck('expense_type_id')   // get only column
-                ->unique()                   // remove duplicate
-                ->values()                   // reset index
-                ->toArray();                 // convert to array
-
             $beginMandate->apply = $lastMandate?->budget ?? 0;
             // $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
-            $beginMandate->expense_type_id = json_encode($expenseTypes);
-            $beginMandate->expense_type_id = $expenseTypes;
             $beginMandate->save();
 
             DB::commit();
@@ -1288,50 +1266,39 @@ class BudgetMandateController extends Controller
 
             $ministryId = decode_params($params);
 
-            $query = BeginMandate::query()
-
-                ->leftJoin('budget_mandates', function ($join) {
+            $query = BudgetMandate::query()
+                ->leftJoin('begin_mandates', function ($join) use ($ministryId) {
                     $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
-                        ->where('budget_mandates.status', 'todo')
-                        ->where('budget_mandates.is_archived', 1)
-                        ->where('budget_mandates.expense_type_id', 1);
+                        ->on('begin_mandates.no', '=', 'budget_mandates.no')
+                        ->where('begin_mandates.ministry_id', $ministryId);
                 })
-
-                ->where('begin_mandates.ministry_id', $ministryId)
-                ->where('begin_mandates.expense_type_id', 1)
-
                 ->select(
-                    'begin_mandates.account_sub_id',
-                    'begin_mandates.no',
+                    'budget_mandates.account_sub_id',
+                    'budget_mandates.no',
                     'begin_mandates.txtDescription',
-                    'begin_mandates.fin_law',
+                    'begin_mandates.fin_law', // from main table
                     'begin_mandates.new_credit_status',
-                    'begin_mandates.early_balance',
-                    'begin_mandates.apply',
+                    // 'begin_mandates.early_balance',
+                    // 'begin_mandates.apply',
+                    DB::raw('SUM(budget_mandates.budget) as apply') // ✅ sum here
                 )
-
                 ->groupBy(
-                    'begin_mandates.account_sub_id',
-                    'begin_mandates.no',
+                    'budget_mandates.account_sub_id',
+                    'budget_mandates.no',
                     'begin_mandates.txtDescription',
                     'begin_mandates.fin_law',
                     'begin_mandates.new_credit_status',
-                    'begin_mandates.early_balance',
-                    'begin_mandates.apply'
+                    // 'budget_mandates.budget',
                 );
 
-
-            // dd($query->get());
+            $query->where('budget_mandates.expense_type_id', 1);
+            $query->where('budget_mandates.status', 'todo');
+            $query->where('budget_mandates.is_archived', 1);
 
             // === Filters (PREFIX table name!) ===
             if ($request->filled('subAccountNumber')) {
                 $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
             }
-            $query->where('budget_mandates.is_archived', 1);
-
-
-            // dd($query);
-            $query->orderBy('begin_mandates.created_at', 'DESC');
 
             $data = $query->get();
 
@@ -1374,44 +1341,39 @@ class BudgetMandateController extends Controller
 
             $ministryId = decode_params($params);
 
-            $query = BeginMandate::query()
-
-                ->leftJoin('budget_mandates', function ($join) {
+            $query = BudgetMandate::query()
+                ->leftJoin('begin_mandates', function ($join) use ($ministryId) {
                     $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
-                        ->where('budget_mandates.status', 'todo')
-                        ->where('budget_mandates.is_archived', 1)
-                        ->where('budget_mandates.expense_type_id', 2);
+                        ->on('begin_mandates.no', '=', 'budget_mandates.no')
+                        ->where('begin_mandates.ministry_id', $ministryId);
                 })
-
-                ->where('begin_mandates.ministry_id', $ministryId)
-                ->where('begin_mandates.expense_type_id', 2)
-
                 ->select(
-                    'begin_mandates.account_sub_id',
-                    'begin_mandates.no',
+                    'budget_mandates.account_sub_id',
+                    'budget_mandates.no',
                     'begin_mandates.txtDescription',
-                    'begin_mandates.fin_law',
+                    'begin_mandates.fin_law', // from main table
                     'begin_mandates.new_credit_status',
-                    'begin_mandates.early_balance',
-                    'begin_mandates.apply',
+                    // 'begin_mandates.early_balance',
+                    // 'begin_mandates.apply',
+                    DB::raw('SUM(budget_mandates.budget) as apply') // ✅ sum here
                 )
-
                 ->groupBy(
-                    'begin_mandates.account_sub_id',
-                    'begin_mandates.no',
+                    'budget_mandates.account_sub_id',
+                    'budget_mandates.no',
                     'begin_mandates.txtDescription',
                     'begin_mandates.fin_law',
                     'begin_mandates.new_credit_status',
-                    'begin_mandates.early_balance',
-                    'begin_mandates.apply'
+                    // 'budget_mandates.budget',
                 );
 
+            $query->where('budget_mandates.expense_type_id', 2);
+            $query->where('budget_mandates.status', 'todo');
+            $query->where('budget_mandates.is_archived', 1);
 
             // === Filters (PREFIX table name!) ===
             if ($request->filled('subAccountNumber')) {
                 $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
             }
-            $query->orderBy('begin_mandates.no', 'asc');
 
             $data = $query->get();
 
@@ -1420,15 +1382,15 @@ class BudgetMandateController extends Controller
                 'count'       => $data->count(),
             ]);
 
-            if ($data->isEmpty()) {
-                flash()
-                    ->translate('en')
-                    ->option('timeout', 2000)
-                    ->error('មិនមានទិន្នន័យបុរេប្រទានទេ!', 'បញ្ហា')
-                    ->flash();
+            // if ($data->isEmpty()) {
+            //     flash()
+            //         ->translate('en')
+            //         ->option('timeout', 2000)
+            //         ->error('មិនមានទិន្នន័យបុរេប្រទានទេ!', 'បញ្ហា')
+            //         ->flash();
 
-                return redirect()->route('budgetAdvancePayment.index', $params);
-            }
+            //     return redirect()->route('budgetAdvancePayment.index', $params);
+            // }
 
             $export = new BeginMandateExport($data, $ministryId);
 

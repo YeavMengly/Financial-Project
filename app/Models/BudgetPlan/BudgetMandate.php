@@ -30,6 +30,7 @@ class BudgetMandate extends Model
         'cluster_id',
         'account_sub_id',
         'no',
+        'fin_law',
         'budget',
         'expense_type_id',
         'legal_id',
