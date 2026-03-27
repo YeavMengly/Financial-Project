@@ -99,7 +99,10 @@
                             <a id="btnExport"
                                 href="{{ route(
                                     'budgetAdvancePayment.exportAdvancePayment',
-                                    array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                                    array_merge(
+                                        ['params' => $params],
+                                        request()->only(['cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                    ),
                                 ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
@@ -261,7 +264,7 @@
     </script>
 
     <script>
-        $('#cboTodo, #cboStatus').on('change keyup', function() {
+        $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
             $('#budgetadvancepayment-table').DataTable().ajax.reload();
         });
     </script>
