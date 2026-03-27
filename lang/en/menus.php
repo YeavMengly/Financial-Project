@@ -6,7 +6,7 @@ return [
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
-
+    // Inventory
     'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័ត',
@@ -19,23 +19,13 @@ return [
     'content.ministries' => 'កំណត់ឆ្នាំ',
     'content.chapters' => 'ជំពូក',
     'content.accounts' => 'គណនី',
-    'content.subaccounts' => 'អនុគណនី',
+    'content.sub.accounts' => 'អនុគណនី',
     'content.agency' => 'អង្គភាព',
     'content.cluster' => 'ចង្កោម',
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
+    'content.expense.type' => 'ប្រភេទចំណាយ',
 
-    'cluster' => 'ចង្កោម',
-    'chapters' => 'ជំពូក',
-    'accounts' => 'គណនី',
-    'sub.account' => 'អនុគណនី',
-    'number' => 'លេខ',
-    'name' => 'ឈ្មោះ',
-    'agency' => 'អង្គភាព',
-    'title' => 'ចំណងជើង',
-
-    'program' => 'កម្មវិធី',
-    'program.sub' => 'អនុកម្មវិធី',
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
     'expense.type' => 'ប្រភេទចំណាយ',
@@ -50,22 +40,10 @@ return [
     'voucher' => 'សលាកបត្រ',
     'mandate' => 'អាណត្តិ',
 
-    'begin.vouchers' => 'កំណត់ឥណទានសលាកបត្រដើមឆ្នាំ',
-    'begin.mandates' => 'កំណត់ឥណទានអាណត្តិដើមឆ្នាំ',
-
-    'payment.voucher' => 'ចុះបញ្ជីសលាកបត្រ',
-    'payment.mandate' => 'ចុះបញ្ជីអាណត្តិ',
-
-    'transfer.voucher' => 'និយ័តថវិកាសលាកបត្រ',
-    'transfer.mandate' => 'និយ័តថវិកាអាណត្តិ',
-
-    'check.control.general'   => 'ពិនិត្យរបាយការណ៍',
-    'check.control.guarantee' => 'ធានាចំណាយ',
     'expenditure.guarantee' => 'ធានាចំណាយ',
-    'payment' => 'ទូទាត់',
     'advance.payment' => 'បុរេប្រទាន',
-    'check.control.summary' => 'របាយការណ៍សង្ខេប',
-
+    'payment' => 'ទូទាត់',
+   
     'library' => 'Media Library',
     'setting' => 'ការកំណត់',
     'setting.roles' => 'តួនាទី',
@@ -78,38 +56,47 @@ return [
     'notes' => 'កំណត់ចំណាំ',
     'api.key' => 'API Key',
 
+    // Electric
     'electric' => 'អគ្គិសនី',
     'electric.entry' => 'អគ្គិសនីនាំចូល',
     'electric.entity' => 'អង្គភាពអគ្គិសនី',
+
+    // Water
     'water' => 'រដ្ឋករទឹក',
     'water.entry' => 'រដ្ឋករទឹកនាំចូល',
     'water.entity' => 'អង្គភាពរដ្ឋករទឹក',
+
     'entity' => 'អង្គភាព',
     'entry' => 'បញ្ចូល',
     'release' => 'បញ្ចេញ',
     'remain' => 'នៅសល់',
     'inventory' => 'សារពើភ័ណ្ឌ',
+
+    // Duel
     'duel' => 'ប្រេងឥន្ធនៈ',
     'duel.entry' => 'ប្រេងឥន្ធនៈនាំចូល',
     'duel.release' => 'ប្រេងឥន្ធនៈនាំចេញ',
+
+    // Material
     'material' => 'សម្ផារផ្គត់ផ្គង់',
     'material.entry' => 'សម្ផារផ្គត់ផ្គង់នាំចូល',
     'material.release' => 'សម្ផារផ្គត់ផ្គង់នាំចេញ',
+
     'year' => 'ឆ្នាំ',
     'create.year' => 'កំណត់ឆ្នាំ',
     'item.name' => 'ឈ្មោះផលិតផល',
     'company.name' => 'ឈ្មោះក្រុមហ៊ុន',
     'stock.number' => 'លេខស្តុក',
     'stock.name' => 'ឈ្មោះស្តុក',
-    'user.entry' => 'អ្នកបញ្ចូល',
-    'user.request' => 'អ្នកស្នើរសុំ',
+    'user.entry' => 'ឈ្មោះអ្នកបញ្ចូល',
+    'user.request' => 'ឈ្មោះអ្នកស្នើរសុំ',
     'receipt.number' => 'លេខបង្កាន់ដៃ',
     'agency.name' => 'ឈ្មោះអង្គភាព',
     'unit' => 'ឯកតា',
-    'quantity' => 'បរិមាណ',
-    'quantity.total' => 'បរិមាណសរុប',
-    'quantity.request' => 'បរិមាណស្នើរសុំ',
-    'price' => 'តម្លៃ',
+    'quantity' => 'បរិមាណ (លីត្រ)',
+    'quantity.total' => 'បរិមាណសរុប (លីត្រ)',
+    'quantity.request' => 'បរិមាណស្នើរសុំ (លីត្រ)',
+    'price' => 'តម្លៃ (លីត្រ)',
     'duel.total' => 'តម្លៃសរុប',
     'note' => 'កំណត់សម្គាល់',
     'refer' => 'យោងពី',

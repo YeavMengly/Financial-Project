@@ -5,7 +5,7 @@ namespace Modules\Electric\App\Http\Controllers;
 use App\DataTables\Electric\ElectricEntityDataTable;
 use App\DataTables\Electric\InitialElectricEntityDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\Electric\ElectricEntity;
 use App\Models\Province;
 use Illuminate\Http\RedirectResponse;

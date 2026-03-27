@@ -32,7 +32,7 @@
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboAgency">{{ __('menus.sub.account') }}</label>
+                            <label class="visually-hidden" for="cboAgency">{{ __('menus.agency') }}</label>
                             <select class="form-control" name="cboAgency" id="cboAgency">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($agency as $item)
@@ -44,8 +44,8 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
+                            <label class="visually-hidden" for="cboAccountSub">{{ __('menus.sub.account') }}</label>
+                            <select class="form-control" name="cboAccountSub" id="cboAccountSub">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($accountSub as $item)
                                     <option value="{{ $item->no }}">
@@ -153,11 +153,11 @@
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('subAccountNumber');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboAccountSub = document.getElementById('cboAccountSub');
+            const cboAccountSubChoices = new Choices(cboAccountSub, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
@@ -168,7 +168,7 @@
             const cboAgencyChoices = new Choices(cboAgencySelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
@@ -197,5 +197,11 @@
                 defaultDate: endDateInput.value || null
             });
         }
+    </script>
+
+     <script>
+        $('#cboAccountSub, #cboAgency').on('change keyup', function() {
+            $('#budgetmandateloan-table').DataTable().ajax.reload();
+        });
     </script>
 @endsection

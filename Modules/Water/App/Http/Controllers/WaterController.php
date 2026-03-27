@@ -5,7 +5,7 @@ namespace Modules\Water\App\Http\Controllers;
 use App\DataTables\Water\InitialWaterDataTable;
 use App\DataTables\Water\WaterDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\Province;
 use App\Exports\Water\WaterExport;
 use App\Models\Water\Water;

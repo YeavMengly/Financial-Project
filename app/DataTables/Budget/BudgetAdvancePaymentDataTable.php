@@ -32,6 +32,21 @@ class BudgetAdvancePaymentDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
             })
+             ->editColumn('transaction_date', function ($row) {
+                $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
+
+                return $active;
+            })
+             ->editColumn('request_date', function ($row) {
+                $active =  Carbon::parse($row->request_date)->format('Y-m-d');
+
+                return $active;
+            })
+             ->editColumn('legal_date', function ($row) {
+                $active =  Carbon::parse($row->legal_date)->format('Y-m-d');
+
+                return $active;
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
@@ -106,6 +121,27 @@ class BudgetAdvancePaymentDataTable extends DataTable
             $model->where('budget_mandates.expense_type_id', 2);
         }
 
+        // ===== SEARCH FILTER =====
+        if ($request->filled('subAccountNumber')) {
+            $model->where('account_subs.no', $request->subAccountNumber);
+        }
+
+        if ($request->filled('agency')) {
+            $model->where('agencies.no', 'like', '%' . $request->agency . '%');
+        }
+
+        if ($request->filled('legal_number')) {
+            $model->where('budget_mandates.legal_number', 'like', '%' . $request->legal_number . '%');
+        }
+
+        if ($request->filled('keyword')) {
+            $model->where(function ($q) use ($request) {
+                $q->where('budget_mandates.no', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('budget_mandates.description', 'like', '%' . $request->keyword . '%')
+                    ->orWhere('budget_mandates.legal_name', 'like', '%' . $request->keyword . '%');
+            });
+        }
+
         $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
                 $join->on('budget_mandates.account_sub_id', '=', 'account_subs.no')
@@ -164,7 +200,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.no    = $("#no").val();
-                d.accountSub = $("#accountSub").val();
+                d.subAccountNumber = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
                 }',

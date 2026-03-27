@@ -6,7 +6,7 @@ use App\DataTables\Electric\ElectricDataTable;
 use App\DataTables\Electric\InitialElectricDataTable;
 use App\Exports\Electric\ElectricExport;
 use App\Http\Controllers\Controller;
-use App\Models\BeginCredit\Ministry;
+use App\Models\Content\Ministry;
 use App\Models\Electric\Electric;
 use App\Models\Electric\ElectricEntity;
 use App\Models\Province;

@@ -378,7 +378,7 @@
 
                     <div class="row align-items-center">
                         <div class="col-sm">
-                            <div id="wallet-balance" data-colors='["#d91b1b", "#52c41a", "#faad14"]' class="apex-charts">
+                            <div id="wallet-balance" data-colors='["#310ef5","#fae605","#d91b1b" ]' class="apex-charts">
                             </div>
                         </div>
                         <div class="col-sm align-self-center">
@@ -386,7 +386,7 @@
                                 <div>
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#faad14"></i>
+                                            style="color:#310ef5"></i>
                                         {{ __('tables.th.financeLaw') }}
                                     </p>
                                     <h6>
@@ -398,7 +398,7 @@
                                 <div class="mt-4 pt-2">
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-2"
-                                            style="color:#52c41a"></i>
+                                            style="color:#fae605"></i>
                                         បាន/កំពុង {{ __('tables.th.apply') }}
                                     </p>
                                     <h6>
@@ -513,7 +513,7 @@
                             </div>
                         </div>
                         <div class="col-sm">
-                            <div id="Expense-Type" data-colors='["#faad14","#2200ff","#1fad12" ,"#f6ff00" ]'
+                            <div id="Expense-Type" data-colors='["#1fad12" ,"#f6ff00","#faad14","#2200ff"]'
                                 class="apex-charts">
                             </div>
                         </div>
@@ -523,7 +523,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#faad14"></i>
-                                        <span class="me-3">{{ __('menus.check.control.guarantee') }}</span>
+                                        <span class="me-3">{{ __('menus.expenditure.guarantee') }}</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
                                             {{ $totalCountArch }}
                                         </button>
@@ -604,12 +604,12 @@
         @foreach ($programs as $program)
             <div class="col-xl-3 col-lg-4 col-md-6 program-card" style="cursor:pointer"
                 data-program-id="{{ $program->id }}"
-                data-program-title="{{ __('menus.program') }} {{ $program->no }}">
+                data-program-title="{{ __('menus.content.program') }} {{ $program->no }}">
                 <div class="card card-h-100 shadow-sm border-1 ">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             <div class="text-truncate">
-                                <div class="text-muted small">{{ __('menus.program') }} <span>{{ $program->no }}</span>
+                                <div class="text-muted small">{{ __('menus.content.program') }} <span>{{ $program->no }}</span>
                                 </div>
                             </div>
                             <div class="ms-auto">
@@ -937,45 +937,6 @@
                 </div>
             </div>
         </div>
-        {{-- <div class="col-xl-2 col-md-6">
-            <div class="card card-h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
-                            <span class="text-muted lh-4 d-block text-truncate">
-                                ប្រេងម៉ាស៊ីន
-                            </span>
-                            <div class="ms-auto">
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    {{ $totalOil }}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="col-4">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="{{ $qtyOil }}">
-                                    {{ number_format($qtyOil) }} <span>លីត្រ</span>
-                                </span>
-                            </span>
-                        </div>
-
-                        <div class="col-4">
-                            <span class="mb-3">
-                                <span class="counter-value" data-target="{{ $qtyOilRelease }}">
-                                    {{ number_format($qtyOilRelease) }} <span>លីត្រ</span>
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="text-nowrap">
-                        <span class="badge bg-danger-subtle text-danger">-29 Trades</span>
-                        <span class="ms-1 text-muted font-size-13">Since last week</span>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
-
         <div class="col-xl-2 col-md-6">
             <!-- card -->
             <div class="card card-h-100">
@@ -1532,14 +1493,14 @@
                     height: 260
                 },
                 series: [
+                    {{ round($percent_fin_law, 2) }},
                     {{ round($percent_credit, 2) }},
                     {{ round($percent_deadline_balance, 2) }},
-                    {{ round($percent_fin_law, 2) }}
                 ],
                 labels: [
-                    "{{ __('tables.th.deadline_balance') }}",
+                    "{{ __('tables.th.financeLaw') }}",
                     "បាន/កំពុង{{ __('tables.th.apply') }}",
-                    "{{ __('tables.th.financeLaw') }}"
+                    "{{ __('tables.th.deadline_balance') }}",
                 ],
                 colors: colors,
                 plotOptions: {
@@ -1594,15 +1555,15 @@
                     height: 260
                 },
                 series: [
+                    {{ round($percent_advance_Payment, 2) }},
+                    {{ round($percent_Payment, 2) }},
                     {{ round($percent_expenditure_Guarantee, 2) }},
                     {{ round($percent_direct_Payment, 2) }},
-                    {{ round($percent_advance_Payment, 2) }},
-                    {{ round($percent_Payment, 2) }}
                 ],
                 labels: [
-                    "ធានាចំណាយ",
-                    "ទូទាត់",
                     "បុរេប្រទាន",
+                    "ទូទាត់",
+                    "ធានាចំណាយ",
                     "ទូទាត់",
                     // "បើកផ្ដល់មុន",
                 ],

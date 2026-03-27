@@ -503,6 +503,7 @@ class BudgetVoucherController extends Controller
                 ->latest()->first();
 
             $beginVoucher->apply = $lastVoucher?->budget ?? 0;
+            $beginVoucher->expense_type_id = $lastVoucher?->expense_type_id ?? 0;
             $beginVoucher->save();
 
             $budgetMandate->update([
@@ -891,45 +892,23 @@ class BudgetVoucherController extends Controller
                     'budget_voucher_loans.additional_increase as loan_additional_increase',
                     'budget_voucher_loans.total_increase as loan_total_increase',
                     'budget_voucher_loans.decrease as loan_decrease',
-                    'budget_voucher_loans.editorial as loan_editorial'
+                    'budget_voucher_loans.editorial as loan_editorial',
+                    'begin_vouchers.expense_type_id'
                 );
 
-            // === Filters (PREFIX table name!) ===
-            if ($request->filled('agency')) {
-                $query->where('begin_vouchers.agency_id', $request->agency);
+            // Apply Expense Type filter
+            if ($request->cboExpenseType == '1') {
+                $query->where('begin_vouchers.expense_type_id', $request->cboExpenseType);
+            } else if ($request->cboExpenseType == '2') {
+                $query->where('begin_vouchers.expense_type_id', 1);
+            } else if ($request->cboExpenseType == '3') {
+                $query->where('begin_vouchers.expense_type_id', 2);
             }
 
-            if ($request->filled('account')) {
-                $query->where('begin_vouchers.account_id', $request->account);
+            // Apply Sub Account filter
+            if ($request->filled('subAccountNumber')) {
+                $query->where('begin_vouchers.account_sub_id', $request->subAccountNumber);
             }
-
-            if ($request->filled('accountSub')) {
-                $query->where('begin_vouchers.account_sub_id', $request->accountSub);
-            }
-
-            if ($request->filled('no')) {
-                $query->where('begin_vouchers.no', 'like', "%{$request->no}%");
-            }
-
-            if ($request->filled('txtDescription')) {
-                $query->where('begin_vouchers.txtDescription', 'like', "%{$request->txtDescription}%");
-            }
-
-            // === DATE RANGE FILTER ===
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $query->whereDate('budget_vouchers.created_at', '>=', $request->start_date)
-                    ->whereDate('budget_vouchers.created_at', '<=', $request->end_date);
-            } else {
-                if ($request->filled('start_date')) {
-                    $query->whereDate('budget_vouchers.created_at', '>=', $request->start_date);
-                }
-
-                if ($request->filled('end_date')) {
-                    $query->whereDate('budget_vouchers.created_at', '<=', $request->end_date);
-                }
-            }
-            $query->orderBy('begin_vouchers.created_at', 'DESC');
-
             $data = $query->get();
 
             Log::info('Exported BeginVoucher Count', [

@@ -100,14 +100,14 @@ class ChapterController extends Controller
      */
     public function edit($params, $id)
     {
-        $id = decode_params($id);
-        $module = Ministry::where('id', decode_params($params))->first();
-        $chapter = Chapter::where('id', $id)->first();
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $chapter = Chapter::where('id', decode_params($id))
+            ->where('ministry_id', $ministry->id)->first();
 
         return view('content::content.chapters.edit')
             ->with('chapter', $chapter)
             ->with('params', $params)
-            ->with('module', $module);
+            ->with('ministry', $ministry);
     }
 
     /**
@@ -115,27 +115,43 @@ class ChapterController extends Controller
      */
     public function update(Request $request, $params, $id)
     {
-        $request->validate([
-            'no' => 'required',
-            'name' => 'required',
+        $validateData = $request->validate([
+            'no' => ['required'],
+            'name' => ['required'],
         ]);
 
-        $chapter = Chapter::where('id', $id)
-            ->where('ministry_id', decode_params($params))
-            ->first();
+        DB::beginTransaction();
 
-        $chapter->update([
-            'no' => $request->no,
-            'name' => $request->name,
-        ]);
+        try {
 
-        flash()
-            ->translate('en')
-            ->option('timeout', 2000)
-            ->success('success_msg', 'successful')
-            ->flash();
+            $chapter = Chapter::findOrfail($id);
 
-        return redirect()->route('chapters.index', $params);
+            $chapter->update([
+                'no' => $validateData['no'],
+                'name' => $validateData['name'],
+            ]);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            return redirect()->route('chapters.index', $params);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error($e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('chapters.index', $params);
+        }
     }
 
     /**

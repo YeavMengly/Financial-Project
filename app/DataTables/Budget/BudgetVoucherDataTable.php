@@ -31,6 +31,21 @@ class BudgetVoucherDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
             })
+            ->editColumn('transaction_date', function ($row) {
+                $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
+
+                return $active;
+            })
+            ->editColumn('request_date', function ($row) {
+                $active =  Carbon::parse($row->request_date)->format('Y-m-d');
+
+                return $active;
+            })
+            ->editColumn('legal_date', function ($row) {
+                $active =  Carbon::parse($row->legal_date)->format('Y-m-d');
+
+                return $active;
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 $active = $active . '<br />' . Carbon::parse($soft_delete->created_at)->format('Y-m-d  h:i:s A');
@@ -102,6 +117,11 @@ class BudgetVoucherDataTable extends DataTable
             $model->where('budget_vouchers.is_archived', 2);
         }
 
+        if ($request->cboAccountSub) {
+            $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+        }
+
+
         $model->leftJoin('account_subs', function ($join) use ($id) {
             $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
                 ->where('account_subs.ministry_id', '=', $id);
@@ -162,12 +182,10 @@ class BudgetVoucherDataTable extends DataTable
             ])
             ->ajax([
                 'data' => 'function(d) {
-                    d.agency     = $("#agency").val();
-                    d.no    = $("#no").val();
-                    d.accountSub = $("#accountSub").val();
                     d.cboTodo = $("#cboTodo").val();
                     d.cboStatus = $("#cboStatus").val();
-                      d.cboExpenseType = $("#cboExpenseType").val();
+                    d.cboExpenseType = $("#cboExpenseType").val();
+                    d.cboAccountSub = $("#cboAccountSub").val();
                 }',
             ])
             ->initComplete('function () {

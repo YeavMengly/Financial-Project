@@ -221,4 +221,10 @@
             document.getElementById('filter').reset();
         });
     </script>
+
+    <script>
+        $('#agency, #chapter, #account, #accountSub').on('change keyup', function() {
+            $('#beginvoucher-table').DataTable().ajax.reload();
+        });
+    </script>
 @endsection
