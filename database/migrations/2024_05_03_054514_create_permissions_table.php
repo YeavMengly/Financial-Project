@@ -28,21 +28,26 @@ return new class extends Migration
                 'edit'   => 'role.edit',
                 'delete' => 'role.destroy',
             ],
-            'ministries'                  => [
+
+            /**
+             *   Content
+             */
+
+            'content.ministries'                  => [
                 'view'   => 'ministries.index',
                 'create' => 'ministries.create',
                 'edit'   => 'ministries.edit',
                 'delete' => 'ministries.destroy',
             ],
 
-            'categories'                  => [
-                'view'   => 'category.index',
-                'create' => 'category.create',
-                'edit'   => 'category.edit',
-                'delete' => 'category.destroy',
-            ],
+            // 'categories'                  => [
+            //     'view'   => 'category.index',
+            //     'create' => 'category.create',
+            //     'edit'   => 'category.edit',
+            //     'delete' => 'category.destroy',
+            // ],
 
-            'chapters'                  => [
+            'content.chapters'                  => [
                 'show'   => 'initialChapter.index',
                 'view'   => 'chapters.index',
                 'create' => 'chapters.create',
@@ -50,7 +55,7 @@ return new class extends Migration
                 'delete' => 'chapters.destroy',
             ],
 
-            'accounts'                  => [
+            'content.accounts'                  => [
                 'show'   => 'initialAccount.index',
                 'view'   => 'accounts.index',
                 'create' => 'accounts.create',
@@ -58,7 +63,7 @@ return new class extends Migration
                 'delete' => 'accounts.destroy',
             ],
 
-            'sub.account'                  => [
+            'content.sub.accounts'                  => [
                 'show'   => 'initialAccountSub.index',
                 'view'   => 'accountSub.index',
                 'create' => 'accountSub.create',
@@ -66,7 +71,7 @@ return new class extends Migration
                 'delete' => 'accountSub.destroy',
             ],
 
-            'program'                  => [
+            'content.program'                  => [
                 'show'   => 'initialProgram.index',
                 'view'   => 'program.index',
                 'create' => 'program.create',
@@ -74,15 +79,21 @@ return new class extends Migration
                 'delete' => 'program.destroy',
             ],
 
-            'program.sub'                  => [
-                'show'   => 'initialProgramSub.index',
+            'content.program.sub'                  => [
                 'view'   => 'programSub.index',
                 'create' => 'programSub.create',
                 'edit'   => 'programSub.edit',
                 'delete' => 'programSub.destroy',
             ],
 
-            'agency'                  => [
+            'content.cluster'                  => [
+                'view'   => 'programSub.index',
+                'create' => 'programSub.create',
+                'edit'   => 'programSub.edit',
+                'delete' => 'programSub.destroy',
+            ],
+
+            'content.agency'                  => [
                 'show'   => 'initialAgency.index',
                 'view'   => 'agency.index',
                 'create' => 'agency.create',
@@ -90,7 +101,16 @@ return new class extends Migration
                 'delete' => 'agency.destroy',
             ],
 
-            //  For Stock Budget
+            'content.expense.type'                  => [
+                'view'   => 'expenseType.index',
+                'create' => 'expenseType.create',
+                'edit'   => 'expenseType.edit',
+                'delete' => 'expenseType.destroy',
+            ],
+
+            /**
+             *   Begin Credit
+             */
 
             'begin.vouchers'                  => [
                 'show'   => 'initialBudgetVoucher.index',
@@ -100,17 +120,19 @@ return new class extends Migration
                 'delete' => 'beginVoucher.destroy',
             ],
 
-            'begin.mandates'                  => [
-                'show'   => 'initialBudgetMandate.index',
-                'view'   => 'beginMandate.index',
-                'create' => 'beginMandate.create',
-                'edit'   => 'beginMandate.edit',
-                'delete' => 'beginMandate.destroy',
-            ],
+            // 'begin.mandates'                  => [
+            //     'show'   => 'initialBudgetMandate.index',
+            //     'view'   => 'beginMandate.index',
+            //     'create' => 'beginMandate.create',
+            //     'edit'   => 'beginMandate.edit',
+            //     'delete' => 'beginMandate.destroy',
+            // ],
 
-            // For Budget Payments
+            /**
+             *   Payment
+             */
 
-            'payment.voucher'                  => [
+            'payment'                  => [
                 'show'   => 'initialVoucher.index',
                 'view'   => 'budgetVoucher.index',
                 'create' => 'budgetVoucher.create',
@@ -118,7 +140,15 @@ return new class extends Migration
                 'delete' => 'budgetVoucher.destroy',
             ],
 
-            'payment.mandate'                  => [
+            'advance.payment'                  => [
+                'show'   => 'initialAdvancePayment.index',
+                'view'   => 'budgetAdvancePayment.index',
+                'create' => 'budgetAdvancePayment.create',
+                'edit'   => 'budgetAdvancePayment.edit',
+                'delete' => 'budgetAdvancePayment.destroy',
+            ],
+
+            'expenditure.guarantee'                  => [
                 'show'   => 'initialMandate.index',
                 'view'   => 'budgetMandate.index',
                 'create' => 'budgetMandate.create',
@@ -126,22 +156,55 @@ return new class extends Migration
                 'delete' => 'budgetMandate.destroy',
             ],
 
-            // For Budget Transfer
-
-            'transfer.voucher'                  => [
-                'show'   => 'voucherLoan.index',
-                'view'   => 'voucher.index',
-                'create' => 'voucher.create',
-                'edit'   => 'voucher.edit',
-                'delete' => 'voucher.destroy',
+            // Water
+            'water'                  => [
+                'show'   => 'initialWater.index',
+                'view'   => 'water.index',
+                'create' => 'water.create',
+                'edit'   => 'water.edit',
+                'delete' => 'water.destroy',
             ],
 
-            'transfer.mandate'                  => [
-                'show'   => 'mandateLoan.index',
-                'view'   => 'mandate.index',
-                'create' => 'mandate.create',
-                'edit'   => 'mandate.edit',
-                'delete' => 'mandate.destroy',
+            // Electric
+            'electric'                  => [
+                'show'   => 'initialElectric.index',
+                'view'   => 'electric.index',
+                'create' => 'electric.create',
+                'edit'   => 'electric.edit',
+                'delete' => 'electric.destroy',
+            ],
+
+            // Duel
+            'duel.entry'                  => [
+                'show'   => 'initialDuelEntry.index',
+                'view'   => 'duelEntry.index',
+                'create' => 'duelEntry.create',
+                'edit'   => 'duelEntry.edit',
+                'delete' => 'duelEntry.destroy',
+            ],
+
+            'duel.release'                  => [
+                'show'   => 'initialDuelRelease.index',
+                'view'   => 'duelRelease.index',
+                'create' => 'duelRelease.create',
+                'edit'   => 'duelRelease.edit',
+                'delete' => 'duelRelease.destroy',
+            ],
+
+            // Material
+            'material.entry'                  => [
+                'show'   => 'initialMaterialEntry.index',
+                'view'   => 'materialEntry.index',
+                'create' => 'materialEntry.create',
+                'edit'   => 'materialEntry.edit',
+                'delete' => 'materialEntry.destroy',
+            ],
+            'material.release'                  => [
+                'show'   => 'initialMaterialRelease.index',
+                'view'   => 'materialRelease.index',
+                'create' => 'materialRelease.create',
+                'edit'   => 'materialRelease.edit',
+                'delete' => 'materialRelease.destroy',
             ],
         ];
 
