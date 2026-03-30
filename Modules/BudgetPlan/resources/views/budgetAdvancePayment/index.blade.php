@@ -59,6 +59,19 @@
                         </div>
 
                         <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboProgram">{{ __('menus.content.program') }}</label>
+                            <select class="form-control" name="cboProgram" id="cboProgram">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($program as $p)
+                                    <option value="{{ $p->id }}"
+                                        {{ request('cboProgram') == $p->id ? 'selected' : '' }}>
+                                        {{ $p->no }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
@@ -96,12 +109,12 @@
                             </a>
                             {{-- Export --}}
 
-                            <a id="btnExport"
+                            <a id="btnExportAdvancePayment"
                                 href="{{ route(
                                     'budgetAdvancePayment.exportAdvancePayment',
                                     array_merge(
                                         ['params' => $params],
-                                        request()->only(['cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                        request()->only(['cboProgram', 'cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
                                     ),
                                 ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
@@ -144,6 +157,7 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
 
     <script>
         function confirm(url, condi) {
@@ -179,7 +193,6 @@
         }
     </script>
 
-    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script>
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
@@ -204,7 +217,6 @@
         }
     </script>
 
-    {!! $dataTable->scripts() !!}
     <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -252,34 +264,43 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('cboExpenseType');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboProgramSelect = document.getElementById('cboProgram');
+            const cboProgramChoices = new Choices(cboProgramSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer placeholder
-                searchPlaceholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer search placeholder
+                placeholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer placeholder
+                searchPlaceholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer search placeholder
                 shouldSort: false
             });
         });
     </script>
 
     <script>
-        $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
             $('#budgetadvancepayment-table').DataTable().ajax.reload();
         });
     </script>
+
     <script>
-        $('#btnExport').on('click', function() {
+        $('#btnExportAdvancePayment').on('click', function(e) {
+            e.preventDefault();
 
-            let url = "{{ route('budgetAdvancePayment.exportAdvancePayment', ['params' => $params]) }}";
+            let baseUrl = "{{ route('budgetAdvancePayment.exportAdvancePayment', ['params' => $params]) }}";
 
-            url += '?subAccountNumber=' + $('#subAccountNumber').val();
-            url += '&agency=' + $('#agency').val();
-            url += '&no=' + $('#no').val();
-            url += '&cboTodo=' + $('#cboTodo').val();
-            url += '&cboStatus=' + $('#cboStatus').val();
+            let params = new URLSearchParams({
+                cboProgram: $('#cboProgram').val(),
+                subAccountNumber: $('#subAccountNumber').val(),
+                agency: $('#agency').val(),
+                no: $('#no').val(),
+                cboTodo: $('#cboTodo').val(),
+                cboStatus: $('#cboStatus').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+            });
 
-            $(this).attr('href', url);
+            window.location.href = baseUrl + '?' + params.toString();
         });
     </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection

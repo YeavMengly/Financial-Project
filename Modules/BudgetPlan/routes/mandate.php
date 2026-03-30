@@ -23,6 +23,7 @@ Route::controller(BudgetMandateController::class)->group(function () {
     Route::post('mandate/{params}/store', 'store')->name('budgetMandate.store');
     Route::post('mandate/{params}/update/{id}', 'update')->name('budgetMandate.update');
     Route::get('mandate/{params}/restore/{id}', 'restore')->name('budgetMandate.restore');
+
     Route::get('mandate/{params}/export', 'export')->name('budgetMandate.export');
     Route::get('mandate/{params}/exportAdvancePayment', 'exportAdvancePayment')->name('budgetAdvancePayment.exportAdvancePayment');
 

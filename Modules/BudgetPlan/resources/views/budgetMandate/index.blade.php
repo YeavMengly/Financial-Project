@@ -58,7 +58,19 @@
                             </select>
                         </div>
 
-                        <!-- Sub Account Number -->
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboProgram">{{ __('menus.content.program') }}</label>
+                            <select class="form-control" name="cboProgram" id="cboProgram">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($program as $p)
+                                    <option value="{{ $p->id }}"
+                                        {{ request('cboProgram') == $p->id ? 'selected' : '' }}>
+                                        {{ $p->no }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
@@ -72,7 +84,6 @@
                             </select>
                         </div>
 
-                        <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
@@ -81,7 +92,6 @@
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <!-- End Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
@@ -95,14 +105,13 @@
                             <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                             </a>
-                            {{-- Export --}}
 
                             <a id="btnExport"
                                 href="{{ route(
                                     'budgetMandate.export',
                                     array_merge(
                                         ['params' => $params],
-                                        request()->only(['cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                        request()->only(['cboProgram','cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
                                     ),
                                 ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
@@ -143,6 +152,7 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
     <script>
@@ -179,7 +189,6 @@
         }
     </script>
 
-    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script>
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
@@ -192,7 +201,6 @@
                 defaultDate: startDateInput.value || null
             });
         }
-
         if (endDateInput) {
             flatpickr(endDateInput, {
                 dateFormat: 'Y-m-d', // value submitted to backend
@@ -204,8 +212,6 @@
         }
     </script>
 
-    {!! $dataTable->scripts() !!}
-    <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cboTodoSelect = document.getElementById('cboTodo');
@@ -252,34 +258,44 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('cboExpenseType');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboProgramSelect = document.getElementById('cboProgram');
+            const cboProgramChoices = new Choices(cboProgramSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer placeholder
-                searchPlaceholderValue: 'ជ្រើសរើស​ ប្រភេទចំណាយ', // Khmer search placeholder
+                placeholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer placeholder
+                searchPlaceholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer search placeholder
                 shouldSort: false
             });
         });
     </script>
+
     <script>
-        $('#subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
             $('#budgetmandate-table').DataTable().ajax.reload();
         });
     </script>
 
     <script>
-        $('#btnExport').on('click', function() {
+        $('#btnExport').on('click', function(e) {
+            e.preventDefault();
 
-            let url = "{{ route('budgetMandate.export', ['params' => $params]) }}";
+            let baseUrl = "{{ route('budgetMandate.export', ['params' => $params]) }}";
 
-            url += '?subAccountNumber=' + $('#subAccountNumber').val();
-            url += '&agency=' + $('#agency').val();
-            url += '&no=' + $('#no').val();
-            url += '&cboTodo=' + $('#cboTodo').val();
-            url += '&cboStatus=' + $('#cboStatus').val();
+            let params = new URLSearchParams({
+                cboProgram: $('#cboProgram').val(),
+                subAccountNumber: $('#subAccountNumber').val(),
+                agency: $('#agency').val(),
+                no: $('#no').val(),
+                cboTodo: $('#cboTodo').val(),
+                cboStatus: $('#cboStatus').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+            });
 
-            $(this).attr('href', url);
+            // ✅ Redirect with correct query string
+            window.location.href = baseUrl + '?' + params.toString();
         });
     </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection
