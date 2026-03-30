@@ -32,17 +32,17 @@ class BudgetAdvancePaymentDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0);
             })
-             ->editColumn('transaction_date', function ($row) {
+            ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
 
                 return $active;
             })
-             ->editColumn('request_date', function ($row) {
+            ->editColumn('request_date', function ($row) {
                 $active =  Carbon::parse($row->request_date)->format('Y-m-d');
 
                 return $active;
             })
-             ->editColumn('legal_date', function ($row) {
+            ->editColumn('legal_date', function ($row) {
                 $active =  Carbon::parse($row->legal_date)->format('Y-m-d');
 
                 return $active;
@@ -126,26 +126,39 @@ class BudgetAdvancePaymentDataTable extends DataTable
             $model->where('account_subs.no', $request->subAccountNumber);
         }
 
-        if ($request->filled('agency')) {
-            $model->where('agencies.no', 'like', '%' . $request->agency . '%');
+        if ($request->filled('cboProgram')) {
+            $model->where('programs.id', $request->cboProgram);
         }
 
-        if ($request->filled('legal_number')) {
-            $model->where('budget_mandates.legal_number', 'like', '%' . $request->legal_number . '%');
-        }
+        // if ($request->filled('agency')) {
+        //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
+        // }
 
-        if ($request->filled('keyword')) {
-            $model->where(function ($q) use ($request) {
-                $q->where('budget_mandates.no', 'like', '%' . $request->keyword . '%')
-                    ->orWhere('budget_mandates.description', 'like', '%' . $request->keyword . '%')
-                    ->orWhere('budget_mandates.legal_name', 'like', '%' . $request->keyword . '%');
-            });
-        }
+        // if ($request->filled('legal_number')) {
+        //     $model->where('budget_mandates.legal_number', 'like', '%' . $request->legal_number . '%');
+        // }
 
+        // if ($request->filled('keyword')) {
+        //     $model->where(function ($q) use ($request) {
+        //         $q->where('budget_mandates.no', 'like', '%' . $request->keyword . '%')
+        //             ->orWhere('budget_mandates.description', 'like', '%' . $request->keyword . '%')
+        //             ->orWhere('budget_mandates.legal_name', 'like', '%' . $request->keyword . '%');
+        //     });
+        // }
+
+        // $model->from('budget_mandates')
+        //     ->leftJoin('account_subs', function ($join) use ($id) {
+        //         $join->on('budget_mandates.account_sub_id', '=', 'account_subs.no')
+        //             ->where('account_subs.ministry_id', '=', $id);
+        //     });
         $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
                 $join->on('budget_mandates.account_sub_id', '=', 'account_subs.no')
-                    ->where('account_subs.ministry_id', '=', $id);
+                    ->where('account_subs.ministry_id', $id);
+            })
+            ->leftJoin('programs', function ($join) use ($id) {
+                $join->on('budget_mandates.program_id', '=', 'programs.id')
+                    ->where('programs.ministry_id', $id);
             });
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
@@ -199,7 +212,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
             ->ajax([
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
-                d.no    = $("#no").val();
+                d.cboProgram    = $("#cboProgram").val();
                 d.subAccountNumber = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
