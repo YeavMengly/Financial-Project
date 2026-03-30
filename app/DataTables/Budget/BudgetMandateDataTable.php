@@ -96,6 +96,7 @@ class BudgetMandateDataTable extends DataTable
         $model = $model->newQuery();
         $model->withTrashed();
 
+        // ===== Seatch filter table =====
         if ($request->cboStatus) {
             if ($request->cboStatus == '2') {
                 $model->where('budget_mandates.deleted_at', null);
@@ -121,33 +122,25 @@ class BudgetMandateDataTable extends DataTable
             $model->where('budget_mandates.expense_type_id', 1);
         }
 
-
-        // ===== SEARCH FILTER =====
         if ($request->filled('subAccountNumber')) {
             $model->where('account_subs.no', $request->subAccountNumber);
         }
 
-        // if ($request->filled('agency')) {
-        //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
-        // }
+        if ($request->filled('cboProgram')) {
+            $model->where('programs.id', $request->cboProgram);
+        }
 
-        // if ($request->filled('legal_number')) {
-        //     $model->where('budget_mandates.legal_number', 'like', '%' . $request->legal_number . '%');
-        // }
-
-        // if ($request->filled('keyword')) {
-        //     $model->where(function ($q) use ($request) {
-        //         $q->where('budget_mandates.no', 'like', '%' . $request->keyword . '%')
-        //             ->orWhere('budget_mandates.description', 'like', '%' . $request->keyword . '%')
-        //             ->orWhere('budget_mandates.legal_name', 'like', '%' . $request->keyword . '%');
-        //     });
-        // }
-
+        // ===== Left Join Table =====
         $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
                 $join->on('budget_mandates.account_sub_id', '=', 'account_subs.no')
                     ->where('account_subs.ministry_id', $id);
+            })
+            ->leftJoin('programs', function ($join) use ($id) {
+                $join->on('budget_mandates.program_id', '=', 'programs.id')
+                    ->where('programs.ministry_id', $id);
             });
+
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_mandates.expense_type_id', '=', 'expense_types.id');
@@ -162,6 +155,7 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.ministry_id',
             'agencies.no AS agency_no',
             'agencies.name AS agency_name',
+            'budget_mandates.program_id',
             'account_subs.no as account_sub_no',
             'budget_mandates.no',
             'budget_mandates.budget',
@@ -200,8 +194,8 @@ class BudgetMandateDataTable extends DataTable
             ->ajax([
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
-                d.no    = $("#no").val();
-                d.subAccountNumber  = $("#subAccountNumber").val(); // ✅ FIXED
+                d.cboProgram    = $("#cboProgram").val();
+                d.subAccountNumber  = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
                 }',
@@ -233,12 +227,10 @@ class BudgetMandateDataTable extends DataTable
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
-            // Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
-
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 
