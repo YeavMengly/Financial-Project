@@ -7,6 +7,7 @@ use App\DataTables\Budget\BudgetMandateDataTable;
 use App\DataTables\Budget\InitialAdvancePaymentDataTable;
 use App\DataTables\Budget\InitialMandateDataTable;
 use App\Exports\BeginMandateExport;
+use App\Exports\BeginguaranteeExport;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\BeginMandate;
 use App\Models\Content\AccountSub;
@@ -1315,7 +1316,7 @@ class BudgetMandateController extends Controller
                 'count'       => $data->count(),
             ]);
 
-            $export = new BeginMandateExport($data, $ministryId);
+            $export = new BeginguaranteeExport($data, $ministryId);
 
             return $export->export($request);
         } catch (\Throwable $e) {
