@@ -1,8 +1,8 @@
 @extends('layouts.master')
 @section('css')
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -72,14 +72,6 @@
                                                 <label for="item_name" class="form-label font-size-13 text-muted">
                                                     {{ __('forms.item.name') }}
                                                 </label>
-                                                {{-- <select id="cboDuel" class="form-select" name="item_name" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}">
-                                                    <option value="">{{ __('forms.search...') }}</option>
-                                                    <option value="{{ $duelRelease->item_name }}"
-                                                        {{ $duelRelease->item_name == $duelType->id ? 'selected' : '' }}>
-                                                        {{ old('item_name', $duelType->name_km) }}
-                                                    </option>
-                                                </select> --}}
                                                 <select id="cboDuel" class="form-select" name="item_name" required>
                                                     <option value="">{{ __('forms.search...') }}</option>
                                                     @foreach ($duelType as $type)
@@ -224,8 +216,9 @@
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#vNote').summernote({
@@ -298,8 +291,6 @@
         });
     </script>
     <script>
-        // existing programSubChoices definition ...
-
         $('#dropStockNumber').change(function() {
             var id = $(this).val();
             $.ajax({

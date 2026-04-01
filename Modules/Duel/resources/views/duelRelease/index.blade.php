@@ -7,8 +7,8 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -66,9 +66,9 @@
                             </button>
 
                             {{-- Reset --}}
-                            {{-- <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                            <a id="btnReset" class="btn btn-danger d-flex align-items-center px-3">
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
-                            </a> --}}
+                            </a>
 
                             {{-- Export --}}
                             <a href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
@@ -111,6 +111,8 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -144,9 +146,7 @@
             }
         }
     </script>
-    {!! $dataTable->scripts() !!}
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
@@ -170,4 +170,14 @@
             });
         }
     </script>
+
+    <script>
+        $('#btnReset').on('click', function() {
+            $('#filter')[0].reset();
+
+            $('#duelrelease-table').DataTable().ajax.reload();
+        });
+    </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection
