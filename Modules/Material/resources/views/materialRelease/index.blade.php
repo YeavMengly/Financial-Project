@@ -130,7 +130,7 @@
                             </button>
 
                             {{-- Reset --}}
-                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                            <a id="btnReset" class="btn btn-danger d-flex align-items-center px-3">
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
 
@@ -265,10 +265,12 @@
                 shouldSort: false
             });
         });
+        $('#btnReset').on('click', function() {
+            $('#filter')[0].reset();
 
-        document.getElementById('btnReset').addEventListener('click', function() {
-            document.getElementById('filter').reset();
+            $('#materialrelease-table').DataTable().ajax.reload();
         });
+
 
         $('#cboCategory').change(function() {
             var cateId = $(this).val();

@@ -34,14 +34,20 @@
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="year">{{ __('menus.year') }}</label>
-                            <select class="form-control" name="year" id="year" required>
-                                <option value="">{{ __('forms.search...') }}</option>
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
 
-                                {{-- @foreach ($module as $md)
-                                    <option value="{{ $md->id }}" {{ request('year') == $md->id ? 'selected' : '' }}>
-                                        {{ $md->year }}</option>
-                                @endforeach --}}
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
                             </select>
                         </div>
 
@@ -105,6 +111,32 @@
             }
         }
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+
     {!! $dataTable->scripts() !!}
     <!-- Choices.js (dropdowns) -->
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>

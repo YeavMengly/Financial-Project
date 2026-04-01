@@ -1,8 +1,8 @@
 @extends('layouts.master')
 @section('css')
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -209,8 +209,9 @@
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#vNote').summernote({
@@ -281,16 +282,6 @@
             });
         });
 
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     const cboItem = document.getElementById('cboItem');
-        //     const cboItemChoice = new Choices(cboItem, {
-        //         searchEnabled: true,
-        //         itemSelectText: '', // Hide "Press to select"
-        //         placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-        //         searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-        //         shouldSort: false
-        //     });
-        // });
     </script>
 
     <script>
