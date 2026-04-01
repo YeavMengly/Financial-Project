@@ -78,6 +78,8 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -111,21 +113,38 @@
             }
         }
     </script>
-    {!! $dataTable->scripts() !!}
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-    <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('year');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
                 searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+
+    <script>
+        $('#cboTodo, #cboStatus').on('change keyup', function() {
+            $('#initialmaterialentry-table').DataTable().ajax.reload();
+        });
+    </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection

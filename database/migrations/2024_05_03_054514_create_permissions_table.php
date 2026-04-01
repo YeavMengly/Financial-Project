@@ -112,7 +112,7 @@ return new class extends Migration
              *   Begin Credit
              */
 
-            'begin.vouchers'                  => [
+            'credit'                  => [
                 'show'   => 'initialBudgetVoucher.index',
                 'view'   => 'beginVoucher.index',
                 'create' => 'beginVoucher.create',
