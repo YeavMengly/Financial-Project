@@ -129,7 +129,17 @@ class BudgetAdvancePaymentDataTable extends DataTable
         if ($request->filled('cboProgram')) {
             $model->where('programs.id', $request->cboProgram);
         }
-
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+                ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+        } else {
+            if ($request->filled('start_date')) {
+                $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+            }
+            if ($request->filled('end_date')) {
+                $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+            }
+        }
         // if ($request->filled('agency')) {
         //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
         // }
@@ -216,6 +226,8 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 d.subAccountNumber = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
                 }',
             ])
             ->initComplete('function () {

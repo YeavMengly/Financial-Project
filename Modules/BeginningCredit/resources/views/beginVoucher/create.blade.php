@@ -1,6 +1,5 @@
 @extends('layouts.master')
 @section('css')
-    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
@@ -18,7 +17,8 @@
                             </li>
                             <li class="breadcrumb-item active"><a href="javascript: void(0);">{{ __('menus.credit') }}</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.cluster') }}</a></li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.cluster') }}</a>
+                            </li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -166,7 +166,6 @@
 @section('script')
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
     <script>
@@ -179,20 +178,6 @@
                 if (!valid) {
                     e.preventDefault();
                 }
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            $('#vDescription').summernote({
-                backColor: 'red',
-                height: 150,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['color', ['color']],
-                ]
             });
         });
     </script>

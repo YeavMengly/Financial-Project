@@ -41,36 +41,6 @@
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
 
-                        {{-- <div class="col-sm-3">
-                            <label for="companyName" class="form-label font-size-13 text-muted">
-                                {{ __('forms.company.name') }}
-                            </label>
-                            <select class="form-control" name="company_name" id="companyName">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($duelEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('company_name') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div> --}}
-
-                        {{-- <div class="col-sm-3">
-                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                {{ __('forms.user.entry') }}
-                            </label>
-                            <select class="form-control" name="user_entry" id="userEntry">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($duelEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('user_entry') == $item->user_entry ? 'selected' : '' }}>
-                                        {{ $item->user_entry }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div> --}}
-
                         <div class="col-sm-3">
                             {{-- <label for="unit" class="form-label font-size-13 text-muted">
                                 {{ __('forms.unit') }}
@@ -86,14 +56,6 @@
                             </select>
                         </div>
 
-                        {{-- <div class="col-sm-3">
-                            <label for="stock_number" class="form-label font-size-13 text-muted">
-                                {{ __('forms.stock.number') }}
-                            </label>
-                            <input type="text" class="form-control" name="stock_number"
-                                value="{{ request('stock_number') }}" />
-                        </div> --}}
-
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 
                             {{-- Search --}}
@@ -102,7 +64,7 @@
                             </button>
 
                             {{-- Reset --}}
-                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                            <a id="btnReset" class="btn btn-danger d-flex align-items-center px-3">
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
 
@@ -148,6 +110,8 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -181,9 +145,7 @@
             }
         }
     </script>
-    {!! $dataTable->scripts() !!}
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const companyName = document.getElementById('companyName');
@@ -218,8 +180,12 @@
             });
         });
 
-        document.getElementById('btnReset').addEventListener('click', function() {
-            document.getElementById('filter').reset();
+        $('#btnReset').on('click', function() {
+            $('#filter')[0].reset();
+
+            $('#beginvoucher-table').DataTable().ajax.reload();
         });
     </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection

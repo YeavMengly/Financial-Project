@@ -164,8 +164,8 @@
 @endsection
 @section('script')
     <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         const dateInput = document.getElementById('date');
         if (dateInput) {

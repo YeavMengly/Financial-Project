@@ -1,8 +1,8 @@
 @extends('layouts.master')
 @section('css')
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <!-- start page title -->
@@ -78,7 +78,8 @@
 
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
-                                                <label for="quantity_request">{{ __('forms.quantity.request') }} / លីត្រ</label>
+                                                <label for="quantity_request">{{ __('forms.quantity.request') }} /
+                                                    លីត្រ</label>
                                                 <input type="text" name="quantity_request" required class="form-control"
                                                     data-pristine-required-message="{{ __('messages.required') }}" />
                                                 @error('quantity_request')
@@ -217,8 +218,9 @@
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#vNote').summernote({
@@ -322,4 +324,5 @@
             });
         });
     </script>
+
 @endsection

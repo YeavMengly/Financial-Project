@@ -87,8 +87,8 @@
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
-                            <input type="text" id="start_date" name="date" class="form-control"
-                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" name="start_date"
+                            <input type="text" id="start_date" name="start_date" class="form-control"
+                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" 
                                 value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
@@ -96,8 +96,8 @@
                         <!-- End Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
-                            <input type="text" id="end_date" name="date" class="form-control"
-                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}" name="end_date"
+                            <input type="text" id="end_date" name="end_date" class="form-control"
+                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}"  
                                 value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
@@ -276,7 +276,7 @@
     </script>
 
     <script>
-        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus').on('change keyup', function() {
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date').on('change keyup', function() {
             $('#budgetadvancepayment-table').DataTable().ajax.reload();
         });
     </script>
