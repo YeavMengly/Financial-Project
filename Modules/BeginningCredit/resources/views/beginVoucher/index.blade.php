@@ -90,7 +90,7 @@
                                 <i class="bi bi-search me-1"></i> {{ __('buttons.search') }}
                             </button>
 
-                            <a href="{{ url()->current() }}" class="btn btn-danger d-flex align-items-center px-3">
+                            <a id="btnReset" class="btn btn-danger d-flex align-items-center px-3">
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
 
@@ -136,6 +136,7 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -169,9 +170,7 @@
             }
         }
     </script>
-    {!! $dataTable->scripts() !!}
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const agency = document.getElementById('agency');
@@ -216,15 +215,23 @@
                 shouldSort: false
             });
         });
-
-        document.getElementById('btnReset').addEventListener('click', function() {
-            document.getElementById('filter').reset();
-        });
     </script>
 
     <script>
+        // Filters reload
         $('#agency, #chapter, #account, #accountSub').on('change keyup', function() {
             $('#beginvoucher-table').DataTable().ajax.reload();
         });
+
+        // Reset button
+        $('#btnReset').on('click', function() {
+            $('#filter')[0].reset();
+
+            $('#agency, #chapter, #account, #accountSub').val('').trigger('change');
+
+            $('#beginvoucher-table').DataTable().ajax.reload();
+        });
     </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection
