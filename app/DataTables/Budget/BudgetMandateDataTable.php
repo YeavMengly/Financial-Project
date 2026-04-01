@@ -129,7 +129,17 @@ class BudgetMandateDataTable extends DataTable
         if ($request->filled('cboProgram')) {
             $model->where('programs.id', $request->cboProgram);
         }
-
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+                ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+        } else {
+            if ($request->filled('start_date')) {
+                $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+            }
+            if ($request->filled('end_date')) {
+                $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+            }
+        }
         // ===== Left Join Table =====
         $model->from('budget_mandates')
             ->leftJoin('account_subs', function ($join) use ($id) {
@@ -198,6 +208,8 @@ class BudgetMandateDataTable extends DataTable
                 d.subAccountNumber  = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
                 }',
             ])
             ->initComplete('function () {
