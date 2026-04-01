@@ -322,7 +322,6 @@ class BeginVoucherController extends Controller
             $this->ResavedData($beginCredit);
             $this->ResavedDataMandate($BeginMandate);
 
-
             DB::commit();
 
             flash()

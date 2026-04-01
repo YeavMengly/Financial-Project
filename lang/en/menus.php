@@ -43,7 +43,7 @@ return [
     'expenditure.guarantee' => 'ធានាចំណាយ',
     'advance.payment' => 'បុរេប្រទាន',
     'payment' => 'ទូទាត់',
-   
+
     'library' => 'Media Library',
     'setting' => 'ការកំណត់',
     'setting.roles' => 'តួនាទី',
