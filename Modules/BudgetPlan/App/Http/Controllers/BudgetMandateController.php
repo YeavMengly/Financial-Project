@@ -1302,13 +1302,51 @@ class BudgetMandateController extends Controller
             $query->where('budget_mandates.is_archived', 1);
 
             // === Filters (PREFIX table name!) ===
+            // Account
             if ($request->filled('subAccountNumber')) {
                 $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
             }
+            // program
             if ($request->filled('cboProgram')) {
                 $query->where('begin_mandates.program_id', $request->cboProgram);
             }
-
+            // Date
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+                    ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+                }
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+                }
+            }
+            //status
+            if ($request->cboStatus) {
+                if ($request->cboStatus == '2') {
+                    $query->where('budget_mandates.deleted_at', null);
+                } elseif ($request->cboStatus == '3') {
+                    $query->where('budget_mandates.deleted_at', '!=', null);
+                } else {
+                    $query->withTrashed();
+                }
+            } else {
+                $query->where('budget_mandates.deleted_at', null);
+            }
+            //To do
+            if ($request->cboTodo) {
+                if ($request->cboTodo == 2) {
+                    $query->where('budget_mandates.is_archived', 1);
+                    $query->where('budget_mandates.expense_type_id', 1);
+                } elseif ($request->cboTodo == 3) {
+                    $query->where('budget_mandates.is_archived', 2);
+                    $query->where('budget_mandates.expense_type_id', 1);
+                }
+            } else {
+                $query->where('budget_mandates.is_archived', 1);
+                $query->where('budget_mandates.expense_type_id', 1);
+            }
             $data = $query->get();
 
             Log::info('Exported BeginMandate Count', [
@@ -1375,6 +1413,43 @@ class BudgetMandateController extends Controller
             }
             if ($request->filled('cboProgram')) {
                 $query->where('begin_mandates.program_id', $request->cboProgram);
+            }
+            // Date
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+                    ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+                }
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+                }
+            }
+            //status
+            if ($request->cboStatus) {
+                if ($request->cboStatus == '2') {
+                    $query->where('budget_mandates.deleted_at', null);
+                } elseif ($request->cboStatus == '3') {
+                    $query->where('budget_mandates.deleted_at', '!=', null);
+                } else {
+                    $query->withTrashed();
+                }
+            } else {
+                $query->where('budget_mandates.deleted_at', null);
+            }
+            //To do
+            if ($request->cboTodo) {
+                if ($request->cboTodo == 2) {
+                    $query->where('budget_mandates.is_archived', 1);
+                    $query->where('budget_mandates.expense_type_id', 2);
+                } elseif ($request->cboTodo == 3) {
+                    $query->where('budget_mandates.is_archived', 2);
+                    $query->where('budget_mandates.expense_type_id', 2);
+                }
+            } else {
+                $query->where('budget_mandates.is_archived', 1);
+                $query->where('budget_mandates.expense_type_id', 2);
             }
 
             $data = $query->get();
