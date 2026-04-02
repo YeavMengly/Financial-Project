@@ -50,6 +50,7 @@ Route::controller(BudgetMandateController::class)->group(function () {
     Route::get('advance/payment/get-by-program/program-subs', 'getByProgramId')->name('budgetAdvancePayment.by.program_sub');
     Route::get('advance/payment/get-by-program/agencies', 'getByAgency')->name('budgetAdvancePayment.by.agency');
     Route::get('advance/payment/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetAdvancePayment.by.cluster');
+
     // These routes are for edit page ajax request
     Route::get('advance/payment/edit-by-program/program-subs', 'editByProgramId')->name('budgetAdvancePayment.edit.program_sub');
     Route::get('advance/payment/edit-by-program/agencies', 'editByAgency')->name('budgetAdvancePayment.edit.agency');
