@@ -381,9 +381,18 @@
                 const credit = toNumber(document.getElementById('credit')?.textContent);
                 const deadline = toNumber(document.getElementById('deadline_balance')?.textContent);
 
+                // setText('applying', apply);
+                // setText('remaining_credit', Math.max(credit - apply, 0));
+                // setText('deadline_balance', Math.max(deadline - apply, 0));
+
+                setText('deadline_balance', Math.max(deadline, 0));
                 setText('applying', apply);
-                setText('remaining_credit', Math.max(credit - apply, 0));
-                setText('deadline_balance', Math.max(deadline - apply, 0));
+
+                if (apply == budgetInput) {
+                    setText('remaining_credit', Math.max(credit, 0));
+                } else {
+                    setText('remaining_credit', Math.max(credit - apply, 0));
+                }
             }
 
             function getSelections() {
@@ -452,152 +461,114 @@
         });
     </script>
     {{-- <script>
-        /* ---------- helpers ---------- */
-        function initChoicesOnce(selectEl, opts = {}) {
-            if (!selectEl) return null;
-            if (selectEl.dataset.choicesInit === '1') return null;
-            selectEl.dataset.choicesInit = '1';
+        document.addEventListener('DOMContentLoaded', () => {
 
-            return new Choices(selectEl, Object.assign({
-                searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false
-            }, opts));
-        }
-
-        const n = v => (isNaN(+v) ? 0 : +v);
-
-        const fmt = v => n(v).toLocaleString('en-US', {
-            maximumFractionDigits: 2
-        });
-
-        function setText(id, val) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = fmt(val);
-        }
-
-        function resetNumbers() {
-            [
-                'fin_law',
-                'credit_movement',
-                'new_credit_status',
-                'credit',
-                'deadline_balance',
-                'applying',
-                'remaining_credit'
-            ].forEach(id => setText(id, 0));
-        }
-
-        function loadEditValues() {
-
-            if (!window.editData) return;
-
-            setText('fin_law', editData.fin_law);
-            setText('credit_movement', editData.credit_movement);
-            setText('new_credit_status', editData.new_credit_status);
-            setText('credit', editData.credit);
-            setText('deadline_balance', editData.deadline_balance);
-            setText('applying', editData.applying);
-
-            const remaining = editData.credit - editData.applying;
-            setText('remaining_credit', remaining);
-        }
-
-        /* ---------- init when DOM ready ---------- */
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const form = document.getElementById('pristine-valid-example');
-
+            // عناصر (elements)
             const cboProgram = document.getElementById('cboProgram');
             const cboProgramSub = document.getElementById('cboProgramSub');
             const cboCluster = document.getElementById('cboCluster');
             const cboSubAccount = document.getElementById('cboSubAccount');
-
             const budgetInput = document.getElementById('budget');
 
+            const ENDPOINT = "{{ route('budgetMandate.getEarlyBalance', ['params' => $params]) }}";
 
-            const earlyEP = "{{ route('budgetMandate.editEarlyBalance', ['params' => $params]) }}";
+            // ✅ Store original values from API
+            let originalBalances = {
+                fin_law: 0,
+                credit_movement: 0,
+                new_credit_status: 0,
+                credit: 0,
+                deadline: 0
+            };
 
-            /* ---------- Pristine validation ---------- */
-            if (form) {
-                const pristine = new Pristine(form);
+            // =========================
+            // Helper functions
+            // =========================
+            function toNumber(v) {
+                v = (v || '').toString().replace(/,/g, '');
+                return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
+            }
 
-                form.addEventListener('submit', function(e) {
-                    if (!pristine.validate()) {
-                        e.preventDefault();
-                    }
+            function formatNumber(v) {
+                return toNumber(v).toLocaleString('en-US', {
+                    maximumFractionDigits: 2
                 });
             }
 
-            /* ---------- Summernote ---------- */
-            if (window.jQuery) {
-                jQuery('#vDescription').summernote({
-                    height: 150,
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['color', ['color']]
-                    ]
-                });
+            function setText(id, val) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = formatNumber(val);
             }
 
-            /* ---------- Choices ---------- */
-            initChoicesOnce(cboSubAccount, {
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...'
-            });
+            function resetBalances() {
+                Object.keys(originalBalances).forEach(k => originalBalances[k] = 0);
 
-            /* ---------- recompute remaining credit ---------- */
+                [
+                    'fin_law',
+                    'credit_movement',
+                    'new_credit_status',
+                    'credit',
+                    'deadline_balance',
+                    'applying',
+                    'remaining_credit'
+                ].forEach(id => setText(id, 0));
+            }
+
+            // =========================
+            // Recompute values
+            // =========================
             function recomputeRemaining() {
+                const apply = toNumber(budgetInput?.value);
 
-                const apply = n(budgetInput?.value);
-
-                const credit = n(
-                    (document.getElementById('credit')?.textContent || '0')
-                    .replace(/,/g, '')
-                );
-
-                const deadline = n(
-                    (document.getElementById('deadline_balance')?.textContent || '0')
-                    .replace(/,/g, '')
-                );
+                const credit = originalBalances.credit;
+                const deadline = originalBalances.deadline;
 
                 setText('applying', apply);
 
+                // remaining credit
                 const remaining = Math.max(credit - apply, 0);
                 setText('remaining_credit', remaining);
 
+                // deadline balance after applying
                 const newDeadline = Math.max(deadline - apply, 0);
                 setText('deadline_balance', newDeadline);
-
-                if (credit - apply < 0) {
-                    budgetInput.value = '';
-                }
             }
 
-            /* ---------- fetch early balance ---------- */
-            async function fetchEarlyBalance() {
+            // =========================
+            // Get selected values
+            // =========================
+            function getSelections() {
+                return {
+                    programId: cboProgram?.value || '',
+                    programSubId: cboProgramSub?.value || '',
+                    clusterId: cboCluster?.value || '',
+                    accountSubId: cboSubAccount?.value || ''
+                };
+            }
 
-                const programId = cboProgram?.value || '';
-                const programSubId = cboProgramSub?.value || '';
-                const clusterId = cboCluster?.value || '';
-                const accountSubId = cboSubAccount?.value || '';
+            // =========================
+            // Load data from API
+            // =========================
+            async function loadBalances() {
+                const {
+                    programId,
+                    programSubId,
+                    clusterId,
+                    accountSubId
+                } = getSelections();
 
                 if (!programId || !programSubId || !clusterId || !accountSubId) {
-                    resetNumbers();
+                    resetBalances();
                     return;
                 }
 
-                const url = new URL(earlyEP, window.location.origin);
-
-                url.searchParams.set('program_id', programId);
-                url.searchParams.set('program_sub_id', programSubId);
-                url.searchParams.set('cluster_id', clusterId);
-                url.searchParams.set('account_sub_id', accountSubId);
-
-                url.searchParams.set('mandate_id', "{{ $budgetMandate->id ?? '' }}");
-
                 try {
+                    const url = new URL(ENDPOINT, window.location.origin);
+
+                    url.searchParams.set('program_id', programId);
+                    url.searchParams.set('program_sub_id', programSubId);
+                    url.searchParams.set('cluster_id', clusterId);
+                    url.searchParams.set('account_sub_id', accountSubId);
 
                     const res = await fetch(url.toString(), {
                         headers: {
@@ -607,40 +578,55 @@
 
                     const data = await res.json();
 
-                    if (!res.ok) {
-                        throw new Error(data?.message || 'Failed');
-                    }
+                    if (!res.ok) throw new Error(data?.message || 'Failed to load balances');
 
-                    setText('fin_law', data.fin_law);
-                    setText('credit_movement', data.credit_movement);
-                    setText('new_credit_status', data.new_credit_status);
-                    setText('credit', data.credit);
-                    setText('deadline_balance', data.deadline_balance);
+                    // ✅ Store original values
+                    originalBalances.fin_law = toNumber(data.fin_law);
+                    originalBalances.credit_movement = toNumber(data.credit_movement);
+                    originalBalances.new_credit_status = toNumber(data.new_credit_status);
+                    originalBalances.credit = toNumber(data.credit);
+                    originalBalances.deadline = toNumber(data.deadline_balance);
 
-                    recomputeRemaining();
+                    // ✅ Update UI
+                    setText('fin_law', originalBalances.fin_law);
+                    setText('credit_movement', originalBalances.credit_movement);
+                    setText('new_credit_status', originalBalances.new_credit_status);
+                    setText('credit', originalBalances.credit);
+                    setText('deadline_balance', originalBalances.deadline);
+
+                    // reset computed fields
+                    setText('applying', 0);
+                    setText('remaining_credit', originalBalances.credit);
 
                 } catch (err) {
                     console.error(err);
-                    resetNumbers();
+                    resetBalances();
                 }
             }
 
-            /* ---------- dropdown change events ---------- */
-            cboProgram?.addEventListener('change', fetchEarlyBalance);
-            cboProgramSub?.addEventListener('change', fetchEarlyBalance);
-            cboCluster?.addEventListener('change', fetchEarlyBalance);
-            cboSubAccount?.addEventListener('change', fetchEarlyBalance);
+            // =========================
+            // Events
+            // =========================
 
-            /* ---------- budget input change ---------- */
-            budgetInput?.addEventListener('input', recomputeRemaining);
+            // Load on page start
+            loadBalances();
 
-            /* ---------- IMPORTANT: Load balances when editing ---------- */
-            setTimeout(() => {
+            // Reload when dropdown changes
+            [cboProgram, cboProgramSub, cboCluster, cboSubAccount].forEach(el => {
+                el?.addEventListener('change', loadBalances);
+            });
 
-                fetchEarlyBalance(); // load existing balances
-                recomputeRemaining(); // recompute using saved budget
+            // Update when typing
+            budgetInput?.addEventListener('input', function() {
+                let val = toNumber(this.value);
 
-            }, 150);
+                // جلوگیری از مقدار بیشتر از credit
+                if (val > originalBalances.credit) {
+                    this.value = originalBalances.credit;
+                }
+
+                recomputeRemaining();
+            });
 
         });
     </script> --}}
