@@ -338,60 +338,20 @@ class BudgetMandateController extends Controller
         ]);
     }
 
-    // public function editEarlyBalance(Request $request, $params)
-    // {
-    //     $ministryId = decode_params($params);
-
-    //     $request->validate([
-    //         'account_sub_id' => 'required',
-    //         'program_id'     => 'required',
-    //         'program_sub_id' => 'required',
-    //         'cluster_id'     => 'required',
-    //     ]);
-
-    //     $beginMandate = BeginMandate::with('loans')
-    //         ->where('ministry_id', $ministryId)
-    //         ->where('program_id', $request->program_id)
-    //         ->where('program_sub_id', $request->program_sub_id)
-    //         ->where('cluster_id', $request->cluster_id)
-    //         ->where('account_sub_id', $request->account_sub_id)
-    //         ->first();
-
-    //     if (!$beginMandate) {
-    //         return response()->json([
-    //             'fin_law'           => 0,
-    //             'credit_movement'   => 0,
-    //             'new_credit_status' => 0,
-    //             'credit'            => 0,
-    //             'deadline_balance'  => 0,
-    //             'exists'            => false,
-    //             'message'           => 'No mandate data found for this selection.'
-    //         ]);
-    //     }
-
-    //     $loan = $beginMandate->loans;
-
-    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
-
-    //     return response()->json([
-    //         'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
-    //         'credit_movement'   => (float) $credit_movement,
-    //         'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
-    //         'credit'            => (float) ($beginMandate->credit ?? 0),
-    //         'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
-    //         'exists'            => true,
-    //     ]);
-    // }
     public function editEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
 
-        $request->validate([
+        $validated = $request->validate([
             'account_sub_id' => 'required',
             'program_id'     => 'required',
             'program_sub_id' => 'required',
             'cluster_id'     => 'required',
         ]);
+
+        if (!$validated) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
 
         $beginMandate = BeginMandate::with('loans')
             ->where('ministry_id', $ministryId)
@@ -531,7 +491,6 @@ class BudgetMandateController extends Controller
                 ->latest()->first();
 
             $beginMandate->apply = $lastMandate?->budget ?? 0;
-            // $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
             $beginMandate->save();
 
             DB::commit();
@@ -568,7 +527,6 @@ class BudgetMandateController extends Controller
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'budget'          => 'required|numeric|min:0',
-            // 'cboExpenseType'       => 'required',
             'txtDescription'  => 'required',
             'attachments'     => 'nullable|array',
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
@@ -657,7 +615,6 @@ class BudgetMandateController extends Controller
                 ->latest()->first();
 
             $beginMandate->apply = $lastMandate?->budget ?? 0;
-            // $beginMandate->expense_type_id = $lastMandate?->expense_type_id ?? 0;
             $beginMandate->save();
 
             DB::commit();
@@ -822,7 +779,6 @@ class BudgetMandateController extends Controller
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'budget'          => 'numeric|min:0',
-            // 'cboExpenseType'       => 'required',
             'txtDescription'  => 'required',
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
@@ -879,7 +835,6 @@ class BudgetMandateController extends Controller
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no'             => $beginCredit->no,
                 'budget'         => $applyValue,
-                // 'expense_type_id'      => $validated['cboExpenseType'],
                 'legal_id'      => $validated['legalID'],
                 'legal_number'      => $validated['legalNumber'],
                 'legal_name'      => $validated['legalName'],
@@ -900,7 +855,6 @@ class BudgetMandateController extends Controller
                 ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastMandater?->budget ?? 0;
-            $beginCredit->expense_type_id = $lastMandater?->expense_type_id ?? 0;
             $beginCredit->save();
 
             DB::commit();
@@ -940,7 +894,6 @@ class BudgetMandateController extends Controller
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'budget'          => 'numeric|min:0',
-            // 'cboExpenseType'       => 'required',
             'txtDescription'  => 'required',
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
@@ -997,7 +950,6 @@ class BudgetMandateController extends Controller
                 'account_sub_id' => $validated['cboSubAccount'],
                 'no'             => $beginCredit->no,
                 'budget'         => $applyValue,
-                // 'expense_type_id'      => $validated['cboExpenseType'],
                 'legal_id'      => $validated['legalID'],
                 'legal_number'      => $validated['legalNumber'],
                 'legal_name'      => $validated['legalName'],
@@ -1018,7 +970,6 @@ class BudgetMandateController extends Controller
                 ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)->latest()->first();
             $beginCredit->apply = $lastMandater?->budget ?? 0;
-            $beginCredit->expense_type_id = $lastMandater?->expense_type_id ?? 0;
             $beginCredit->save();
 
             DB::commit();

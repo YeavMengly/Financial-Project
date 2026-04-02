@@ -359,7 +359,7 @@
             });
         });
     </script>
-     <script>
+    <script>
         // ---------- helpers ----------
         function initChoicesOnce(selectEl, opts = {}) {
             if (!selectEl) return null;
