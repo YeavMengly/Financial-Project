@@ -121,7 +121,18 @@ class BudgetVoucherDataTable extends DataTable
             $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
         }
 
-
+        //Date
+        // if ($request->filled('start_date') && $request->filled('end_date')) {
+        //     $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
+        //         ->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
+        // } else {
+        //     if ($request->filled('start_date')) {
+        //         $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
+        //     }
+        //     if ($request->filled('end_date')) {
+        //         $model->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
+        //     }
+        // }
         $model->leftJoin('account_subs', function ($join) use ($id) {
             $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
                 ->where('account_subs.ministry_id', '=', $id);
@@ -129,14 +140,19 @@ class BudgetVoucherDataTable extends DataTable
         $model->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_vouchers.expense_type_id', '=', 'expense_types.id');
 
-        if ($request->cboExpenseType) {
-            if ($request->cboExpenseType == 2) {
+
+        if ($request->filled('cboExpenseType')) {
+            $expenseType = intval($request->cboExpenseType); // ensure integer
+
+            if ($expenseType === 2) {
                 $model->where('budget_vouchers.expense_type_id', 1);
-            } elseif ($request->cboExpenseType == 3) {
+            } elseif ($expenseType === 3) {
                 $model->where('budget_vouchers.expense_type_id', 2);
+            } elseif ($expenseType === 1) {
+                // Only filter if the value is positive and valid
+                $model->where('budget_vouchers.expense_type_id', $expenseType);
             }
-        } else {
-            $model->where('budget_vouchers.expense_type_id', 1);
+            // If $expenseType <= 0, skip filtering
         }
 
         // ===== FIXED CONDITION =====
@@ -186,6 +202,8 @@ class BudgetVoucherDataTable extends DataTable
                     d.cboStatus = $("#cboStatus").val();
                     d.cboExpenseType = $("#cboExpenseType").val();
                     d.cboAccountSub = $("#cboAccountSub").val();
+                    d.start_date = $("#start_date").val();
+                    d.end_date = $("#end_date").val();
                 }',
             ])
             ->initComplete('function () {
