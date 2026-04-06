@@ -881,34 +881,102 @@ class BudgetVoucherController extends Controller
         try {
             $ministryId = decode_params($params);
 
-            // Base JOIN query
-            $query = BeginVoucher::query()
-                ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
-                ->where('begin_vouchers.ministry_id', $ministryId)
-                ->select(
-                    'begin_vouchers.*',
-                    'budget_voucher_loans.internal_increase as loan_internal_increase',
-                    'budget_voucher_loans.unexpected_increase as loan_unexpected_increase',
-                    'budget_voucher_loans.additional_increase as loan_additional_increase',
-                    'budget_voucher_loans.total_increase as loan_total_increase',
-                    'budget_voucher_loans.decrease as loan_decrease',
-                    'budget_voucher_loans.editorial as loan_editorial',
-                    'begin_vouchers.expense_type_id'
-                );
+            $query = BudgetVoucher::query();
 
-            // Apply Expense Type filter
-            if ($request->cboExpenseType == '1') {
-                $query->where('begin_vouchers.expense_type_id', $request->cboExpenseType);
-            } else if ($request->cboExpenseType == '2') {
-                $query->where('begin_vouchers.expense_type_id', 1);
-            } else if ($request->cboExpenseType == '3') {
-                $query->where('begin_vouchers.expense_type_id', 2);
-            }
+            $query->leftJoin('begin_vouchers', function ($join) use ($ministryId) {
+                $join->on('budget_vouchers.account_sub_id', '=', 'begin_vouchers.account_sub_id')
+                    ->on('budget_vouchers.no', '=', 'begin_vouchers.no')
+                    ->where('begin_vouchers.ministry_id', $ministryId);
+            });
 
-            // Apply Sub Account filter
-            if ($request->filled('subAccountNumber')) {
-                $query->where('begin_vouchers.account_sub_id', $request->subAccountNumber);
+            $query->select(
+                'budget_vouchers.program_id',
+                'budget_vouchers.account_sub_id',
+                'begin_vouchers.account_id',
+                'begin_vouchers.chapter_id',
+                'budget_vouchers.no',
+                'begin_vouchers.txtDescription',
+                'begin_vouchers.fin_law',
+                'begin_vouchers.new_credit_status',
+                'begin_vouchers.deadline_balance',
+                'begin_vouchers.current_loan',
+                'begin_vouchers.new_credit_status',
+                'begin_vouchers.early_balance',
+                'begin_vouchers.credit',
+                'begin_vouchers.law_average',
+                'begin_vouchers.law_correction',
+                DB::raw('SUM(budget_vouchers.budget) as apply')
+            );
+            $query->groupBy(
+                'budget_vouchers.program_id',
+                'budget_vouchers.account_sub_id',
+                'begin_vouchers.account_id',
+                'begin_vouchers.chapter_id',
+                'budget_vouchers.no',
+                'begin_vouchers.txtDescription',
+                'begin_vouchers.fin_law',
+                'begin_vouchers.new_credit_status',
+                'begin_vouchers.deadline_balance',
+                'begin_vouchers.current_loan',
+                'begin_vouchers.new_credit_status',
+                'begin_vouchers.early_balance',
+                'begin_vouchers.credit',
+                'begin_vouchers.law_average',
+                'begin_vouchers.law_correction',
+            );
+            
+            // Expense Type filter
+            if ($request->filled('cboExpenseType')) {
+                $expenseType = intval($request->cboExpenseType); // ensure integer
+
+                if ($expenseType === 2) {
+                    $query->where('budget_vouchers.expense_type_id', 1);
+                } elseif ($expenseType === 3) {
+                    $query->where('budget_vouchers.expense_type_id', 2);
+                } elseif ($expenseType === 1) {
+                    $query->where('budget_vouchers.expense_type_id', $expenseType);
+                }
             }
+            // Sub Account filter
+            if ($request->filled('cboAccountSub')) {
+                $query->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+            }
+            //status
+            if ($request->cboStatus) {
+                if ($request->cboStatus == '2') {
+                    $query->where('budget_vouchers.deleted_at', null);
+                } elseif ($request->cboStatus == '3') {
+                    $query->where('budget_vouchers.deleted_at','!=',null);
+                } else {
+                    $query->withTrashed();
+                }
+            } else {
+                $query->where('budget_vouchers.deleted_at', null);
+            }
+            //To do
+            if ($request->cboTodo) {
+                if ($request->cboTodo == 2) {
+                    $query->where('budget_vouchers.is_archived', 1);
+                } elseif ($request->cboTodo == 3) {
+                    $query->where('budget_vouchers.is_archived', 2);
+                }
+            } else {
+                $query->where('budget_vouchers.is_archived', 2);
+            }
+            //Date
+            // if ($request->filled('start_date') && $request->filled('end_date')) {
+            //     $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
+            //         ->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
+            // } else {
+            //     if ($request->filled('start_date')) {
+            //         $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
+            //     }
+            //     if ($request->filled('end_date')) {
+            //         $query->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
+            //     }
+            // }
+
+
             $data = $query->get();
 
             Log::info('Exported BeginVoucher Count', [
@@ -916,17 +984,6 @@ class BudgetVoucherController extends Controller
                 'count'       => $data->count(),
             ]);
 
-            if ($data->isEmpty()) {
-                flash()
-                    ->translate('en')
-                    ->option('timeout', 2000)
-                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
-                    ->flash();
-
-                return redirect()->route('budgetVoucher.index', $params);
-            }
-
-            // Pass filtered data + ministry id into export
             $export = new BeginExport($data, $ministryId);
 
             return $export->export($request);
