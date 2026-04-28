@@ -924,7 +924,7 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.law_average',
                 'begin_vouchers.law_correction',
             );
-            
+
             // Expense Type filter
             if ($request->filled('cboExpenseType')) {
                 $expenseType = intval($request->cboExpenseType); // ensure integer
@@ -942,16 +942,20 @@ class BudgetVoucherController extends Controller
                 $query->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
             }
             //status
-            if ($request->cboStatus) {
+            if ($request->has('cboStatus')) {
                 if ($request->cboStatus == '2') {
-                    $query->where('budget_vouchers.deleted_at', null);
+                    // Only non-deleted
+                    $query->whereNull('budget_vouchers.deleted_at');
                 } elseif ($request->cboStatus == '3') {
-                    $query->where('budget_vouchers.deleted_at','!=',null);
+                    // Only deleted
+                    $query->onlyTrashed();
                 } else {
+                    // All records
                     $query->withTrashed();
                 }
             } else {
-                $query->where('budget_vouchers.deleted_at', null);
+                // Default: non-deleted
+                $query->whereNull('budget_vouchers.deleted_at');
             }
             //To do
             if ($request->cboTodo) {
