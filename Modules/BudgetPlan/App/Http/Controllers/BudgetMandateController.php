@@ -705,7 +705,7 @@ class BudgetMandateController extends Controller
             ->with('beginMandate', $beginMandate)
             ->with('module', $module);
     }
-
+ 
     public function editAdvancePayment($params, $id)
     {
         $id = decode_params($id);

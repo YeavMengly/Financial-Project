@@ -9,7 +9,7 @@ Route::middleware('PermissionCheck')
         Route::get('mandate/', 'getIndex')->name('initialMandate.index');
         Route::get('mandate/{params}', 'index')->name('budgetMandate.index');
         Route::get('mandate/{params}/create', 'create')->name('budgetMandate.create');
-        Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');
+        Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');  
         Route::get('mandate/{params}/destroy/{id}', 'destroy')->name('budgetMandate.destroy');
 
         Route::get('advance/payment/', 'getIndexAdvancePay')->name('initialAdvancePayment.index');
