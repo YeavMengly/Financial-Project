@@ -12,6 +12,12 @@
                         <i class="bx bx-edit"></i> {{ __('buttons.edit') }}
                     </a>
                 @endif
+                 @if (hasPermission('advancePayment.edit.doc'))
+                    <a href="{{ route('advancePayment.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item">
+                        <i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}
+                    </a>
+                @endif
                 @if (hasPermission('budgetAdvancePayment.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('budgetAdvancePayment.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
