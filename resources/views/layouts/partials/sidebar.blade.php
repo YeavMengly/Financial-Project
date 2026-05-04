@@ -115,7 +115,36 @@
                                 </a>
                             </li>
                         @endif
-
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow">
+                                <i data-feather="sliders"></i>
+                                <span data-key="t-budget-plan">{{ __('menus.direct.payment') }}</span>
+                            </a>
+                            <ul>
+                                @if (hasPermission('ministries.index'))
+                                    <li>
+                                        <a href="{{ route('initialDirectPayment.expenseRecord.index') }}"
+                                            class="{{ Request::routeIs('initialDirectPayment.expenseRecord.*') ? 'active' : '' }}">
+                                            <i data-feather="file-plus"></i>
+                                            <span data-key="t-budget-control-voucher">
+                                                {{ __('menus.expense.record.book') }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endif
+                                 @if (hasPermission('ministries.index'))
+                                    <li>
+                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
+                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
+                                            <i data-feather="file-plus"></i>
+                                            <span data-key="t-budget-control-voucher">
+                                                {{ __('menus.payment.deadline') }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
 
                     </ul>
                 </li>

@@ -9,7 +9,7 @@ Route::middleware('PermissionCheck')
         Route::get('mandate/', 'getIndex')->name('initialMandate.index');
         Route::get('mandate/{params}', 'index')->name('budgetMandate.index');
         Route::get('mandate/{params}/create', 'create')->name('budgetMandate.create');
-        Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');  
+        Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');
         Route::get('mandate/{params}/destroy/{id}', 'destroy')->name('budgetMandate.destroy');
 
         Route::get('advance/payment/', 'getIndexAdvancePay')->name('initialAdvancePayment.index');
@@ -17,6 +17,12 @@ Route::middleware('PermissionCheck')
         Route::get('advance/payment/{params}/create', 'createAdvancePayment')->name('budgetAdvancePayment.create');
         Route::get('advance/payment/{params}/edit/{id}', 'editAdvancePayment')->name('budgetAdvancePayment.edit');
         Route::get('advance/payment/{params}/destroy/{id}', 'destroyAdvancePayment')->name('budgetAdvancePayment.destroy');
+
+        Route::get('direct/payment/expense-record', 'getIndexExpenseRecord')->name('initialDirectPayment.expenseRecord.index');
+        Route::get('direct/payment/expense-record/{params}', 'getIndexExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.index');
+        Route::get('direct/payment/expense-record/{params}/create', 'createExpenseRecord')->name('budgetDirectPayment.expenseRecord.create');
+        Route::get('direct/payment/expense-record/{params}/edit/{id}', 'editExpenseRecord')->name('budgetDirectPayment.expenseRecord.edit');
+        Route::get('direct/payment/expense-record/{params}/destroy/{id}', 'destroyExpenseRecord')->name('budgetDirectPayment.expenseRecord.destroy');
     });
 
 Route::controller(BudgetMandateController::class)->group(function () {
@@ -60,4 +66,8 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetAdvancePayment.getEarlyBalance');
     Route::get('advance/payment/{params}/edit-early-balance', 'editEarlyBalance')
         ->name('budgetAdvancePayment.editEarlyBalance');
+
+    Route::post('direct/payment/expense-record/{params}/store', 'storeExpenseRecord')->name('budgetDirectPayment.expenseRecord.store');
+    Route::post('direct/payment/expense-record/{params}/update/{id}', 'updateExpenseRecord')->name('budgetDirectPayment.expenseRecord.update');
+    Route::get('direct/payment/expense-record/{params}/restore/{id}', 'restoreExpenseRecord')->name('budgetDirectPayment.expenseRecord.restore');
 });

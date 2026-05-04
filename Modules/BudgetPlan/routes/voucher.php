@@ -17,6 +17,11 @@ Route::middleware('PermissionCheck')
 
         Route::get('voucher/{params}/edit-early-balance', 'editEarlyBalance')
             ->name('budgetVoucher.editEarlyBalance');
+
+        Route::get('direct/payment/payment-deadline/', 'getPaymentDeadline')->name('initialDirectPayment.paymentDeadline.index');
+        Route::get('direct/payment/payment-deadline/{params}', 'indexPaymentDeadline')->name('budgetDirectPayment.paymentDeadline.index');
+        Route::get('direct/payment/payment-deadline/{params}/create', 'createPaymentDeadline')->name('budgetDirectPayment.paymentDeadline.create');
+        Route::get('direct/payment/payment-deadline/{params}/edit/{id}', 'editPaymentDeadline')->name('budgetDirectPayment.paymentDeadline.edit');
     });
 
 Route::controller(BudgetVoucherController::class)->group(function () {

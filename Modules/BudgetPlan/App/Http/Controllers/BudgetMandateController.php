@@ -4,7 +4,9 @@ namespace Modules\BudgetPlan\App\Http\Controllers;
 
 use App\DataTables\Budget\BudgetAdvancePaymentDataTable;
 use App\DataTables\Budget\BudgetMandateDataTable;
+use App\DataTables\Budget\BudgetDirectPaymentDataTable;
 use App\DataTables\Budget\InitialAdvancePaymentDataTable;
+use App\DataTables\Budget\InitialDirectPaymentDataTable;
 use App\DataTables\Budget\InitialMandateDataTable;
 use App\Exports\BeginMandateExport;
 use App\Exports\BeginguaranteeExport;
@@ -34,6 +36,10 @@ class BudgetMandateController extends Controller
     public function getIndexAdvancePay(InitialAdvancePaymentDataTable $dataTable)
     {
         return $dataTable->render('budgetplan::initialAdvancePayment.index');
+    }
+    public function getIndexExpenseRecord(InitialDirectPaymentDataTable $dataTable)
+    {
+        return $dataTable->render('budgetplan::initialDirectPayment.expenseRecord.index');
     }
 
     /**
@@ -82,6 +88,27 @@ class BudgetMandateController extends Controller
         ]);
     }
 
+    public function getIndexExpenseRecordBook(BudgetDirectPaymentDataTable $dataTable, $params)
+    {
+        $id = decode_params($params);
+        $data = Ministry::where('id', $id)->first();
+        $expenseType = ExpenseType::where('id', 1)->get();
+        $program = Program::where('ministry_id', $data->id)->get();
+
+        $accountSub = AccountSub::where('ministry_id', $data->id)->get();
+        $agency = Agency::all();
+        $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
+
+        return $dataTable->render('budgetplan::budgetDirectPayment.expenseRecord.index', [
+            'data' => $data,
+            'params' => $params,
+            'program' => $program,
+            'accountSub' => $accountSub,
+            'expenseType' => $expenseType,
+            'agency' => $agency,
+            'budgetMandate' => $budgetMandate
+        ]);
+    }
     /**
      * AJAX: Fetch program sub-options by program ID request.
      */
@@ -286,6 +313,44 @@ class BudgetMandateController extends Controller
             ->get();
 
         return view('budgetplan::budgetAdvancePayment.create')
+            ->with('accountSub', $accountSub)
+            ->with('agency', $agency)
+            ->with('expenseType', $expenseType)
+            ->with('params', $params)
+            ->with('beginMandate', $beginMandate)
+            ->with('program', $program);
+    }
+
+    public function createExpenseRecord($params)
+    {
+        $id = decode_params($params);
+        $ministry = Ministry::where('id', $id)->first();
+        $agency = Agency::where('ministry_id', $ministry->id)->get();
+        $program = Program::where('ministry_id', $ministry->id)->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
+        $expenseType = ExpenseType::where('id', 1)
+            ->get();
+
+        $beginMandate = BeginMandate::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_mandates.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
+            ->where('begin_mandates.ministry_id', $ministry->id)
+            ->select(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no as mandate_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_mandates.account_sub_id')
+            ->get();
+
+        return view('budgetplan::budgetDirectPayment.expenseRecord.create')
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('expenseType', $expenseType)
@@ -638,6 +703,129 @@ class BudgetMandateController extends Controller
         }
     }
 
+    public function storeExpenseRecord(Request $request, $params)
+    {
+        $validated = $request->validate([
+            'legalID' =>   'required',
+            'paymentVoucher' => 'required',
+            'legalNumber' =>   'required',
+            'legalName' =>  'required',
+            'cboProgram'       => 'required',
+            'cboProgramSub'       => 'required',
+            'cboCluster'       => 'required',
+            'cboAgency'       => 'required',
+            'cboSubAccount'   => 'required',
+            'budget'          => 'required|numeric|min:0',
+            'txtDescription'  => 'required',
+            'attachments'     => 'nullable|array',
+            'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
+            'transactionDate'            => 'required|date',
+            'requestDate'            => 'required|date',
+            'legalDate'            => 'required|date',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $ministryId = decode_params($params);
+            $ministry   = Ministry::where('id', $ministryId)->first();
+
+            $beginMandate = BeginMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if (!$beginMandate) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្ន័យ', 'បញ្ហា')
+                    ->flash();
+
+                return back()->withInput();
+            }
+
+            $applyValue      = (float) $validated['budget'];
+            $currentCredit   = (float) ($beginMandate->credit ?? 0);
+            $remainingCredit = $currentCredit - $applyValue;
+
+            if ($remainingCredit < 0) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')
+                    ->flash();
+
+                return back();
+            }
+
+            $stored = [];
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    if ($file->isValid()) {
+                        $stored[] = $file->store('certificateDatas', 'public');
+                    }
+                }
+            }
+
+            BudgetMandate::create([
+                'ministry_id'      => $ministry->id,
+                'agency_id'        => $validated['cboAgency'],
+                'program_id'       => $validated['cboProgram'],
+                'program_sub_id'   => $validated['cboProgramSub'],
+                'cluster_id'       => $validated['cboCluster'],
+                'account_sub_id'   => $validated['cboSubAccount'],
+                'fin_law'               => $beginMandate->fin_law,
+                'no'               => $beginMandate->no,
+                'budget'           => $applyValue,
+                'expense_type_id'  => 2,
+                'legal_id'         => $validated['legalID'],
+                'payment_voucher_number'         => $validated['paymentVoucher'],
+                'legal_number'     => $validated['legalNumber'],
+                'legal_name'       => $validated['legalName'],
+                'status'           => 'todo',
+                'is_archived'      => 1,
+                'description'      => strip_tags($validated['txtDescription']),
+                'attachments'      => json_encode($stored),
+                'transaction_date' => $validated['transactionDate'],
+                'request_date'     => $validated['requestDate'],
+                'legal_date'     => $validated['legalDate'],
+            ]);
+
+            $this->recalculateAndSaveReport($beginMandate);
+
+            $beginMandate->refresh();
+            $lastMandate = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('agency_id', $validated['cboAgency'])
+                ->latest()->first();
+
+            $beginMandate->apply = $lastMandate?->budget ?? 0;
+            $beginMandate->save();
+
+            DB::commit();
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            return redirect()->route('budgetDirectPayment.expenseRecord.index', $params);
+        } catch (\Throwable $e) {
+            Log::error('BudgetDirectPayment store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error($e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return back()->withInput();
+        }
+    }
     /**
      * Show the specified resource.
      */
@@ -705,7 +893,7 @@ class BudgetMandateController extends Controller
             ->with('beginMandate', $beginMandate)
             ->with('module', $module);
     }
- 
+
     public function editAdvancePayment($params, $id)
     {
         $id = decode_params($id);
@@ -763,6 +951,62 @@ class BudgetMandateController extends Controller
             ->with('module', $module);
     }
 
+    public function editExpenseRecord($params, $id)
+    {
+        $id = decode_params($id);
+        $ministry = Ministry::where('id', decode_params($params))->first();
+
+        $agency   = Agency::where('ministry_id', $ministry->id)->get();
+        $expenseType = ExpenseType::where('id', 1)->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
+
+        $module = BudgetMandate::where('id', $id)
+            ->where('ministry_id', $ministry->id)
+            ->where('is_archived', 1)
+            ->first();
+
+        if (!$module) {
+            flash()->translate('en')->option('timeout', 2000)
+                ->warning('ទិន្ន័យបានបញ្ចប់', 'Task')->flash();
+            return back()->withInput();
+        }
+
+        $program     = Program::where('ministry_id', $ministry->id)->get();
+        $programId   = Program::where('ministry_id', $ministry->id)
+            ->findOrFail($module->program_id);
+        $programSub  = ProgramSub::where('ministry_id', $ministry->id)
+            ->where('program_id', $module->program_id)->get();
+
+        $beginMandate = BeginMandate::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_mandates.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
+            ->where('begin_mandates.ministry_id', $ministry->id)
+            ->select(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_mandates.account_sub_id',
+                'begin_mandates.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_mandates.account_sub_id')
+            ->get();
+
+        return view('budgetplan::budgetDirectPayment.expenseRecord.edit')
+            ->with('expenseType', $expenseType)
+            ->with('accountSub', $accountSub)
+            ->with('agency', $agency)
+            ->with('program', $program)
+            ->with('programId', $programId)
+            ->with('programSub', $programSub)
+            ->with('params', $params)
+            ->with('beginMandate', $beginMandate)
+            ->with('module', $module);
+    }
     /**
      * Update the specified resource in storage.
      */
@@ -994,6 +1238,120 @@ class BudgetMandateController extends Controller
             return redirect()->route('budgetAdvancePayment.index', $params);
         }
     }
+
+    public function updateExpenseRecord(Request $request, $params, $id)
+    {
+        $validated = $request->validate([
+            'legalID' =>   'required',
+            'paymentVoucher' => 'required',
+            'legalNumber' =>   'required',
+            'legalName' =>  'required',
+            'cboProgram'       => 'required',
+            'cboProgramSub'       => 'required',
+            'cboCluster'       => 'required',
+            'cboAgency'       => 'required',
+            'cboSubAccount'   => 'required',
+            'budget'          => 'numeric|min:0',
+            'txtDescription'  => 'required',
+            'transactionDate'            => 'required|date',
+            'requestDate'            => 'required|date',
+            'legalDate'            => 'required|date',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $mandate = BudgetMandate::where('id', $id)
+                ->where('ministry_id', $ministry->id)->first();
+
+            $beginCredit = BeginMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if (!$beginCredit) {
+                flash()->translate('en')->option('timeout', 2000)
+                    ->error('មិនមានទិន្ន័យ', 'បញ្ហា')->flash();
+                return back()->withInput();
+            }
+
+            $applyValue = $validated['budget'];
+            $remainingCredit = $beginCredit->credit - $applyValue;
+
+            if ($remainingCredit < 0) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')
+                    ->flash();
+
+                return back();
+            }
+            $storedFilePaths = json_decode($voucher->attachments ?? '[]', true);
+
+            if ($request->hasFile('attachments')) {
+                foreach ($request->file('attachments') as $file) {
+                    if ($file->isValid()) {
+                        $storedFilePaths[] = $file->store('certificateDatas', 'public');
+                    }
+                }
+            }
+
+            $mandate->update([
+                'ministry_id'    => $ministry->id,
+                'agency_id'      => $validated['cboAgency'],
+                'program_id'      => $validated['cboProgram'],
+                'program_sub_id'      => $validated['cboProgramSub'],
+                'cluster_id'      => $validated['cboCluster'],
+                'account_sub_id' => $validated['cboSubAccount'],
+                'no'             => $beginCredit->no,
+                'budget'         => $applyValue,
+                'legal_id'      => $validated['legalID'],
+                'legal_number'      => $validated['legalNumber'],
+                'legal_name'      => $validated['legalName'],
+                'status' => 'todo',
+                'is_archived' => 1,
+                'description' => strip_tags($validated['txtDescription']),
+                'attachments'    => json_encode($storedFilePaths),
+                'transaction_date'           => $validated['transactionDate'],
+                'request_date'           => $validated['requestDate'],
+            ]);
+
+            $this->recalculateAndSaveReport($beginCredit);
+
+            $beginCredit->refresh();
+            $lastMandater = BudgetMandate::where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)->latest()->first();
+            $beginCredit->apply = $lastMandater?->budget ?? 0;
+            $beginCredit->save();
+
+            DB::commit();
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+
+            return redirect()->route('budgetDirectPayment.expenseRecord.index', $params);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error($e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetDirectPayment.expenseRecord.index', $params);
+        }
+    }
     /**
      * Remove the specified resource from storage.
      */
@@ -1079,6 +1437,48 @@ class BudgetMandateController extends Controller
             ->flash();
 
         return redirect()->route('budgetAdvancePayment.index', $params);
+    }
+
+    public function destroyExpenseRecord($params, $id)
+    {
+        $id = decode_params($id);
+        $ministry   = Ministry::where('id', decode_params($params))->first();
+        $mandate = BudgetMandate::where('id', $id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        // ✅ Delete attached files
+        if ($mandate->attachments) {
+            $attachments = json_decode($mandate->attachments, true);
+
+            foreach ($attachments as $filePath) {
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                } else {
+                    Log::warning("Attachment not found for deletion: " . $filePath);
+                }
+            }
+        }
+
+        $mandate->delete();
+
+        // Recalculate related data
+        $beginCredit = BeginMandate::where('account_sub_id', $mandate->account_sub_id)
+            ->where('no', $mandate->no)
+            ->where('ministry_id', $mandate->ministry_id)
+            ->first();
+
+        if ($beginCredit) {
+            $this->recalculateAndSaveReport($beginCredit);
+        }
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->error('delete_msg', 'delete')
+            ->flash();
+
+        return redirect()->route('budgetDirectPayment.expenseRecord.index', $params);
     }
 
     public function restore($params, $id)
@@ -1171,6 +1571,52 @@ class BudgetMandateController extends Controller
             ->flash();
 
         return redirect()->route('budgetAdvancePayment.index', $params);
+    }
+
+    public function restoreExpenseRecord($params, $id)
+    {
+        $pid = decode_params($id);
+
+        $mandate = BudgetMandate::withTrashed()->whereKey($pid)->first();
+
+        if ($mandate->attachments) {
+
+            $attachments = json_decode($mandate->attachments, true);
+            $restoredFiles = [];
+
+            foreach ($attachments as $filePath) {
+
+                if (Storage::disk('public')->exists($filePath)) {
+
+                    $originalPath = str_replace('trash/', '', $filePath);
+
+                    Storage::disk('public')->move($filePath, $originalPath);
+
+                    $restoredFiles[] = $originalPath;
+                }
+            }
+
+            $mandate->attachments = json_encode($restoredFiles);
+        }
+
+        $mandate->restore();
+        // Recalculate related data
+        $beginCredit = BeginMandate::where('account_sub_id', $mandate->account_sub_id)
+            ->where('no', $mandate->no)
+            ->where('ministry_id', $mandate->ministry_id)
+            ->first();
+
+        if ($beginCredit) {
+            $this->recalculateAndSaveReport($beginCredit);
+        }
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
+            ->flash();
+
+        return redirect()->route('budgetDirectPayment.expenseRecord.index', $params);
     }
 
     private function recalculateAndSaveReport(BeginMandate $beginMandate)
