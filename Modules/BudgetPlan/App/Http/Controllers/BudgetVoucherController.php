@@ -3,7 +3,9 @@
 namespace Modules\BudgetPlan\App\Http\Controllers;
 
 use App\DataTables\Budget\BudgetVoucherDataTable;
+use App\DataTables\Budget\budgetPaymentDeadlineDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
+use App\DataTables\Budget\InitialPaymentDeadlineDataTable;
 use App\Exports\BeginExport;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\BeginMandate;
@@ -31,6 +33,10 @@ class BudgetVoucherController extends Controller
     {
         return $dataTable->render('budgetplan::initialVoucher.index');
     }
+     public function getPaymentDeadline(InitialPaymentDeadlineDataTable $dataTable)
+    {
+        return $dataTable->render('budgetplan::initialDirectPayment.paymentDeadline.index');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -53,6 +59,24 @@ class BudgetVoucherController extends Controller
         ]);
     }
 
+     public function indexPaymentDeadline(budgetPaymentDeadlineDataTable $dataTable, $params)
+    {
+        $id = decode_params($params);
+        $data = Ministry::where('id', $id)->first();
+        $expenseType = ExpenseType::where('id', 1)
+            ->orWhere('id', 2)
+            ->get();
+        $agency = Agency::all();
+        $budgetVoucher = BudgetVoucher::where('ministry_id', $data->id)->get();
+
+        return $dataTable->render('budgetplan::budgetDirectPayment.paymentDeadline.index', [
+            'data' => $data,
+            'params' => $params,
+            'expenseType' => $expenseType,
+            'agency' => $agency,
+            'budgetVoucher' => $budgetVoucher
+        ]);
+    }
     /**
      * AJAX: Fetch program sub-options by program ID request.
      */
@@ -273,6 +297,49 @@ class BudgetVoucherController extends Controller
             ->orderBy('legal_number', 'asc')->get();
 
         return view('budgetplan::budgetVoucher.create')
+            ->with('accountSub', $accountSub)
+            ->with('agency', $agency)
+            ->with('expenseType', $expenseType)
+            ->with('params', $params)
+            ->with('beginVoucher', $beginVoucher)
+            ->with('budgetMandate', $budgetMandate)
+            ->with('program', $program);
+    }
+
+     public function createPaymentDeadline($params)
+    {
+        $id = decode_params($params);
+        $ministry = Ministry::where('id', $id)->first();
+        $agency = Agency::where('ministry_id', $ministry->id)->get();
+        $program = Program::where('ministry_id', $ministry->id)->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
+        $expenseType = ExpenseType::where('id', 1)
+            ->orWhere('id', 2)
+            ->get();
+
+        $beginVoucher = BeginVoucher::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
+            ->where('begin_vouchers.ministry_id', $ministry->id)
+            ->select(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_vouchers.account_sub_id')
+            ->get();
+
+        $budgetMandate = BudgetMandate::where("is_archived", "!=", 2)
+            ->orderBy('legal_number', 'asc')->get();
+
+        return view('budgetplan::budgetDirectPayment.paymentDeadline.create')
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('expenseType', $expenseType)
@@ -597,6 +664,59 @@ class BudgetVoucherController extends Controller
             ->with('module', $module);
     }
 
+    public function editPaymentDeadline($params, $id)
+    {
+        $id = decode_params($id);
+        $ministry = Ministry::where('id', decode_params($params))->first();
+
+        $agency   = Agency::where('ministry_id', $ministry->id)->get();
+
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
+
+        $module = BudgetVoucher::where('id', $id)
+            ->where('is_archived', 2)
+            ->where('status', 'done')
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        $expenseType = ExpenseType::where('id', $module->expense_type_id)
+            ->get();
+
+        $program     = Program::where('ministry_id', $ministry->id)->get();
+        $programId   = Program::findOrFail($module->program_id);
+        $programSub  = ProgramSub::where('ministry_id', $ministry->id)
+            ->where('program_id', $module->program_id)->get();
+
+        $beginVoucher = BeginVoucher::query()
+            ->join('account_subs', function ($join) use ($ministry) {
+                $join->on('begin_vouchers.account_sub_id', '=', 'account_subs.no')
+                    ->where('account_subs.ministry_id', '=', $ministry->id); // avoid cross-ministry dupes
+            })
+            ->where('begin_vouchers.ministry_id', $ministry->id)
+            ->select(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no as voucher_no',
+                'account_subs.name as sub_name'
+            )
+            ->groupBy(
+                'begin_vouchers.account_sub_id',
+                'begin_vouchers.no',
+                'account_subs.name'
+            )
+            ->orderBy('begin_vouchers.account_sub_id')
+            ->get();
+
+        return view('budgetplan::budgetDirectPayment.paymentDeadline.edit')
+            ->with('expenseType', $expenseType)
+            ->with('accountSub', $accountSub)
+            ->with('agency', $agency)
+            ->with('program', $program)
+            ->with('programId', $programId)
+            ->with('programSub', $programSub)
+            ->with('params', $params)
+            ->with('beginVoucher', $beginVoucher)
+            ->with('module', $module);
+    }
     /**
      * Update the specified resource in storage.
      */
