@@ -85,7 +85,7 @@
                                             បានបញ្ចប់
                                         </option>
                                     </select>
-                                </div> Hey Cortana clock Powerpoint Clover Visual Studio
+                                </div>
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">

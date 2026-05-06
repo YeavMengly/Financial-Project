@@ -43,6 +43,9 @@ return [
     'expenditure.guarantee' => 'ធានាចំណាយ',
     'advance.payment' => 'បុរេប្រទាន',
     'payment' => 'ទូទាត់',
+    'direct.payment' => 'ទូទាត់ត្រង់',
+    'expense.record.book' => 'សលកបត្រកត់ត្រាចំណាយ',
+    'payment.deadline' => 'អាណត្ដិបើកប្រាក់',
 
     'library' => 'Media Library',
     'setting' => 'ការកំណត់',
