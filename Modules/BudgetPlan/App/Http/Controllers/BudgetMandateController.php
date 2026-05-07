@@ -10,6 +10,7 @@ use App\DataTables\Budget\InitialDirectPaymentDataTable;
 use App\DataTables\Budget\InitialMandateDataTable;
 use App\Exports\BeginMandateExport;
 use App\Exports\BeginguaranteeExport;
+use App\Exports\ExpenseRecordExport;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\BeginMandate;
 use App\Models\Content\AccountSub;
@@ -708,7 +709,7 @@ class BudgetMandateController extends Controller
         $validated = $request->validate([
             'legalID' =>   'required',
             'paymentVoucher' => 'required',
-            'legalNumber' =>   'required',
+            'legalNumber' =>   'nullable',
             'legalName' =>  'required',
             'cboProgram'       => 'required',
             'cboProgramSub'       => 'required',
@@ -719,7 +720,7 @@ class BudgetMandateController extends Controller
             'txtDescription'  => 'required',
             'attachments'     => 'nullable|array',
             'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
-            'transactionDate'            => 'required|date',
+            'transactionDate'            => 'nullable',
             'requestDate'            => 'required|date',
             'legalDate'            => 'required|date',
         ]);
@@ -779,16 +780,16 @@ class BudgetMandateController extends Controller
                 'fin_law'               => $beginMandate->fin_law,
                 'no'               => $beginMandate->no,
                 'budget'           => $applyValue,
-                'expense_type_id'  => 2,
+                'expense_type_id'  => 3,
                 'legal_id'         => $validated['legalID'],
                 'payment_voucher_number'         => $validated['paymentVoucher'],
-                'legal_number'     => $validated['legalNumber'],
+                // 'legal_number'     =>  $validated['legalNumber'],
                 'legal_name'       => $validated['legalName'],
                 'status'           => 'todo',
                 'is_archived'      => 1,
                 'description'      => strip_tags($validated['txtDescription']),
                 'attachments'      => json_encode($stored),
-                'transaction_date' => $validated['transactionDate'],
+                // 'transaction_date' => $validated['transactionDate'],
                 'request_date'     => $validated['requestDate'],
                 'legal_date'     => $validated['legalDate'],
             ]);
@@ -1244,7 +1245,7 @@ class BudgetMandateController extends Controller
         $validated = $request->validate([
             'legalID' =>   'required',
             'paymentVoucher' => 'required',
-            'legalNumber' =>   'required',
+            'legalNumber' =>   'nullable',
             'legalName' =>  'required',
             'cboProgram'       => 'required',
             'cboProgramSub'       => 'required',
@@ -1253,7 +1254,7 @@ class BudgetMandateController extends Controller
             'cboSubAccount'   => 'required',
             'budget'          => 'numeric|min:0',
             'txtDescription'  => 'required',
-            'transactionDate'            => 'required|date',
+            'transactionDate'            => 'nullable',
             'requestDate'            => 'required|date',
             'legalDate'            => 'required|date',
         ]);
@@ -1309,13 +1310,13 @@ class BudgetMandateController extends Controller
                 'no'             => $beginCredit->no,
                 'budget'         => $applyValue,
                 'legal_id'      => $validated['legalID'],
-                'legal_number'      => $validated['legalNumber'],
+                // 'legal_number'      => $validated['legalNumber'],
                 'legal_name'      => $validated['legalName'],
                 'status' => 'todo',
                 'is_archived' => 1,
                 'description' => strip_tags($validated['txtDescription']),
                 'attachments'    => json_encode($storedFilePaths),
-                'transaction_date'           => $validated['transactionDate'],
+                // 'transaction_date'           => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
             ]);
 
@@ -1871,6 +1872,111 @@ class BudgetMandateController extends Controller
                 ->flash();
 
             return redirect()->route('budgetAdvancePayment.index', $params);
+        }
+    }
+
+     public function exportExpenseRecordBook(Request $request, $params)
+    {
+        try {
+
+            $ministryId = decode_params($params);
+
+            $query = BudgetMandate::query();
+            $query->leftJoin('begin_mandates', function ($join) use ($ministryId) {
+                $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
+                    ->on('begin_mandates.no', '=', 'budget_mandates.no')
+                    ->on('begin_mandates.program_id', '=', 'budget_mandates.program_id')
+                    ->where('begin_mandates.ministry_id', $ministryId);
+            });
+            $query->select(
+                'budget_mandates.program_id',
+                'budget_mandates.account_sub_id',
+                'budget_mandates.no',
+                'begin_mandates.txtDescription',
+                'begin_mandates.fin_law',
+                'begin_mandates.new_credit_status',
+                DB::raw('SUM(budget_mandates.budget) as apply')
+            );
+            $query->groupBy(
+                'budget_mandates.program_id',
+                'budget_mandates.account_sub_id',
+                'budget_mandates.no',
+                'begin_mandates.txtDescription',
+                'begin_mandates.fin_law',
+                'begin_mandates.new_credit_status',
+            );
+
+            $query->where('budget_mandates.expense_type_id', 3);
+            $query->where('budget_mandates.status', 'todo');
+            $query->where('budget_mandates.is_archived', 1);
+
+            // === Filters (PREFIX table name!) ===
+            if ($request->filled('subAccountNumber')) {
+                $query->where('begin_mandates.account_sub_id', $request->subAccountNumber);
+            }
+            if ($request->filled('cboProgram')) {
+                $query->where('begin_mandates.program_id', $request->cboProgram);
+            }
+            // Date
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+                    ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+                }
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+                }
+            }
+            //status
+            if ($request->cboStatus) {
+                if ($request->cboStatus == '2') {
+                    $query->where('budget_mandates.deleted_at', null);
+                } elseif ($request->cboStatus == '3') {
+                    $query->where('budget_mandates.deleted_at', '!=', null);
+                } else {
+                    $query->withTrashed();
+                }
+            } else {
+                $query->where('budget_mandates.deleted_at', null);
+            }
+            //To do
+            if ($request->cboTodo) {
+                if ($request->cboTodo == 2) {
+                    $query->where('budget_mandates.is_archived', 1);
+                    $query->where('budget_mandates.expense_type_id', 3);
+                } elseif ($request->cboTodo == 3) {
+                    $query->where('budget_mandates.is_archived', 2);
+                    $query->where('budget_mandates.expense_type_id', 3);
+                }
+            } else {
+                $query->where('budget_mandates.is_archived', 1);
+                $query->where('budget_mandates.expense_type_id', 3);
+            }
+
+            $data = $query->get();
+
+            Log::info('Exported BeginMandate Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            $export = new ExpenseRecordExport($data, $ministryId);
+
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetDirectPayment.expenseRecord.index', $params);
         }
     }
 }
