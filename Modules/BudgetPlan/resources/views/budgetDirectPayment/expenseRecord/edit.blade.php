@@ -71,14 +71,14 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.number') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             type="text" class="form-control" name="legalNumber"
                                             value="{{ old('legalNumber', $module->legal_number) }}" tabindex="2" />
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -209,7 +209,7 @@
                                     </div>
                                 </div> --}}
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="transactionDate"
                                             class="form-label">{{ __('forms.select_date') }}</label>
@@ -219,7 +219,7 @@
                                             placeholder="{{ __('forms.select_transaction_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">

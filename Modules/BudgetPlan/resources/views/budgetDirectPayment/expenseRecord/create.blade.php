@@ -73,7 +73,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.number') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
@@ -83,7 +83,7 @@
                                             placeholder="{{ __('forms.legal.number') }}" name="legalNumber"
                                             tabindex="2" />
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -201,7 +201,7 @@
                                     </div>
                                 </div> --}}
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="transactionDate"
                                             class="form-label">{{ __('forms.select_date') }}</label>
@@ -209,7 +209,7 @@
                                             class="form-control" placeholder="{{ __('forms.select_transaction_date') }}"
                                             required data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -363,7 +363,7 @@
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
-            const earlyEP = "{{ route('budgetAdvancePayment.getEarlyBalance', ['params' => $params]) }}";
+            const earlyEP = "{{ route('budgetDirectPayment.expenseRecord.getEarlyBalance', ['params' => $params]) }}";
 
             // Pristine
             if (form) {
@@ -558,7 +558,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetAdvancePayment.by.program_sub') }}",
+                    url: "{{ route('budgetDirectPayment.expenseRecord.by.program_sub') }}",
                     data: {
                         program_id: programId
                     },
@@ -577,7 +577,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetAdvancePayment.by.agency') }}",
+                    url: "{{ route('budgetDirectPayment.expenseRecord.by.agency') }}",
                     data: {
                         program_id: programId
                     },
@@ -596,7 +596,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetAdvancePayment.by.cluster') }}",
+                    url: "{{ route('budgetDirectPayment.expenseRecord.by.cluster') }}",
                     data: {
                         program_sub_id: programSubId
                     },

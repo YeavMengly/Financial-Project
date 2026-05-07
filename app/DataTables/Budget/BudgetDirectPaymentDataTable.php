@@ -111,14 +111,14 @@ class BudgetDirectPaymentDataTable extends DataTable
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
                 $model->where('budget_mandates.is_archived', 1);
-                $model->where('budget_mandates.expense_type_id', 2);
+                $model->where('budget_mandates.expense_type_id', 3);
             } elseif ($request->cboTodo == 3) {
                 $model->where('budget_mandates.is_archived', 2);
-                $model->where('budget_mandates.expense_type_id', 2);
+                $model->where('budget_mandates.expense_type_id', 3);
             }
         } else {
             $model->where('budget_mandates.is_archived', 1);
-            $model->where('budget_mandates.expense_type_id', 2);
+            $model->where('budget_mandates.expense_type_id', 3);
         }
 
         // ===== SEARCH FILTER =====
@@ -176,7 +176,7 @@ class BudgetDirectPaymentDataTable extends DataTable
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
-        $model->where('budget_mandates.expense_type_id', 2);
+        $model->where('budget_mandates.expense_type_id', 3);
 
         // ===== SELECT =====
         $model->select([
@@ -252,7 +252,7 @@ class BudgetDirectPaymentDataTable extends DataTable
 
             Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
             Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
-            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            // Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),

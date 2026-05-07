@@ -61,12 +61,12 @@
                             <label class="visually-hidden" for="cboProgram">{{ __('menus.content.program') }}</label>
                             <select class="form-control" name="cboProgram" id="cboProgram">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($program as $p)
+                                @foreach ($program as $p)
                                     <option value="{{ $p->id }}"
                                         {{ request('cboProgram') == $p->id ? 'selected' : '' }}>
                                         {{ $p->no }}
                                     </option>
-                                @endforeach --}}
+                                @endforeach
                             </select>
                         </div>
 
@@ -74,12 +74,12 @@
                             <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
                             <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                {{-- @foreach ($accountSub as $as)
+                                @foreach ($accountSub as $as)
                                     <option value="{{ $as->no }}"
                                         {{ request('subAccountNumber') == $as->no ? 'selected' : '' }}>
                                         {{ $as->no }}
                                     </option>
-                                @endforeach --}}
+                                @endforeach
                             </select>
                         </div>
 
@@ -107,7 +107,7 @@
 
                             <a id="btnExport"
                                 href="{{ route(
-                                    'budgetMandate.export',
+                                    'budgetDirectPayment.expenseRecord.exportExpenseRecordBook',
                                     array_merge(
                                         ['params' => $params],
                                         request()->only(['cboProgram','cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
@@ -278,7 +278,7 @@
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
 
-            let baseUrl = "{{ route('budgetMandate.export', ['params' => $params]) }}";
+            let baseUrl = "{{ route('budgetDirectPayment.expenseRecord.exportExpenseRecordBook', ['params' => $params]) }}";
 
             let params = new URLSearchParams({
                 cboProgram: $('#cboProgram').val(),
