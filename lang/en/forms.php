@@ -80,6 +80,8 @@ return [
     'legal.id' => 'លេខលិខិត',
     'payment.voucher' => 'លេខសលាកប័ត្រ',
     'legal.number' => 'លេខសម្គាល់សំណើ​ ( PO FMIS )',
+    'day.number' => 'លេខអាណត្ដិ',
+    'temporary.id' => 'លេខសម្កាល់អាណត្ដិ',
     'legal.name' => 'ឈ្មោះសំណើ',
     'title.entity' => 'អង្គភាព',
     'location.number' => 'លេខទីតាំង',
