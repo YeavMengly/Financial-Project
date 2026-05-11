@@ -3,6 +3,7 @@
 use App\Livewire\BudgetPlan\advancePayment;
 use App\Livewire\BudgetPlan\expenseRecordFile;
 use App\Livewire\BudgetPlan\payment;
+use App\Livewire\BudgetPlan\paymentDeadline;
 use App\Livewire\Document\EditFileDocument;
 use App\Livewire\BudgetPlan\GaranteeFile;
 use Illuminate\Support\Facades\Auth;
@@ -37,5 +38,6 @@ Route::prefix('budgetplan/mandates')->middleware(['auth'])->group(function () {
 });
 Route::prefix('budgetplan/voucher')->middleware(['auth'])->group(function () {
     Route::get('{params}/payment-file/{id}', payment::class)->name('payment.edit.doc');
+    Route::get('{params}/payment-deadline-file/{id}', paymentDeadline::class)->name('paymentDeadline.edit.doc');
 });
 

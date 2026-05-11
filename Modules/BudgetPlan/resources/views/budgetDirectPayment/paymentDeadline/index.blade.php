@@ -55,15 +55,6 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboExpenseType">{{ __('menus.task') }}</label>
-                            <select class="form-select" id="cboExpenseType" name="cboExpenseType">
-                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
-                                <option value="2">ធានាចំណាយ</option>
-                                <option value="3">បុរេប្រទាន</option>
-                            </select>
-                        </div>
-
                         <!-- Sub Account Number -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="cboAccountSub">{{ __('menus.sub.account') }}</label>
@@ -77,9 +68,7 @@
                                 @endforeach
                             </select>
                         </div>
-
-
-
+ 
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
@@ -106,7 +95,7 @@
                             {{-- Export --}}
 
                             <a id="btnExport" href="{{ route(
-                                'budgetVoucher.export',
+                                'budgetDirectPayment.paymentDeadline.export',
                                 array_merge(
                                     ['params' => $params],
                                     request()->only(['cboTodo', 'cboStatus', 'cboExpenseType', 'cboAccountSub', 'start_date', 'end_date']),
@@ -265,7 +254,7 @@
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
 
-            let baseUrl = "{{ route('budgetVoucher.export', ['params' => $params]) }}";
+            let baseUrl = "{{ route('budgetDirectPayment.paymentDeadline.export', ['params' => $params]) }}";
 
             let params = new URLSearchParams({
                 cboExpenseType: $('#cboExpenseType').val(),
