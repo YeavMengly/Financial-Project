@@ -109,9 +109,18 @@ return [
     'entry' => 'នាំចូល',
     'release' => 'នាំចេញ',
 
+
+        // Reports
     'report.program' => 'របាយការណ៍តាមកម្មវិធី',
     'report.account.sub' => 'រាយការណ៍តាមអនុគណនី',
     'report.account' => 'របាយការណ៍តាមគណនី',
     'report.chapter' => 'របាយការណ៍តាមជំពូក',
+
+    'reports' => 'របាយការណ៍',
+    'cost.implement.agency' => 'ការអនុវត្តចំណាយតាមអង្គភាព',
+    'cost.implement.program' => 'ការអនុវត្តចំណាយតាមកម្មវិធី',
+    'cost.implement.importants' => 'ការអនុវត្តមុខចំណាយសំខាន់ៗ',
+    
+    'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 
 ];

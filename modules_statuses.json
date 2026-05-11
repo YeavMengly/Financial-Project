@@ -17,5 +17,6 @@
     "Duel": true,
     "Water": true,
     "Electric": true,
-    "Content": true
+    "Content": true,
+    "Report": true
 }

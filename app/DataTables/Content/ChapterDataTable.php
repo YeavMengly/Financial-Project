@@ -34,7 +34,6 @@ class ChapterDataTable extends DataTable
                 return view('content::content.chapters.action', ['module' => $module]);
             })
             ->rawColumns(['soft_delete', 'action']);
-
     }
 
     /**
@@ -49,15 +48,23 @@ class ChapterDataTable extends DataTable
         $id = decode_params($params);
 
         $model = $model->newQuery();
+
+        if ($request->filled('cboType')) {
+            $model->where('types.code', $request->cboType);
+        }
+        $model->leftJoin('types', 'chapters.type_id', '=', 'types.code');
+
         $model->withTrashed();
-        $model->newQuery()
+        $model
             ->select([
                 'chapters.id',
                 'chapters.ministry_id',
                 'chapters.no',
                 'chapters.name',
+                'chapters.type_id',
                 'chapters.created_at',
-                'chapters.deleted_at'
+                'chapters.deleted_at',
+                'types.name as type_name'
             ])
             ->orderBy('created_at', 'ASC');
 
@@ -65,6 +72,7 @@ class ChapterDataTable extends DataTable
          * ================       Step 2:  Filter by chapter number if provided        ================
          */
         $model->where('chapters.ministry_id', $id);
+
 
         return $model->orderBy('chapters.id', 'ASC');
     }
@@ -81,7 +89,11 @@ class ChapterDataTable extends DataTable
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
-
+            ->ajax([
+                'data' => 'function(d) {
+                 d.cboType    = $("#cboType").val();
+                }',
+            ])
             ->columns($this->getColumns())
             ->orderBy(2, 'ASC');
     }
@@ -94,6 +106,7 @@ class ChapterDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
+            Column::make('type_name')->title(__('tables.th.type'))->addClass('align-middle'),
 
             Column::make('no')->title(__('tables.th.chapter'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.txtChapter'))->addClass('align-middle'),
