@@ -75,7 +75,7 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     {!! $dataTable->scripts() !!}
-    <script>
+    {{-- <script>
         $(document).ready(function() {
 
             let table = $('#costimplementagency-table').DataTable();
@@ -126,6 +126,60 @@
             //     }
 
             // });
+
+        });
+    </script> --}}
+    <script>
+        $(document).ready(function() {
+
+            let table = $('#costimplementagency-table').DataTable();
+
+            /**
+             * GLOBAL SEARCH
+             */
+            $('#customSearch').on('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            /**
+             * SHOW / HIDE COLUMN (CLICK ACTION)
+             */
+            $('.toggle-column').on('change', function() {
+
+                let columnIndex = $(this).data('column');
+                let column = table.column(columnIndex);
+
+                let isVisible = column.visible();
+
+                column.visible(!isVisible);
+
+                /**
+                 * SAVE STATE IN LOCAL STORAGE
+                 */
+                let key = 'dt_col_' + columnIndex;
+                localStorage.setItem(key, !isVisible);
+            });
+
+            /**
+             * RESTORE STATE ON PAGE LOAD
+             */
+            $('.toggle-column').each(function() {
+
+                let columnIndex = $(this).data('column');
+                let key = 'dt_col_' + columnIndex;
+
+                let saved = localStorage.getItem(key);
+
+                if (saved !== null) {
+
+                    let isVisible = (saved === 'true');
+
+                    table.column(columnIndex).visible(isVisible);
+
+                    $(this).prop('checked', isVisible);
+                }
+
+            });
 
         });
     </script>
