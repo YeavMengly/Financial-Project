@@ -75,11 +75,8 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     {!! $dataTable->scripts() !!}
-
-{{-- 
     <script>
-
-           $(document).ready(function() {
+        $(document).ready(function() {
 
             let table = $('#costimplementprogram-table').DataTable();
 
@@ -93,7 +90,7 @@
             /**
              * SHOW / HIDE COLUMN (CLICK ACTION)
              */
-            $('.toggle-column-program').on('change', function() {
+            $('.toggle-column').on('change', function() {
 
                 let columnIndex = $(this).data('column');
                 let column = table.column(columnIndex);
@@ -109,10 +106,10 @@
                 localStorage.setItem(key, !isVisible);
             });
 
-            // /**
-            //  * RESTORE STATE ON PAGE LOAD
-            //  */
-            $('.toggle-column-program').each(function() {
+            /**
+             * RESTORE STATE ON PAGE LOAD
+             */
+            $('.toggle-column').each(function() {
 
                 let columnIndex = $(this).data('column');
                 let key = 'dt_col_' + columnIndex;
@@ -131,57 +128,5 @@
             });
 
         });
-    </script> --}}
-<script>
-$(document).ready(function () {
-
-    let table = $('#costimplementprogram-table').DataTable();
-
-    /**
-     * GLOBAL SEARCH
-     */
-    $('#customSearchProgram').on('keyup', function () {
-        table.search(this.value).draw();
-    });
-
-    /**
-     * RESTORE STATE ON PAGE LOAD (FIXED)
-     */
-    $('.toggle-column-program').each(function () {
-
-        let columnIndex = $(this).data('column');
-
-        let key = 'dt_program_col_' + columnIndex;
-
-        let saved = localStorage.getItem(key);
-
-        let isVisible = true;
-
-        if (saved !== null) {
-            isVisible = (saved === 'true');
-        }
-
-        table.column(columnIndex).visible(isVisible);
-
-        $(this).prop('checked', isVisible);
-    });
-
-    /**
-     * CLICK ACTION
-     */
-    $('.toggle-column-program').on('change', function () {
-
-        let columnIndex = $(this).data('column');
-
-        let column = table.column(columnIndex);
-
-        let newState = !column.visible();
-
-        column.visible(newState);
-
-        localStorage.setItem('dt_program_col_' + columnIndex, newState);
-    });
-
-});
-</script>
+    </script>
 @endsection
