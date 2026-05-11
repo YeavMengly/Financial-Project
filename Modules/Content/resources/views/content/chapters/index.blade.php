@@ -7,6 +7,7 @@
         type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 @endsection
 @section('content')
     <div class="row">
@@ -33,7 +34,25 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-body">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboType">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-control" name="cboType" id="cboType" required
+                                data-pristine-required-message="{{ __('messages.required') }}">
 
+                                <option value="">{{ __('forms.search...') }}</option>
+
+                                @foreach ($type as $item)
+                                    <option value="{{ $item->code }}"
+                                        {{ request('cboType') == $item->code ? 'selected' : '' }}>
+                                        {{ $item->number_type }} - {{ $item->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -51,6 +70,7 @@
                         </div>
                     @endif
                     <div class="table-responsive">
+
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
 
@@ -65,6 +85,8 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -97,6 +119,24 @@
                 });
             }
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTypeSelect = document.getElementById('cboType');
+            const cboTypeChoices = new Choices(cboTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសកម្មវិធី', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        $('#cboType').on('change keyup', function() {
+            $('#chapter-table').DataTable().ajax.reload();
+        });
     </script>
     {!! $dataTable->scripts() !!}
 @endsection
