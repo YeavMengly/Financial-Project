@@ -145,23 +145,9 @@ class budgetPaymentDeadlineDataTable extends DataTable
         $model->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_vouchers.expense_type_id', '=', 'expense_types.id');
 
-
-        if ($request->filled('cboExpenseType')) {
-            $expenseType = intval($request->cboExpenseType); // ensure integer
-
-            if ($expenseType === 2) {
-                $model->where('budget_vouchers.expense_type_id', 1);
-            } elseif ($expenseType === 3) {
-                $model->where('budget_vouchers.expense_type_id', 2);
-            } elseif ($expenseType === 1) {
-                // Only filter if the value is positive and valid
-                $model->where('budget_vouchers.expense_type_id', $expenseType);
-            }
-            // If $expenseType <= 0, skip filtering
-        }
-
         // ===== FIXED CONDITION =====
         $model->where('budget_vouchers.ministry_id', $id);
+        $model->where('budget_vouchers.expense_type_id', 3);
 
         // ===== SELECT =====
         $model->select([
@@ -173,7 +159,10 @@ class budgetPaymentDeadlineDataTable extends DataTable
             'budget_vouchers.no',
             'budget_vouchers.budget',
             'budget_vouchers.legal_number',
+            'budget_vouchers.legal_id',
             'budget_vouchers.legal_name',
+            'budget_vouchers.temporary_id',
+            'budget_vouchers.day_of_number',
             'budget_vouchers.is_archived',
             'budget_vouchers.expense_type_id',
             'expense_types.name_kh',
@@ -231,7 +220,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
 
-            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),

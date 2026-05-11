@@ -10,21 +10,21 @@
                     <a href="{{ route('budgetDirectPayment.paymentDeadline.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                 @if (hasPermission('payment.edit.doc'))
-                    <a href="{{ route('payment.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                 @if (hasPermission('paymentDeadline.edit.doc'))
+                    <a href="{{ route('paymentDeadline.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}</a>
                 @endif
-                @if (hasPermission('budgetVoucher.destroy'))
+                @if (hasPermission('budgetDirectPayment.paymentDeadline.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetVoucher.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
+                        onclick="confirm('{{ route('budgetDirectPayment.paymentDeadline.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item">
                         <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
                     </a>
                 @endif
             @else
-                @if (hasPermission('budgetVoucher.destroy'))
+                @if (hasPermission('budgetDirectPayment.paymentDeadline.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetVoucher.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
+                        onclick="confirm('{{ route('budgetDirectPayment.paymentDeadline.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
                 @endif
             @endif

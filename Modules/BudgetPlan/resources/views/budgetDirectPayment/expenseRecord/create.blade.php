@@ -36,8 +36,9 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('budgetDirectPayment.expenseRecord.store', $params) }}"
-                            method="POST" enctype="multipart/form-data" novalidate>
+                        <form id="pristine-valid-example"
+                            action="{{ route('budgetDirectPayment.expenseRecord.store', $params) }}" method="POST"
+                            enctype="multipart/form-data" novalidate>
                             @csrf
 
                             <div class="row">
@@ -363,7 +364,8 @@
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
-            const earlyEP = "{{ route('budgetDirectPayment.expenseRecord.getEarlyBalance', ['params' => $params]) }}";
+            const earlyEP =
+                "{{ route('budgetDirectPayment.expenseRecord.getEarlyBalance', ['params' => $params]) }}";
 
             // Pristine
             if (form) {

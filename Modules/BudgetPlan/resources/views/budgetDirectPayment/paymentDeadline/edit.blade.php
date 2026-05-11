@@ -27,7 +27,7 @@
                 <div class="card-body">
 
                     <form id="pristine-valid-example"
-                        action="{{ route('budgetVoucher.update', ['params' => $params, 'id' => $module->id]) }}"
+                        action="{{ route('budgetDirectPayment.paymentDeadline.update', ['params' => $params, 'id' => $module->id]) }}"
                         method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
                         @csrf
 
@@ -51,16 +51,16 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.legal.number') }}
+                                    <label for="cboLegalId" class="form-label font-size-13 text-muted">
+                                        {{ __('forms.legal.id') }}
                                     </label>
-                                    <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
-                                        data-old="{{ old('cboLegalNumber', $module->legal_number ?? '') }}"
+                                    <select id="cboLegalId" class="form-select" name="cboLegalId" required
+                                        data-old="{{ old('cboLegalId', $module->legal_id ?? '') }}"
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
                                     </select>
 
-                                    @error('cboLegalNumber')
+                                    @error('cboLegalId')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -74,7 +74,26 @@
                                         value="{{ old('legalName', $module->legal_name) }}" tabindex="2" />
                                 </div>
                             </div>
-
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.temporary.id') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="{{ old('cbotemporaryId', $module->temporary_id) }}"
+                                        type="number" class="form-control" placeholder="{{ __('forms.temporary.id') }}"
+                                        name="cbotemporaryId" tabindex="2" />
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.day.number') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="{{ old('cbodayOfNumber', $module->day_of_number) }}"
+                                        type="text" class="form-control" placeholder="{{ __('forms.day.number') }}"
+                                        name="cbodayOfNumber" tabindex="2" />
+                                </div>
+                            </div>
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProgram" class="form-label font-size-13 text-muted">
@@ -258,7 +277,7 @@
                             <button type="submit" class="btn btn-primary"
                                 id="insertToTableBtn">{{ __('buttons.save') }}</button>
                             <a class="btn btn-dark"
-                                href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
+                                href="{{ route('budgetDirectPayment.paymentDeadline.index', $params) }}">{{ __('buttons.back') }}</a>
 
                         </div>
                     </form>
@@ -348,7 +367,7 @@
             const budgetInput = document.getElementById('budget');
 
             // The endpoint already includes {params} (ministry) in the URL.
-            const EARLY_EP = "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}";
+            const EARLY_EP = "{{ route('budgetDirectPayment.paymentDeadline.getEarlyBalance', ['params' => $params]) }}";
 
             initValidation(form);
             initEditors();
@@ -561,7 +580,7 @@
             const cboSubAccount = document.getElementById('cboSubAccount');
             const budgetInput = document.getElementById('budget');
 
-            const ENDPOINT = "{{ route('budgetVoucher.editEarlyBalance', ['params' => $params]) }}";
+            const ENDPOINT = "{{ route('budgetDirectPayment.paymentDeadline.editEarlyBalance', ['params' => $params]) }}";
 
             function toNumber(v) {
                 v = (v || '').toString().replace(/,/g, '');
@@ -671,7 +690,8 @@
             const cboSubAccount = document.getElementById('cboSubAccount');
             const budgetInput = document.getElementById('budget');
 
-            const ENDPOINT = "{{ route('budgetVoucher.editEarlyBalance', ['params' => $params]) }}";
+            const ENDPOINT =
+                "{{ route('budgetDirectPayment.paymentDeadline.editEarlyBalance', ['params' => $params]) }}";
 
             function toNumber(v) {
                 v = (v || '').toString().replace(/,/g, '');
@@ -881,7 +901,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.edit.program_sub') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.edit.program_sub') }}",
                     data: {
                         program_id: programId,
                         selected_id: selectedId
@@ -900,7 +920,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.edit.agency') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.edit.agency') }}",
                     data: {
                         program_id: programId,
                         selected_id: selectedId
@@ -919,7 +939,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.edit.cluster') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.edit.cluster') }}",
                     data: {
                         program_sub_id: programSubId,
                         selected_id: selectedId
@@ -966,7 +986,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            const element = document.getElementById('cboLegalNumber');
+            const element = document.getElementById('cboLegalId');
 
             cboLegalChoices = new Choices(element, {
                 searchEnabled: true,
@@ -977,7 +997,7 @@
             });
 
             // ===== for EDIT page =====
-            let selectedLegal = "{{ old('cboLegalNumber', $data->legal_number_id ?? '') }}";
+            let selectedLegal = "{{ old('cboLegalId', $data->legal_number_id ?? '') }}";
 
             if (selectedLegal) {
                 cboLegalChoices.setChoiceByValue(selectedLegal);
@@ -991,7 +1011,7 @@
             var expenseTypeId = $(this).val();
 
             $.ajax({
-                url: '{!! route('budgetVoucher.by.expense_type_id') !!}',
+                url: '{!! route('budgetDirectPayment.paymentDeadline.by.expense_type_id') !!}',
                 type: 'get',
                 data: {
                     expense_type_id: expenseTypeId
@@ -1034,7 +1054,7 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             /* ================== Choices Instance ================== */
-            let legalChoices = initChoices('#cboLegalNumber');
+            let legalChoices = initChoices('#cboLegalId');
 
             function initChoices(selector) {
                 return new Choices(selector, {
@@ -1055,15 +1075,15 @@
                 return initChoices(selector);
             }
 
-            function loadLegalNumber(expenseTypeId, selectedId = null) {
+            function loadLegalId(expenseTypeId, selectedId = null) {
 
-                resetSelect('#cboLegalNumber');
-                legalChoices = resetChoices('#cboLegalNumber', legalChoices);
+                resetSelect('#cboLegalId');
+                legalChoices = resetChoices('#cboLegalId', legalChoices);
 
                 if (!expenseTypeId) return;
 
                 $.ajax({
-                    url: "{{ route('budgetVoucher.edit.expense_type_id') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.edit.expense_type_id') }}",
                     type: "GET",
                     data: {
                         expense_type_id: expenseTypeId,
@@ -1071,9 +1091,9 @@
                     },
                     success: function(html) {
 
-                        $('#cboLegalNumber').html(html);
+                        $('#cboLegalId').html(html);
 
-                        legalChoices = resetChoices('#cboLegalNumber', legalChoices);
+                        legalChoices = resetChoices('#cboLegalId', legalChoices);
                     }
                 });
             }
@@ -1081,16 +1101,16 @@
             /* ================== PRELOAD EDIT DATA ================== */
 
             const expenseTypeId = $('#cboExpenseType').val();
-            const oldLegalId = $('#cboLegalNumber').data('old');
+            const oldLegalId = $('#cboLegalId').data('old');
 
             if (expenseTypeId) {
-                loadLegalNumber(expenseTypeId, oldLegalId);
+                loadLegalId(expenseTypeId, oldLegalId);
             }
 
             /* ================== EVENT ================== */
 
             $('#cboExpenseType').on('change', function() {
-                loadLegalNumber($(this).val());
+                loadLegalId($(this).val());
             });
 
         });

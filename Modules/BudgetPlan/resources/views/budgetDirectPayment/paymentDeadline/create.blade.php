@@ -39,7 +39,7 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('budgetVoucher.store', $params) }}"
+                        <form id="pristine-valid-example" action="{{ route('budgetDirectPayment.paymentDeadline.store', $params) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
                             <div class="row">
@@ -51,7 +51,7 @@
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($expenseType as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name_kh }}</option>
+                                                <option value="{{ $item->id}}">{{ $item->name_kh }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -59,15 +59,15 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.legal.number') }}
+                                        <label for="cboLegalId" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.legal.id') }}
                                         </label>
-                                        <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
+                                        <select id="cboLegalId" class="form-select" name="cboLegalId" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
 
-                                        @error('cboLegalNumber')
+                                        @error('cboLegalId')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -97,7 +97,7 @@
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="number" class="form-control"
+                                            type="text" class="form-control"
                                             placeholder="{{ __('forms.day.number') }}" name="cbodayOfNumber"
                                             tabindex="2" />
                                     </div>
@@ -250,7 +250,7 @@
                                     {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
-                                    href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('budgetDirectPayment.paymentDeadline.index', $params) }}">{{ __('buttons.back') }}</a>
 
                             </div>
                         </form>
@@ -386,7 +386,7 @@
             const budgetInput = document.getElementById('budget');
 
             // named route -> correct URL always
-            const earlyEP = "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}";
+            const earlyEP = "{{ route('budgetDirectPayment.paymentDeadline.getEarlyBalance', ['params' => $params]) }}";
 
             // Pristine
             if (form) {
@@ -576,7 +576,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.by.program_sub') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.by.program_sub') }}",
                     data: {
                         program_id: programId
                     },
@@ -595,7 +595,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.by.agency') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.by.agency') }}",
                     data: {
                         program_id: programId
                     },
@@ -614,7 +614,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetVoucher.by.cluster') }}",
+                    url: "{{ route('budgetDirectPayment.paymentDeadline.by.cluster') }}",
                     data: {
                         program_sub_id: programSubId
                     },
@@ -660,7 +660,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            const element = document.getElementById('cboLegalNumber');
+            const element = document.getElementById('cboLegalId');
 
             cboLegalChoices = new Choices(element, {
                 searchEnabled: true,
@@ -692,7 +692,7 @@
 
             /* ===== Load new options ===== */
             $.ajax({
-                url: "{{ route('budgetVoucher.get.expense_type_id') }}",
+                url: "{{ route('budgetDirectPayment.paymentDeadline.get.expense_type_id') }}",
                 type: 'GET',
                 data: {
                     expense_type_id: expenseTypeId
