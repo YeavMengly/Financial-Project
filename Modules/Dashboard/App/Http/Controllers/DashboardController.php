@@ -296,10 +296,11 @@ class DashboardController extends Controller
             ->get();
         $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
         $advance_Payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
+        $expense_Record= $budgetMandate->where('expense_type_id', '3')->pluck('budget');
 
         $direct_Payment = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
         $payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
-        // $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
+        $payment_Deadline = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
         // $pre_Financing = $budgetMandate->where('expense_type_id', '5')->pluck('budget');     
         $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
         $advance_Payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
