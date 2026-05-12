@@ -38,10 +38,20 @@
                         <!-- RIGHT ACTION -->
                         <div class="d-flex align-items-center gap-2">
 
+                            <!-- Filter Year -->
+                            <select id="ministryFilter" class="form-select">
+                                <option value="">{{ __('menus.annual.data') }}</option>
+
+                                @foreach ($ministries as $ministry)
+                                    <option value="{{ $ministry->id }}">
+                                        {{ $ministry->year }}
+                                    </option>
+                                @endforeach
+                            </select>
                             <!-- SEARCH -->
                             <div class="position-relative">
 
-                                <input type="text" id="customSearchAgency" class="form-control ps-5"
+                                <input type="text" id="customSearch-agency" class="form-control ps-5"
                                     placeholder="{{ __('forms.search...') }}" style="min-width:250px;">
 
                                 <i class="bx bx-search position-absolute" style="top:10px; left:15px;"></i>
@@ -49,6 +59,7 @@
                             </div>
 
                             @include('report::report.cost_implement.agency.dropdown')
+
                         </div>
                     </div>
                 </div>
@@ -75,76 +86,23 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     {!! $dataTable->scripts() !!}
-    {{-- <script>
-        $(document).ready(function() {
 
-            let table = $('#costimplementagency-table').DataTable();
-
-            /**
-             * GLOBAL SEARCH
-             */
-            $('#customSearchAgency').on('keyup', function() {
-                table.search(this.value).draw();
-            });
-
-            /**
-             * SHOW / HIDE COLUMN (CLICK ACTION)
-             */
-            $('.toggle-column').on('change', function() {
-
-                let columnIndex = $(this).data('column');
-                let column = table.column(columnIndex);
-
-                let isVisible = column.visible();
-
-                column.visible(!isVisible);
-
-                /**
-                 * SAVE STATE IN LOCAL STORAGE
-                 */
-                let key = 'dt_col_' + columnIndex;
-                localStorage.setItem(key, !isVisible);
-            });
-
-            // /**
-            //  * RESTORE STATE ON PAGE LOAD
-            //  */
-            // $('.toggle-column').each(function() {
-
-            //     let columnIndex = $(this).data('column');
-            //     let key = 'dt_col_' + columnIndex;
-
-            //     let saved = localStorage.getItem(key);
-
-            //     if (saved !== null) {
-
-            //         let isVisible = (saved === 'true');
-
-            //         table.column(columnIndex).visible(isVisible);
-
-            //         $(this).prop('checked', isVisible);
-            //     }
-
-            // });
-
-        });
-    </script> --}}
     <script>
         $(document).ready(function() {
 
             let table = $('#costimplementagency-table').DataTable();
 
             /**
-             * GLOBAL SEARCH
+             * GLOBAL SEARCH (optional if you use it)
              */
-            $('#customSearch').on('keyup', function() {
+            $('#customSearch-agency').on('keyup', function() {
                 table.search(this.value).draw();
             });
 
             /**
-             * SHOW / HIDE COLUMN (CLICK ACTION)
+             * TOGGLE COLUMN (AGENCY ONLY)
              */
-            $('.toggle-column').on('change', function() {
+            $('.toggle-column-agency').on('change', function() {
 
                 let columnIndex = $(this).data('column');
                 let column = table.column(columnIndex);
@@ -154,19 +112,20 @@
                 column.visible(!isVisible);
 
                 /**
-                 * SAVE STATE IN LOCAL STORAGE
+                 * UNIQUE STORAGE KEY
                  */
-                let key = 'dt_col_' + columnIndex;
+                let key = 'costimplementagency_dt_col_' + columnIndex;
                 localStorage.setItem(key, !isVisible);
             });
 
             /**
-             * RESTORE STATE ON PAGE LOAD
+             * RESTORE STATE
              */
-            $('.toggle-column').each(function() {
+            $('.toggle-column-agency').each(function() {
 
                 let columnIndex = $(this).data('column');
-                let key = 'dt_col_' + columnIndex;
+
+                let key = 'costimplementagency_dt_col_' + columnIndex;
 
                 let saved = localStorage.getItem(key);
 
@@ -181,6 +140,30 @@
 
             });
 
+            /**
+             * RESET BUTTON
+             */
+            $('#resetAgencyColumns').on('click', function() {
+
+                $('.toggle-column-agency').each(function() {
+
+                    let columnIndex = $(this).data('column');
+
+                    table.column(columnIndex).visible(true);
+
+                    $(this).prop('checked', true);
+
+                    localStorage.removeItem('costimplementagency_dt_col_' + columnIndex);
+                });
+
+            });
+
+        });
+    </script>
+
+    <script>
+        $('#yearFilter, #ministryFilter').on('change keyup', function() {
+            $('#costimplementagency-table').DataTable().ajax.reload();
         });
     </script>
 @endsection

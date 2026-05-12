@@ -406,7 +406,14 @@
                     </a>
                 </li>
 
-              
+                <li class="{{ Request::routeIs('states.assets.vehicles.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('states.assets.vehicles.index') }}"
+                        class="{{ Request::routeIs('states.assets.vehicles.*') ? 'active' : '' }}">
+                        <i data-feather="folder"></i>
+                        <span data-key="t-states.assets.vehicles">{{ __('menus.state.assets.vehicles') }}</span>
+                    </a>
+                </li>
+
 
                 <li class="menu-title" data-key="t-content">{{ __('menus.content') }}</li>
 
