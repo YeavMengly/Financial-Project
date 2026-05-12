@@ -23,7 +23,8 @@ class Chapter extends Model
     protected $fillable = [
         'ministry_id',
         'no',
-        'name'
+        'name', 
+        'type_id'
     ];
 
     /* -----------------------------------------------------------------

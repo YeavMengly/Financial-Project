@@ -14,7 +14,8 @@
                             </li>
                             <li class="breadcrumb-item"><a href="javascript: void(0);"><span>{{ $module->year }}</span></a>
                             </li>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.content.chapters') }}</a></li>
+                            <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);">{{ __('menus.content.chapters') }}</a></li>
                             <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                         </ol>
                     </div>
@@ -54,6 +55,24 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label for="cboType" class="form-label font-size-13 text-muted">
+                                        {{ __('forms.type') }}
+                                    </label>
+
+                                    <select class="form-control" name="cboType" required
+                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+
+                                        @foreach ($type as $item)
+                                            <option value="{{ $item->code }}">
+                                                {{ $item->number_type }} - {{ $item->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>

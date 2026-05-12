@@ -81,7 +81,7 @@ return [
     'payment.voucher' => 'លេខសលាកប័ត្រ',
     'legal.number' => 'លេខសម្គាល់សំណើ​ ( PO FMIS )',
     'day.number' => 'លេខអាណត្ដិ',
-    'temporary.id' => 'លេខសម្កាល់អាណត្ដិ',
+    'temporary.id' => 'លេខសម្គាល់អាណត្ដិ',
     'legal.name' => 'ឈ្មោះសំណើ',
     'title.entity' => 'អង្គភាព',
     'location.number' => 'លេខទីតាំង',
@@ -98,4 +98,5 @@ return [
     'active' => 'សកម្ម',
     'inactive' => 'មិនសកម្ម',
     'expense.type' => 'ប្រភេទចំណាយ',
+    'type' => 'ប្រភេទ',
 ];

@@ -35,6 +35,7 @@ return [
     'th.txtSubAccount' => 'នាមអនុគណនី',
     'th.number' => 'លេខ',
     'th.agency' => 'អង្គភាព',
+    'th.agency.execute' => 'អង្គភាពប្រតិបត្តិ',
     'th.sub.program' => 'អនុកម្មវិធី',
     'th.program' => 'កម្មវិធី',
     'th.cluster' => 'ចង្កោម',
@@ -109,4 +110,7 @@ return [
     'th.cost.total' => 'ប្រាក់សរុបជារៀល',
     'th.reactive.energy' => 'ថាមពលអំណានចាស់',
     'th.receipt.number' => 'លេខបណ្ណបញ្ចេញ',
+
+    'hide' => 'លាក់',
+    'show' => 'បង្ហាញ',
 ];

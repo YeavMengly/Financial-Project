@@ -132,7 +132,7 @@
                                         </a>
                                     </li>
                                 @endif
-                                 @if (hasPermission('ministries.index'))
+                                @if (hasPermission('ministries.index'))
                                     <li>
                                         <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
                                             class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
@@ -375,6 +375,38 @@
                         @endif
                     </ul>
                 </li>
+
+
+
+                {{-- ========== Reports ========== --}}
+                <li class="menu-title" data-key="t-reports">{{ __('menus.reports') }}</li>
+
+
+                <li class="{{ Request::routeIs('cost.implement.agency.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('cost.implement.agency.index') }}"
+                        class="{{ Request::routeIs('cost.implement.agency.*') ? 'active' : '' }}">
+                        <i data-feather="folder"></i>
+                        <span data-key="t-cost.implement.agency">{{ __('menus.cost.implement.agency') }}</span>
+                    </a>
+                </li>
+
+                <li class="{{ Request::routeIs('cost.implement.program.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('cost.implement.program.index') }}"
+                        class="{{ Request::routeIs('cost.implement.program.*') ? 'active' : '' }}">
+                        <i data-feather="folder"></i>
+                        <span data-key="t-cost.implement.program">{{ __('menus.cost.implement.program') }}</span>
+                    </a>
+                </li>
+
+                <li class="{{ Request::routeIs('cost.implement.importants.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('cost.implement.importants.index') }}"
+                        class="{{ Request::routeIs('cost.implement.importants.*') ? 'active' : '' }}">
+                        <i data-feather="folder"></i>
+                        <span data-key="t-cost.implement.importants">{{ __('menus.cost.implement.importants') }}</span>
+                    </a>
+                </li>
+
+              
 
                 <li class="menu-title" data-key="t-content">{{ __('menus.content') }}</li>
 

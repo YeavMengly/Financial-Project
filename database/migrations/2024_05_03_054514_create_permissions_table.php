@@ -40,13 +40,6 @@ return new class extends Migration
                 'delete' => 'ministries.destroy',
             ],
 
-            // 'categories'                  => [
-            //     'view'   => 'category.index',
-            //     'create' => 'category.create',
-            //     'edit'   => 'category.edit',
-            //     'delete' => 'category.destroy',
-            // ],
-
             'content.chapters'                  => [
                 'show'   => 'initialChapter.index',
                 'view'   => 'chapters.index',
@@ -119,14 +112,6 @@ return new class extends Migration
                 'edit'   => 'beginVoucher.edit',
                 'delete' => 'beginVoucher.destroy',
             ],
-
-            // 'begin.mandates'                  => [
-            //     'show'   => 'initialBudgetMandate.index',
-            //     'view'   => 'beginMandate.index',
-            //     'create' => 'beginMandate.create',
-            //     'edit'   => 'beginMandate.edit',
-            //     'delete' => 'beginMandate.destroy',
-            // ],
 
             /**
              *   Payment
