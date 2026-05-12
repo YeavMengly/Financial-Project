@@ -4,6 +4,7 @@ namespace Modules\Report\App\Http\Controllers;
 
 use App\DataTables\Report\CostImplementProgramDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +16,10 @@ class CostImplementProgramController extends Controller
      */
     public function index(CostImplementProgramDataTable $dataTable)
     {
-        return $dataTable->render('report::report.cost_implement.program.index');
+         $ministries = Ministry::all();
+        return $dataTable->render('report::report.cost_implement.program.index', [
+            'ministries' => $ministries
+        ]);
     }
 
 

@@ -120,7 +120,8 @@ return [
     'cost.implement.agency' => 'ការអនុវត្តចំណាយតាមអង្គភាព',
     'cost.implement.program' => 'ការអនុវត្តចំណាយតាមកម្មវិធី',
     'cost.implement.importants' => 'ការអនុវត្តមុខចំណាយសំខាន់ៗ',
-    
+
     'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 
+    'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ'
 ];
