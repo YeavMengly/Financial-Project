@@ -41,9 +41,9 @@ class CostImplementProgramDataTable extends DataTable
             })
             ->rawColumns(['txtDescription'])
 
-            ->addColumn('action', function ($module) {
-                return view('report::report.cost_implement.program.action', ['module' => $module]);
-            })
+            // ->addColumn('action', function ($module) {
+            //     return view('report::report.cost_implement.program.action', ['module' => $module]);
+            // })
             ->setRowId('id');
     }
 
@@ -72,6 +72,20 @@ class CostImplementProgramDataTable extends DataTable
     {
         return $this->builder()
             ->setTableId('costimplementprogram-table') // FIXED
+            ->ajax([
+                'data' => 'function(d) {
+
+                    d.yearFilter = $("#yearFilter").val();
+                    d.ministry_id = $("#ministryFilter").val();
+
+    }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#costimplementprogram-table").DataTable().ajax.reload();
+                });
+            }')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
@@ -96,8 +110,14 @@ class CostImplementProgramDataTable extends DataTable
             Column::make('txtDescription')
                 ->title(__('tables.th.description')),
 
+            Column::make('law_average')
+                ->title(__('tables.th.law_average')),
+
+            Column::make('law_correction')
+                ->title(__('tables.th.law_correction')),
+
             Column::make('fin_law')
-                ->title(__('tables.th.fin_law')),
+                ->title(__('tables.th.financeLaw')),
 
             Column::make('new_credit_status')
                 ->title(__('tables.th.new_credit_status')),

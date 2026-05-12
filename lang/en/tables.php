@@ -18,7 +18,7 @@ return [
     'th.category' => 'ប្រភេទ',
     'th.description' => 'បរិយាយ',
     'th.category.sub' => 'អនុប្រភេទ',
-    'th.no' => 'លេខសម្គាល់',
+    'th.id' => 'លេខសម្គាល់',
     'th.year' => 'ឆ្នាំ',
     'th.document.title' => 'ចំណងជើង ឯកសារ',
     'th.document.total' => 'ចំនួនឯកសារ',
@@ -87,7 +87,6 @@ return [
     'th.price' => 'តម្លៃ',
     'th.duel.total' => 'សរុបតម្លៃ',
     'th.note' => 'កំណត់សម្គាល់',
-    'th.refer' => 'យោង',
     'th.date.entry' => 'កាលបរិច្ឆេទបញ្ចូល',
     'th.date.release' => 'កាលបរិច្ឆេទបញ្ចេញ',
     'th.file' => 'ឯកសារ',
@@ -113,4 +112,9 @@ return [
 
     'hide' => 'លាក់',
     'show' => 'បង្ហាញ',
+
+    // States Assets Vehicles
+    'th.motor' => 'ម៉ូតូ',
+    'th.car' => 'ឡាន',
+    'th.bus' => 'ឡានក្រុង',
 ];

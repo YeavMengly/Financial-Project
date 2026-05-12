@@ -38,10 +38,21 @@
                         <!-- RIGHT ACTION -->
                         <div class="d-flex align-items-center gap-2">
 
+                              <!-- Filter Year -->
+                            <select id="ministryFilter" class="form-select">
+                                <option value="">{{ __('menus.annual.data') }}</option>
+
+                                @foreach ($ministries as $ministry)
+                                    <option value="{{ $ministry->id }}">
+                                        {{ $ministry->year }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                             <!-- SEARCH -->
                             <div class="position-relative">
 
-                                <input type="text" id="customSearchProgram" class="form-control ps-5"
+                                <input type="text" id="customSearch-program" class="form-control ps-5"
                                     placeholder="{{ __('forms.search...') }}" style="min-width:250px;">
 
                                 <i class="bx bx-search position-absolute" style="top:10px; left:15px;"></i>
@@ -49,6 +60,7 @@
                             </div>
 
                             @include('report::report.cost_implement.program.dropdown')
+
                         </div>
                     </div>
                 </div>
@@ -75,22 +87,23 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     {!! $dataTable->scripts() !!}
+
     <script>
         $(document).ready(function() {
 
             let table = $('#costimplementprogram-table').DataTable();
 
             /**
-             * GLOBAL SEARCH
+             * GLOBAL SEARCH (optional if you have input)
              */
-            $('#customSearchProgram').on('keyup', function() {
+            $('#customSearch-program').on('keyup', function() {
                 table.search(this.value).draw();
             });
 
             /**
-             * SHOW / HIDE COLUMN (CLICK ACTION)
+             * TOGGLE COLUMN (PROGRAM TABLE ONLY)
              */
-            $('.toggle-column').on('change', function() {
+            $('.toggle-column-program').on('change', function() {
 
                 let columnIndex = $(this).data('column');
                 let column = table.column(columnIndex);
@@ -100,19 +113,20 @@
                 column.visible(!isVisible);
 
                 /**
-                 * SAVE STATE IN LOCAL STORAGE
+                 * UNIQUE STORAGE KEY
                  */
-                let key = 'dt_col_' + columnIndex;
+                let key = 'costimplementprogram_dt_col_' + columnIndex;
                 localStorage.setItem(key, !isVisible);
             });
 
             /**
-             * RESTORE STATE ON PAGE LOAD
+             * RESTORE STATE
              */
-            $('.toggle-column').each(function() {
+            $('.toggle-column-program').each(function() {
 
                 let columnIndex = $(this).data('column');
-                let key = 'dt_col_' + columnIndex;
+
+                let key = 'costimplementprogram_dt_col_' + columnIndex;
 
                 let saved = localStorage.getItem(key);
 
@@ -124,9 +138,34 @@
 
                     $(this).prop('checked', isVisible);
                 }
+            });
+
+            /**
+             * RESET BUTTON
+             */
+            $('#resetProgramColumns').on('click', function() {
+
+                $('.toggle-column-program').each(function() {
+
+                    let columnIndex = $(this).data('column');
+
+                    table.column(columnIndex).visible(true);
+
+                    $(this).prop('checked', true);
+
+                    localStorage.removeItem(
+                        'costimplementprogram_dt_col_' + columnIndex
+                    );
+                });
 
             });
 
+        });
+    </script>
+
+     <script>
+        $('#yearFilter, #ministryFilter').on('change keyup', function() {
+            $('#costimplementprogram-table').DataTable().ajax.reload();
         });
     </script>
 @endsection

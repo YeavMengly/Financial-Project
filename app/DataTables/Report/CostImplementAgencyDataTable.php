@@ -43,18 +43,40 @@ class CostImplementAgencyDataTable extends DataTable
             })
             ->rawColumns(['txtDescription'])
 
-            ->addColumn('action', function ($module) {
-                return view('report::report.cost_implement.agency.action', ['module' => $module]);
-            })
+            // ->addColumn('action', function ($module) {
+            //     return view('report::report.cost_implement.agency.action', ['module' => $module]);
+            // })
             ->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(BeginMandate $model, Request $request): QueryBuilder
+   public function query(BeginMandate $model): QueryBuilder
     {
         $query = $model->newQuery();
+
+        /**
+         * FILTER YEAR
+         */
+        if ($this->request()->has('yearFilter') && !empty($this->request()->yearFilter)) {
+
+            $query->whereYear('created_at', $this->request()->yearFilter);
+
+            /**
+             * OR if you have direct year column:
+             *
+             * $query->where('year', $this->request()->yearFilter);
+             */
+        }
+
+        /**
+         * FILTER ministry_id
+         */
+        if ($this->request()->has('ministry_id') && !empty($this->request()->ministry_id)) {
+
+            $query->where('ministry_id', $this->request()->ministry_id);
+        }
 
         return $query;
     }
@@ -66,6 +88,20 @@ class CostImplementAgencyDataTable extends DataTable
     {
         return $this->builder()
             ->setTableId('costimplementagency-table')
+            ->ajax([
+                'data' => 'function(d) {
+
+                    d.yearFilter = $("#yearFilter").val();
+                    d.ministry_id = $("#ministryFilter").val();
+
+    }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#costimplementagency-table").DataTable().ajax.reload();
+                });
+            }')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),

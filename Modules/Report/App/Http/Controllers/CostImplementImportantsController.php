@@ -4,6 +4,7 @@ namespace Modules\Report\App\Http\Controllers;
 
 use App\DataTables\Report\CostImplementImportantsDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,8 +16,12 @@ class CostImplementImportantsController extends Controller
      */
     public function index(CostImplementImportantsDataTable $dataTable)
     {
-        return $dataTable->render('report::report.cost_implement.importants.index');
-    }  
+
+        $ministries = Ministry::all();
+        return $dataTable->render('report::report.cost_implement.importants.index', [
+            'ministries' => $ministries
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
