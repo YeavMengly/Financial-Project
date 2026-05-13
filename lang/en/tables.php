@@ -38,6 +38,7 @@ return [
     'th.agency.execute' => 'អង្គភាពប្រតិបត្តិ',
     'th.sub.program' => 'អនុកម្មវិធី',
     'th.program' => 'កម្មវិធី',
+      'th.program.code' => 'លេខកម្មវិធី',
     'th.cluster' => 'ចង្កោម',
     'th.rank' => 'ចំណាត់ថ្នាក់',
     'th.financeLaw' => 'ច្បាប់ហិរញ្ញវត្ថុ',
@@ -100,6 +101,7 @@ return [
     'th.created_at' => 'បានបង្កើតនៅ',
 
     'th.title_entity' => 'អង្គភាព',
+    'th.title_entity.code' => 'លេខអង្គភាព',
     'th.location_number' => 'លេខទីតាំង',
     'th.province' => 'រាជធានី / ខេត្ត',
     'th.invoice' => 'វិក្ក័យបត្រ',

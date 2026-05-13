@@ -90,20 +90,21 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('accountSub.create'))
-                        <div class="col-sm">
-                            <div class="mb-4">
+                    {{-- @if (hasPermission('accountSub.create') && $module->is_archived != 2) --}}
+                    <div class="col-sm">
+                        <div class="mb-4">
+                            @if (hasPermission('accountSub.create') && $module->is_archived != 2 )
                                 <a class="btn btn-light waves-effect waves-light"
                                     href="{{ route('accountSub.create', ['params' => $params, 'chId' => $chId, 'accId' => $accId]) }}"><i
                                         class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
+                            @endif
+                            <a class="btn btn-dark"
+                                href="{{ route('accounts.index', ['params' => $params, 'chId' => $chId]) }}">{{ __('buttons.back') }}</a>
 
-                                <a class="btn btn-dark"
-                                    href="{{ route('accounts.index', ['params' => $params, 'chId' => $chId]) }}">{{ __('buttons.back') }}</a>
-
-                            </div>
                         </div>
-                    @endif
+                    </div>
+                    {{-- @endif --}}
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>

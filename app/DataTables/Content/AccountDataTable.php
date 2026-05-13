@@ -53,6 +53,7 @@ class AccountDataTable extends DataTable
         $model->withTrashed();
         $query = $model->newQuery()
             ->leftJoin('chapters', 'accounts.chapter_id', '=', 'chapters.id')
+            ->leftJoin('ministries', 'accounts.ministry_id', '=', 'ministries.id')
             ->select([
                 'accounts.id',
                 'accounts.ministry_id',
@@ -60,7 +61,9 @@ class AccountDataTable extends DataTable
                 'accounts.no',
                 'accounts.name',
                 'accounts.created_at',
-                'accounts.deleted_at'
+                'accounts.deleted_at',
+                'ministries.is_archived'
+
             ])
             ->where('accounts.ministry_id', $id)
             ->where('accounts.chapter_id', $chId)

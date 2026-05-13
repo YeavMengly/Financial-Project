@@ -48,7 +48,15 @@ class ChapterController extends Controller
         $module = Ministry::where('id', decode_params($params))->first();
         $type = Type::all();
 
-        // dd($type);
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($module->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
 
         return view('content::content.chapters.create')
             ->with('params', $params)
@@ -113,6 +121,17 @@ class ChapterController extends Controller
         $chapter = Chapter::where('id', decode_params($id))
             ->where('ministry_id', $ministry->id)->first();
         $type = Type::all();
+
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($ministry->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
+
 
         return view('content::content.chapters.edit')
             ->with('chapter', $chapter)

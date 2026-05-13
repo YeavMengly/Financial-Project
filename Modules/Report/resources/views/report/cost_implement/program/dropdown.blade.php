@@ -30,54 +30,47 @@
         <div class="form-check mb-2">
             <input class="form-check-input toggle-column-program" type="checkbox" data-column="1" checked>
             <label class="form-check-label">
-                {{ __('tables.th.description') }}
+                {{ __('tables.th.program') }}
             </label>
         </div>
 
         <div class="form-check mb-2">
             <input class="form-check-input toggle-column-program" type="checkbox" data-column="2" checked>
             <label class="form-check-label">
-                {{ __('tables.th.law_average') }}
+                {{ __('tables.th.description') }}
             </label>
         </div>
 
         <div class="form-check mb-2">
             <input class="form-check-input toggle-column-program" type="checkbox" data-column="3" checked>
             <label class="form-check-label">
-                {{ __('tables.th.law_correction') }}
+                {{ __('tables.th.financeLaw') }}
             </label>
         </div>
 
         <div class="form-check mb-2">
             <input class="form-check-input toggle-column-program" type="checkbox" data-column="4" checked>
             <label class="form-check-label">
-                {{ __('tables.th.financeLaw') }}
+                {{ __('tables.th.new_credit_status') }}
             </label>
         </div>
 
         <div class="form-check mb-2">
             <input class="form-check-input toggle-column-program" type="checkbox" data-column="5" checked>
             <label class="form-check-label">
-                {{ __('tables.th.new_credit_status') }}
+                {{ __('tables.th.deadline_balance') }}
             </label>
         </div>
 
         <div class="form-check mb-2">
             <input class="form-check-input toggle-column-program" type="checkbox" data-column="6" checked>
             <label class="form-check-label">
-                {{ __('tables.th.deadline_balance') }}
-            </label>
-        </div>
-
-        <div class="form-check mb-2">
-            <input class="form-check-input toggle-column-program" type="checkbox" data-column="7" checked>
-            <label class="form-check-label">
                 {{ __('tables.th.law_average') }}
             </label>
         </div>
 
         <div class="form-check mb-2">
-            <input class="form-check-input toggle-column-program" type="checkbox" data-column="8" checked>
+            <input class="form-check-input toggle-column-program" type="checkbox" data-column="7" checked>
             <label class="form-check-label">
                 {{ __('tables.th.law_correction') }}
             </label>
