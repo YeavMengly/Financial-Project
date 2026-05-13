@@ -10,14 +10,14 @@
                     <a href="{{ route('accountSub.index', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->chapter_id), 'accId' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.account.sub') }}</a>
                 @endif
-                @if (hasPermission('account.index') and (hasPermission('chapters.edit') or hasPermission('chapters.destroy')))
+                @if (hasPermission('accountSub.index') and (hasPermission('accounts.edit') or hasPermission('accounts.destroy')))
                     <hr />
                 @endif
-                @if (hasPermission('accounts.edit'))
+                @if (hasPermission('accounts.edit') && $module->is_archived != 2)
                     <a href="{{ route('accounts.edit', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->chapter_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                @if (hasPermission('accounts.destroy'))
+                @if (hasPermission('accounts.destroy') && $module->is_archived != 2)
                     <a href="#"
                         onclick="confirm('{{ route('accounts.destroy', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->chapter_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>

@@ -6,7 +6,7 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('accountSub.edit'))
+                @if (hasPermission('accountSub.edit') && $module->is_archived != 2)
                     <a href="{{ route('accountSub.edit', [
                         'params' => encode_params($module->ministry_id),
                         'chId' => encode_params($module->chapter_id),
@@ -18,7 +18,7 @@
                         {{ __('buttons.edit') }}
                     </a>
                 @endif
-                @if (hasPermission('accountSub.destroy'))
+                @if (hasPermission('accountSub.destroy') && $module->is_archived != 2)
                     <a href="#"
                         onclick="confirm('{{ route('accountSub.destroy', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->chapter_id), 'accId' => encode_params($module->account_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>

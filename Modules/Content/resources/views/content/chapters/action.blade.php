@@ -10,14 +10,14 @@
                     <a href="{{ route('accounts.index', ['params' => encode_params($module->ministry_id), 'chId' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.account') }}</a>
                 @endif
-                @if (hasPermission('account.index') and (hasPermission('chapters.edit') or hasPermission('chapters.destroy')))
+                @if (hasPermission('accounts.index') and (hasPermission('chapters.edit') or hasPermission('chapters.destroy')))
                     <hr />
                 @endif
-                @if (hasPermission('chapters.edit'))
+                @if (hasPermission('chapters.edit') && $module->is_archived != 2)
                     <a href="{{ route('chapters.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                @if (hasPermission('chapters.destroy'))
+                @if (hasPermission('chapters.destroy') && $module->is_archived != 2)
                     <a href="#"
                         onclick="confirm('{{ route('chapters.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>

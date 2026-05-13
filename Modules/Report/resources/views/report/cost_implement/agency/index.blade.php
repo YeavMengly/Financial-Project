@@ -40,11 +40,9 @@
 
                             <!-- Filter Year -->
                             <select id="ministryFilter" class="form-select">
-                                <option value="">{{ __('menus.annual.data') }}</option>
-
                                 @foreach ($ministries as $ministry)
                                     <option value="{{ $ministry->id }}">
-                                        {{ $ministry->year }}
+                                        {{ __('menus.annual.data') }} {{ $ministry->year }}
                                     </option>
                                 @endforeach
                             </select>

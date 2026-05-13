@@ -8,18 +8,27 @@ use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class CostImplementImportantsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(CostImplementImportantsDataTable $dataTable)
+    public function index(CostImplementImportantsDataTable $dataTable, Request $request)
     {
 
-        $ministries = Ministry::all();
+        $ministries = DB::table('ministries')
+            ->select('id', 'no', 'year', 'title', 'refer', 'name')
+            ->where('is_archived', 1)
+            ->orderBy('year', 'desc')
+            ->get();
+        $defaultYear = $ministries->first()->year ?? date('Y');
+        $year = $request->filled('year') ? $request->input('year') : $defaultYear;
+
         return $dataTable->render('report::report.cost_implement.importants.index', [
-            'ministries' => $ministries
+            'ministries' => $ministries,
+            'selectedYear' => $year,
         ]);
     }
 

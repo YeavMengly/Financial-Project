@@ -46,13 +46,16 @@ class ProgramDataTable extends DataTable
 
         $model = $model->newQuery();
         $model->withTrashed();
+        $model->leftJoin('ministries', 'programs.ministry_id', '=', 'ministries.id');
+
         $model->select([
             'programs.id',
             'programs.ministry_id',
             'programs.no',
             'programs.title',
             'programs.created_at',
-            'programs.deleted_at'
+            'programs.deleted_at',
+            'ministries.is_archived'
         ])
             ->where('programs.ministry_id', $id);
 

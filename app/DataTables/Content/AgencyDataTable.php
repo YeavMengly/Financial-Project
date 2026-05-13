@@ -45,17 +45,19 @@ class AgencyDataTable extends DataTable
         $model = $model->newQuery();
         $model->withTrashed();
         $model->newQuery()
+            ->leftJoin('ministries', 'agencies.ministry_id', '=', 'ministries.id')
             ->leftJoin('programs', 'agencies.program_id', '=', 'programs.id')
             ->select([
                 'agencies.id',
                 'agencies.ministry_id',
                 'agencies.program_id',
-                'agencies.no as name_no',
+                'agencies.no as agencies_no',
                 'agencies.name',
                 'agencies.nick_name',
                 'programs.no as no_program',
                 'agencies.created_at',
-                'agencies.deleted_at'
+                'agencies.deleted_at',
+                'ministries.is_archived'
 
             ])->where('agencies.ministry_id', $id)
             ->orderBy('agencies.created_at', 'ASC');
@@ -89,9 +91,9 @@ class AgencyDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('no_program')->title(__('tables.th.program'))->addClass('align-middle'),
-            Column::make('name_no')->title(__('tables.th.agency'))->addClass('align-middle'),
-            Column::make('name')->title(__('tables.th.title'))->addClass('align-middle'),
+            Column::make('no_program')->title(__('tables.th.program.code'))->addClass('align-middle'),
+            Column::make('agencies_no')->title(__('tables.th.title_entity.code'))->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.agency'))->addClass('align-middle'),
             Column::make('nick_name')->title(__('tables.th.nick_name'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
