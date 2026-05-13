@@ -53,6 +53,7 @@ class ChapterDataTable extends DataTable
             $model->where('types.code', $request->cboType);
         }
         $model->leftJoin('types', 'chapters.type_id', '=', 'types.code');
+        $model->leftJoin('ministries', 'chapters.ministry_id', '=', 'ministries.id');
 
         $model->withTrashed();
         $model
@@ -64,7 +65,8 @@ class ChapterDataTable extends DataTable
                 'chapters.type_id',
                 'chapters.created_at',
                 'chapters.deleted_at',
-                'types.name as type_name'
+                'types.name as type_name',
+                'ministries.is_archived'
             ])
             ->orderBy('created_at', 'ASC');
 

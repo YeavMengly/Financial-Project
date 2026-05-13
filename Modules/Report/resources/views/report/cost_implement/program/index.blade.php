@@ -38,26 +38,24 @@
                         <!-- RIGHT ACTION -->
                         <div class="d-flex align-items-center gap-2">
 
-                              <!-- Filter Year -->
+                            <!-- Filter Year -->
                             <select id="ministryFilter" class="form-select">
-                                <option value="">{{ __('menus.annual.data') }}</option>
-
                                 @foreach ($ministries as $ministry)
                                     <option value="{{ $ministry->id }}">
-                                        {{ $ministry->year }}
+                                        {{ __('menus.annual.data') }} {{ $ministry->year }}
                                     </option>
                                 @endforeach
                             </select>
 
                             <!-- SEARCH -->
-                            <div class="position-relative">
+                            {{-- <div class="position-relative">
 
                                 <input type="text" id="customSearch-program" class="form-control ps-5"
                                     placeholder="{{ __('forms.search...') }}" style="min-width:250px;">
 
                                 <i class="bx bx-search position-absolute" style="top:10px; left:15px;"></i>
 
-                            </div>
+                            </div> --}}
 
                             @include('report::report.cost_implement.program.dropdown')
 
@@ -163,7 +161,7 @@
         });
     </script>
 
-     <script>
+    <script>
         $('#yearFilter, #ministryFilter').on('change keyup', function() {
             $('#costimplementprogram-table').DataTable().ajax.reload();
         });

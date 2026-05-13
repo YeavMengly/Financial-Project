@@ -45,6 +45,15 @@ class AccountController extends Controller
         $id = decode_params($chId);
         $module = Ministry::where('id', decode_params($params))->first();
         $chapter = Chapter::where('id', $id)->first();
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($module->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
 
         return view('content::content.accounts.create')
             ->with('params', $params)
@@ -135,6 +144,16 @@ class AccountController extends Controller
         $account = Account::where('id', $id)
             ->where('chapter_id', $chapter->id)
             ->first();
+
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($module->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
 
         return view('content::content.accounts.edit')
             ->with('module', $module)

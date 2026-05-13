@@ -17,11 +17,11 @@
                     @if (hasPermission('program.sub.index') and (hasPermission('program.edit') or hasPermission('program.destroy')))
                         <hr />
                     @endif
-                    @if (hasPermission('program.edit'))
+                    @if (hasPermission('program.edit') && $module->is_archived != 2)
                         <a href="{{ route('program.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                             class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                     @endif
-                    @if (hasPermission('program.destroy'))
+                    @if (hasPermission('program.destroy') && $module->is_archived != 2)
                         <a href="#"
                             onclick="confirm('{{ route('program.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                             class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>

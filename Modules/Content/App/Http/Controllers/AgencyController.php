@@ -45,7 +45,7 @@ class AgencyController extends Controller
         $data = Program::where('ministry_id', $id)->get();
 
         return view('content::content.agency.create')->with('params', $params)
-            ->with('data', $data)->with('ministry', $ministry) ;
+            ->with('data', $data)->with('ministry', $ministry);
     }
 
     /**

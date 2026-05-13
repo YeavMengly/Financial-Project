@@ -30,6 +30,112 @@ return new class extends Migration
             ],
 
             /**
+             *   Begin Credit
+             */
+
+            'credit'                  => [
+                'show'   => 'initialBudgetVoucher.index',
+                'view'   => 'beginVoucher.index',
+                'create' => 'beginVoucher.create',
+                'edit'   => 'beginVoucher.edit',
+                'delete' => 'beginVoucher.destroy',
+            ],
+
+            /**
+             *   Payment
+             */
+            'expenditure.guarantee'                  => [
+                'show'   => 'initialMandate.index',
+                'view'   => 'budgetMandate.index',
+                'create' => 'budgetMandate.create',
+                'edit'   => 'budgetMandate.edit',
+                'delete' => 'budgetMandate.destroy',
+            ],
+
+            'advance.payment'                  => [
+                'show'   => 'initialAdvancePayment.index',
+                'view'   => 'budgetAdvancePayment.index',
+                'create' => 'budgetAdvancePayment.create',
+                'edit'   => 'budgetAdvancePayment.edit',
+                'delete' => 'budgetAdvancePayment.destroy',
+            ],
+
+            'payment'                  => [
+                'show'   => 'initialVoucher.index',
+                'view'   => 'budgetVoucher.index',
+                'create' => 'budgetVoucher.create',
+                'edit'   => 'budgetVoucher.edit',
+                'delete' => 'budgetVoucher.destroy',
+            ],
+
+            'expense.record.book'                  => [
+                'show'   => 'initialDirectPayment.index',
+                'view'   => 'budgetDirectPayment.index',
+                'create' => 'budgetDirectPayment.create',
+                'edit'   => 'budgetDirectPayment.edit',
+                'delete' => 'budgetDirectPayment.destroy',
+            ],
+
+            'payment.deadline'                  => [
+                'show'   => 'initialDirectPayment.paymentDeadline.index',
+                'view'   => 'budgetDirectPayment.paymentDeadline.index',
+                'create' => 'budgetDirectPayment.paymentDeadline.create',
+                'edit'   => 'budgetDirectPayment.paymentDeadline.edit',
+                'delete' => 'budgetDirectPayment.paymentDeadline.destroy',
+            ],
+
+            // Duel
+            'duel.entry'                  => [
+                'show'   => 'initialDuelEntry.index',
+                'view'   => 'duelEntry.index',
+                'create' => 'duelEntry.create',
+                'edit'   => 'duelEntry.edit',
+                'delete' => 'duelEntry.destroy',
+            ],
+
+            'duel.release'                  => [
+                'show'   => 'initialDuelRelease.index',
+                'view'   => 'duelRelease.index',
+                'create' => 'duelRelease.create',
+                'edit'   => 'duelRelease.edit',
+                'delete' => 'duelRelease.destroy',
+            ],
+
+            // Material
+            'material.entry'                  => [
+                'show'   => 'initialMaterialEntry.index',
+                'view'   => 'materialEntry.index',
+                'create' => 'materialEntry.create',
+                'edit'   => 'materialEntry.edit',
+                'delete' => 'materialEntry.destroy',
+            ],
+            'material.release'                  => [
+                'show'   => 'initialMaterialRelease.index',
+                'view'   => 'materialRelease.index',
+                'create' => 'materialRelease.create',
+                'edit'   => 'materialRelease.edit',
+                'delete' => 'materialRelease.destroy',
+            ],
+
+            // Water
+            'water'                  => [
+                'show'   => 'initialWater.index',
+                'view'   => 'water.index',
+                'create' => 'water.create',
+                'edit'   => 'water.edit',
+                'delete' => 'water.destroy',
+            ],
+
+            // Electric
+            'electric'                  => [
+                'show'   => 'initialElectric.index',
+                'view'   => 'electric.index',
+                'create' => 'electric.create',
+                'edit'   => 'electric.edit',
+                'delete' => 'electric.destroy',
+            ],
+
+            /**
              *   Content
              */
 
@@ -99,97 +205,6 @@ return new class extends Migration
                 'create' => 'expenseType.create',
                 'edit'   => 'expenseType.edit',
                 'delete' => 'expenseType.destroy',
-            ],
-
-            /**
-             *   Begin Credit
-             */
-
-            'credit'                  => [
-                'show'   => 'initialBudgetVoucher.index',
-                'view'   => 'beginVoucher.index',
-                'create' => 'beginVoucher.create',
-                'edit'   => 'beginVoucher.edit',
-                'delete' => 'beginVoucher.destroy',
-            ],
-
-            /**
-             *   Payment
-             */
-
-            'payment'                  => [
-                'show'   => 'initialVoucher.index',
-                'view'   => 'budgetVoucher.index',
-                'create' => 'budgetVoucher.create',
-                'edit'   => 'budgetVoucher.edit',
-                'delete' => 'budgetVoucher.destroy',
-            ],
-
-            'advance.payment'                  => [
-                'show'   => 'initialAdvancePayment.index',
-                'view'   => 'budgetAdvancePayment.index',
-                'create' => 'budgetAdvancePayment.create',
-                'edit'   => 'budgetAdvancePayment.edit',
-                'delete' => 'budgetAdvancePayment.destroy',
-            ],
-
-            'expenditure.guarantee'                  => [
-                'show'   => 'initialMandate.index',
-                'view'   => 'budgetMandate.index',
-                'create' => 'budgetMandate.create',
-                'edit'   => 'budgetMandate.edit',
-                'delete' => 'budgetMandate.destroy',
-            ],
-
-            // Water
-            'water'                  => [
-                'show'   => 'initialWater.index',
-                'view'   => 'water.index',
-                'create' => 'water.create',
-                'edit'   => 'water.edit',
-                'delete' => 'water.destroy',
-            ],
-
-            // Electric
-            'electric'                  => [
-                'show'   => 'initialElectric.index',
-                'view'   => 'electric.index',
-                'create' => 'electric.create',
-                'edit'   => 'electric.edit',
-                'delete' => 'electric.destroy',
-            ],
-
-            // Duel
-            'duel.entry'                  => [
-                'show'   => 'initialDuelEntry.index',
-                'view'   => 'duelEntry.index',
-                'create' => 'duelEntry.create',
-                'edit'   => 'duelEntry.edit',
-                'delete' => 'duelEntry.destroy',
-            ],
-
-            'duel.release'                  => [
-                'show'   => 'initialDuelRelease.index',
-                'view'   => 'duelRelease.index',
-                'create' => 'duelRelease.create',
-                'edit'   => 'duelRelease.edit',
-                'delete' => 'duelRelease.destroy',
-            ],
-
-            // Material
-            'material.entry'                  => [
-                'show'   => 'initialMaterialEntry.index',
-                'view'   => 'materialEntry.index',
-                'create' => 'materialEntry.create',
-                'edit'   => 'materialEntry.edit',
-                'delete' => 'materialEntry.destroy',
-            ],
-            'material.release'                  => [
-                'show'   => 'initialMaterialRelease.index',
-                'view'   => 'materialRelease.index',
-                'create' => 'materialRelease.create',
-                'edit'   => 'materialRelease.edit',
-                'delete' => 'materialRelease.destroy',
             ],
         ];
 
