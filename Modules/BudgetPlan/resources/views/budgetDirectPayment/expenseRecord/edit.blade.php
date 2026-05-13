@@ -40,7 +40,7 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.legal.id') }}</label>
+                                        <label>{{ __('forms.legal.id.payment') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"

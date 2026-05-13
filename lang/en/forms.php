@@ -78,9 +78,10 @@ return [
     'total.price' => 'តម្លៃ​សរុប​',
 
     'legal.id' => 'លេខលិខិត',
+    'legal.id.payment' => 'លេខលិខិត ( លិខិតសុំថវិការលេខ​ )',
     'payment.voucher' => 'លេខសលាកប័ត្រ',
     'legal.number' => 'លេខសម្គាល់សំណើ​ ( PO FMIS )',
-    'day.number' => 'លេខអាណត្ដិ',
+    'day.number' => 'លេខអាណត្ដិ ( អាណត្ដិបើកប្រាក់ )',
     'temporary.id' => 'លេខសម្គាល់អាណត្ដិ',
     'legal.name' => 'ឈ្មោះសំណើ',
     'title.entity' => 'អង្គភាព',
