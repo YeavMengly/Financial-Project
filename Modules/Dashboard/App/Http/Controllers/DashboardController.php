@@ -16,16 +16,42 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $ministries = DB::table('ministries')
-            ->select('id', 'no', 'year', 'title', 'refer', 'name')
-            ->where('is_archived', 1)
-            ->orderBy('year', 'desc')
-            ->get();
+        $todoStatus = $request->input('cboTodo', 2);
 
-        // ✅ default year = request('year') else latest ministry year else current year
+        $ministriesQuery = DB::table('ministries')
+            ->select('id', 'no', 'year', 'title', 'refer', 'name', 'status')
+            ->orderBy('year', 'desc');
+
+        if ($todoStatus == 2) {
+            $ministriesQuery->where('is_archived', 1);
+        } else {
+            $ministriesQuery->where('is_archived', 2);
+        }
+        $ministries = $ministriesQuery->get();
+        // First available year from current filtered rows
         $defaultYear = $ministries->first()->year ?? date('Y');
-        $year = $request->filled('year') ? $request->input('year') : $defaultYear;
+        // Requested year
+        $requestYear = $request->input('year');
 
+        $yearExists = $ministries->contains('year', $requestYear);
+        $year = ($request->filled('year') && $yearExists)
+            ? $requestYear
+            : $defaultYear;
+
+        // Fetch vouchers
+        $beginReportQuery = DB::table('begin_vouchers')
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->select('begin_vouchers.*');
+
+        if ($todoStatus == 2) {
+            $beginReportQuery->where('ministries.year', $year)
+                ->where('ministries.is_archived', 1);
+        } else {
+            $beginReportQuery->where('ministries.year', $year)
+                ->where('ministries.is_archived', 2);
+        }
+
+        $beginReport = $beginReportQuery->get();
         // BEGIN VOUCHERS (by year)
         $beginReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
@@ -350,7 +376,7 @@ class DashboardController extends Controller
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
-    
+
             'total_fin_law' => $total_fin_law,
             'chartDataFinLaw' => $chartDataFinLaw,
             'totalBeginVoucher' => $totalBeginVoucher,
