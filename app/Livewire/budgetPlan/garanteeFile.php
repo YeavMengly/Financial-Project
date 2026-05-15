@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class garanteeFile extends Component
+class GaranteeFile extends Component
 {
     use WithFileUploads;
 
