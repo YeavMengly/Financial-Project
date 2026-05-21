@@ -68,9 +68,13 @@
                         Request::routeIs('initialVoucher.*') ||
                         Request::routeIs('initialMandate.*') ||
                         Request::routeIs('initialAdvancePayment.*') ||
+                        Request::routeIs('initialDirectPayment.expenseRecord.*') ||
+                        Request::routeIs('initialDirectPayment.paymentDeadline.*') ||
                         Request::routeIs('budgetVoucher.*') ||
                         Request::routeIs('budgetMandate.*') ||
-                        Request::routeIs('budgetAdvancePayment.*');
+                        Request::routeIs('budgetAdvancePayment.*') ||
+                        Request::routeIs('budgetDirectPayment.expenseRecord.*') ||
+                        Request::routeIs('budgetDirectPayment.paymentDeadline.*');
                 @endphp
                 <li class="{{ $budgetPlanActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
@@ -80,7 +84,7 @@
                     <ul class="sub-menu {{ $budgetPlanActive ? 'mm-show' : '' }}"
                         aria-expanded="{{ $budgetPlanActive ? 'true' : 'false' }}">
 
-                        @if (hasPermission('ministries.index'))
+                        @if (hasPermission('initialMandate.index'))
                             <li>
                                 <a href="{{ route('initialMandate.index') }}"
                                     class="{{ Request::routeIs('initialMandate.*') ? 'active' : '' }}">
@@ -92,7 +96,7 @@
                             </li>
                         @endif
 
-                        @if (hasPermission('ministries.index'))
+                        @if (hasPermission('initialAdvancePayment.index'))
                             <li>
                                 <a href="{{ route('initialAdvancePayment.index') }}"
                                     class="{{ Request::routeIs('initialAdvancePayment.*') ? 'active' : '' }}">
@@ -104,7 +108,7 @@
                             </li>
                         @endif
 
-                        @if (hasPermission('ministries.index'))
+                        @if (hasPermission('initialVoucher.index'))
                             <li>
                                 <a href="{{ route('initialVoucher.index') }}"
                                     class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
@@ -121,7 +125,7 @@
                                 <span data-key="t-budget-plan">{{ __('menus.direct.payment') }}</span>
                             </a>
                             <ul>
-                                @if (hasPermission('ministries.index'))
+                                @if (hasPermission('initialDirectPayment.expenseRecord.index'))
                                     <li>
                                         <a href="{{ route('initialDirectPayment.expenseRecord.index') }}"
                                             class="{{ Request::routeIs('initialDirectPayment.expenseRecord.*') ? 'active' : '' }}">
@@ -132,7 +136,7 @@
                                         </a>
                                     </li>
                                 @endif
-                                @if (hasPermission('ministries.index'))
+                                @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
                                     <li>
                                         <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
                                             class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
@@ -402,7 +406,8 @@
                     <a href="{{ route('cost.implement.importants.index') }}"
                         class="{{ Request::routeIs('cost.implement.importants.*') ? 'active' : '' }}">
                         <i data-feather="folder"></i>
-                        <span data-key="t-cost.implement.importants">{{ __('menus.cost.implement.importants') }}</span>
+                        <span
+                            data-key="t-cost.implement.importants">{{ __('menus.cost.implement.importants') }}</span>
                     </a>
                 </li>
 
@@ -415,10 +420,11 @@
                 </li>
 
 
-                <li class="menu-title" data-key="t-content">{{ __('menus.content') }}</li>
+                {{-- ========== Setting ========== --}}
 
-                {{-- ========== Cluster ========== --}}
-                {{-- <li class="menu-title">{{ __('menus.cluster') }}</li> --}}
+                {{-- @if (hasPermission('ministries.index') and auth()->user()->role_id != 1) --}}
+
+                <li class="menu-title" data-key="t-content">{{ __('menus.content') }}</li>
 
                 @if (hasPermission('ministries.index'))
                     <li class="{{ Request::routeIs('ministries.*') ? 'mm-active' : '' }}">
@@ -439,26 +445,6 @@
                         </a>
                     </li>
                 @endif
-
-                {{-- @if (hasPermission('ministries.index'))
-                    <li class="{{ Request::routeIs('initialAccount.*') ? 'mm-active' : '' }}">
-                        <a href="{{ route('initialAccount.index') }}"
-                            class="{{ Request::routeIs('initialAccount.*') ? 'active' : '' }}">
-                            <i data-feather="database"></i>
-                            <span>{{ __('menus.accounts') }}</span>
-                        </a>
-                    </li>
-                @endif --}}
-
-                {{-- @if (hasPermission('ministries.index'))
-                    <li class="{{ Request::routeIs('initialAccountSub.*') ? 'mm-active' : '' }}">
-                        <a href="{{ route('initialAccountSub.index') }}"
-                            class="{{ Request::routeIs('initialAccountSub.*') ? 'active' : '' }}">
-                            <i data-feather="layers"></i>
-                            <span>{{ __('menus.sub.account') }}</span>
-                        </a>
-                    </li>
-                @endif --}}
 
                 @if (hasPermission('ministries.index'))
                     <li class="{{ Request::routeIs('initialProgram.*') ? 'mm-active' : '' }}">
@@ -489,6 +475,9 @@
                         </a>
                     </li>
                 @endif
+
+                {{-- @endif --}}
+
 
                 {{-- ========== Setting ========== --}}
                 @if (auth()->user()->role_id == 1)

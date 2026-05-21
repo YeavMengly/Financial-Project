@@ -69,11 +69,11 @@ return new class extends Migration
             ],
 
             'expense.record.book'                  => [
-                'show'   => 'initialDirectPayment.index',
-                'view'   => 'budgetDirectPayment.index',
-                'create' => 'budgetDirectPayment.create',
-                'edit'   => 'budgetDirectPayment.edit',
-                'delete' => 'budgetDirectPayment.destroy',
+                'show'   => 'initialDirectPayment.expenseRecord.index',
+                'view'   => 'budgetDirectPayment.expenseRecord.index',
+                'create' => 'budgetDirectPayment.expenseRecord.create',
+                'edit'   => 'budgetDirectPayment.expenseRecord.edit',
+                'delete' => 'budgetDirectPayment.expenseRecord.destroy',
             ],
 
             'payment.deadline'                  => [
