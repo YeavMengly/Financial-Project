@@ -447,13 +447,13 @@
                         </a>
                     </li>
 
-                    <li class="{{ Request::routeIs('keys.*') ? 'mm-active' : '' }}">
+                    {{-- <li class="{{ Request::routeIs('keys.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('keys.index') }}"
                             class="{{ Request::routeIs('keys.*') ? 'active' : '' }}">
                             <i data-feather="shield"></i>
                             <span data-key="t-roles">{{ __('menus.api.key') }}</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     {{-- <li class="{{ Request::routeIs('category.*') ? 'mm-active' : '' }}">
                         <a href="{{ route('category.index') }}"
