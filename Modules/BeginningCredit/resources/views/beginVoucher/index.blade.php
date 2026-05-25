@@ -94,12 +94,20 @@
                                 <i class="bi bi-arrow-clockwise me-1"></i> {{ __('buttons.delete') }}
                             </a>
 
-                            <a href="{{ route(
+                            {{-- <a href="{{ route(
                                 'beginVoucher.export',
                                 array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
                             ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
+                            </a> --}}
+                            <a href="{{ route(
+                                'beginVoucher.exportReport',
+                                array_merge(['params' => $params], request()->only(['agency', 'account', 'accountSub', 'no', 'txtDescription'])),
+                            ) }}"
+                                class="btn btn-success d-inline-flex align-items-center px-3 text-nowrap">
+                                <i class="bx bx-download me-1"></i>
+                                {{ __('buttons.download') }}
                             </a>
                         </div>
                     </form>

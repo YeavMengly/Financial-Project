@@ -23,6 +23,7 @@ return [
     "change.password" => "ផ្លាស់ប្ដូរពាក្យសម្ងាត់",
     "search" => "ស្វែងរក",
     "download" => "ទាញយក ឯកសារ",
+    "download.file" => "ឯកសារប្រចាំឆ្នាំ",
 
     "select" => "ជ្រើសរើស",
     'download' => 'ទាញយក',
