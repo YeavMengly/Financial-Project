@@ -19,7 +19,6 @@ class CostImplementAgencyController extends Controller
     {
         $ministries = DB::table('ministries')
             ->select('id', 'no', 'year', 'title', 'refer', 'name')
-            ->where('is_archived', 1)
             ->orderBy('year', 'desc')
             ->get();
         $defaultYear = $ministries->first()->year ?? date('Y');

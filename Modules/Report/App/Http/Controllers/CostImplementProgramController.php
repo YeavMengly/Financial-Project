@@ -19,13 +19,10 @@ class CostImplementProgramController extends Controller
     {
         $ministries = DB::table('ministries')
             ->select('id', 'no', 'year', 'title', 'refer', 'name')
-            ->where('is_archived', 1)
             ->orderBy('year', 'desc')
             ->get();
         $defaultYear = $ministries->first()->year ?? date('Y');
         $year = $request->filled('year') ? $request->input('year') : $defaultYear;
-
-        // dd($year);
 
         return $dataTable->render('report::report.cost_implement.program.index', [
             'ministries' => $ministries,
