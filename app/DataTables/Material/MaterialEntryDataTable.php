@@ -25,10 +25,10 @@ class MaterialEntryDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('price', function ($row) {
-                return number_format($row->price ?? 0);
+                return number_format($row->price ?? 0) . ' ៛';
             })
             ->editColumn('total_price', function ($row) {
-                return number_format($row->total_price ?? 0);
+                return number_format($row->total_price ?? 0) . ' ៛';
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';

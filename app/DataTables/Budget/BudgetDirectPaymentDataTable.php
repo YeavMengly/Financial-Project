@@ -30,7 +30,7 @@ class BudgetDirectPaymentDataTable extends DataTable
                 return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
             ->editColumn('budget', function ($row) {
-                return number_format($row->budget ?? 0);
+                return number_format($row->budget ?? 0) . ' ៛';
             })
             ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');

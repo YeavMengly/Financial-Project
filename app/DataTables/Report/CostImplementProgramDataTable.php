@@ -29,29 +29,26 @@ class CostImplementProgramDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('fin_law', function ($row) {
-                return number_format($row->fin_law ?? 0);
+                return number_format($row->fin_law ?? 0) . ' ៛';
             })
             ->editColumn('new_credit_status', function ($row) {
-                return number_format($row->new_credit_status ?? 0);
+                return number_format($row->new_credit_status ?? 0) . ' ៛';
             })
             ->editColumn('deadline_balance', function ($row) {
-                return number_format($row->deadline_balance ?? 0);
+                return number_format($row->deadline_balance ?? 0) . ' ៛';
             })
             ->editColumn('law_average', function ($row) {
-                return number_format($row->law_average ?? 0);
+
+                $value = $row->law_average ?? 0;
+
+                return number_format($value / 100, 2)  . '%';
             })
             ->editColumn('law_correction', function ($row) {
-                return number_format($row->law_correction ?? 0);
-            })
-            // ->editColumn('soft_delete', function ($soft_delete) {
-            //     $active = (is_null($soft_delete->delete_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
-            //     return $active;
-            // })
-            // ->editColumn('txtDescription', function ($row) {
-            //     return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
-            // })
-            // ->rawColumns(['txtDescription'])
 
+                $value = $row->law_correction ?? 0;
+
+                return number_format($value / 100, 2) . '%';
+            })
             ->setRowId('id');
     }
 
@@ -78,10 +75,10 @@ class CostImplementProgramDataTable extends DataTable
 
             DB::raw('COUNT(begin_vouchers.id) as total_records'),
         ])->groupBy(
-                'programs.id',
-                'programs.no',
-                'programs.title'
-            );
+            'programs.id',
+            'programs.no',
+            'programs.title'
+        );
 
         /**
          * FILTER YEAR

@@ -160,7 +160,7 @@
     </script>
 
     <script>
-        $('#yearFilter, #ministryFilter').on('change keyup', function() {
+        $('#yearFilter, #ministryFilter, #customSearch-agency').on('change keyup', function() {
             $('#costimplementagency-table').DataTable().ajax.reload();
         });
     </script>

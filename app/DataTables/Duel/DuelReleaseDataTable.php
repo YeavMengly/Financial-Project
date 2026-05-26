@@ -25,13 +25,13 @@ class DuelReleaseDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('quantity_total', function ($row) {
-                return number_format($row->quantity_total ?? 0);
+                return number_format($row->quantity_total ?? 0) . ' L';
             })
             ->editColumn('quantity_request', function ($row) {
-                return number_format($row->quantity_request ?? 0);
+                return number_format($row->quantity_request ?? 0) . ' L';
             })
             ->editColumn('duel_total', function ($row) {
-                return number_format($row->duel_total ?? 0);
+                return number_format($row->duel_total ?? 0) . ' L';
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';

@@ -21,6 +21,7 @@ return [
     'content.accounts' => 'គណនី',
     'content.sub.accounts' => 'អនុគណនី',
     'content.agency' => 'អង្គភាព',
+    'content.agency.executive.unit' => 'អង្គភាពប្រតិបត្តិ',
     'content.cluster' => 'ចង្កោម',
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',

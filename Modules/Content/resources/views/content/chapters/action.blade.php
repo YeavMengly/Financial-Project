@@ -1,4 +1,4 @@
-@if (hasPermission('chapters.edit') or hasPermission('chapters.destroy'))
+@if (hasPermission('chapters.index') || hasPermission('chapters.edit') || hasPermission('chapters.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
