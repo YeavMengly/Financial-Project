@@ -13,4 +13,8 @@ class Type extends Model
         'number_type',
         'name'
     ];
+      public function chapter()
+    {
+        return $this->belongsTo(Chapter::class, 'type_id', 'id');
+    }
 }

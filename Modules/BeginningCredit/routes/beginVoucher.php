@@ -19,6 +19,7 @@ Route::controller(BeginVoucherController::class)->group(function () {
     Route::post('{params}/credit-approved/store', 'store')->name('beginVoucher.store');
     Route::post('{params}/credit-approved/update/{id}', 'update')->name('beginVoucher.update');
     Route::get('{params}/credit-approved/export', 'export')->name('beginVoucher.export');
+    Route::get('{params}/annual_report/export', 'exportReport')->name('beginVoucher.exportReport');
 
     // These routes are for ajax request
     Route::get('/begin-voucher/get-by-program/program-subs', 'getByProgramId')->name('beginVoucher.by.program_sub');

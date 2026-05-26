@@ -47,6 +47,10 @@ class Chapter extends Model
     {
         return $this->hasMany(Account::class, 'chapter_id', 'id');
     }
+      public function type()
+    {
+        return $this->hasMany(Chapter::class, 'type_id', 'id');
+    }
 
     /* -----------------------------------------------------------------
      |  Activity Log Configuration
