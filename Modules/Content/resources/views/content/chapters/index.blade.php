@@ -60,20 +60,22 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('chapters.create'))
-                        <div class="col-sm">
-                            <div class="mb-4">
+                    {{-- @if (hasPermission('chapters.create') && $module->is_archived != 2) --}}
+                    <div class="col-sm">
+                        <div class="mb-4 d-flex flex-wrap gap-2">
+                            @if (hasPermission('chapters.create') && $module->is_archived != 2)
                                 <a class="btn btn-light waves-effect waves-light"
                                     href="{{ route('chapters.create', $params) }}"><i class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
-                            </div>
+                            @endif
+                            <a class="btn btn-dark"
+                                href="{{ route('initialChapter.index') }}">{{ __('buttons.back') }}</a>
                         </div>
-                    @endif
+                    </div>
+                    {{-- @endif --}}
                     <div class="table-responsive">
-
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
-
                 </div>
             </div>
         </div>

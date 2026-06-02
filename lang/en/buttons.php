@@ -31,5 +31,13 @@ return [
     'sub.program' => 'អនុកម្មវិធី',
     'account' => 'គណនី',
     'account.sub' => 'អនុគណនី',
-    'cluster' => 'ចង្កោម'
+    'cluster' => 'ចង្កោម',
+    'agency' => 'អង្គភាព',
+    'agency.execute' => 'អង្គភាពប្រតិបត្តិ',
+    'program' => 'កម្មវិធី',
+    'program.sub' => 'អនុកម្មវិធី',
+    'program.code' => 'លេខកម្មវិធី',
+    'executive.units' => 'អង្គភាពប្រតិបត្តិ',
+    'action' => 'សកម្មភាព',
+    'back' => 'ត្រឡប់វិញ',
 ];

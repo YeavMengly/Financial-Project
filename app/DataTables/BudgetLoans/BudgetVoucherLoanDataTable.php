@@ -24,19 +24,19 @@ class BudgetVoucherLoanDataTable extends DataTable
                 return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
             ->addColumn('internal_increase', function ($row) {
-                return number_format($row->internal_increase ?? 0);
+                return number_format($row->internal_increase ?? 0) . ' ៛';
             })
             ->addColumn('unexpected_increase', function ($row) {
-                return number_format($row->unexpected_increase ?? 0);
+                return number_format($row->unexpected_increase ?? 0) . ' ៛';
             })
             ->addColumn('additional_increase', function ($row) {
-                return number_format($row->additional_increase ?? 0);
+                return number_format($row->additional_increase ?? 0) . ' ៛';
             })
             ->addColumn('decrease', function ($row) {
-                return number_format($row->decrease ?? 0);
+                return number_format($row->decrease ?? 0) . ' ៛';
             })
             ->addColumn('editorial', function ($row) {
-                return number_format($row->editorial ?? 0);
+                return number_format($row->editorial ?? 0) . ' ៛';
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 return is_null($soft_delete->deleted_at)

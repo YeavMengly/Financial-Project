@@ -70,8 +70,8 @@
                                         <option value="">{{ __('forms.search...') }}</option>
 
                                         @foreach ($type as $item)
-                                            <option value="{{ $item->code }}"
-                                                {{ old('cboType', $chapter->type_id) == $item->code ? 'selected' : '' }}>
+                                            <option value="{{ $item->id }}"
+                                                {{ old('cboType', $chapter->type_id) == $item->id ? 'selected' : '' }}>
                                                 {{ $item->number_type }} - {{ $item->name }}
                                             </option>
                                         @endforeach

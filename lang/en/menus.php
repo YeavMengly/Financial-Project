@@ -21,6 +21,7 @@ return [
     'content.accounts' => 'គណនី',
     'content.sub.accounts' => 'អនុគណនី',
     'content.agency' => 'អង្គភាព',
+    'content.agency.executive.unit' => 'អង្គភាពប្រតិបត្តិ',
     'content.cluster' => 'ចង្កោម',
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
@@ -120,7 +121,8 @@ return [
     'cost.implement.agency' => 'ការអនុវត្តចំណាយតាមអង្គភាព',
     'cost.implement.program' => 'ការអនុវត្តចំណាយតាមកម្មវិធី',
     'cost.implement.importants' => 'ការអនុវត្តមុខចំណាយសំខាន់ៗ',
-    
+
     'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 
+    'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ'
 ];

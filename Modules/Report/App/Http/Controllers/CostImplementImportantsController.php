@@ -4,19 +4,32 @@ namespace Modules\Report\App\Http\Controllers;
 
 use App\DataTables\Report\CostImplementImportantsDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class CostImplementImportantsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(CostImplementImportantsDataTable $dataTable)
+    public function index(CostImplementImportantsDataTable $dataTable, Request $request)
     {
-        return $dataTable->render('report::report.cost_implement.importants.index');
-    }  
+
+        $ministries = DB::table('ministries')
+            ->select('id', 'no', 'year', 'title', 'refer', 'name')
+            ->orderBy('year', 'desc')
+            ->get();
+        $defaultYear = $ministries->first()->year ?? date('Y');
+        $year = $request->filled('year') ? $request->input('year') : $defaultYear;
+
+        return $dataTable->render('report::report.cost_implement.importants.index', [
+            'ministries' => $ministries,
+            'selectedYear' => $year,
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.

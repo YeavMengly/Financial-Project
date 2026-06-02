@@ -25,17 +25,17 @@ class DuelEntryDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('quantity', function ($row) {
-                return number_format($row->quantity ?? 0);
+                return number_format($row->quantity ?? 0) . ' L';
             })
             ->editColumn('price', function ($row) {
-                return number_format($row->price ?? 0);
+                return number_format($row->price ?? 0) . ' ៛';
             })
 
             ->editColumn('file', function ($row) {
                 return '<strong>' . $row->title  . '</strong><br/><hr/>' . $row->file;
             })
             ->editColumn('duel_total', function ($row) {
-                return number_format($row->duel_total ?? 0);
+                return number_format($row->duel_total ?? 0) . ' ៛';
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';

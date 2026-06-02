@@ -66,7 +66,7 @@
                                         <option value="">{{ __('forms.search...') }}</option>
 
                                         @foreach ($type as $item)
-                                            <option value="{{ $item->code }}">
+                                            <option value="{{ $item->id }}">
                                                 {{ $item->number_type }} - {{ $item->name }}
                                             </option>
                                         @endforeach

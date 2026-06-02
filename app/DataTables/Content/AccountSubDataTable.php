@@ -57,6 +57,7 @@ class AccountSubDataTable extends DataTable
         $query = $model->newQuery()
             ->leftJoin('chapters', 'account_subs.chapter_id', '=', 'chapters.id')
             ->leftJoin('accounts', 'account_subs.account_id', '=', 'accounts.id')
+            ->leftJoin('ministries', 'account_subs.ministry_id', '=', 'ministries.id')
             ->select([
                 'account_subs.id',
                 'account_subs.ministry_id',
@@ -66,6 +67,7 @@ class AccountSubDataTable extends DataTable
                 'account_subs.name',
                 'account_subs.created_at',
                 'account_subs.deleted_at',
+                'ministries.is_archived'
             ])
             ->where('account_subs.ministry_id', $id)
             ->where('account_subs.chapter_id', $chId)

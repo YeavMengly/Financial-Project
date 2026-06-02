@@ -61,7 +61,15 @@ class AccountSubController extends Controller
         $accountSub =  AccountSub::where('chapter_id', decode_params($chId))
             ->where('account_id', decode_params($accId))
             ->where('ministry_id', $id)->first();
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($module->is_archived == 2) {
 
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
         return view('content::content.accounts.accountSub.create')
             ->with('module', $module)
             ->with('chapter', $chapter)
@@ -156,6 +164,16 @@ class AccountSubController extends Controller
             ->where('chapter_id', decode_params($chId))
             ->where('account_id', decode_params($accId))
             ->where('ministry_id', decode_params($params))->first();
+
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($module->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
 
         return view('content::content.accounts.accountSub.edit')
             ->with('module', $module)

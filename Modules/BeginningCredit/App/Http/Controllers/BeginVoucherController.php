@@ -681,16 +681,16 @@ class BeginVoucherController extends Controller
         }
     }
 
-     public function exportReport(Request $request, $params)
+    public function exportReport(Request $request, $params)
     {
         try {
             $ministryId = decode_params($params);
 
-            // Base query: full BeginVoucher models
             $query = BeginVoucher::query()
-                ->where('ministry_id', $ministryId);
+                ->join('types', 'begin_vouchers.type_id', '=', 'types.id')
+                ->where('begin_vouchers.ministry_id', $ministryId)
+                ->select('begin_vouchers.*', 'types.name as type_name',);
 
-            // Apply the same filters as in DataTable::query()
             if ($request->filled('agency')) {
                 $query->where('agency_id', $request->agency);
             }

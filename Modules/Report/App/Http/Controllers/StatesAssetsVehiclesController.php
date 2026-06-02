@@ -2,7 +2,9 @@
 
 namespace Modules\Report\App\Http\Controllers;
 
+use App\DataTables\Report\StatesAssetsVehiclesDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,9 +14,12 @@ class StatesAssetsVehiclesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(StatesAssetsVehiclesDataTable $dataTable)
     {
-        return view('report::index');
+         $ministries = Ministry::all();
+        return $dataTable->render('report::report.states_assets.vehicles.index', [
+            'ministries' => $ministries
+        ]);
     }
 
     /**

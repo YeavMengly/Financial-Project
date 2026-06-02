@@ -39,6 +39,7 @@ class RoleController extends Controller
         try {
             Role::create([
                 'name' => $request->txtRole,
+                'slug' => strtolower($request->txtRole),
                 'permissions' => arrayCheck('permissions', $request->all()) ? $request->permissions : [],
             ]);
             DB::commit();
@@ -106,6 +107,7 @@ class RoleController extends Controller
             $role = Role::where('id', $id)->first();
             $role->update([
                 'name' => $request->txtRole,
+                'slug' => strtolower($request->txtRole),
                 'permissions' => arrayCheck('permissions', $request->all()) ? $request->permissions : [],
             ]);
             User::where('role_id', $id)
