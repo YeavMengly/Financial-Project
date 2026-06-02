@@ -4,6 +4,7 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\AnnualOpen\InitialBudgetVoucherDataTable;
 use App\DataTables\BeginVoucherDataTable;
+use App\Exports\AnnualReport;
 use App\Exports\ReportBook;
 use App\Http\Controllers\Controller;
 use App\Models\BeginCredit\BeginMandate;
@@ -274,8 +275,13 @@ class BeginVoucherController extends Controller
                 ? ($deadline_balance / $new_credit_status) * 100
                 : 0;
 
+            $chapter = Chapter::where('no', substr($validatedData['cboSubAccount'], 0, 2))
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
             $beginCredit = BeginVoucher::create([
                 'ministry_id'       => $ministry->id,
+                'type_id'           => $chapter->type_id ?? null,
                 'agency_id'         => $validatedData['cboAgency'],
                 'program_id'        => $validatedData['cboProgram'],
                 'program_sub_id'    => $validatedData['cboProgramSub'],
@@ -298,6 +304,7 @@ class BeginVoucherController extends Controller
 
             $BeginMandate = BeginMandate::create([
                 'ministry_id'       => $ministry->id,
+                'type_id'           => $chapter->type_id ?? null,
                 'agency_id'         => $validatedData['cboAgency'],
                 'program_id'        => $validatedData['cboProgram'],
                 'program_sub_id'    => $validatedData['cboProgramSub'],
@@ -662,6 +669,75 @@ class BeginVoucherController extends Controller
 
             // Pass filtered data + ministry id into export
             $export = new ReportBook($data, $ministryId);
+
+            // you can pass $request if you want to use date filters/text in header
+            return $export->export($request);
+        } catch (\Throwable $e) {
+            Log::error('Export Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('beginVoucher.index', $params);
+        }
+    }
+
+    public function exportReport(Request $request, $params)
+    {
+        try {
+            $ministryId = decode_params($params);
+
+            $query = BeginVoucher::query()
+                ->join('types', 'begin_vouchers.type_id', '=', 'types.id')
+                ->where('begin_vouchers.ministry_id', $ministryId)
+                ->select('begin_vouchers.*', 'types.name as type_name',);
+
+            if ($request->filled('agency')) {
+                $query->where('agency_id', $request->agency);
+            }
+
+            if ($request->filled('account')) {
+                $query->where('account_id', $request->account);
+            }
+
+            if ($request->filled('accountSub')) {
+                $query->where('account_sub_id', $request->accountSub);
+            }
+
+            if ($request->filled('cluster')) {
+                $query->where('cluster_id', $request->cluster);
+            }
+
+            if ($request->filled('txtDescription')) {
+                $query->where('txtDescription', 'like', "%{$request->txtDescription}%");
+            }
+
+            $query->orderBy('created_at', 'DESC');
+
+            $data = $query->get();
+
+            Log::info('Exported BeginVoucher Count', [
+                'ministry_id' => $ministryId,
+                'count'       => $data->count(),
+            ]);
+
+            if ($data->isEmpty()) {
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+                    ->flash();
+
+                return redirect()->route('beginVoucher.index', $params);
+            }
+
+            // Pass filtered data + ministry id into export
+            $export = new AnnualReport($data, $ministryId);
 
             // you can pass $request if you want to use date filters/text in header
             return $export->export($request);

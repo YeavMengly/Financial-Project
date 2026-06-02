@@ -19,7 +19,8 @@ class EditFileDocument extends Component
     public $documentFile = "";
     public $documentOldFile = "";
 
-    public function mount($params) {
+    public function mount($params)
+    {
         $id = decode_params($params);
         $document = Document::where("id", $id)->first();
         $this->doc_id = $document->id;
@@ -31,19 +32,20 @@ class EditFileDocument extends Component
         return view('livewire.document.edit-file-document');
     }
 
-    public function save() {
+    public function save()
+    {
         $validated = $this->validate([
             'documentFile'   => 'required|file|max:51200',
-        ],[
+        ], [
             "documentFile" => [
                 "required" => "ជ្រើសរើស File ឯកសារ",
                 "max" => "File ឯកសារត្រូវតែតូចជាងទំហំ 10MB"
             ]
-        ],[
+        ], [
             "documentFile" => __("forms.document.file")
         ]);
-        $path_store = "uploads/document/".date("Y-m-d");
-        if(!File::exists($path_store)) {
+        $path_store = "uploads/document/" . date("Y-m-d");
+        if (!File::exists($path_store)) {
             File::makeDirectory($path_store, 0777, true, true);
         }
         $last_file = $this->documentFile->store($path_store);

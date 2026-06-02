@@ -23,7 +23,10 @@ return new class extends Migration
             $table->decimal('budget', 15, 2)->default(0);
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legal_number', 100);
+            $table->string('legal_id', 100);
             $table->string('legal_name');
+            $table->string('temporary_id', 100);
+            $table->string('day_of_number', 100);
             $table->enum('status', ['todo', 'done'])->default('todo');
             $table->integer('is_archived')->default(1);
             $table->text('description');

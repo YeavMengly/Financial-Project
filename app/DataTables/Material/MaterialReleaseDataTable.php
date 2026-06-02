@@ -24,12 +24,6 @@ class MaterialReleaseDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            // ->editColumn('price', function ($row) {
-            //     return number_format($row->price ?? 0);
-            // })
-            // ->editColumn('total_price', function ($row) {
-            //     return number_format($row->total_price ?? 0);
-            // })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
@@ -37,9 +31,6 @@ class MaterialReleaseDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('material::materialEntry.action', ['module' => $module]);
             })
-            // ->editColumn('note', function ($row) {
-            //     return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->note) . '</div>';
-            // })
             ->editColumn('refer', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->refer) . '</div>';
             })

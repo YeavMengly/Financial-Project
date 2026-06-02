@@ -44,6 +44,15 @@ class ProgramController extends Controller
     {
         $ministry = Ministry::where('id', decode_params($params))->first();
 
+        /**
+         * BLOCK ARCHIVED
+         */
+        // if ($ministry->is_archived == 2) {
+
+        //     return redirect()
+        //         ->back()
+        //         ->with('error', __('messages.archive_not_allowed'));
+        // }
         return view('content::content.program.create')
             ->with('ministry', $ministry)
             ->with('params', $params);
@@ -98,6 +107,16 @@ class ProgramController extends Controller
         $module = Program::where('id', decode_params($id))
             ->where('ministry_id', $ministry->id)
             ->first();
+
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($ministry->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
 
         return view('content::content.program.edit')
             ->with('module', $module)

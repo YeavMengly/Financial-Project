@@ -7,6 +7,7 @@ use App\DataTables\Content\ChapterDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Ministry;
 use App\Models\Content\Chapter;
+use App\Models\Content\Type;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -30,10 +31,12 @@ class ChapterController extends Controller
     {
         $id  = decode_params($params);
         $module = Ministry::where('id', $id)->first();
+        $type = Type::all();
 
         return $dataTable->render('content::content.chapters.index', [
             'params' => $params,
-            'module' => $module
+            'module' => $module,
+            'type' => $type
         ]);
     }
 
@@ -43,10 +46,22 @@ class ChapterController extends Controller
     public function create($params)
     {
         $module = Ministry::where('id', decode_params($params))->first();
+        $type = Type::all();
+
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($module->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
 
         return view('content::content.chapters.create')
             ->with('params', $params)
-            ->with('module', $module);
+            ->with('module', $module)
+            ->with('type', $type);
     }
 
     /**
@@ -57,6 +72,7 @@ class ChapterController extends Controller
         $request->validate([
             'no' => 'required',
             'name' => 'required',
+            'cboType' => 'required'
         ]);
 
         $id = decode_params($params);
@@ -70,6 +86,7 @@ class ChapterController extends Controller
                 'ministry_id' => $ministry->id,
                 'no' => $request->no,
                 'name' => $request->name,
+                'type_id' => $request->cboType
             ]);
 
             DB::commit(); // Commit the transaction
@@ -103,11 +120,24 @@ class ChapterController extends Controller
         $ministry = Ministry::where('id', decode_params($params))->first();
         $chapter = Chapter::where('id', decode_params($id))
             ->where('ministry_id', $ministry->id)->first();
+        $type = Type::all();
+
+        /**
+         * BLOCK ARCHIVED
+         */
+        if ($ministry->is_archived == 2) {
+
+            return redirect()
+                ->back()
+                ->with('error', __('messages.archive_not_allowed'));
+        }
+
 
         return view('content::content.chapters.edit')
             ->with('chapter', $chapter)
             ->with('params', $params)
-            ->with('ministry', $ministry);
+            ->with('ministry', $ministry)
+            ->with('type', $type);
     }
 
     /**
@@ -118,6 +148,7 @@ class ChapterController extends Controller
         $validateData = $request->validate([
             'no' => ['required'],
             'name' => ['required'],
+            'cboType' => ['required'],
         ]);
 
         DB::beginTransaction();
@@ -129,6 +160,7 @@ class ChapterController extends Controller
             $chapter->update([
                 'no' => $validateData['no'],
                 'name' => $validateData['name'],
+                'type_id' => $validateData['cboType'],
             ]);
 
             DB::commit();

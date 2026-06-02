@@ -10,6 +10,10 @@
                     <a href="{{ route('budgetVoucher.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
+                 @if (hasPermission('payment.edit.doc'))
+                    <a href="{{ route('payment.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}</a>
+                @endif
                 @if (hasPermission('budgetVoucher.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('budgetVoucher.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"

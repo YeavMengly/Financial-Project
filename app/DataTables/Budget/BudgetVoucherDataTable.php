@@ -29,7 +29,7 @@ class BudgetVoucherDataTable extends DataTable
                 return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
             })
             ->editColumn('budget', function ($row) {
-                return number_format($row->budget ?? 0);
+                return number_format($row->budget ?? 0) . ' ៛';
             })
             ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
@@ -95,16 +95,20 @@ class BudgetVoucherDataTable extends DataTable
         $model = $model->newQuery();
         $model->withTrashed();
 
-        if ($request->cboStatus) {
+        if ($request->has('cboStatus')) {
             if ($request->cboStatus == '2') {
-                $model->where('budget_vouchers.deleted_at', null);
+                // Only non-deleted
+                $model->whereNull('budget_vouchers.deleted_at');
             } elseif ($request->cboStatus == '3') {
-                $model->where('budget_vouchers.deleted_at', '!=', null);
+                // Only deleted
+                $model->onlyTrashed();
             } else {
+                // All records
                 $model->withTrashed();
             }
         } else {
-            $model->where('budget_vouchers.deleted_at', null);
+            // Default: non-deleted
+            $model->whereNull('budget_vouchers.deleted_at');
         }
 
         if ($request->cboTodo) {

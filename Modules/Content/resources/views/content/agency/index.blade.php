@@ -47,7 +47,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('agency.create'))
+                    @if (hasPermission('agency.create') && $data->is_archived != 2)
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"

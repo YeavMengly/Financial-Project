@@ -50,6 +50,8 @@ class ProgramSubDataTable extends DataTable
 
         $model = $model->newQuery();
         $model->withTrashed();
+         $model->leftJoin('ministries', 'program_subs.ministry_id', '=', 'ministries.id');
+
         $query = $model->newQuery()
             ->leftJoin('programs', 'program_subs.program_id', '=', 'programs.id')
             ->select([
@@ -60,6 +62,7 @@ class ProgramSubDataTable extends DataTable
                 'program_subs.decription',
                 'program_subs.created_at',
                 'program_subs.deleted_at',
+                'ministries.is_archived'
             ])
             ->where('program_subs.ministry_id', $id)
             ->where('program_subs.program_id', $pId)

@@ -133,6 +133,13 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-sm-3">
+                            <label class="form-label font-size-13 text-muted" for="cboTodo">កំណត់ចំណាំ</label>
+                            <select class="form-select" id="cboTodo" name="cboTodo" onchange="this.form.submit()">
+                                <option value="2" {{ request('cboTodo') == 2 ? 'selected' : '' }}>កំពុងធ្វើ</option>
+                                <option value="3" {{ request('cboTodo') == 3 ? 'selected' : '' }}>បានបញ្ចប់</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -442,7 +449,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#1fad12"></i>
-                                        <span class="me-3">បុរេប្រទាន</span>
+                                        <span class="me-3">{{ __('menus.advance.payment') }}</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
                                             {{ $totalCountAdvance }}
                                         </button>
@@ -479,7 +486,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-12 me-3"
                                             style="color:#f6ff00"></i>
-                                        <span class="me-3">ទូទាត់ </span>
+                                        <span class="me-3">{{ __('menus.payment') }}</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                             {{ $totalCountPayment }}
                                         </button>
@@ -511,9 +518,87 @@
                                     </h6>
                                 </div>
                             </div>
+                            <div class="col-sm align-self-center mt-5">
+                                {{-- expense_Record --}}
+                                <div class="mt-4 mt-sm-0">
+                                    <div>
+                                        <p class="mb-2">
+                                            <i class="mdi mdi-circle align-middle font-size-10 me-3"
+                                                style="color:#fa2314"></i>
+                                            <span class="me-3">{{ __('menus.direct.payment') }}</span>
+                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                                {{ $totalCountExpenseR }}
+                                            </button>
+                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                                {{ $totalCountPaymentD }}
+                                            </button>
+                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                                type="button">
+                                                <span class="dropdown">
+                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true">
+                                                        នៅសល់
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
+                                                        style="min-width:250px;">
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                            <i class="mdi mdi-circle"
+                                                                style="color:#c0341e; font-size:10px;"></i>
+                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        </p>
+                                        <h6>
+                                            <span class="text-muted font-size-14 fw-normal">
+                                                {{ number_format($expense_Record) }} រៀល
+                                            </span>
+                                        </h6>
+                                    </div>
+                                    <div class="mt-10 pt-2">
+                                        <p class="mb-2">
+                                            <i class="mdi mdi-circle align-middle font-size-10 me-3"
+                                                style="color:#00fff2"></i>
+                                            <span class="me-3">{{ __('menus.payment') }}</span>
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                                {{ $totalCountPaymentD }}
+                                            </button>
+                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                                type="button">
+                                                <span class="dropdown w-100">
+                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true">
+                                                        នៅសល់
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
+                                                        style="min-width:250px;">
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                            <i class="mdi mdi-circle"
+                                                                style="color:#c0341e; font-size:10px;"></i>
+                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                                {{ number_format($totalDirPayment) }} រៀល</h6>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        </p>
+                                        <h6>
+                                            <span class="text-muted font-size-14 fw-normal">
+                                                {{ number_format($payment_Deadline) }} រៀល
+                                            </span>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <div class="col-sm">
-                            <div id="Expense-Type" data-colors='["#1fad12" ,"#f6ff00","#faad14","#2200ff"]'
+                            <div id="Expense-Type"
+                                data-colors='["#1fad12" ,"#f6ff00","#fa2314","#00fff2","#faad14","#2200ff"]'
                                 class="apex-charts">
                             </div>
                         </div>
@@ -560,7 +645,7 @@
                                     <p class="mb-2">
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#2200ff"></i>
-                                        <span class="me-3">ទូទាត់ </span>
+                                        <span class="me-3">{{ __('menus.payment') }}</span>
                                         <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                             {{ $totalCountDir }}
                                         </button>
@@ -609,7 +694,8 @@
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
                             <div class="text-truncate">
-                                <div class="text-muted small">{{ __('menus.content.program') }} <span>{{ $program->no }}</span>
+                                <div class="text-muted small">{{ __('menus.content.program') }}
+                                    <span>{{ $program->no }}</span>
                                 </div>
                             </div>
                             <div class="ms-auto">
@@ -745,7 +831,7 @@
                                     @endforeach
                                 </select>
                             </form> --}}
-                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalFuel }}
                             </button>
                             <button type="button" class="btn btn-soft-danger btn-sm mb-3">
@@ -821,7 +907,7 @@
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalDiesel }}
                             </button>
-                             <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
                                 {{ $totalDieselRelease }}
                             </button>
                         </div>
@@ -850,8 +936,7 @@
                                     <div class="p-2 rounded bg-primary-subtle">
                                         <small class="text-muted d-block">{{ __('menus.remain') }}</small>
                                         <div class="fw-semibold">
-                                            {{ number_format($qtyDieselRemain) }} <span
-                                                class="text-muted">លីត្រ</span>
+                                            {{ number_format($qtyDieselRemain) }} <span class="text-muted">លីត្រ</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1044,7 +1129,18 @@
                 shouldSort: false
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: '',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
     </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1258,6 +1354,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const year = document.getElementById('year');
+            const cboTodo = document.getElementById('cboTodo');
             const chapter = document.getElementById('chapterLabels');
             const form = document.getElementById('filter');
             const chapterForm = document.getElementById('chapterFilter');
@@ -1265,7 +1362,9 @@
             year.addEventListener('change', function() {
                 form.submit();
             });
-
+            cboTodo.addEventListener('change', function() {
+                form.submit();
+            });
             chapter.addEventListener('change', function() {
                 chapterForm.submit();
             });
@@ -1557,15 +1656,18 @@
                 series: [
                     {{ round($percent_advance_Payment, 2) }},
                     {{ round($percent_Payment, 2) }},
+                    {{ round($percent_expense_record, 2) }},
+                    {{ round($percent_Payment_Deadline, 2) }},
                     {{ round($percent_expenditure_Guarantee, 2) }},
                     {{ round($percent_direct_Payment, 2) }},
                 ],
                 labels: [
-                    "បុរេប្រទាន",
-                    "ទូទាត់",
-                    "ធានាចំណាយ",
-                    "ទូទាត់",
-                    // "បើកផ្ដល់មុន",
+                    "{{ __('menus.advance.payment') }}",
+                    "{{ __('menus.payment') }}",
+                    "{{ __('menus.direct.payment') }}",
+                    "{{ __('menus.payment') }}",
+                    "{{ __('menus.expenditure.guarantee') }}",
+                    "{{ __('menus.payment') }}",
                 ],
                 colors: colors,
                 plotOptions: {

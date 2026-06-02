@@ -93,19 +93,20 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('cluster.create'))
-                        <div class="col-sm">
-                            <div class="mb-4 d-flex flex-wrap gap-2">
+                    {{-- @if (hasPermission('cluster.create') && $module->is_archived != 2) --}}
+                    <div class="col-sm">
+                        <div class="mb-4 d-flex flex-wrap gap-2">
+                            @if (hasPermission('cluster.create') && $module->is_archived != 2)
                                 <a class="btn btn-light waves-effect waves-light"
                                     href="{{ route('cluster.create', ['params' => $params, 'pId' => $pId, 'pSubId' => $pSubId]) }}"><i
                                         class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
-
-                                <a class="btn btn-dark"
-                                    href="{{ route('program.sub.index', ['params' => $params, 'pId' => $pId]) }}">{{ __('buttons.back') }}</a>
-                            </div>
+                            @endif
+                            <a class="btn btn-dark"
+                                href="{{ route('program.sub.index', ['params' => $params, 'pId' => $pId]) }}">{{ __('buttons.back') }}</a>
                         </div>
-                    @endif
+                    </div>
+                    {{-- @endif --}}
 
 
                     <div class="table-responsive">

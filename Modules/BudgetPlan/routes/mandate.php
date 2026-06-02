@@ -17,6 +17,12 @@ Route::middleware('PermissionCheck')
         Route::get('advance/payment/{params}/create', 'createAdvancePayment')->name('budgetAdvancePayment.create');
         Route::get('advance/payment/{params}/edit/{id}', 'editAdvancePayment')->name('budgetAdvancePayment.edit');
         Route::get('advance/payment/{params}/destroy/{id}', 'destroyAdvancePayment')->name('budgetAdvancePayment.destroy');
+
+        Route::get('direct/payment/expense-record', 'getIndexExpenseRecord')->name('initialDirectPayment.expenseRecord.index');
+        Route::get('direct/payment/expense-record/{params}', 'getIndexExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.index');
+        Route::get('direct/payment/expense-record/{params}/create', 'createExpenseRecord')->name('budgetDirectPayment.expenseRecord.create');
+        Route::get('direct/payment/expense-record/{params}/edit/{id}', 'editExpenseRecord')->name('budgetDirectPayment.expenseRecord.edit');
+        Route::get('direct/payment/expense-record/{params}/destroy/{id}', 'destroyExpenseRecord')->name('budgetDirectPayment.expenseRecord.destroy');
     });
 
 Route::controller(BudgetMandateController::class)->group(function () {
@@ -60,4 +66,24 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetAdvancePayment.getEarlyBalance');
     Route::get('advance/payment/{params}/edit-early-balance', 'editEarlyBalance')
         ->name('budgetAdvancePayment.editEarlyBalance');
+
+    Route::post('direct/payment/expense-record/{params}/store', 'storeExpenseRecord')->name('budgetDirectPayment.expenseRecord.store');
+    Route::post('direct/payment/expense-record/{params}/update/{id}', 'updateExpenseRecord')->name('budgetDirectPayment.expenseRecord.update');
+    Route::get('direct/payment/expense-record/{params}/restore/{id}', 'restoreExpenseRecord')->name('budgetDirectPayment.expenseRecord.restore');
+
+    Route::get('direct/payment/expense-record/get-by-program/program-subs', 'getByProgramId')->name('budgetDirectPayment.expenseRecord.by.program_sub');
+    Route::get('direct/payment/expense-record/get-by-program/agencies', 'getByAgency')->name('budgetDirectPayment.expenseRecord.by.agency');
+    Route::get('direct/payment/expense-record/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetDirectPayment.expenseRecord.by.cluster');
+
+    Route::get('direct/payment/expense-record/edit-by-program/program-subs', 'editByProgramId')->name('budgetDirectPayment.expenseRecord.edit.program_sub');
+    Route::get('direct/payment/expense-record/edit-by-program/agencies', 'editByAgency')->name('budgetDirectPayment.expenseRecord.edit.agency');
+    Route::get('direct/payment/expense-record/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetDirectPayment.expenseRecord.edit.cluster');
+
+    Route::get('direct/payment/expense-record/{params}/get-early-balance', 'getEarlyBalance')
+        ->name('budgetDirectPayment.expenseRecord.getEarlyBalance');
+    Route::get('direct/payment/expense-record/{params}/edit-early-balance', 'editEarlyBalance')
+        ->name('budgetDirectPayment.expenseRecord.editEarlyBalance');
+
+    Route::get('direct/payment/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.exportExpenseRecordBook');
+
 });

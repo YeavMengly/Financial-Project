@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('begin_mandates', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('type_id');
             $table->unsignedBigInteger('agency_id');
             $table->unsignedBigInteger('program_id');
             $table->unsignedBigInteger('program_sub_id');

@@ -6,11 +6,21 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('agency.edit'))
+                @if (hasPermission('executiveUnit.index'))
+                    <a href="{{ route('executiveUnit.index', [
+                        'params' => encode_params($module->ministry_id),
+                        'executiveId' => encode_params($module->id),
+                    ]) }}"
+                        class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.executive.units') }}</a>
+                @endif
+                @if (hasPermission('executiveUnit.index') and (hasPermission('agency.edit') or hasPermission('agency.destroy')))
+                    <hr />
+                @endif
+                @if (hasPermission('agency.edit') && $module->is_archived != 2)
                     <a href="{{ route('agency.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                @if (hasPermission('agency.destroy'))
+                @if (hasPermission('agency.destroy') && $module->is_archived != 2)
                     <a href="#"
                         onclick="confirm('{{ route('agency.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item"><i class="bx bx-trash"></i> {{ __('buttons.delete') }}</a>
