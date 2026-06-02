@@ -133,6 +133,13 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-sm-3">
+                            <label class="form-label font-size-13 text-muted" for="cboTodo">កំណត់ចំណាំ</label>
+                            <select class="form-select" id="cboTodo" name="cboTodo" onchange="this.form.submit()">
+                                <option value="2" {{ request('cboTodo') == 2 ? 'selected' : '' }}>កំពុងធ្វើ</option>
+                                <option value="3" {{ request('cboTodo') == 3 ? 'selected' : '' }}>បានបញ្ចប់</option>
+                            </select>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -1122,7 +1129,18 @@
                 shouldSort: false
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: '',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
     </script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1336,6 +1354,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const year = document.getElementById('year');
+            const cboTodo = document.getElementById('cboTodo');
             const chapter = document.getElementById('chapterLabels');
             const form = document.getElementById('filter');
             const chapterForm = document.getElementById('chapterFilter');
@@ -1343,7 +1362,9 @@
             year.addEventListener('change', function() {
                 form.submit();
             });
-
+            cboTodo.addEventListener('change', function() {
+                form.submit();
+            });
             chapter.addEventListener('change', function() {
                 chapterForm.submit();
             });

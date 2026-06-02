@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class advancePayment extends Component
+class AdvancePayment extends Component
 {
     use WithFileUploads;
 

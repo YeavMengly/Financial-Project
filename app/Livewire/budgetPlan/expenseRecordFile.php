@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class expenseRecordFile extends Component
+class ExpenseRecordFile extends Component
 {
     use WithFileUploads;
 

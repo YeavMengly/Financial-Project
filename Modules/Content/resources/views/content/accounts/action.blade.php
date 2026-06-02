@@ -1,4 +1,4 @@
-@if (hasPermission('accounts.edit') or hasPermission('accounts.destroy'))
+@if (hasPermission('accounts.index') or hasPermission('accounts.edit') or hasPermission('accounts.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">

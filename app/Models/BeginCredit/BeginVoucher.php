@@ -5,6 +5,7 @@ namespace App\Models\BeginCredit;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\Content\Ministry;
+use App\Models\Content\Type;
 use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Program;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,6 +75,10 @@ class BeginVoucher extends Model
     public function agency()
     {
         return $this->belongsTo(Agency::class, 'agency_id', 'id');
+    }
+      public function type()
+    {
+        return $this->belongsTo(Type::class );
     }
 
     /**

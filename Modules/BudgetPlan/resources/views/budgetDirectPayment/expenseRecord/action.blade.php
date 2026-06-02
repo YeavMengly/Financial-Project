@@ -1,5 +1,5 @@
 
-@if (hasPermission('budgetDirectPayment.expenseRecord.edit') or hasPermission('budgetMandate.destroy'))
+@if (hasPermission('budgetDirectPayment.expenseRecord.edit') or hasPermission('budgetDirectPayment.expenseRecord.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">

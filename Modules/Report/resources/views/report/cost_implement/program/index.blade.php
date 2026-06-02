@@ -47,16 +47,6 @@
                                 @endforeach
                             </select>
 
-                            <!-- SEARCH -->
-                            {{-- <div class="position-relative">
-
-                                <input type="text" id="customSearch-program" class="form-control ps-5"
-                                    placeholder="{{ __('forms.search...') }}" style="min-width:250px;">
-
-                                <i class="bx bx-search position-absolute" style="top:10px; left:15px;"></i>
-
-                            </div> --}}
-
                             @include('report::report.cost_implement.program.dropdown')
 
                         </div>

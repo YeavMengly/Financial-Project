@@ -10,7 +10,12 @@ class Type extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'number_type',
         'name'
     ];
+    public function chapter()
+    {
+         return $this->hasMany(Chapter::class, 'type_id', 'id');
+    }
 }
