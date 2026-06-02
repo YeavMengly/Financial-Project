@@ -4,7 +4,6 @@
     {{-- Plugin CSS (only if used on this page) --}}
     <link href="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet"
         type="text/css" />
-
     <link href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
@@ -101,17 +100,14 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.dashboard') }}</h4>
-
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.dashboard') }}</a></li>
-                        {{-- <li class="breadcrumb-item active">{{ __('menus.dashboard') }}</li> --}}
                     </ol>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -122,7 +118,6 @@
                             <label for="year" class="form-label font-size-13 text-muted">
                                 {{ __('forms.year') }}
                             </label>
-
                             <select class="form-control" name="year" id="year">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($ministries as $item)
@@ -161,7 +156,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_fin_law }}">
@@ -169,12 +163,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap mt-2">
                         <span class="badge bg-success-subtle text-success">
                             {{ number_format($total_fin_law) }}
@@ -183,7 +175,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -198,7 +189,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_total_increase }}">
@@ -206,12 +196,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap">
                         <span class="badge bg-success-subtle text-success">
                             {{ number_format($total_total_increase) }}
@@ -234,7 +222,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_new_credit_status }}">
@@ -242,12 +229,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart9" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap">
                         <span class="badge bg-success-subtle text-success">
                             {{ number_format($total_total_increase) }}
@@ -256,7 +241,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -271,7 +255,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_deadline_balance }}">
@@ -279,12 +262,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart3" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap">
                         <span class="badge bg-danger-subtle text-danger">
                             {{ number_format($total_deadline_balance) }}
@@ -293,7 +274,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -314,7 +294,6 @@
                                     </span>
                                 </div>
                             </div>
-
                             <div class="col-12">
                                 <span class="text-muted lh-4 d-block text-truncate">
                                     {{ __('tables.th.law_correction') }}
@@ -332,7 +311,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-6 text-nowrap d-flex">
                         <div class="col-12">
                             <span class="badge bg-success-subtle text-success">
@@ -363,26 +341,6 @@
             <div class="card card-h-100">
                 <!-- card body -->
                 <div class="card-body">
-                    {{-- <div class="d-flex flex-wrap align-items-center mb-4">
-                        <h5 class="card-title me-2">{{ __('labels.begin.budget') }}</h5>
-                        <div class="ms-auto">
-                            <div>
-                                <button type="button" class="btn btn-soft-secondary btn-sm">
-                                    ALL
-                                </button>
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    1M
-                                </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm">
-                                    6M
-                                </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm">
-                                    1Y
-                                </button>
-                            </div>
-                        </div>
-                    </div> --}}
-
                     <div class="row align-items-center">
                         <div class="col-sm">
                             <div id="wallet-balance" data-colors='["#310ef5","#fae605","#d91b1b" ]' class="apex-charts">
@@ -442,7 +400,7 @@
                 <!-- card body -->
                 <div class="card-body">
                     <div class="row align-items-center text-center">
-                        {{-- pre_Financing --}}
+                        {{-- Advance Payment --}}
                         <div class="col-sm align-self-center ">
                             <div class="mt-4 mt-sm-0">
                                 <div>
@@ -595,13 +553,13 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-sm">
                             <div id="Expense-Type"
                                 data-colors='["#1fad12" ,"#f6ff00","#fa2314","#00fff2","#faad14","#2200ff"]'
                                 class="apex-charts">
                             </div>
                         </div>
+                        {{-- Guarantee --}}
                         <div class="col-sm align-self-center">
                             <div class="mt-4 mt-sm-0">
                                 <div>
@@ -683,7 +641,6 @@
             <!-- end card -->
         </div>
     </div>
-
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
@@ -804,7 +761,7 @@
         </div>
         <!-- end card -->
     </div>
-
+    {{-- Duel :fual and oil --}}
     <div class="row">
         @php
             $qtyFuelRemain = max(($qtyFuel ?? 0) - ($qtyFuelRelease ?? 0), 0);
@@ -816,21 +773,6 @@
                     <div class="d-flex align-items-center mb-3">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងសាំង</span>
                         <div class="ms-auto d-flex align-items-center gap-1">
-                            {{-- <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
-                                @foreach (request()->except('item_name') as $k => $v)
-                                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
-                                @endforeach
-
-                                <select name="item_name" class="form-select form-select-sm"
-                                    onchange="this.form.submit()">
-                                    @foreach ($itemOptions as $opt)
-                                        <option value="{{ $opt }}"
-                                            {{ ($itemName ?? '') === $opt ? 'selected' : '' }}>
-                                            {{ $opt }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </form> --}}
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalFuel }}
                             </button>
@@ -893,17 +835,6 @@
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងម៉ាស៊ូត</span>
                         <div class="ms-auto d-flex align-items-center gap-1">
-                            {{-- <span>
-                                <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
-                                    <input type="hidden" name=" " value=" ">
-                                    <select name="item_name" class="form-select form-select-sm"
-                                        onchange="this.form.submit()">
-                                        <option value="">
-                                            ប្រភេទ
-                                        </option>
-                                    </select>
-                                </form>
-                            </span> --}}
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalDiesel }}
                             </button>
@@ -962,17 +893,6 @@
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate"> ប្រេងម៉ាស៊ីន</span>
                         <div class="ms-auto d-flex align-items-center gap-1">
-                            {{-- <span>
-                                <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
-                                    <input type="hidden" name=" " value=" ">
-                                    <select name="item_name" class="form-select form-select-sm"
-                                        onchange="this.form.submit()">
-                                        <option value="">
-                                            ប្រភេទ
-                                        </option>
-                                    </select>
-                                </form>
-                            </span> --}}
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalOil }}
                             </button>
@@ -1055,7 +975,6 @@
             </div><!-- end card -->
         </div>
     </div>
-
     {{-- Modal Program Sub --}}
     <div class="modal fade" id="programSubModal" tabindex="-1" aria-labelledby="programSubModalLabel"
         aria-hidden="true">
@@ -1071,7 +990,6 @@
             </div>
         </div>
     </div>
-
     {{-- Modal Cluster --}}
     <div class="modal fade" id="clusterModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -1107,7 +1025,6 @@
         </div>
     </div>
 @endsection
-
 @section('script')
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/dashboard.init.js') }}"></script>
@@ -1117,7 +1034,6 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js') }}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('year');
@@ -1140,7 +1056,7 @@
             });
         });
     </script>
-
+    {{-- mini cahart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1206,10 +1122,8 @@
 
             var chart = new ApexCharts(document.querySelector("#mini-chart9"), options);
             chart.render();
-
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1219,7 +1133,6 @@
                 var colors = document.getElementById(id).getAttribute("data-colors");
                 return JSON.parse(colors);
             }
-
             var options = {
                 chart: {
                     type: 'line',
@@ -1244,7 +1157,6 @@
 
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1279,7 +1191,6 @@
 
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1314,7 +1225,6 @@
 
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1349,7 +1259,6 @@
 
         });
     </script>
-
     {{-- Search Auth Sticky --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1370,7 +1279,6 @@
             });
         });
     </script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.program-card');
@@ -1379,10 +1287,8 @@
                 card.addEventListener('click', function() {
                     const programId = this.dataset.programId;
                     const programTitle = this.dataset.programTitle;
-
                     // Set modal title
                     document.getElementById('programSubModalLabel').innerText = programTitle;
-
                     // Show modal immediately with loading spinner
                     const modalElement = document.getElementById('programSubModal');
                     document.getElementById('programSubContent').innerHTML = `
@@ -1404,10 +1310,6 @@
                                     '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
-                            // else {
-                            //     console.log(data)
-                            // }
-
                             // Build HTML grid
                             let html = '<div class="row g-2">';
                             data.forEach(sub => {
@@ -1495,7 +1397,6 @@
             });
         });
     </script>
-
     <script>
         document.addEventListener('click', function(e) {
             const card = e.target.closest('.program-sub-card');
@@ -1575,11 +1476,9 @@
 
             const clusterId = cluster.dataset.clusterId;
             console.log('Load vouchers for cluster:', clusterId);
-
-            // fetch(`/dashboard/cluster/${clusterId}/vouchers`)
         });
     </script>
-
+    {{-- wallet-balance --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1913,18 +1812,15 @@
                     `;
                     const modal = new bootstrap.Modal(modalElement);
                     modal.show();
-
                     // Fetch programSubs via AJAX
                     fetch(`/dashboard/account/${accountId}/subs`)
                         .then(res => res.json())
                         .then(data => {
-                            // console.log(data);
                             if (data.length === 0) {
                                 document.getElementById('accountSubContent').innerHTML =
                                     '<p class="text-center">មិនមានអនុគណនីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
-
                             // Build HTML grid
                             let html = `
                                 <div class="card-body">
@@ -1959,7 +1855,6 @@
                                     </div>
                                 </div>
                             `;
-
                             document.getElementById('accountSubContent').innerHTML = html;
                         })
                         .catch(err => {
