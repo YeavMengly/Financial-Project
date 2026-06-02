@@ -23,7 +23,7 @@ class Chapter extends Model
     protected $fillable = [
         'ministry_id',
         'no',
-        'name', 
+        'name',
         'type_id'
     ];
 
@@ -47,9 +47,9 @@ class Chapter extends Model
     {
         return $this->hasMany(Account::class, 'chapter_id', 'id');
     }
-      public function type()
+    public function type()
     {
-        return $this->hasMany(Chapter::class, 'type_id', 'id');
+        return $this->belongsTo(Type::class, 'type_id', 'id');
     }
 
     /* -----------------------------------------------------------------

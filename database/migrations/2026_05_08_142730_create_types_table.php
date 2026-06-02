@@ -37,6 +37,13 @@ return new class extends Migration
                 'created_at'        => $now,
                 'updated_at'        => $now,
             ],
+            //  [
+            //     'code' => '3',
+            //     'number_type' => 'ប្រភេទ៣',
+            //     'name' => 'បន្ទុកហិរញ្ញវត្ថុ',
+            //     'created_at'        => $now,
+            //     'updated_at'        => $now,
+            // ],
             [
                 'code' => '4',
                 'number_type' => 'ប្រភេទ៤',
