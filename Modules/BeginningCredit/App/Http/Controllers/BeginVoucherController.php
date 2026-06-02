@@ -275,8 +275,13 @@ class BeginVoucherController extends Controller
                 ? ($deadline_balance / $new_credit_status) * 100
                 : 0;
 
+            $chapter = Chapter::where('no', substr($validatedData['cboSubAccount'], 0, 2))
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
             $beginCredit = BeginVoucher::create([
                 'ministry_id'       => $ministry->id,
+                'type_id'           => $chapter->type_id ?? null,
                 'agency_id'         => $validatedData['cboAgency'],
                 'program_id'        => $validatedData['cboProgram'],
                 'program_sub_id'    => $validatedData['cboProgramSub'],
@@ -299,6 +304,7 @@ class BeginVoucherController extends Controller
 
             $BeginMandate = BeginMandate::create([
                 'ministry_id'       => $ministry->id,
+                'type_id'           => $chapter->type_id ?? null,
                 'agency_id'         => $validatedData['cboAgency'],
                 'program_id'        => $validatedData['cboProgram'],
                 'program_sub_id'    => $validatedData['cboProgramSub'],

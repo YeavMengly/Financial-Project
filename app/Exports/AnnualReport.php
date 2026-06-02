@@ -98,31 +98,6 @@ class AnnualReport
         ];
         $row = 6;
         $col = 'E';
-
-        // dd($typeId);
-        // $grouped = $this->data
-        //     ->sortBy(['type_id', 'chapter_id', 'account_id', 'account_sub_id', 'program_id', 'program_sub_id', 'cluster_id'])
-        //     ->groupBy('type_id')
-        //     ->map(function ($typeGroup) {
-        //         return $typeGroup->groupBy('chapter_id')
-        //             ->map(function ($chapterGroup) {
-        //                 return $chapterGroup->groupBy('account_id')
-        //                     ->map(function ($accountGroup) {
-        //                         return $accountGroup->groupBy('account_sub_id')
-        //                             ->map(function ($programGroup) {
-        //                                 return $programGroup->groupBy('program_id')
-        //                                     ->map(function ($programSubGroup) {
-        //                                         return $programSubGroup->groupBy('program_sub_id')
-        //                                             ->map(function ($clusterGroup) {
-        //                                                 return $clusterGroup->groupBy('cluster_id');
-        //                                             });
-        //                                     });
-        //                             });
-        //                     });
-        //             });
-        //     });
-
-        // $typeId = $this->data->pluck('type_id')->filter()->unique();
         $grouped = $this->data
             ->sortBy([
                 'type_id',
@@ -134,12 +109,12 @@ class AnnualReport
                 'cluster_id'
             ])
             ->groupBy('type_id')
-            ->sortKeys() // sort type_id ASC
+            ->sortKeys()
             ->map(function ($typeGroup) {
 
                 return $typeGroup
                     ->groupBy('chapter_id')
-                    ->sortKeys() // sort chapter_id ASC
+                    ->sortKeys()
                     ->map(function ($chapterGroup) {
 
                         return $chapterGroup
@@ -172,21 +147,11 @@ class AnnualReport
                     });
             });
 
-        $typeId = $this->data
-            ->pluck('type_id')
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values();
         $chapterId = $this->data->pluck('chapter_id')->filter()->unique();
         $accountId = $this->data->pluck('account_id')->filter()->unique();
         $accountSubId     = $this->data->pluck('account_sub_id')->filter()->unique();
-        $progamId     = $this->data->pluck('program_id')->filter()->unique();
-        $programSubId     = $this->data->pluck('program_sub_id')->filter()->unique();
-        $clusterId     = $this->data->pluck('cluster_id')->filter()->unique();
-
         $ministry = Ministry::where('id', $id)->first();
-        $typeMap = Type::all();
+        $typeMap = Type::all()->keyBy('id');
 
         $chapterMap = Chapter::where('ministry_id', $ministry->id)
             ->whereIn('no', $chapterId)
@@ -330,7 +295,6 @@ class AnnualReport
             'EQ' => '50504',
             'ER' => '50505'
         ];
-
         $summaryTotalColumns = [
             'E',
             'F',
@@ -361,6 +325,7 @@ class AnnualReport
         ];
 
         $allActiveColumns = array_merge($summaryTotalColumns, array_keys($excelColumnMapping));
+        $allTypeRowHeaders = [];
 
         $row = 7;
         foreach ($grouped as $typeNo => $chapters) {
@@ -376,10 +341,6 @@ class AnnualReport
                     'color' => ['rgb' => '000000'],
                     'size' => 12,
                 ],
-                // 'alignment' => [
-                //     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                //     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                // ],
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -395,20 +356,16 @@ class AnnualReport
             // CHAPTERS
             foreach ($chapters as $chapterNo => $accounts) {
                 $chapter = $chapterMap->get($chapterNo);
-                $chapterRowHeader = $row; // Link this Chapter row to its parent Type
+                $chapterRowHeader = $row;
                 $typeToChaptersMap[$typeNo][] = $chapterRowHeader;
                 $sheet->setCellValue("A{$row}", $chapterNo);
                 $sheet->setCellValue("D{$row}", $chapter ? $chapter->name : '');
                 $sheet->getStyle("A{$row}:ER{$row}")->applyFromArray([
                     'font' => [
-                        // 'bold' => true,
+                        'bold' => true,
                         'color' => ['rgb' => '000000'],
                         'size' => 12,
                     ],
-                    // 'alignment' => [
-                    //     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                    //     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                    // ],
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -424,20 +381,14 @@ class AnnualReport
                 foreach ($accounts as $accountNo => $subAccounts) {
                     $account = $accountMap->get($accountNo);
                     $accountRowHeader = $row;
-                    // Link this Account row to its parent Chapter
                     $chapterToAccountsMap[$chapterNo][] = $accountRowHeader;
                     $sheet->setCellValue("B{$row}", $accountNo);
                     $sheet->setCellValue("D{$row}", $account ? $account->name : '');
                     $sheet->getStyle("A{$row}:ER{$row}")->applyFromArray([
                         'font' => [
-                            // 'bold' => true,
                             'color' => ['rgb' => '000000'],
                             'size' => 12,
                         ],
-                        // 'alignment' => [
-                        //     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        //     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                        // ],
                         'borders' => [
                             'allBorders' => [
                                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -457,14 +408,9 @@ class AnnualReport
                         $sheet->setCellValue("D{$row}", $accountSub ? $accountSub->name : '');
                         $sheet->getStyle("A{$row}:ER{$row}")->applyFromArray([
                             'font' => [
-                                // 'bold' => true,
                                 'color' => ['rgb' => '000000'],
                                 'size' => 12,
                             ],
-                            // 'alignment' => [
-                            //     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                            //     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
-                            // ],
                             'borders' => [
                                 'allBorders' => [
                                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -692,7 +638,6 @@ class AnnualReport
                  * 5. WRITE TOTALS ON THE CHAPTER HEADER ROW
                  */
                 if (!empty($chapterRows)) {
-                    // Summing the distinct row entries of the child Accounts headers directly
                     foreach ($allActiveColumns as $col) {
                         $formulaParts = [];
                         foreach ($chapterRows as $targetAccRow) {
@@ -716,6 +661,8 @@ class AnnualReport
                 }
             }
         }
+
+
         $fileName = 'template_annual_report.xlsx';
 
         return response()->streamDownload(function () use ($spreadsheet) {
