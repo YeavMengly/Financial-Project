@@ -72,7 +72,7 @@ class ChapterController extends Controller
         $request->validate([
             'no' => 'required',
             'name' => 'required',
-            'cboType' => 'required'
+            'cboType' => 'required',
         ]);
 
         $id = decode_params($params);
@@ -81,12 +81,12 @@ class ChapterController extends Controller
 
         try {
             $ministry = Ministry::where('id', $id)->first();
-
             Chapter::create([
                 'ministry_id' => $ministry->id,
                 'no' => $request->no,
                 'name' => $request->name,
-                'type_id' => $request->cboType
+                'type_id' => $request->cboType,
+                'sub_type' => $request->subType ?? [] // Convert array to comma-separated string
             ]);
 
             DB::commit(); // Commit the transaction
@@ -121,7 +121,6 @@ class ChapterController extends Controller
         $chapter = Chapter::where('id', decode_params($id))
             ->where('ministry_id', $ministry->id)->first();
         $type = Type::all();
-
         /**
          * BLOCK ARCHIVED
          */
@@ -149,6 +148,10 @@ class ChapterController extends Controller
             'no' => ['required'],
             'name' => ['required'],
             'cboType' => ['required'],
+            'subType' => ['required']
+        ], [
+            'subType.required' => 'សូមជ្រើសរើសយ៉ាងតិចណាស់មួយប្រភេទ',
+            'subType.min' => 'សូមជ្រើសរើសយ៉ាងតិចណាស់មួយប្រភេទ',
         ]);
 
         DB::beginTransaction();
@@ -161,6 +164,7 @@ class ChapterController extends Controller
                 'no' => $validateData['no'],
                 'name' => $validateData['name'],
                 'type_id' => $validateData['cboType'],
+                'sub_type' => $request->subType ?? [],
             ]);
 
             DB::commit();
