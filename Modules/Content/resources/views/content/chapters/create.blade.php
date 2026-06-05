@@ -73,6 +73,45 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label>ប្រភេទផ្សេងៗ</label>
+
+                                    @php
+                                        $selectedTypes = old('subType', []);
+                                    @endphp
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subType[]"
+                                            value="មូលនិធិទ្រទ្រង់ថវិកា" id="type1"
+                                            {{ in_array('មូលនិធិទ្រទ្រង់ថវិកា', $selectedTypes) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="type1">
+                                            មូលនិធិទ្រទ្រង់ថវិកា
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subType[]" value="បដិភាគ"
+                                            id="type2" {{ in_array('បដិភាគ', $selectedTypes) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="type2">
+                                            បដិភាគ
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subType[]"
+                                            value="គម្រោងវិនិយោគផ្ទាល់" id="type3"
+                                            {{ in_array('គម្រោងវិនិយោគផ្ទាល់', $selectedTypes) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="type3">
+                                            គម្រោងវិនិយោគផ្ទាល់
+                                        </label>
+                                    </div>
+                                    @error('subType')
+                                        <div class="pristine-error text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
