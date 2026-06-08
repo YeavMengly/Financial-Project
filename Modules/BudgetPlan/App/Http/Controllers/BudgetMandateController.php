@@ -1678,8 +1678,10 @@ class BudgetMandateController extends Controller
                     ->where('begin_mandates.ministry_id', $ministryId);
             });
             $query->select(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
@@ -1687,8 +1689,10 @@ class BudgetMandateController extends Controller
                 DB::raw('SUM(budget_mandates.budget) as apply')
             );
             $query->groupBy(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
@@ -1784,8 +1788,10 @@ class BudgetMandateController extends Controller
                     ->where('begin_mandates.ministry_id', $ministryId);
             });
             $query->select(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
@@ -1793,8 +1799,10 @@ class BudgetMandateController extends Controller
                 DB::raw('SUM(budget_mandates.budget) as apply')
             );
             $query->groupBy(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
