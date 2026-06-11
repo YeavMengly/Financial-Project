@@ -1678,24 +1678,40 @@ class BudgetMandateController extends Controller
                     ->where('begin_mandates.ministry_id', $ministryId);
             });
             $query->select(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
+                'begin_mandates.deadline_balance',
+                'begin_mandates.current_loan',
+                'begin_mandates.early_balance',
+                'begin_mandates.credit',
+                'begin_mandates.law_average',
+                'begin_mandates.law_correction',
                 DB::raw('SUM(budget_mandates.budget) as apply')
             );
             $query->groupBy(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
+                'begin_mandates.deadline_balance',
+                'begin_mandates.current_loan',
+                'begin_mandates.early_balance',
+                'begin_mandates.credit',
+                'begin_mandates.law_average',
+                'begin_mandates.law_correction',
             );
 
-            $query->where('budget_mandates.expense_type_id', 1);
+            // $query->where('budget_mandates.expense_type_id', 1);
             $query->where('budget_mandates.status', 'todo');
             $query->where('budget_mandates.is_archived', 1);
 
@@ -1784,21 +1800,37 @@ class BudgetMandateController extends Controller
                     ->where('begin_mandates.ministry_id', $ministryId);
             });
             $query->select(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
+                'begin_mandates.deadline_balance',
+                'begin_mandates.current_loan',
+                'begin_mandates.early_balance',
+                'begin_mandates.credit',
+                'begin_mandates.law_average',
+                'begin_mandates.law_correction',
                 DB::raw('SUM(budget_mandates.budget) as apply')
             );
             $query->groupBy(
+                'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
+                'begin_mandates.account_id',
                 'budget_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
+                'begin_mandates.deadline_balance',
+                'begin_mandates.current_loan',
+                'begin_mandates.early_balance',
+                'begin_mandates.credit',
+                'begin_mandates.law_average',
+                'begin_mandates.law_correction',
             );
 
             $query->where('budget_mandates.expense_type_id', 2);
@@ -1875,7 +1907,7 @@ class BudgetMandateController extends Controller
         }
     }
 
-     public function exportExpenseRecordBook(Request $request, $params)
+    public function exportExpenseRecordBook(Request $request, $params)
     {
         try {
 

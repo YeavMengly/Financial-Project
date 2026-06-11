@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataTables\budget;
+namespace App\DataTables\Budget;
 
 use App\Models\BudgetDirectPayment;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
