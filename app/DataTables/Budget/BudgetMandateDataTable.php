@@ -157,7 +157,7 @@ class BudgetMandateDataTable extends DataTable
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
-        $model->where('budget_mandates.expense_type_id', 1);
+        // $model->where('budget_mandates.expense_type_id', 1);
 
         // ===== SELECT =====
         $model->select([

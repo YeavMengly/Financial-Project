@@ -34,19 +34,8 @@ class BeginguaranteeExport
         $sheet = $spreadsheet->getActiveSheet();
 
         $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
-        $currentMonth = $khmerMonths[date('n') - 1];
-        $khmerNumbers = [
-            '0' => '០',
-            '1' => '១',
-            '2' => '២',
-            '3' => '៣',
-            '4' => '៤',
-            '5' => '៥',
-            '6' => '៦',
-            '7' => '៧',
-            '8' => '៨',
-            '9' => '៩'
-        ];
+        $currentMonth =  $khmerMonths[date('n') - 1];
+        $khmerNumbers = ['0' => '០','1' => '១','2' => '២','3' => '៣','4' => '៤','5' => '៥','6' => '៦','7' => '៧','8' => '៨','9' => '៩'];
         $currentYear = strtr(date('Y'), $khmerNumbers);
         $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
 
@@ -103,6 +92,7 @@ class BeginguaranteeExport
             ->get()
             ->keyBy('no');
 
+
         foreach ($grouped as $chapterNo => $accounts) {
 
             $chapter = $chapterMap->get($chapterNo);
@@ -154,12 +144,19 @@ class BeginguaranteeExport
                         $sheet->setCellValue("M{$row}", $editorial);
                         $sheet->setCellValue("N{$row}", $item->new_credit_status);
                         $sheet->setCellValue("O{$row}", $item->early_balance);
-                        $sheet->setCellValue("P{$row}", $item->apply);
+                        $Month = now()->month;
+                        $applyValue = 0;
+                        if ( !empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
+                            $applyValue = $item->apply;
+                        }
+                        $sheet->setCellValue("P{$row}", $applyValue);
                         $sheet->setCellValue("Q{$row}", $item->deadline_balance);
                         $sheet->setCellValue("R{$row}", $item->credit);
-                        $sheet->setCellValue("S{$row}", $item->law_average / 100);
-                        $sheet->setCellValue("T{$row}", $item->law_correction / 100);
-                        // $sheet->setCellValue("U{$row}", $item->agency_id);
+                        $sheet->setCellValue("S{$row}", $item->law_average);
+                        $sheet->setCellValue("T{$row}", $item->law_correction);
+                        $sheet->getStyle("S{$row}:T{$row}")
+                            ->getNumberFormat()
+                            ->setFormatCode('0.00"%"');
                         $values = [
                             'fin_law'            => (float) $item->fin_law,
                             'current_loan'       => (float) $item->current_loan,
@@ -171,25 +168,61 @@ class BeginguaranteeExport
                             'editorial'          => (float) $editorial,
                             'new_credit_status'  => (float) $item->new_credit_status,
                             'early_balance'      => (float) $item->early_balance,
-                            'apply'              => (float) $item->apply,
+                            'apply'              => (float) $applyValue,
                             'deadline_balance'   => (float) $item->deadline_balance,
                             'credit'             => (float) $item->credit,
-                            'law_average'        => (float) $item->law_average / 100,
-                            'law_correction'     => (float) $item->law_correction / 100,
+                            'law_average'        => (float) $item->law_average,
+                            'law_correction'     => (float) $item->law_correction,
                         ];
+
                         $this->addToTotals($subTotals,     $values);
                         $this->addToTotals($accountTotals, $values);
                         $this->addToTotals($chapterTotals, $values);
 
                         $row++;
                     }
-                    $this->writeTotalsRow($sheet, $subRow, $subTotals);
-                }
-                $this->writeTotalsRow($sheet, $accountRow, $accountTotals);
-            }
-            $this->writeTotalsRow($sheet, $chapterRow, $chapterTotals);
-        }
+                    $subTotals['law_average'] =
+                        $subTotals['fin_law'] > 0
+                        ? ($subTotals['deadline_balance'] / $subTotals['fin_law']) * 100
+                        : 0;
 
+                    $subTotals['law_correction'] =
+                        $subTotals['new_credit_status'] > 0
+                        ? ($subTotals['deadline_balance'] / $subTotals['new_credit_status']) * 100
+                        : 0;
+                    $this->writeTotalsRow($sheet, $subRow, $subTotals);
+                    $sheet->getStyle("S{$subRow}:T{$subRow}")
+                        ->getNumberFormat()
+                        ->setFormatCode('0.00"%"');
+                }
+                $accountTotals['law_average'] =
+                    $accountTotals['fin_law'] > 0
+                    ? ($accountTotals['deadline_balance'] / $accountTotals['fin_law']) * 100
+                    : 0;
+
+                $accountTotals['law_correction'] =
+                    $accountTotals['new_credit_status'] > 0
+                    ? ($accountTotals['deadline_balance'] / $accountTotals['new_credit_status']) * 100
+                    : 0;
+                $this->writeTotalsRow($sheet, $accountRow, $accountTotals);
+                $sheet->getStyle("S{$accountRow}:T{$accountRow}")
+                    ->getNumberFormat()
+                    ->setFormatCode('0.00"%"');
+            }
+            $chapterTotals['law_average'] =
+                $chapterTotals['fin_law'] > 0
+                ? ($chapterTotals['deadline_balance'] / $chapterTotals['fin_law']) * 100
+                : 0;
+
+            $chapterTotals['law_correction'] =
+                $chapterTotals['new_credit_status'] > 0
+                ? ($chapterTotals['deadline_balance'] / $chapterTotals['new_credit_status']) * 100
+                : 0;
+            $this->writeTotalsRow($sheet, $chapterRow, $chapterTotals);
+            $sheet->getStyle("S{$chapterRow}:T{$chapterRow}")
+                ->getNumberFormat()
+                ->setFormatCode('0.00"%"');
+        }
         $totalsStyleArray = [
             'font' => [
                 'bold' => true,
@@ -244,10 +277,13 @@ class BeginguaranteeExport
 
     private function addToTotals(array &$totals, array $values): void
     {
-        foreach ($totals as $key => $v) {
-            if (isset($values[$key])) {
-                $totals[$key] += $values[$key];
+        foreach ($values as $key => $value) {
+
+            if (!isset($totals[$key])) {
+                $totals[$key] = 0;
             }
+
+            $totals[$key] += $value;
         }
     }
 
