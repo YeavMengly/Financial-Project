@@ -221,7 +221,6 @@ class BeginVoucherController extends Controller
             'cboCluster'     => 'required',
             'cboAgency'      => 'required',
             'cboSubAccount'  => 'required',
-            'cboCluster'             => 'required',
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);
@@ -312,7 +311,6 @@ class BeginVoucherController extends Controller
                 'account_id'        => substr($validatedData['cboSubAccount'], 0, 4),
                 'account_sub_id'    => $validatedData['cboSubAccount'],
                 'cluster_id'        => $validatedData['cboCluster'],
-                'cluster_id'                => $validatedData['cboCluster'],
                 'no'                => $valueNo,
                 'txtDescription'    => $cluster->decription ?? null,
                 'fin_law'           => $validatedData['fin_law'],
@@ -405,7 +403,6 @@ class BeginVoucherController extends Controller
             'cboCluster'     => 'required',
             'cboAgency'      => 'required',
             'cboSubAccount'  => 'required',
-            'cboCluster'             => 'required',
             'fin_law'        => 'required|integer|min:1',
             'current_loan'   => 'required|integer|min:1',
         ]);

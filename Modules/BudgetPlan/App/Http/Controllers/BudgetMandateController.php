@@ -783,13 +783,11 @@ class BudgetMandateController extends Controller
                 'expense_type_id'  => 3,
                 'legal_id'         => $validated['legalID'],
                 'payment_voucher_number'         => $validated['paymentVoucher'],
-                // 'legal_number'     =>  $validated['legalNumber'],
                 'legal_name'       => $validated['legalName'],
                 'status'           => 'todo',
                 'is_archived'      => 1,
                 'description'      => strip_tags($validated['txtDescription']),
                 'attachments'      => json_encode($stored),
-                // 'transaction_date' => $validated['transactionDate'],
                 'request_date'     => $validated['requestDate'],
                 'legal_date'     => $validated['legalDate'],
             ]);
@@ -1124,7 +1122,6 @@ class BudgetMandateController extends Controller
             return redirect()->route('budgetMandate.index', $params);
         }
     }
-
 
     public function updateAdvancePayment(Request $request, $params, $id)
     {
@@ -1485,22 +1482,14 @@ class BudgetMandateController extends Controller
     public function restore($params, $id)
     {
         $pid = decode_params($id);
-
         $mandate = BudgetMandate::withTrashed()->whereKey($pid)->first();
-
         if ($mandate->attachments) {
-
             $attachments = json_decode($mandate->attachments, true);
             $restoredFiles = [];
-
             foreach ($attachments as $filePath) {
-
                 if (Storage::disk('public')->exists($filePath)) {
-
                     $originalPath = str_replace('trash/', '', $filePath);
-
                     Storage::disk('public')->move($filePath, $originalPath);
-
                     $restoredFiles[] = $originalPath;
                 }
             }
@@ -1531,29 +1520,19 @@ class BudgetMandateController extends Controller
     public function restoreAdvancePayment($params, $id)
     {
         $pid = decode_params($id);
-
         $mandate = BudgetMandate::withTrashed()->whereKey($pid)->first();
-
         if ($mandate->attachments) {
-
             $attachments = json_decode($mandate->attachments, true);
             $restoredFiles = [];
-
             foreach ($attachments as $filePath) {
-
                 if (Storage::disk('public')->exists($filePath)) {
-
                     $originalPath = str_replace('trash/', '', $filePath);
-
                     Storage::disk('public')->move($filePath, $originalPath);
-
                     $restoredFiles[] = $originalPath;
                 }
             }
-
             $mandate->attachments = json_encode($restoredFiles);
         }
-
         $mandate->restore();
         // Recalculate related data
         $beginCredit = BeginMandate::where('account_sub_id', $mandate->account_sub_id)
@@ -1577,31 +1556,21 @@ class BudgetMandateController extends Controller
     public function restoreExpenseRecord($params, $id)
     {
         $pid = decode_params($id);
-
         $mandate = BudgetMandate::withTrashed()->whereKey($pid)->first();
-
         if ($mandate->attachments) {
-
             $attachments = json_decode($mandate->attachments, true);
             $restoredFiles = [];
-
             foreach ($attachments as $filePath) {
-
                 if (Storage::disk('public')->exists($filePath)) {
-
                     $originalPath = str_replace('trash/', '', $filePath);
-
                     Storage::disk('public')->move($filePath, $originalPath);
-
                     $restoredFiles[] = $originalPath;
                 }
             }
-
             $mandate->attachments = json_encode($restoredFiles);
         }
 
         $mandate->restore();
-        // Recalculate related data
         $beginCredit = BeginMandate::where('account_sub_id', $mandate->account_sub_id)
             ->where('no', $mandate->no)
             ->where('ministry_id', $mandate->ministry_id)
@@ -1669,7 +1638,6 @@ class BudgetMandateController extends Controller
         try {
 
             $ministryId = decode_params($params);
-
             $query = BudgetMandate::query();
             $query->leftJoin('begin_mandates', function ($join) use ($ministryId) {
                 $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
@@ -1791,7 +1759,6 @@ class BudgetMandateController extends Controller
         try {
 
             $ministryId = decode_params($params);
-
             $query = BudgetMandate::query();
             $query->leftJoin('begin_mandates', function ($join) use ($ministryId) {
                 $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
@@ -1912,7 +1879,6 @@ class BudgetMandateController extends Controller
         try {
 
             $ministryId = decode_params($params);
-
             $query = BudgetMandate::query();
             $query->leftJoin('begin_mandates', function ($join) use ($ministryId) {
                 $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
