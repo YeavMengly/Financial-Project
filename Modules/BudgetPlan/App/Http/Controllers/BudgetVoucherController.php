@@ -1090,6 +1090,8 @@ class BudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
+            // dd($beginCredit);
+
             if (!$beginCredit) {
                 flash()->translate('en')->option('timeout', 2000)
                     ->error('មិនមានទិន្ន័យ', 'បញ្ហា')->flash();
@@ -1129,6 +1131,7 @@ class BudgetVoucherController extends Controller
                 'no' => $beginCredit->no,
                 'budget' => $applyValue,
                 'expense_type_id' => $validated['cboExpenseType'],
+                // 'legal_number'    => $validated['cboLegalNumber'],
                 'legal_id'    => $validated['cboLegalId'],
                 'legal_name'    => $validated['legalName'],
                 'temporary_id'      => $validated['cbotemporaryId'],
@@ -1136,6 +1139,7 @@ class BudgetVoucherController extends Controller
                 'status' => 'done',
                 'is_archived' => 2,
                 'description' => strip_tags($validated['txtDescription']),
+                // 'attachments' => json_encode($storedFilePaths),
                 'transaction_date'           => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
             ]);
@@ -1304,7 +1308,9 @@ class BudgetVoucherController extends Controller
 
             $voucher->attachments = json_encode($restoredFiles);
         }
+
         $mandate->update([
+
             'status' => 'done',
             'is_archived' => 2,
         ]);
@@ -1318,6 +1324,7 @@ class BudgetVoucherController extends Controller
         if ($beginCredit) {
             $this->recalculateAndSaveReport($beginCredit);
         }
+
 
         flash()
             ->translate('en')
@@ -1332,7 +1339,9 @@ class BudgetVoucherController extends Controller
     {
         $pid = decode_params($id);
         $ministry   = Ministry::where('id', decode_params($params))->first();
+
         $voucher = BudgetVoucher::withTrashed()->whereKey($pid)->first();
+
         $mandate = BudgetMandate::where('legal_id', $voucher->legal_id)
             ->where('account_sub_id', $voucher->account_sub_id)
             ->where('program_id', $voucher->program_id)
@@ -1342,14 +1351,19 @@ class BudgetVoucherController extends Controller
             ->first();
 
         if ($voucher->attachments) {
+
             $attachments = json_decode($voucher->attachments ?? '[]', true) ?? [];
             $restoredFiles = [];
+
             foreach ($attachments as $filePath) {
                 Storage::disk('public')->delete($filePath);
             }
+
             $voucher->attachments = json_encode($restoredFiles);
         }
+
         $mandate->update([
+
             'status' => 'done',
             'is_archived' => 2,
         ]);
@@ -1363,6 +1377,7 @@ class BudgetVoucherController extends Controller
         if ($beginCredit) {
             $this->recalculateAndSaveReport($beginCredit);
         }
+
 
         flash()
             ->translate('en')
@@ -1403,6 +1418,7 @@ class BudgetVoucherController extends Controller
             ->where('ministry_id', $beginCredit->ministry_id)
             ->get();
 
+
         if ($budgetVoucher->count() === 1) {
             return 0;
         }
@@ -1418,14 +1434,16 @@ class BudgetVoucherController extends Controller
     public function export(Request $request, $params)
     {
         try {
-
             $ministryId = decode_params($params);
+
             $query = BudgetVoucher::query();
+
             $query->leftJoin('begin_vouchers', function ($join) use ($ministryId) {
                 $join->on('budget_vouchers.account_sub_id', '=', 'begin_vouchers.account_sub_id')
                     ->on('budget_vouchers.no', '=', 'begin_vouchers.no')
                     ->where('begin_vouchers.ministry_id', $ministryId);
             });
+
             $query->select(
                 'budget_vouchers.program_id',
                 'budget_vouchers.account_sub_id',
@@ -1516,6 +1534,8 @@ class BudgetVoucherController extends Controller
             //         $query->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
             //     }
             // }
+
+
             $data = $query->get();
 
             Log::info('Exported BeginVoucher Count', [
