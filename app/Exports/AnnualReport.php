@@ -331,7 +331,7 @@ class AnnualReport
             'EW' => '50504',
             'EX' => '50505'
         ];
-        
+
         $summaryTotalColumns = [
             // Totals
             'E',
@@ -482,7 +482,7 @@ class AnnualReport
                                             $rowValues[$key] = 0;
                                         }
                                         // $rowValues[$key] += (float) $item->fin_law;
-                                        $rowValues[$key] = number_format(( $item->fin_law) / 1000000, 1);
+                                        $rowValues[$key] += ( $item->fin_law) / 1000000;
                                     }
                                 }
                             }
