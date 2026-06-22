@@ -633,7 +633,11 @@ class BudgetVoucherController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('budgetVoucher.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('budgetVoucher.index', $params);
+            }
+
+            return redirect()->route('budgetVoucher.create', $params);
         } catch (\Throwable $e) {
             Log::error('BudgetVoucher store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
