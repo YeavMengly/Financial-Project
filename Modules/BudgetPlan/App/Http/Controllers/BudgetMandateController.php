@@ -566,7 +566,10 @@ class BudgetMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('budgetMandate.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('budgetMandate.index', $params);
+            }
+            return redirect()->route('budgetMandate.create', $params);
         } catch (\Throwable $e) {
             Log::error('BudgetMandate store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -690,7 +693,11 @@ class BudgetMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('budgetAdvancePayment.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('budgetAdvancePayment.index', $params);
+            }
+
+            return redirect()->route('budgetAdvancePayment.create', $params);
         } catch (\Throwable $e) {
             Log::error('BudgetAdvancePayment store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -1682,7 +1689,7 @@ class BudgetMandateController extends Controller
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
-                'budget_mandates.no',
+                'begin_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
@@ -1699,7 +1706,7 @@ class BudgetMandateController extends Controller
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
-                'budget_mandates.no',
+                'begin_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',

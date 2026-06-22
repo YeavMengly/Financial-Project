@@ -35,7 +35,7 @@ class BeginguaranteeExport
 
         $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
         $currentMonth =  $khmerMonths[date('n') - 1];
-        $khmerNumbers = ['0' => '០','1' => '១','2' => '២','3' => '៣','4' => '៤','5' => '៥','6' => '៦','7' => '៧','8' => '៨','9' => '៩'];
+        $khmerNumbers = ['0' => '០', '1' => '១', '2' => '២', '3' => '៣', '4' => '៤', '5' => '៥', '6' => '៦', '7' => '៧', '8' => '៨', '9' => '៩'];
         $currentYear = strtr(date('Y'), $khmerNumbers);
         $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
 
@@ -135,7 +135,6 @@ class BeginguaranteeExport
                         $totalInc   = $item->loan_total_increase      ?? ($internal + $unexpected + $additional);
                         $decrease   = $item->loan_decrease            ?? 0;
                         $editorial  = $item->loan_editorial           ?? 0;
-
                         $sheet->setCellValue("H{$row}", $internal);
                         $sheet->setCellValue("I{$row}", $unexpected);
                         $sheet->setCellValue("J{$row}", $additional);
@@ -146,7 +145,7 @@ class BeginguaranteeExport
                         $sheet->setCellValue("O{$row}", $item->early_balance);
                         $Month = now()->month;
                         $applyValue = 0;
-                        if ( !empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
+                        if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
                             $applyValue = $item->apply;
                         }
                         $sheet->setCellValue("P{$row}", $applyValue);
@@ -154,12 +153,9 @@ class BeginguaranteeExport
                         $sheet->setCellValue("R{$row}", $item->credit);
                         $sheet->setCellValue("S{$row}", $item->law_average);
                         $sheet->setCellValue("T{$row}", $item->law_correction);
-<<<<<<< HEAD
-=======
                         $sheet->getStyle("S{$row}:T{$row}")
                             ->getNumberFormat()
                             ->setFormatCode('0.00"%"');
->>>>>>> 5c370763c5c0754fdcdb471794f53e0fd50b593a
                         $values = [
                             'fin_law'            => (float) $item->fin_law,
                             'current_loan'       => (float) $item->current_loan,
@@ -194,12 +190,9 @@ class BeginguaranteeExport
                         ? ($subTotals['deadline_balance'] / $subTotals['new_credit_status']) * 100
                         : 0;
                     $this->writeTotalsRow($sheet, $subRow, $subTotals);
-<<<<<<< HEAD
-=======
                     $sheet->getStyle("S{$subRow}:T{$subRow}")
                         ->getNumberFormat()
                         ->setFormatCode('0.00"%"');
->>>>>>> 5c370763c5c0754fdcdb471794f53e0fd50b593a
                 }
                 $accountTotals['law_average'] =
                     $accountTotals['fin_law'] > 0
@@ -211,12 +204,6 @@ class BeginguaranteeExport
                     ? ($accountTotals['deadline_balance'] / $accountTotals['new_credit_status']) * 100
                     : 0;
                 $this->writeTotalsRow($sheet, $accountRow, $accountTotals);
-<<<<<<< HEAD
-=======
-                $sheet->getStyle("S{$accountRow}:T{$accountRow}")
-                    ->getNumberFormat()
-                    ->setFormatCode('0.00"%"');
->>>>>>> 5c370763c5c0754fdcdb471794f53e0fd50b593a
             }
             $chapterTotals['law_average'] =
                 $chapterTotals['fin_law'] > 0
@@ -228,12 +215,6 @@ class BeginguaranteeExport
                 ? ($chapterTotals['deadline_balance'] / $chapterTotals['new_credit_status']) * 100
                 : 0;
             $this->writeTotalsRow($sheet, $chapterRow, $chapterTotals);
-<<<<<<< HEAD
-=======
-            $sheet->getStyle("S{$chapterRow}:T{$chapterRow}")
-                ->getNumberFormat()
-                ->setFormatCode('0.00"%"');
->>>>>>> 5c370763c5c0754fdcdb471794f53e0fd50b593a
         }
         $totalsStyleArray = [
             'font' => [
