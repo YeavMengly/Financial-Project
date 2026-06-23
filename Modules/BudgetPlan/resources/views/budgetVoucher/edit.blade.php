@@ -74,7 +74,28 @@
                                         value="{{ old('legalName', $module->legal_name) }}" tabindex="2" />
                                 </div>
                             </div>
-
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.temporary.id') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
+                                        value="{{ old('cbotemporaryId', $module->temporary_id) }}" type="number"
+                                        class="form-control" placeholder="{{ __('forms.temporary.id') }}"
+                                        name="cbotemporaryId" tabindex="2" />
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.day.number') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
+                                        value="{{ old('cbodayOfNumber', $module->day_of_number) }}" type="text"
+                                        class="form-control" placeholder="{{ __('forms.day.number') }}"
+                                        name="cbodayOfNumber" tabindex="2" />
+                                </div>
+                            </div>
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProgram" class="form-label font-size-13 text-muted">
