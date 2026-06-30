@@ -173,6 +173,8 @@ class BudgetVoucherDataTable extends DataTable
             'budget_vouchers.budget',
             'budget_vouchers.legal_number',
             'budget_vouchers.legal_name',
+            'budget_vouchers.temporary_id',
+            'budget_vouchers.day_of_number',
             'budget_vouchers.is_archived',
             'budget_vouchers.expense_type_id',
             'expense_types.name_kh',
@@ -232,6 +234,8 @@ class BudgetVoucherDataTable extends DataTable
 
             Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
+            Column::make('temporary_id')->title(__('tables.th.temporary.id'))->width(30)->addClass('align-middle'),
+            Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),

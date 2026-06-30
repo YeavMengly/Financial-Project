@@ -55,6 +55,8 @@ return [
   'th.legal.id' => 'លេខលិខិត',
   'th.legal.number' => 'លេខសំណើ',
   'th.legal.name' => 'ឈ្មោះសំណើ',
+  'th.temporary.id' => 'លេខសម្គាល់អាណត្ដិ',
+  'th.day.number' => 'លេខអាណត្ដិ',
   'th.pvn' => 'លេខសលាកប័ត្រ',
   'th.fin_law' => 'ឥណទានអនុម័ត',
   'th.current_loan' => 'ឥណទានបច្ចុប្បន្ន',

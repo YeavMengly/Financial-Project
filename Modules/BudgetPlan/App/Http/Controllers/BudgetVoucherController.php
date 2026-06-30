@@ -491,6 +491,8 @@ class BudgetVoucherController extends Controller
         $validated = $request->validate([
             'cboLegalNumber' =>   'required',
             'legalName' =>  'required',
+            'cbotemporaryId' =>  'required',
+            'cbodayOfNumber' =>  'required',
             'cboProgram'       => 'required',
             'cboProgramSub'       => 'required',
             'cboCluster'       => 'required',
@@ -598,6 +600,8 @@ class BudgetVoucherController extends Controller
                 'expense_type_id'      => $validated['cboExpenseType'],
                 'legal_number'      => $validated['cboLegalNumber'],
                 'legal_name'      => $validated['legalName'],
+                'temporary_id'      => $validated['cbotemporaryId'],
+                'day_of_number'      => $validated['cbodayOfNumber'],
                 'status' => 'done',
                 'is_archived' => 2,
                 'description' => strip_tags($validated['txtDescription']),
@@ -987,6 +991,8 @@ class BudgetVoucherController extends Controller
         $validated = $request->validate([
             'cboLegalNumber' =>   'required',
             'legalName' =>  'required',
+            'cbotemporaryId' =>  'required',
+            'cbodayOfNumber' =>  'required',
             'cboProgram'       => 'required',
             'cboProgramSub'       => 'required',
             'cboCluster'       => 'required',
@@ -1060,8 +1066,15 @@ class BudgetVoucherController extends Controller
                 'expense_type_id' => $validated['cboExpenseType'],
                 'legal_number'    => $validated['cboLegalNumber'],
                 'legal_name'    => $validated['legalName'],
+<<<<<<< HEAD
                 // 'status' => 'done',
                 // 'is_archived' => 2,
+=======
+                'temporary_id'      => $validated['cbotemporaryId'],
+                'day_of_number'      => $validated['cbodayOfNumber'],
+                'status' => 'done',
+                'is_archived' => 2,
+>>>>>>> 9bd059949acf3c4712e748bc8d962a0908673781
                 'description' => strip_tags($validated['txtDescription']),
                 // 'attachments' => json_encode($storedFilePaths),
                 'transaction_date'           => $validated['transactionDate'],
