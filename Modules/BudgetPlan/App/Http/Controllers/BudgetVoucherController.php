@@ -617,14 +617,36 @@ class BudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->latest()->first();
 
+            $dataCheck = BudgetVoucher::where('legal_number', $validated['cboLegalNumber'])
+                ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)
+                ->get();
+
+            $totalBudget = $dataCheck->sum('budget');
+
+            if ($budgetMandate->budget != $totalBudget) {
+                $budgetMandate->update([
+                    'status' => 'todo',
+                    'is_archived' => 1,
+                ]);
+            } else {
+                $budgetMandate->update([
+                    'status' => 'done',
+                    'is_archived' => 2,
+                ]);
+            }
+
             $beginVoucher->apply = $lastVoucher?->budget ?? 0;
             $beginVoucher->expense_type_id = $lastVoucher?->expense_type_id ?? 0;
             $beginVoucher->save();
 
-            $budgetMandate->update([
-                'status' => 'done',
-                'is_archived' => 2,
-            ]);
+            // $budgetMandate->update([
+            //     'status' => 'done',
+            //     'is_archived' => 2,
+            // ]);
 
             DB::commit();
             flash()
@@ -788,14 +810,36 @@ class BudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->latest()->first();
 
+            $dataCheck = BudgetVoucher::where('legal_number', $validated['cboLegalNumber'])
+                ->where('account_sub_id', $validated['cboSubAccount'])
+                ->where('program_id', $validated['cboProgram'])
+                ->where('program_sub_id', $validated['cboProgramSub'])
+                ->where('cluster_id', $validated['cboCluster'])
+                ->where('ministry_id', $ministry->id)
+                ->get();
+
+            $totalBudget = $dataCheck->sum('budget');
+
+            if ($budgetMandate->budget != $totalBudget) {
+                $budgetMandate->update([
+                    'status' => 'todo',
+                    'is_archived' => 1,
+                ]);
+            } else {
+                $budgetMandate->update([
+                    'status' => 'done',
+                    'is_archived' => 2,
+                ]);
+            }
+
             $beginVoucher->apply = $lastVoucher?->budget ?? 0;
             $beginVoucher->expense_type_id = $lastVoucher?->expense_type_id ?? 0;
             $beginVoucher->save();
 
-            $budgetMandate->update([
-                'status' => 'done',
-                'is_archived' => 2,
-            ]);
+            // $budgetMandate->update([
+            //     'status' => 'done',
+            //     'is_archived' => 2,
+            // ]);
 
             DB::commit();
             flash()
@@ -1016,8 +1060,8 @@ class BudgetVoucherController extends Controller
                 'expense_type_id' => $validated['cboExpenseType'],
                 'legal_number'    => $validated['cboLegalNumber'],
                 'legal_name'    => $validated['legalName'],
-                'status' => 'done',
-                'is_archived' => 2,
+                // 'status' => 'done',
+                // 'is_archived' => 2,
                 'description' => strip_tags($validated['txtDescription']),
                 // 'attachments' => json_encode($storedFilePaths),
                 'transaction_date'           => $validated['transactionDate'],
@@ -1140,8 +1184,8 @@ class BudgetVoucherController extends Controller
                 'legal_name'    => $validated['legalName'],
                 'temporary_id'      => $validated['cbotemporaryId'],
                 'day_of_number'      => $validated['cbodayOfNumber'],
-                'status' => 'done',
-                'is_archived' => 2,
+                // 'status' => 'done',
+                // 'is_archived' => 2,
                 'description' => strip_tags($validated['txtDescription']),
                 // 'attachments' => json_encode($storedFilePaths),
                 'transaction_date'           => $validated['transactionDate'],
