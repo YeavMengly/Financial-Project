@@ -17,10 +17,15 @@ class BeginguaranteeExport
 {
     protected $data;
     protected $ministryId;
-    public function __construct($data, $ministryId)
+    protected $startDate;
+    protected $endDate;
+
+    public function __construct($data, $ministryId, $startDate = null, $endDate = null)
     {
         $this->data = $data;
         $this->ministryId = $ministryId;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     public function export(Request $request)
@@ -32,12 +37,29 @@ class BeginguaranteeExport
         $templatePath = public_path('template_guarantee.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
-
         $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
-        $currentMonth =  $khmerMonths[date('n') - 1];
-        $khmerNumbers = ['0' => '០','1' => '១','2' => '២','3' => '៣','4' => '៤','5' => '៥','6' => '៦','7' => '៧','8' => '៨','9' => '៩'];
+        $khmerNumbers = ['0' => '០', '1' => '១', '2' => '២', '3' => '៣', '4' => '៤', '5' => '៥', '6' => '៦', '7' => '៧', '8' => '៨', '9' => '៩'];
+        $currentMonth = $khmerMonths[date('n') - 1];
         $currentYear = strtr(date('Y'), $khmerNumbers);
-        $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
+
+        if ($this->startDate && $this->endDate) {
+
+            $start = strtotime($this->startDate);
+            $end = strtotime($this->endDate);
+
+            $startDay = strtr(date('d', $start), $khmerNumbers);
+            $startMonth = $khmerMonths[date('n', $start) - 1];
+            $startYear = strtr(date('Y', $start), $khmerNumbers);
+
+            $endDay = strtr(date('d', $end), $khmerNumbers);
+            $endMonth = $khmerMonths[date('n', $end) - 1];
+            $endYear = strtr(date('Y', $end), $khmerNumbers);
+
+            $dateRangeText = "ចាប់ពីថ្ងៃទី {$startDay} ខែ {$startMonth} ឆ្នាំ {$startYear} ដល់ថ្ងៃទី {$endDay} ខែ {$endMonth} ឆ្នាំ {$endYear}";
+        } else {
+            $dateRangeText = "ប្រចាំ ខែ {$currentMonth} ឆ្នាំ {$currentYear}";
+        }
+
 
         $row = 10;
         $sheet->getStyle("A{$row}:T{$row}")->applyFromArray([
@@ -143,14 +165,37 @@ class BeginguaranteeExport
                         $sheet->setCellValue("L{$row}", $decrease);
                         $sheet->setCellValue("M{$row}", $editorial);
                         $sheet->setCellValue("N{$row}", $item->new_credit_status);
-                        $sheet->setCellValue("O{$row}", $item->early_balance);
+
                         $Month = now()->month;
+                        $transactionDate = strtotime($item->transaction_date);
+                        $inRange = true;
                         $applyValue = 0;
-                        if ( !empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
-                            $applyValue = $item->apply;
+                        $deadlineBalance = $item->apply + $item->early_balance;
+                        $earlyBalance = $deadlineBalance;
+
+                        if ($this->startDate && $this->endDate) {
+                            $start = strtotime($this->startDate);
+                            $end   = strtotime($this->endDate);
+
+                            $inRange = $transactionDate >= $start && $transactionDate <= $end;
+                            $applyValue = 0;
+                            $deadlineBalance = $item->budget;
+                            $earlyBalance = $deadlineBalance;
+ 
+                            if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
+                                $applyValue = $item->apply;
+                                $deadlineBalance = $item->apply + $item->early_balance;
+                                $earlyBalance = $item->early_balance;
+                            }
                         }
+                        if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
+                            $applyValue = $item->apply;
+                            $deadlineBalance = $item->apply + $item->early_balance;
+                            $earlyBalance = $item->early_balance;
+                        }
+                        $sheet->setCellValue("O{$row}", $earlyBalance);
                         $sheet->setCellValue("P{$row}", $applyValue);
-                        $sheet->setCellValue("Q{$row}", $item->deadline_balance);
+                        $sheet->setCellValue("Q{$row}",  $deadlineBalance);
                         $sheet->setCellValue("R{$row}", $item->credit);
                         $sheet->setCellValue("S{$row}", $item->law_average);
                         $sheet->setCellValue("T{$row}", $item->law_correction);
@@ -167,9 +212,10 @@ class BeginguaranteeExport
                             'decrease'           => (float) $decrease,
                             'editorial'          => (float) $editorial,
                             'new_credit_status'  => (float) $item->new_credit_status,
-                            'early_balance'      => (float) $item->early_balance,
-                            'apply'              => (float) $applyValue,
-                            'deadline_balance'   => (float) $item->deadline_balance,
+                            // Only include these in totals if the row is in the selected range
+                            'early_balance'    => $inRange ? (float) $earlyBalance : 0,
+                            'apply'            => $inRange ? (float) $applyValue : 0,
+                            'deadline_balance' => $inRange ? (float) $deadlineBalance : 0,
                             'credit'             => (float) $item->credit,
                             'law_average'        => (float) $item->law_average,
                             'law_correction'     => (float) $item->law_correction,

@@ -33,9 +33,9 @@ class BeginMandateExport
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-       $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+        $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
         $currentMonth =  $khmerMonths[date('n') - 1];
-        $khmerNumbers = ['0' => '០','1' => '១','2' => '២','3' => '៣','4' => '៤','5' => '៥','6' => '៦','7' => '៧','8' => '៨','9' => '៩'];
+        $khmerNumbers = ['0' => '០', '1' => '១', '2' => '២', '3' => '៣', '4' => '៤', '5' => '៥', '6' => '៦', '7' => '៧', '8' => '៨', '9' => '៩'];
         $currentYear = strtr(date('Y'), $khmerNumbers);
         $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
 
@@ -143,14 +143,19 @@ class BeginMandateExport
                         $sheet->setCellValue("L{$row}", $decrease);
                         $sheet->setCellValue("M{$row}", $editorial);
                         $sheet->setCellValue("N{$row}", $item->new_credit_status);
-                        $sheet->setCellValue("O{$row}", $item->early_balance);
                         $Month = now()->month;
                         $applyValue = 0;
+                        $deadlineBalance = $item->apply + $item->early_balance;
+                        $earlyBalance = $deadlineBalance;
+
                         if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
                             $applyValue = $item->apply;
+                            $deadlineBalance = $item->apply + $item->early_balance;
+                            $earlyBalance = $item->early_balance;
                         }
+                        $sheet->setCellValue("O{$row}", $earlyBalance);
                         $sheet->setCellValue("P{$row}", $applyValue);
-                        $sheet->setCellValue("Q{$row}", $item->deadline_balance);
+                        $sheet->setCellValue("Q{$row}",  $deadlineBalance);
                         $sheet->setCellValue("R{$row}", $item->credit);
                         $sheet->setCellValue("S{$row}", $item->law_average);
                         $sheet->setCellValue("T{$row}", $item->law_correction);
@@ -167,9 +172,9 @@ class BeginMandateExport
                             'decrease'           => (float) $decrease,
                             'editorial'          => (float) $editorial,
                             'new_credit_status'  => (float) $item->new_credit_status,
-                            'early_balance'      => (float) $item->early_balance,
-                            'apply'              => (float) $item->apply,
-                            'deadline_balance'   => (float) $item->deadline_balance,
+                            'early_balance'      => (float) $earlyBalance,
+                            'apply'              => (float) $applyValue,
+                            'deadline_balance'   => (float)  $deadlineBalance,
                             'credit'             => (float) $item->credit,
                             'law_average'        => (float) $item->law_average,
                             'law_correction'     => (float) $item->law_correction,
