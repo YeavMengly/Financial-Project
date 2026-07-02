@@ -38,8 +38,8 @@ class BeginguaranteeExport
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
         $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+        $currentMonth =  $khmerMonths[date('n') - 1];
         $khmerNumbers = ['0' => '០', '1' => '១', '2' => '២', '3' => '៣', '4' => '៤', '5' => '៥', '6' => '៦', '7' => '៧', '8' => '៨', '9' => '៩'];
-        $currentMonth = $khmerMonths[date('n') - 1];
         $currentYear = strtr(date('Y'), $khmerNumbers);
 
         if ($this->startDate && $this->endDate) {
@@ -157,7 +157,6 @@ class BeginguaranteeExport
                         $totalInc   = $item->loan_total_increase      ?? ($internal + $unexpected + $additional);
                         $decrease   = $item->loan_decrease            ?? 0;
                         $editorial  = $item->loan_editorial           ?? 0;
-
                         $sheet->setCellValue("H{$row}", $internal);
                         $sheet->setCellValue("I{$row}", $unexpected);
                         $sheet->setCellValue("J{$row}", $additional);
@@ -251,9 +250,6 @@ class BeginguaranteeExport
                     ? ($accountTotals['deadline_balance'] / $accountTotals['new_credit_status']) * 100
                     : 0;
                 $this->writeTotalsRow($sheet, $accountRow, $accountTotals);
-                $sheet->getStyle("S{$accountRow}:T{$accountRow}")
-                    ->getNumberFormat()
-                    ->setFormatCode('0.00"%"');
             }
             $chapterTotals['law_average'] =
                 $chapterTotals['fin_law'] > 0
@@ -265,9 +261,6 @@ class BeginguaranteeExport
                 ? ($chapterTotals['deadline_balance'] / $chapterTotals['new_credit_status']) * 100
                 : 0;
             $this->writeTotalsRow($sheet, $chapterRow, $chapterTotals);
-            $sheet->getStyle("S{$chapterRow}:T{$chapterRow}")
-                ->getNumberFormat()
-                ->setFormatCode('0.00"%"');
         }
         $totalsStyleArray = [
             'font' => [

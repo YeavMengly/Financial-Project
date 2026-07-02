@@ -24,7 +24,13 @@ class Chapter extends Model
         'ministry_id',
         'no',
         'name',
-        'type_id'
+        'type_id',
+        'sub_type',
+    ];
+
+    // Cast sub_type as an array to handle multiple sub-types
+    protected $casts = [
+        'sub_type' => 'array',
     ];
 
     /* -----------------------------------------------------------------

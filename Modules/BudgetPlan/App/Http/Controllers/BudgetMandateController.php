@@ -566,7 +566,10 @@ class BudgetMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('budgetMandate.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('budgetMandate.index', $params);
+            }
+            return redirect()->route('budgetMandate.create', $params);
         } catch (\Throwable $e) {
             Log::error('BudgetMandate store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -690,7 +693,11 @@ class BudgetMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('budgetAdvancePayment.index', $params);
+            if ($request->has('submit')) {
+                return redirect()->route('budgetAdvancePayment.index', $params);
+            }
+
+            return redirect()->route('budgetAdvancePayment.create', $params);
         } catch (\Throwable $e) {
             Log::error('BudgetAdvancePayment store failed: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -1684,7 +1691,7 @@ class BudgetMandateController extends Controller
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
-                'budget_mandates.no',
+                'begin_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
@@ -1694,12 +1701,15 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
+<<<<<<< HEAD
                 'begin_mandates.apply',
                 DB::raw('MAX(budget_mandates.transaction_date) as transaction_date'),
                 DB::raw('SUM(budget_mandates.budget) as budget')
                  
+=======
+                DB::raw('SUM(budget_mandates.budget) as apply')
+>>>>>>> ea9f253c6eb560896fbb25caff37b3818b07635a
             );
-
             $query->groupBy(
                 'budget_mandates.no',
                 'begin_mandates.chapter_id',
@@ -1707,7 +1717,7 @@ class BudgetMandateController extends Controller
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
-                'budget_mandates.no',
+                'begin_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
@@ -1717,8 +1727,8 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                'begin_mandates.apply',
             );
+
             // $query->where('budget_mandates.expense_type_id', 1);
             $query->where('budget_mandates.status', 'todo');
             $query->where('budget_mandates.is_archived', 1);
@@ -1827,10 +1837,8 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                'begin_mandates.apply',
-                DB::raw('MAX(budget_mandates.transaction_date) as transaction_date')
+                DB::raw('SUM(budget_mandates.budget) as apply')
             );
-
             $query->groupBy(
                 'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
@@ -1846,7 +1854,6 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                'begin_mandates.apply',
             );
 
             $query->where('budget_mandates.expense_type_id', 2);
@@ -1943,8 +1950,7 @@ class BudgetMandateController extends Controller
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
-                'begin_mandates.apply',
-
+                DB::raw('SUM(budget_mandates.budget) as apply')
             );
             $query->groupBy(
                 'budget_mandates.program_id',
@@ -1953,7 +1959,6 @@ class BudgetMandateController extends Controller
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
-                'begin_mandates.apply',
             );
 
             $query->where('budget_mandates.expense_type_id', 3);

@@ -238,10 +238,11 @@
                                 </div>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
-                                <button type="submit" class="btn btn-primary"
-                                    id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-primary" type="submit" name="submit"
+                                    value="save">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    {{ __('buttons.delete') }}
+                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
                                     href="{{ route('budgetMandate.index', $params) }}">{{ __('buttons.back') }}</a>
