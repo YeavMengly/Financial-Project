@@ -1701,14 +1701,10 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-<<<<<<< HEAD
                 'begin_mandates.apply',
                 DB::raw('MAX(budget_mandates.transaction_date) as transaction_date'),
                 DB::raw('SUM(budget_mandates.budget) as budget')
                  
-=======
-                DB::raw('SUM(budget_mandates.budget) as apply')
->>>>>>> ea9f253c6eb560896fbb25caff37b3818b07635a
             );
             $query->groupBy(
                 'budget_mandates.no',
