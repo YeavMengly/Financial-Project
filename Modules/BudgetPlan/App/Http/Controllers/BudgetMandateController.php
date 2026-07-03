@@ -1685,7 +1685,9 @@ class BudgetMandateController extends Controller
                     ->where('begin_mandates.ministry_id', $ministryId);
             });
             $query->select(
+                'budget_mandates.no',
                 'begin_mandates.chapter_id',
+                // 'budget_mandates.expense_type_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
@@ -1699,10 +1701,15 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                DB::raw('SUM(budget_mandates.budget) as apply')
+                'begin_mandates.apply',
+                DB::raw('MAX(budget_mandates.transaction_date) as transaction_date'),
+                DB::raw('SUM(budget_mandates.budget) as budget')
+                 
             );
             $query->groupBy(
+                'budget_mandates.no',
                 'begin_mandates.chapter_id',
+                // 'budget_mandates.expense_type_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
@@ -1759,14 +1766,14 @@ class BudgetMandateController extends Controller
             if ($request->cboTodo) {
                 if ($request->cboTodo == 2) {
                     $query->where('budget_mandates.is_archived', 1);
-                    $query->where('budget_mandates.expense_type_id', 1);
+                    // $query->where('budget_mandates.expense_type_id', 1);
                 } elseif ($request->cboTodo == 3) {
                     $query->where('budget_mandates.is_archived', 2);
-                    $query->where('budget_mandates.expense_type_id', 1);
+                    // $query->where('budget_mandates.expense_type_id', 1);
                 }
             } else {
                 $query->where('budget_mandates.is_archived', 1);
-                $query->where('budget_mandates.expense_type_id', 1);
+                // $query->where('budget_mandates.expense_type_id', 1);
             }
             $data = $query->get();
 
@@ -1775,7 +1782,12 @@ class BudgetMandateController extends Controller
                 'count'       => $data->count(),
             ]);
 
-            $export = new BeginguaranteeExport($data, $ministryId);
+            $export = new BeginguaranteeExport(
+                $data,
+                $ministryId,
+                $request->start_date,
+                $request->end_date
+            );
 
             return $export->export($request);
         } catch (\Throwable $e) {
