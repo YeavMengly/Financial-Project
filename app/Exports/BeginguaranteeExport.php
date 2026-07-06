@@ -180,25 +180,22 @@ class BeginguaranteeExport
                             $inRange = $transactionDate >= $start && $transactionDate <= $end;
 
 
-                            $transactionMonth = (int)date('n', strtotime($item->transaction_date));
-                            $apply = (float)$item->apply;
-
-                            if ($apply != 0 && $transactionMonth == $Month) {
-                                $applyValue = $apply;
-                                $deadlineBalance = $apply + $item->budget;
+                            if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
+                                $applyValue = $item->apply;
+                                $deadlineBalance = $item->apply + $item->budget;
                                 $earlyBalance = $item->budget;
-                            } elseif ($apply == 0.00 && $transactionMonth != $Month) {
+                            } elseif ($item->apply == 0 && date('n', strtotime($item->transaction_date)) != $Month) {
+                                $applyValue = 0;
+                                $deadlineBalance = $item->apply + $item->budget;
+                                $earlyBalance = $deadlineBalance;
+                            } elseif (!empty($item->apply) && date('n', strtotime($item->transaction_date)) != $Month){
                                 $applyValue = 0;
                                 $deadlineBalance = $item->budget;
-                                $earlyBalance = $deadlineBalance;
-                            } elseif ($apply != 0.00 && $transactionMonth != $Month) {
-                                $applyValue = 0;
-                                $deadlineBalance =$item->apply + $item->budget;
-                                $earlyBalance = $deadlineBalance;
-                            } else {
+                                $earlyBalance = $item->budget;
+                            }else{
                                 $applyValue = 0;
                                 $deadlineBalance = $item->budget;
-                                $earlyBalance = $deadlineBalance;
+                                $earlyBalance = $item->budget;
                             }
                         }
                         if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
