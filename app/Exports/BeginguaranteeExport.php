@@ -168,6 +168,7 @@ class BeginguaranteeExport
                         $Month = now()->month;
                         $transactionDate = strtotime($item->transaction_date);
                         $inRange = true;
+
                         $applyValue = 0;
                         $deadlineBalance = $item->apply + $item->early_balance;
                         $earlyBalance = $deadlineBalance;
@@ -177,20 +178,33 @@ class BeginguaranteeExport
                             $end   = strtotime($this->endDate);
 
                             $inRange = $transactionDate >= $start && $transactionDate <= $end;
-                            $applyValue = 0;
-                            $deadlineBalance = $item->budget;
-                            $earlyBalance = $deadlineBalance;
- 
-                            if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
-                                $applyValue = $item->apply;
-                                $deadlineBalance = $item->apply + $item->early_balance;
-                                $earlyBalance = $item->early_balance;
+
+
+                            $transactionMonth = (int)date('n', strtotime($item->transaction_date));
+                            $apply = (float)$item->apply;
+
+                            if ($apply != 0 && $transactionMonth == $Month) {
+                                $applyValue = $apply;
+                                $deadlineBalance = $apply + $item->budget;
+                                $earlyBalance = $item->budget;
+                            } elseif ($apply == 0.00 && $transactionMonth != $Month) {
+                                $applyValue = 0;
+                                $deadlineBalance = $item->budget;
+                                $earlyBalance = $deadlineBalance;
+                            } elseif ($apply != 0.00 && $transactionMonth != $Month) {
+                                $applyValue = 0;
+                                $deadlineBalance =$item->apply + $item->budget;
+                                $earlyBalance = $deadlineBalance;
+                            } else {
+                                $applyValue = 0;
+                                $deadlineBalance = $item->budget;
+                                $earlyBalance = $deadlineBalance;
                             }
                         }
                         if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
                             $applyValue = $item->apply;
-                            $deadlineBalance = $item->apply + $item->early_balance;
-                            $earlyBalance = $item->early_balance;
+                            $deadlineBalance = $item->apply + $item->budget;
+                            $earlyBalance = $item->budget;
                         }
                         $sheet->setCellValue("O{$row}", $earlyBalance);
                         $sheet->setCellValue("P{$row}", $applyValue);

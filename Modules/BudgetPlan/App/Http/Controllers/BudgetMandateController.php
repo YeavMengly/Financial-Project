@@ -1687,7 +1687,7 @@ class BudgetMandateController extends Controller
             $query->select(
                 'budget_mandates.no',
                 'begin_mandates.chapter_id',
-                // 'budget_mandates.expense_type_id',
+                'budget_mandates.expense_type_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
@@ -1701,15 +1701,15 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                'begin_mandates.apply',
+                DB::raw('MAX(begin_mandates.apply) as apply'),
                 DB::raw('MAX(budget_mandates.transaction_date) as transaction_date'),
                 DB::raw('SUM(budget_mandates.budget) as budget')
-                 
+
             );
             $query->groupBy(
                 'budget_mandates.no',
                 'begin_mandates.chapter_id',
-                // 'budget_mandates.expense_type_id',
+                'budget_mandates.expense_type_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
@@ -1723,11 +1723,12 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
+
             );
 
             // $query->where('budget_mandates.expense_type_id', 1);
-            $query->where('budget_mandates.status', 'todo');
-            $query->where('budget_mandates.is_archived', 1);
+            // $query->where('budget_mandates.status', 'todo');
+            // $query->where('budget_mandates.is_archived', 1);
 
             // === Filters (PREFIX table name!) ===
             // Account
@@ -1763,18 +1764,19 @@ class BudgetMandateController extends Controller
                 $query->where('budget_mandates.deleted_at', null);
             }
             //To do
-            if ($request->cboTodo) {
+            if ($request->filled('cboTodo')) {
                 if ($request->cboTodo == 2) {
                     $query->where('budget_mandates.is_archived', 1);
-                    // $query->where('budget_mandates.expense_type_id', 1);
                 } elseif ($request->cboTodo == 3) {
                     $query->where('budget_mandates.is_archived', 2);
-                    // $query->where('budget_mandates.expense_type_id', 1);
+                } else {
+                    $query->whereIn('budget_mandates.is_archived', [1, 2]);
                 }
             } else {
-                $query->where('budget_mandates.is_archived', 1);
-                // $query->where('budget_mandates.expense_type_id', 1);
+                // Default: include both
+                $query->whereIn('budget_mandates.is_archived', [1, 2]);
             }
+            
             $data = $query->get();
 
             Log::info('Exported BeginMandate Count', [
