@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('legal_id', 100);
             $table->string('legal_name');
             $table->string('temporary_id', 100);
+            $table->string('payment_voucher_number', 100);
             $table->string('day_of_number', 100);
             $table->enum('status', ['todo', 'done'])->default('todo');
             $table->integer('is_archived')->default(1);

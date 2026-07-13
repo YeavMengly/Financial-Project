@@ -59,15 +59,16 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.legal.number') }}
+                                        <label for="cboPaymentVoucherNumber" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.payment.voucher') }}
                                         </label>
-                                        <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
+                                        <select id="cboPaymentVoucherNumber" class="form-select"
+                                            name="cboPaymentVoucherNumber" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
 
-                                        @error('cboLegalNumber')
+                                        @error('cboPaymentVoucherNumber')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -664,7 +665,7 @@
         let cboLegalChoices;
 
         document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboLegalNumber');
+            const element = document.getElementById('cboPaymentVoucherNumber');
 
             cboLegalChoices = new Choices(element, {
                 searchEnabled: true,
@@ -713,7 +714,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            const element = document.getElementById('cboLegalNumber');
+            const element = document.getElementById('cboPaymentVoucherNumber');
 
             cboLegalChoices = new Choices(element, {
                 searchEnabled: true,
@@ -729,7 +730,7 @@
 
             var expenseTypeId = $(this).val();
 
-            /* ===== Reset cboLegalNumber ===== */
+            /* ===== Reset cboPaymentVoucherNumber ===== */
             cboLegalChoices.clearStore(); // remove selected item
             cboLegalChoices.clearChoices(); // remove all options
 
