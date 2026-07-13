@@ -124,6 +124,19 @@ class BudgetVoucherDataTable extends DataTable
         if ($request->cboAccountSub) {
             $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
         }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where(
+                'budget_vouchers.payment_voucher_number',
+                $request->CboPaymentVoucherNumber
+            );
+        }
+        if ($request->filled('CboMandate')) {
+            $model->where(
+                'budget_vouchers.day_of_number',
+                $request->CboMandate
+            );
+        }
+
 
         //Date
         // if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -201,6 +214,7 @@ class BudgetVoucherDataTable extends DataTable
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
+                    'emptyTable' => 'Invalid Payment Voucher Number or no data found.'
                 ],
             ])
             ->ajax([
@@ -208,6 +222,8 @@ class BudgetVoucherDataTable extends DataTable
                     d.cboTodo = $("#cboTodo").val();
                     d.cboStatus = $("#cboStatus").val();
                     d.cboExpenseType = $("#cboExpenseType").val();
+                    d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
+                    d.CboMandate = $("#CboMandate").val();
                     d.cboAccountSub = $("#cboAccountSub").val();
                     d.start_date = $("#start_date").val();
                     d.end_date = $("#end_date").val();
