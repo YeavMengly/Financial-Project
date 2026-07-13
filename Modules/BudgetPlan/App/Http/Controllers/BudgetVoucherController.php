@@ -214,7 +214,7 @@ class BudgetVoucherController extends Controller
     {
         if ($request->expense_type_id) {
 
-            $data = BudgetMandate::select('id', 'legal_number')
+            $data = BudgetMandate::select('id', 'payment_voucher_number')
                 ->where('expense_type_id', $request->expense_type_id)
                 ->where('is_archived', 1)
                 ->where('status', 'todo')
@@ -226,9 +226,9 @@ class BudgetVoucherController extends Controller
 
             foreach ($data as $d) {
 
-                $selected = $selectedId == $d->legal_number ? 'selected' : '';
+                $selected = $selectedId == $d->payment_voucher_number ? 'selected' : '';
 
-                $html .= "<option value='{$d->legal_number}' {$selected}>{$d->legal_number}</option>";
+                $html .= "<option value='{$d->payment_voucher_number}' {$selected}>{$d->payment_voucher_number}</option>";
             }
 
             return response($html);
@@ -269,7 +269,7 @@ class BudgetVoucherController extends Controller
             return response('<option value="">ស្វែងរក...</option>');
         }
 
-        $data = BudgetMandate::select('id', 'legal_number')
+        $data = BudgetMandate::select('id', 'payment_voucher_number')
             ->where('expense_type_id', $request->expense_type_id)
             ->where('is_archived', 2)
             ->where('status', 'done')
@@ -280,8 +280,8 @@ class BudgetVoucherController extends Controller
         $html = '<option value="">ស្វែងរក...</option>';
 
         foreach ($data as $d) {
-            $selected = ((string)$d->legal_number === $selectedId) ? 'selected' : '';
-            $html .= "<option value='{$d->legal_number}' {$selected}>{$d->legal_number}</option>";
+            $selected = ((string)$d->payment_voucher_number === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->payment_voucher_number}' {$selected}>{$d->payment_voucher_number}</option>";
         }
 
         return response($html);
@@ -489,7 +489,7 @@ class BudgetVoucherController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'cboLegalNumber' =>   'required',
+            'cboPaymentVoucherNumber' =>   'required',
             'legalName' =>  'required',
             'cbotemporaryId' =>  'required',
             'cbodayOfNumber' =>  'required',
@@ -546,7 +546,7 @@ class BudgetVoucherController extends Controller
                 return back()->withInput();
             }
 
-            $budgetMandate = BudgetMandate::where('legal_number', $validated['cboLegalNumber'])
+            $budgetMandate = BudgetMandate::where('payment_voucher_number', $validated['cboPaymentVoucherNumber'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])
                 ->where('program_sub_id', $validated['cboProgramSub'])
@@ -598,9 +598,9 @@ class BudgetVoucherController extends Controller
                 'no'             => $beginVoucher->no,
                 'budget'         => $applyValue,
                 'expense_type_id'      => $validated['cboExpenseType'],
-                'legal_number'      => $validated['cboLegalNumber'],
                 'legal_name'      => $validated['legalName'],
                 'temporary_id'      => $validated['cbotemporaryId'],
+                'payment_voucher_number'      => $validated['cboPaymentVoucherNumber'],
                 'day_of_number'      => $validated['cbodayOfNumber'],
                 'status' => 'done',
                 'is_archived' => 2,
@@ -613,7 +613,7 @@ class BudgetVoucherController extends Controller
             $this->recalculateAndSaveReport($beginVoucher);
 
             $beginVoucher->refresh();
-            $lastVoucher = BudgetVoucher::where('legal_number', $validated['cboLegalNumber'])
+            $lastVoucher = BudgetVoucher::where('payment_voucher_number', $validated['cboPaymentVoucherNumber'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])
                 ->where('program_sub_id', $validated['cboProgramSub'])
@@ -621,7 +621,7 @@ class BudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->latest()->first();
 
-            $dataCheck = BudgetVoucher::where('legal_number', $validated['cboLegalNumber'])
+            $dataCheck = BudgetVoucher::where('payment_voucher_number', $validated['cboPaymentVoucherNumber'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])
                 ->where('program_sub_id', $validated['cboProgramSub'])
@@ -646,11 +646,6 @@ class BudgetVoucherController extends Controller
             $beginVoucher->apply = $lastVoucher?->budget ?? 0;
             $beginVoucher->expense_type_id = $lastVoucher?->expense_type_id ?? 0;
             $beginVoucher->save();
-
-            // $budgetMandate->update([
-            //     'status' => 'done',
-            //     'is_archived' => 2,
-            // ]);
 
             DB::commit();
             flash()
@@ -880,11 +875,8 @@ class BudgetVoucherController extends Controller
     {
         $id = decode_params($id);
         $ministry = Ministry::where('id', decode_params($params))->first();
-
         $agency   = Agency::where('ministry_id', $ministry->id)->get();
-
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-
         $module = BudgetVoucher::where('id', $id)
             ->where('is_archived', 2)
             ->where('status', 'done')
@@ -989,7 +981,7 @@ class BudgetVoucherController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
-            'cboLegalNumber' =>   'required',
+            'cboPaymentVoucherNumber' =>   'required',
             'legalName' =>  'required',
             'cbotemporaryId' =>  'required',
             'cbodayOfNumber' =>  'required',
@@ -1011,10 +1003,9 @@ class BudgetVoucherController extends Controller
             $voucher = BudgetVoucher::where('id', $id)
                 ->where('ministry_id', $ministry->id)
                 ->where('expense_type_id', $validated['cboExpenseType'])
-                ->where('is_archived', 1)
-                ->where('status', 'todo')
+                ->where('is_archived', 2)
+                ->where('status', 'done')
                 ->first();
-
             $beginCredit = BeginVoucher::where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])
                 ->where('program_sub_id', $validated['cboProgramSub'])
@@ -1022,8 +1013,6 @@ class BudgetVoucherController extends Controller
                 ->where('agency_id', $validated['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
-
-            // dd($beginCredit);
 
             if (!$beginCredit) {
                 flash()->translate('en')->option('timeout', 2000)
@@ -1064,12 +1053,12 @@ class BudgetVoucherController extends Controller
                 'no' => $beginCredit->no,
                 'budget' => $applyValue,
                 'expense_type_id' => $validated['cboExpenseType'],
-                'legal_number'    => $validated['cboLegalNumber'],
+                'payment_voucher_number'    => $validated['cboPaymentVoucherNumber'],
                 'legal_name'    => $validated['legalName'],
                 // 'status' => 'done',
                 // 'is_archived' => 2,
                 'description' => strip_tags($validated['txtDescription']),
-                // 'attachments' => json_encode($storedFilePaths),
+                'attachments' => json_encode($storedFilePaths),
                 'transaction_date'           => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
             ]);
