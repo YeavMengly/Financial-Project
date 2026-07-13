@@ -125,6 +125,9 @@ class BudgetMandateDataTable extends DataTable
         if ($request->filled('subAccountNumber')) {
             $model->where('account_subs.no', $request->subAccountNumber);
         }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
 
         if ($request->filled('cboProgram')) {
             $model->where('programs.id', $request->cboProgram);
@@ -205,6 +208,7 @@ class BudgetMandateDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.cboProgram    = $("#cboProgram").val();
+                d.CboPaymentVoucherNumber    = $("#CboPaymentVoucherNumber").val();
                 d.subAccountNumber  = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();

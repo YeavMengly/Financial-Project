@@ -140,6 +140,10 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
             }
         }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
+
         // if ($request->filled('agency')) {
         //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
         // }
@@ -223,6 +227,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.cboProgram    = $("#cboProgram").val();
+                d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
                 d.subAccountNumber = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();

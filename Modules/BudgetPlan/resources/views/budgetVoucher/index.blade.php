@@ -78,14 +78,26 @@
                             </select>
                         </div>
 
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="CboPaymentVoucherNumber">{{ __('menus.voucher') }}</label>
+                            <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber"
+                                class="form-control" placeholder="{{ __('menus.voucher') }}"
+                                value="{{ request('CboPaymentVoucherNumber') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
 
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="CboMandate">{{ __('menus.mandate') }}</label>
+                            <input type="text" id="CboMandate" name="CboMandate" class="form-control"
+                                placeholder="{{ __('menus.mandate') }}" value="{{ request('CboMandate') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
 
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
-                                placeholder="{{ __('forms.select_date') }}"  
-                                value="{{ request('start_date') }}"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
@@ -93,8 +105,7 @@
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
-                                placeholder="{{ __('forms.select_date') }}"  
-                                value="{{ request('end_date') }}"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
@@ -105,13 +116,14 @@
                             </a>
                             {{-- Export --}}
 
-                            <a id="btnExport" href="{{ route(
-                                'budgetVoucher.export',
-                                array_merge(
-                                    ['params' => $params],
-                                    request()->only(['cboTodo', 'cboStatus', 'cboExpenseType', 'cboAccountSub', 'start_date', 'end_date']),
-                                ),
-                            ) }}"
+                            <a id="btnExport"
+                                href="{{ route(
+                                    'budgetVoucher.export',
+                                    array_merge(
+                                        ['params' => $params],
+                                        request()->only(['cboTodo', 'cboStatus', 'cboExpenseType', 'cboAccountSub', 'start_date', 'end_date']),
+                                    ),
+                                ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
@@ -261,7 +273,7 @@
             });
         });
     </script>
-     <script>
+    <script>
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
 
@@ -282,8 +294,9 @@
         });
     </script>
     <script>
-        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub').on('change keyup', function() {
-            $('#budgetvoucher-table').DataTable().ajax.reload();
-        });
+        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboPaymentVoucherNumber, #CboMandate').on('change keyup',
+            function() {
+                $('#budgetvoucher-table').DataTable().ajax.reload();
+            });
     </script>
 @endsection
