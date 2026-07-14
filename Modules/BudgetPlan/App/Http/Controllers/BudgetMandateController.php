@@ -404,20 +404,56 @@ class BudgetMandateController extends Controller
         ]);
     }
 
+    // public function editEarlyBalance(Request $request, $params)
+    // {
+    //     $ministryId = decode_params($params);
+
+    //     $validated = $request->validate([
+    //         'account_sub_id' => 'required',
+    //         'program_id'     => 'required',
+    //         'program_sub_id' => 'required',
+    //         'cluster_id'     => 'required',
+    //     ]);
+
+    //     if (!$validated) {
+    //         return response('<option value="">ស្វែងរក...</option>');
+    //     }
+
+    //     $beginMandate = BeginMandate::with('loans')
+    //         ->where('ministry_id', $ministryId)
+    //         ->where('program_id', $request->program_id)
+    //         ->where('program_sub_id', $request->program_sub_id)
+    //         ->where('cluster_id', $request->cluster_id)
+    //         ->where('account_sub_id', $request->account_sub_id)
+    //         ->first();
+
+    //     if (!$beginMandate) {
+    //         return response()->json([
+    //             'fin_law' => 0,
+    //             'credit_movement' => 0,
+    //             'new_credit_status' => 0,
+    //             'credit' => 0,
+    //             'deadline_balance' => 0,
+    //             'exists' => false
+    //         ]);
+    //     }
+
+    //     $loan = $beginMandate->loans;
+
+    //     $creditMovement = ($loan->total_increase ?? 0) - ($loan->decrease ?? 0);
+
+    //     return response()->json([
+    //         'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
+    //         'credit_movement'   => (float) $creditMovement,
+    //         'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
+    //         'credit'            => (float) ($beginMandate->credit ?? 0),
+    //         'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
+    //         'exists'            => true
+    //     ]);
+    // }
     public function editEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
-
-        $validated = $request->validate([
-            'account_sub_id' => 'required',
-            'program_id'     => 'required',
-            'program_sub_id' => 'required',
-            'cluster_id'     => 'required',
-        ]);
-
-        if (!$validated) {
-            return response('<option value="">ស្វែងរក...</option>');
-        }
 
         $beginMandate = BeginMandate::with('loans')
             ->where('ministry_id', $ministryId)
@@ -434,24 +470,21 @@ class BudgetMandateController extends Controller
                 'new_credit_status' => 0,
                 'credit' => 0,
                 'deadline_balance' => 0,
-                'exists' => false
+                'exists' => false,
             ]);
         }
 
         $loan = $beginMandate->loans;
 
-        $creditMovement = ($loan->total_increase ?? 0) - ($loan->decrease ?? 0);
-
         return response()->json([
-            'fin_law'           => (float) ($beginMandate->fin_law ?? 0),
-            'credit_movement'   => (float) $creditMovement,
-            'new_credit_status' => (float) ($beginMandate->new_credit_status ?? 0),
-            'credit'            => (float) ($beginMandate->credit ?? 0),
-            'deadline_balance'  => (float) ($beginMandate->deadline_balance ?? 0),
-            'exists'            => true
+            'fin_law' => (float)$beginMandate->fin_law,
+            'credit_movement' => (float)(($loan->total_increase ?? 0) - ($loan->decrease ?? 0)),
+            'new_credit_status' => (float)$beginMandate->new_credit_status,
+            'credit' => (float)$beginMandate->credit,
+            'deadline_balance' => (float)$beginMandate->deadline_balance,
+            'exists' => true,
         ]);
     }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -1776,7 +1809,7 @@ class BudgetMandateController extends Controller
                 // Default: include both
                 $query->whereIn('budget_mandates.is_archived', [1, 2]);
             }
-            
+
             $data = $query->get();
 
             Log::info('Exported BeginMandate Count', [
