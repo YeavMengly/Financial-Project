@@ -79,8 +79,9 @@
                                     <label>{{ __('forms.temporary.id') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="{{ old('cbotemporaryId', $module->temporary_id) }}"
-                                        type="number" class="form-control" placeholder="{{ __('forms.temporary.id') }}"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
+                                        value="{{ old('cbotemporaryId', $module->temporary_id) }}" type="number"
+                                        class="form-control" placeholder="{{ __('forms.temporary.id') }}"
                                         name="cbotemporaryId" tabindex="2" />
                                 </div>
                             </div>
@@ -89,8 +90,9 @@
                                     <label>{{ __('forms.day.number') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="{{ old('cbodayOfNumber', $module->day_of_number) }}"
-                                        type="text" class="form-control" placeholder="{{ __('forms.day.number') }}"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
+                                        value="{{ old('cbodayOfNumber', $module->day_of_number) }}" type="text"
+                                        class="form-control" placeholder="{{ __('forms.day.number') }}"
                                         name="cbodayOfNumber" tabindex="2" />
                                 </div>
                             </div>
@@ -779,7 +781,10 @@
             }
 
             // Load table on page load
-            loadBalances();
+            // loadBalances();
+            window.addEventListener('load', function() {
+                loadBalances();
+            });
 
             // Optional: reload table if user changes any dropdown
             [cboProgram, cboProgramSub, cboCluster, cboSubAccount].forEach(el => {
@@ -790,6 +795,10 @@
             budgetInput?.addEventListener('input', recomputeRemaining);
 
         });
+        $('#cboProgram').val(program_id).trigger('change');
+        $('#cboProgramSub').val(program_sub_id).trigger('change');
+        $('#cboCluster').val(cluster_id).trigger('change');
+        $('#cboSubAccount').val(account_sub_id).trigger('change');
     </script>
 
     <script>

@@ -441,16 +441,54 @@ class BudgetVoucherController extends Controller
         ]);
     }
 
-    public function editEarlyBalance(Request $request, $params)
+    // public function editEarlyBalance(Request $request, $params)
+    // {
+    //     $ministryId = decode_params($params);
+
+    //     $request->validate([
+    //         'account_sub_id' => 'required',
+    //         'program_id'     => 'required',
+    //         'program_sub_id' => 'required',
+    //         'cluster_id'     => 'required',
+    //     ]);
+
+    //     $beginVoucher = BeginVoucher::with('loans')
+    //         ->where('ministry_id', $ministryId)
+    //         ->where('program_id', $request->program_id)
+    //         ->where('program_sub_id', $request->program_sub_id)
+    //         ->where('cluster_id', $request->cluster_id)
+    //         ->where('account_sub_id', $request->account_sub_id)
+    //         ->first();
+
+    //     if (!$beginVoucher) {
+    //         return response()->json([
+    //             'fin_law'           => 0,
+    //             'credit_movement'   => 0,
+    //             'new_credit_status' => 0,
+    //             'credit'            => 0,
+    //             'deadline_balance'  => 0,
+    //             'exists'            => false,
+    //             'message'           => 'No mandate data found for this selection.'
+    //         ]);
+    //     }
+
+    //     $loan = $beginVoucher->loans;
+
+    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+
+    //     return response()->json([
+    //         'fin_law'           => (float) ($beginVoucher->fin_law ?? 0),
+    //         'credit_movement'   => (float) $credit_movement,
+    //         'new_credit_status' => (float) ($beginVoucher->new_credit_status ?? 0),
+    //         'credit'            => (float) ($beginVoucher->credit ?? 0),
+    //         'deadline_balance'  => (float) ($beginVoucher->deadline_balance ?? 0),
+    //         'exists'            => true,
+    //     ]);
+    // }
+
+        public function editEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
-
-        $request->validate([
-            'account_sub_id' => 'required',
-            'program_id'     => 'required',
-            'program_sub_id' => 'required',
-            'cluster_id'     => 'required',
-        ]);
 
         $beginVoucher = BeginVoucher::with('loans')
             ->where('ministry_id', $ministryId)
@@ -462,27 +500,24 @@ class BudgetVoucherController extends Controller
 
         if (!$beginVoucher) {
             return response()->json([
-                'fin_law'           => 0,
-                'credit_movement'   => 0,
+                'fin_law' => 0,
+                'credit_movement' => 0,
                 'new_credit_status' => 0,
-                'credit'            => 0,
-                'deadline_balance'  => 0,
-                'exists'            => false,
-                'message'           => 'No mandate data found for this selection.'
+                'credit' => 0,
+                'deadline_balance' => 0,
+                'exists' => false,
             ]);
         }
 
         $loan = $beginVoucher->loans;
 
-        $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
-
         return response()->json([
-            'fin_law'           => (float) ($beginVoucher->fin_law ?? 0),
-            'credit_movement'   => (float) $credit_movement,
-            'new_credit_status' => (float) ($beginVoucher->new_credit_status ?? 0),
-            'credit'            => (float) ($beginVoucher->credit ?? 0),
-            'deadline_balance'  => (float) ($beginVoucher->deadline_balance ?? 0),
-            'exists'            => true,
+            'fin_law' => (float)$beginVoucher->fin_law,
+            'credit_movement' => (float)(($loan->total_increase ?? 0) - ($loan->decrease ?? 0)),
+            'new_credit_status' => (float)$beginVoucher->new_credit_status,
+            'credit' => (float)$beginVoucher->credit,
+            'deadline_balance' => (float)$beginVoucher->deadline_balance,
+            'exists' => true,
         ]);
     }
 

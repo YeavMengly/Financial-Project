@@ -54,7 +54,8 @@
                                     <label for="cboPaymentVoucherNumber" class="form-label font-size-13 text-muted">
                                         {{ __('forms.payment.voucher') }}
                                     </label>
-                                    <select id="cboPaymentVoucherNumber" class="form-select" name="cboPaymentVoucherNumber" required
+                                    <select id="cboPaymentVoucherNumber" class="form-select" name="cboPaymentVoucherNumber"
+                                        required
                                         data-old="{{ old('cboPaymentVoucherNumber', $module->legal_number ?? '') }}"
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
@@ -429,7 +430,10 @@
             }
 
             // Load table on page load
-            loadBalances();
+            // loadBalances();
+            window.addEventListener('load', function() {
+                loadBalances();
+            });
 
             // Optional: reload table if user changes any dropdown
             [cboProgram, cboProgramSub, cboCluster, cboSubAccount].forEach(el => {
@@ -440,6 +444,10 @@
             budgetInput?.addEventListener('input', recomputeRemaining);
 
         });
+        $('#cboProgram').val(program_id).trigger('change');
+        $('#cboProgramSub').val(program_sub_id).trigger('change');
+        $('#cboCluster').val(cluster_id).trigger('change');
+        $('#cboSubAccount').val(account_sub_id).trigger('change');
     </script>
 
     <script>
