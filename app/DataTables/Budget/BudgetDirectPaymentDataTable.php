@@ -140,6 +140,9 @@ class BudgetDirectPaymentDataTable extends DataTable
                 $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
             }
         }
+
+        
+
         // if ($request->filled('agency')) {
         //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
         // }

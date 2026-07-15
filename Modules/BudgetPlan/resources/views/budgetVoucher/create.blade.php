@@ -81,7 +81,7 @@
                                             type="text" class="form-control" name="legalName" tabindex="2" />
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.temporary.id') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
@@ -90,6 +90,28 @@
                                             type="number" class="form-control"
                                             placeholder="{{ __('forms.temporary.id') }}" name="cbotemporaryId"
                                             tabindex="2" />
+                                    </div>
+                                </div> --}}
+                                 <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.temporary.id') }}</label>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input class="form-control" id="temporaryId"
+                                                data-pristine-required-message="{{ __('messages.required') }}"
+                                                data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                                data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0"
+                                                min="1" type="number" 
+                                                placeholder="{{ __('forms.temporary.id') }}" name="temporaryId"
+                                                tabindex="2">
+
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="skipTemporaryId">
+                                                <label class="form-check-label" for="skipTemporaryId">
+                                                    រំលង / មិនបញ្ចូលលេខ
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6">
@@ -772,6 +794,28 @@
                     );
 
                 }
+            });
+
+        });
+    </script>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const checkbox = document.getElementById('skipLegalNumber');
+            const input = document.getElementById('legalNumber');
+
+            checkbox.addEventListener('change', function() {
+
+                if (this.checked) {
+                    input.value = '';
+                    input.disabled = true;
+                    input.removeAttribute('required');
+                } else {
+                    input.disabled = false;
+                    input.setAttribute('required', 'required');
+                    input.value = 0;
+                }
+
             });
 
         });

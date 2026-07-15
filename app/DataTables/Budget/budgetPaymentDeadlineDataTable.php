@@ -126,6 +126,12 @@ class budgetPaymentDeadlineDataTable extends DataTable
             $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
         }
 
+        if ($request->filled('CboMandate')) {
+            $model->where(
+                'budget_vouchers.day_of_number',
+                $request->CboMandate
+            );
+        }
         //Date
         // if ($request->filled('start_date') && $request->filled('end_date')) {
         //     $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
@@ -162,6 +168,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
             'budget_vouchers.legal_id',
             'budget_vouchers.legal_name',
             'budget_vouchers.temporary_id',
+            'budget_vouchers.payment_voucher_number AS pvn',
             'budget_vouchers.day_of_number',
             'budget_vouchers.is_archived',
             'budget_vouchers.expense_type_id',
@@ -196,6 +203,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
                     d.cboStatus = $("#cboStatus").val();
                     d.cboExpenseType = $("#cboExpenseType").val();
                     d.cboAccountSub = $("#cboAccountSub").val();
+                    d.CboMandate = $("#CboMandate").val();
                     d.start_date = $("#start_date").val();
                     d.end_date = $("#end_date").val();
                 }',
@@ -219,6 +227,8 @@ class budgetPaymentDeadlineDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
+            Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
+            Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
