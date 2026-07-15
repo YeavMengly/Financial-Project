@@ -73,7 +73,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.number') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
@@ -83,7 +83,29 @@
                                             placeholder="{{ __('forms.legal.number') }}" name="legalNumber"
                                             tabindex="2" />
                                     </div>
+                                </div> --}}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.legal.number') }}</label>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input class="form-control" id="legalNumber"
+                                                data-pristine-required-message="{{ __('messages.required') }}"
+                                                data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                                data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0"
+                                                min="1" type="number" placeholder="{{ __('forms.legal.number') }}"
+                                                name="legalNumber" tabindex="2">
+
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="skipLegalNumber">
+                                                <label class="form-check-label" for="skipLegalNumber">
+                                                    រំលង / មិនបញ្ចូលលេខ
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -628,6 +650,26 @@
                 handleProgramSubChangeForCluster(programSubId);
             });
 
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const checkbox = document.getElementById('skipTemporaryId');
+            const input = document.getElementById('temporaryId');
+
+            checkbox.addEventListener('change', function() {
+
+                if (this.checked) {
+                    input.value = '';
+                    input.disabled = true;
+                    input.removeAttribute('required');
+                } else {
+                    input.disabled = false;
+                    input.setAttribute('required', 'required');
+                    input.value = 0;
+                }
+            });
         });
     </script>
 @endsection
