@@ -68,6 +68,13 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="CboMandate">{{ __('menus.mandate') }}</label>
+                            <input type="text" id="CboMandate" name="CboMandate" class="form-control"
+                                placeholder="{{ __('menus.mandate') }}" value="{{ request('CboMandate') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
  
                         <!-- Start Date -->
                         <div class="col-sm-3">
@@ -271,7 +278,7 @@
         });
     </script>
     <script>
-        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub').on('change keyup', function() {
+        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboMandate').on('change keyup', function() {
             $('#budgetpaymentdeadline-table').DataTable().ajax.reload();
         });
     </script>
