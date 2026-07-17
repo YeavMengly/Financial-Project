@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class BudgetMandateController extends Controller
 {
@@ -1678,20 +1679,136 @@ class BudgetMandateController extends Controller
             $ministryId = decode_params($params);
 
             $query = BudgetMandate::query();
+
             $query->leftJoin('begin_mandates', function ($join) use ($ministryId) {
                 $join->on('begin_mandates.account_sub_id', '=', 'budget_mandates.account_sub_id')
                     ->on('begin_mandates.no', '=', 'budget_mandates.no')
                     ->on('begin_mandates.program_id', '=', 'budget_mandates.program_id')
-                    ->where('begin_mandates.ministry_id', $ministryId);
+                    ->where('begin_mandates.ministry_id', '=', $ministryId);
             });
-            $query->select(
-                'budget_mandates.no',
+
+            $query->leftJoin('budget_mandate_loans', function ($join) {
+                $join->on('budget_mandate_loans.account_sub_id', '=', 'begin_mandates.account_sub_id')
+                    ->on('budget_mandate_loans.no', '=', 'begin_mandates.no')
+                    ->on('budget_mandate_loans.program_id', '=', 'begin_mandates.program_id');
+            });
+            /**
+             * Current Budget
+             */
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+
+                $budgetSum = "
+                            SUM(
+                                CASE
+                                    WHEN budget_mandates.transaction_date
+                                        BETWEEN '{$request->start_date}'
+                                        AND '{$request->end_date}'
+                                    THEN budget_mandates.budget
+                                    ELSE 0
+                                END
+                            ) AS budget
+                        ";
+
+                $endDate = Carbon::parse($request->end_date);
+            } else {
+
+                $month = now()->month;
+                $year  = now()->year;
+
+                $budgetSum = "
+                            SUM(
+                                CASE
+                                    WHEN MONTH(budget_mandates.transaction_date) = {$month}
+                                    AND YEAR(budget_mandates.transaction_date) = {$year}
+                                    THEN budget_mandates.budget
+                                    ELSE 0
+                                END
+                            ) AS budget
+                        ";
+
+                $endDate = now();
+            }
+            $start = Carbon::parse($request->start_date);
+            $end   = Carbon::parse($request->end_date);
+
+            $lastMonthStart = $end->copy()->startOfMonth()->toDateString();
+
+            /**
+             * Early Budget (Normal)
+             */
+            $earlyBudget = "
+                    SUM(
+                        CASE
+                            WHEN budget_mandates.transaction_date >= '{$start->toDateString()}'
+                            AND budget_mandates.transaction_date < '{$lastMonthStart}'
+                            AND budget_mandates.is_archived = 1
+                            THEN budget_mandates.budget
+                            ELSE 0
+                        END
+                    ) AS early_budget
+                    ";
+
+            /**
+             * Last Month Budget (Normal)
+             */
+            $lastMonthBudget = "
+                    SUM(
+                        CASE
+                            WHEN YEAR(budget_mandates.transaction_date) = {$end->year}
+                            AND MONTH(budget_mandates.transaction_date) = {$end->month}
+                            AND budget_mandates.is_archived = 1
+                            THEN budget_mandates.budget
+                            ELSE 0
+                        END
+                    ) AS last_month_budget
+                    ";
+
+            /**
+             * Archived Early Budget
+             */
+            $archivedEarlyBudget = "
+                    COALESCE(
+                    (
+                        SELECT SUM(bm2.budget)
+                        FROM budget_mandates bm2
+                        WHERE bm2.no = budget_mandates.no
+                        AND bm2.program_id = budget_mandates.program_id
+                        AND bm2.account_sub_id = budget_mandates.account_sub_id
+                        AND bm2.is_archived = 2
+                        AND bm2.transaction_date >= '{$start->toDateString()}'
+                        AND bm2.transaction_date < '{$lastMonthStart}'
+                    ),
+                    0
+                    ) AS archived_early_budget
+                    ";
+
+            /**
+             * Archived Last Month Budget
+             */
+            $archivedLastMonthBudget = "
+                    COALESCE(
+                    (
+                        SELECT SUM(bm2.budget)
+                        FROM budget_mandates bm2
+                        WHERE bm2.no = budget_mandates.no
+                        AND bm2.program_id = budget_mandates.program_id
+                        AND bm2.account_sub_id = budget_mandates.account_sub_id
+                        AND bm2.is_archived = 2
+                        AND YEAR(bm2.transaction_date) = {$end->year}
+                        AND MONTH(bm2.transaction_date) = {$end->month}
+                    ),
+                    0
+                    ) AS archived_last_month_budget
+                    ";
+
+            $query->select([
+                'budget_mandates.no as budget_no',
+                'begin_mandates.no as begin_no',
+
                 'begin_mandates.chapter_id',
-                'budget_mandates.expense_type_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
-                'begin_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
@@ -1701,19 +1818,32 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                DB::raw('MAX(begin_mandates.apply) as apply'),
-                DB::raw('MAX(budget_mandates.transaction_date) as transaction_date'),
-                DB::raw('SUM(budget_mandates.budget) as budget')
 
-            );
+                'budget_mandate_loans.internal_increase as loan_internal_increase',
+                'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
+                'budget_mandate_loans.additional_increase as loan_additional_increase',
+                'budget_mandate_loans.total_increase as loan_total_increase',
+                'budget_mandate_loans.decrease as loan_decrease',
+                'budget_mandate_loans.editorial as loan_editorial',
+
+                DB::raw('MAX(begin_mandates.apply) AS apply'),
+                DB::raw($budgetSum),
+                DB::raw('MAX(budget_mandates.transaction_date) AS transaction_date'),
+
+                DB::raw($earlyBudget),
+                DB::raw($lastMonthBudget),
+
+                DB::raw($archivedEarlyBudget),
+                DB::raw($archivedLastMonthBudget),
+            ]);
+
             $query->groupBy(
                 'budget_mandates.no',
+                'begin_mandates.no',
                 'begin_mandates.chapter_id',
-                'budget_mandates.expense_type_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
                 'begin_mandates.account_id',
-                'begin_mandates.no',
                 'begin_mandates.txtDescription',
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
@@ -1723,13 +1853,14 @@ class BudgetMandateController extends Controller
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
+                'budget_mandate_loans.internal_increase',
+                'budget_mandate_loans.unexpected_increase',
+                'budget_mandate_loans.additional_increase',
+                'budget_mandate_loans.total_increase',
+                'budget_mandate_loans.decrease',
+                'budget_mandate_loans.editorial',
 
             );
-
-            // $query->where('budget_mandates.expense_type_id', 1);
-            // $query->where('budget_mandates.status', 'todo');
-            // $query->where('budget_mandates.is_archived', 1);
-
             // === Filters (PREFIX table name!) ===
             // Account
             if ($request->filled('subAccountNumber')) {
@@ -1776,7 +1907,7 @@ class BudgetMandateController extends Controller
                 // Default: include both
                 $query->whereIn('budget_mandates.is_archived', [1, 2]);
             }
-            
+
             $data = $query->get();
 
             Log::info('Exported BeginMandate Count', [

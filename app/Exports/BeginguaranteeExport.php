@@ -147,7 +147,7 @@ class BeginguaranteeExport
 
                     foreach ($items as $item) {
 
-                        $sheet->setCellValue("D{$row}", $item->no);
+                        $sheet->setCellValue("D{$row}", $item->budget_no);
                         $sheet->setCellValue("E{$row}", $item->txtDescription);
                         $sheet->setCellValue("F{$row}", $item->fin_law);
                         $sheet->setCellValue("G{$row}", $item->current_loan);
@@ -165,47 +165,54 @@ class BeginguaranteeExport
                         $sheet->setCellValue("M{$row}", $editorial);
                         $sheet->setCellValue("N{$row}", $item->new_credit_status);
 
-                        $Month = now()->month;
-                        $transactionDate = strtotime($item->transaction_date);
-                        $inRange = true;
+                        $totalBudget     = $item->budget;
+                        $totalApply      = $item->apply;
 
-                        $applyValue = 0;
-                        $deadlineBalance = $item->apply + $item->early_balance;
-                        $earlyBalance = $deadlineBalance;
+                        if ($request->filled('start_date') && $request->filled('end_date')) {
 
-                        if ($this->startDate && $this->endDate) {
-                            $start = strtotime($this->startDate);
-                            $end   = strtotime($this->endDate);
+                            $start = Carbon::parse($request->start_date);
+                            $end   = Carbon::parse($request->end_date);
 
-                            $inRange = $transactionDate >= $start && $transactionDate <= $end;
+                            $months = $start->diffInMonths($end) + 1;
+                            if ($months > 1) {
 
+                                $earlyBalance = $item->early_budget + $item->archived_early_budget;
 
-                            if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
-                                $applyValue = $item->apply;
-                                $deadlineBalance = $item->apply + $item->budget;
-                                $earlyBalance = $item->budget;
-                            } elseif ($item->apply == 0 && date('n', strtotime($item->transaction_date)) != $Month) {
-                                $applyValue = 0;
-                                $deadlineBalance = $item->apply + $item->budget;
-                                $earlyBalance = $deadlineBalance;
-                            } elseif (!empty($item->apply) && date('n', strtotime($item->transaction_date)) != $Month){
-                                $applyValue = 0;
-                                $deadlineBalance = $item->budget;
-                                $earlyBalance = $item->budget;
-                            }else{
-                                $applyValue = 0;
-                                $deadlineBalance = $item->budget;
-                                $earlyBalance = $item->budget;
+                                $applyValue = $item->last_month_budget + $item->archived_last_month_budget;
+
+                                $deadlineBalance = $totalBudget
+                                    + $item->archived_early_budget
+                                    + $item->archived_last_month_budget;
+                            } else {
+
+                                $earlyBalance = 0;
+
+                                if ($totalApply > 0) {
+                                    $applyValue = $totalBudget + $item->archived_last_month_budget;
+                                } else {
+                                    $applyValue = 0;
+                                }
+
+                                $deadlineBalance = $totalBudget + $item->archived_last_month_budget;
                             }
-                        }
-                        if (!empty($item->apply) && date('n', strtotime($item->transaction_date)) == $Month) {
-                            $applyValue = $item->apply;
-                            $deadlineBalance = $item->apply + $item->budget;
-                            $earlyBalance = $item->budget;
+                        } else {
+
+                            if ($totalApply > 0) {
+
+                                $applyValue = $totalBudget + $item->archived_last_month_budget;
+                                $earlyBalance = $item->deadline_balance - $applyValue;
+                                $deadlineBalance = $item->deadline_balance;
+                               
+                            } else {
+
+                                $applyValue = 0;
+                                $earlyBalance = $item->deadline_balance;
+                                $deadlineBalance = $item->deadline_balance;
+                            }
                         }
                         $sheet->setCellValue("O{$row}", $earlyBalance);
                         $sheet->setCellValue("P{$row}", $applyValue);
-                        $sheet->setCellValue("Q{$row}",  $deadlineBalance);
+                        $sheet->setCellValue("Q{$row}", $deadlineBalance);
                         $sheet->setCellValue("R{$row}", $item->credit);
                         $sheet->setCellValue("S{$row}", $item->law_average);
                         $sheet->setCellValue("T{$row}", $item->law_correction);
@@ -222,10 +229,9 @@ class BeginguaranteeExport
                             'decrease'           => (float) $decrease,
                             'editorial'          => (float) $editorial,
                             'new_credit_status'  => (float) $item->new_credit_status,
-                            // Only include these in totals if the row is in the selected range
-                            'early_balance'    => $inRange ? (float) $earlyBalance : 0,
-                            'apply'            => $inRange ? (float) $applyValue : 0,
-                            'deadline_balance' => $inRange ? (float) $deadlineBalance : 0,
+                            'early_balance'    =>  (float) $earlyBalance,
+                            'apply'            =>  (float) $applyValue,
+                            'deadline_balance' =>  (float) $deadlineBalance,
                             'credit'             => (float) $item->credit,
                             'law_average'        => (float) $item->law_average,
                             'law_correction'     => (float) $item->law_correction,
