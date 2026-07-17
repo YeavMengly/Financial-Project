@@ -139,17 +139,18 @@ class BudgetVoucherDataTable extends DataTable
 
 
         //Date
-        // if ($request->filled('start_date') && $request->filled('end_date')) {
-        //     $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
-        //         ->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
-        // } else {
-        //     if ($request->filled('start_date')) {
-        //         $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
-        //     }
-        //     if ($request->filled('end_date')) {
-        //         $model->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
-        //     }
-        // }
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $model->whereDate('budget_vouchers.request_date', '>=', $request->start_date)
+                ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+        } else {
+            if ($request->filled('start_date')) {
+                $model->whereDate('budget_vouchers.request_date', '>=', $request->start_date);
+            }
+            if ($request->filled('end_date')) {
+                $model->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+            }
+        }
+
         $model->leftJoin('account_subs', function ($join) use ($id) {
             $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
                 ->where('account_subs.ministry_id', '=', $id);
