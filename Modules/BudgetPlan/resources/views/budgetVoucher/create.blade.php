@@ -59,15 +59,16 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboLegalNumber" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.legal.number') }}
+                                        <label for="cboPaymentVoucherNumber" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.payment.voucher') }}
                                         </label>
-                                        <select id="cboLegalNumber" class="form-select" name="cboLegalNumber" required
+                                        <select id="cboPaymentVoucherNumber" class="form-select"
+                                            name="cboPaymentVoucherNumber" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
 
-                                        @error('cboLegalNumber')
+                                        @error('cboPaymentVoucherNumber')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -80,7 +81,7 @@
                                             type="text" class="form-control" name="legalName" tabindex="2" />
                                     </div>
                                 </div>
-                                <div class="col-lg-4 col-md-6">
+                                {{-- <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.temporary.id') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
@@ -89,6 +90,28 @@
                                             type="number" class="form-control"
                                             placeholder="{{ __('forms.temporary.id') }}" name="cbotemporaryId"
                                             tabindex="2" />
+                                    </div>
+                                </div> --}}
+                                 <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.temporary.id') }}</label>
+
+                                        <div class="d-flex align-items-center gap-2">
+                                            <input class="form-control" id="temporaryId"
+                                                data-pristine-required-message="{{ __('messages.required') }}"
+                                                data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                                data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0"
+                                                min="1" type="number" 
+                                                placeholder="{{ __('forms.temporary.id') }}" name="temporaryId"
+                                                tabindex="2">
+
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="skipTemporaryId">
+                                                <label class="form-check-label" for="skipTemporaryId">
+                                                    រំលង / មិនបញ្ចូលលេខ
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-4 col-md-6">
@@ -664,7 +687,7 @@
         let cboLegalChoices;
 
         document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboLegalNumber');
+            const element = document.getElementById('cboPaymentVoucherNumber');
 
             cboLegalChoices = new Choices(element, {
                 searchEnabled: true,
@@ -713,7 +736,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
 
-            const element = document.getElementById('cboLegalNumber');
+            const element = document.getElementById('cboPaymentVoucherNumber');
 
             cboLegalChoices = new Choices(element, {
                 searchEnabled: true,
@@ -729,7 +752,7 @@
 
             var expenseTypeId = $(this).val();
 
-            /* ===== Reset cboLegalNumber ===== */
+            /* ===== Reset cboPaymentVoucherNumber ===== */
             cboLegalChoices.clearStore(); // remove selected item
             cboLegalChoices.clearChoices(); // remove all options
 
@@ -771,6 +794,28 @@
                     );
 
                 }
+            });
+
+        });
+    </script>
+     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const checkbox = document.getElementById('skipLegalNumber');
+            const input = document.getElementById('legalNumber');
+
+            checkbox.addEventListener('change', function() {
+
+                if (this.checked) {
+                    input.value = '';
+                    input.disabled = true;
+                    input.removeAttribute('required');
+                } else {
+                    input.disabled = false;
+                    input.setAttribute('required', 'required');
+                    input.value = 0;
+                }
+
             });
 
         });

@@ -125,6 +125,9 @@ class BudgetMandateDataTable extends DataTable
         if ($request->filled('subAccountNumber')) {
             $model->where('account_subs.no', $request->subAccountNumber);
         }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
 
         if ($request->filled('cboProgram')) {
             $model->where('programs.id', $request->cboProgram);
@@ -205,6 +208,7 @@ class BudgetMandateDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.cboProgram    = $("#cboProgram").val();
+                d.CboPaymentVoucherNumber    = $("#CboPaymentVoucherNumber").val();
                 d.subAccountNumber  = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
@@ -231,21 +235,19 @@ class BudgetMandateDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
-
-            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
             Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
-            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
-            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
-            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
+            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
+            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
-
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

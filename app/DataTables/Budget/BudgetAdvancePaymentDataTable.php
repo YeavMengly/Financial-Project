@@ -140,6 +140,10 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
             }
         }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
+
         // if ($request->filled('agency')) {
         //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
         // }
@@ -223,6 +227,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.cboProgram    = $("#cboProgram").val();
+                d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
                 d.subAccountNumber = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
@@ -251,11 +256,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
 
-            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
             Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
-            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
-            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
-            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             // Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
@@ -263,7 +264,10 @@ class BudgetAdvancePaymentDataTable extends DataTable
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
-
+            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
+            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 

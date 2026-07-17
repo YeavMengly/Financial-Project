@@ -35,6 +35,7 @@ class BudgetVoucher extends Model
         'legal_id',
         'legal_name',
         'temporary_id',
+        'payment_voucher_number',
         'day_of_number',
         'status',
         'is_archived',

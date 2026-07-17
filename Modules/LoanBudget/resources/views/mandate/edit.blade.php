@@ -39,55 +39,109 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('mandate.update', $params) }}" method="POST"
-                            enctype="multipart/form-data" novalidate autocomplete="off">
+                        <form id="pristine-valid-example"
+                            action="{{ route('mandate.update', ['params' => $params, 'id' => $module->id]) }}"
+                            method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
                             @csrf
 
                             <div class="row">
-                                {{-- Sub Account Number --}}
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubAccountNumber" class="form-label text-muted">
-                                            {{ __('forms.sub.account') }}
+                                        <label for="cboProgram" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program') }}
                                         </label>
-                                        <select class="form-control" id="cboSubAccountNumber" name="subAccountNumber"
-                                            required data-pristine-required-message="{{ __('messages.required') }}">
+                                        <select id="cboProgram" class="form-select" name="cboProgram" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($beginMandate as $bc)
-                                                <option value="{{ $bc->subAccountNumber }}"
-                                                    data-program="{{ $bc->program }}"
-                                                    {{ old('subAccountNumber', $mandate->subAccountNumber == $bc->subAccountNumber ? 'selected' : ' ') }}>
-                                                    {{ $bc->subAccount->subAccountNumber }} | {{ $bc->program }}
+                                            @foreach ($program as $p)
+                                                <option value="{{ $p->id }}"
+                                                    {{ $module->program_id == $p->id ? 'selected' : '' }}>
+                                                    {{ $p->no }}-{{ $p->title }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('subAccountNumber')
+                                        @error('cboProgram')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
-                                {{-- Program Code (auto-filled from JS) --}}
-                                <div class="col-xl-4 col-md-6">
+                                <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="programInput">{{ __('forms.program.code') }}</label>
-                                        <input type="number" min="0" name="program" id="programInput" readonly
-                                            required class="form-control"
-                                            value="{{ old('program', $mandate->subAccountNumber) }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('program')
+                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.program.sub') }}
+                                        </label>
+                                        <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
+                                            data-old="{{ old('cboProgramSub', $module->program_sub_id ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+
+                                        @error('cboProgramSub')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
 
-                                {{-- internal --}}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.cluster') }}
+                                        </label>
+                                        <select id="cboCluster" class="form-select" name="cboCluster"
+                                            data-old="{{ old('cboCluster', $module->cluster_id ?? '') }}">
+                                            <option value="">ស្វែងរក...</option>
+                                        </select>
+
+                                        @error('cboCluster')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.agency') }}
+                                        </label>
+                                        <select id="cboAgency" class="form-select" name="cboAgency" required
+                                            data-old="{{ old('cboAgency', $module->agency_id ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                        </select>
+                                        @error('cboAgency')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.sub.account') }}
+                                        </label>
+                                        <select class="form-control" data-trigger id="cboSubAccount" name="cboSubAccount"
+                                            required data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($accountSub as $as)
+                                                <option value="{{ $as->no }}"
+                                                    {{ $as->no == $module->account_sub_id ? 'selected' : '' }}>
+                                                    {{ $as->no }}-{{ $as->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('cboSubAccount')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="internal">{{ __('forms.internal') }}</label>
                                         <input type="number" min="0" name="internal_increase" id="internal_increase"
                                             class="form-control"
-                                            value="{{ old('internal_increase', $mandate->internal_increase) }}"
+                                            value="{{ old('internal_increase', $module->internal_increase) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('internal_increase')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -95,13 +149,12 @@
                                     </div>
                                 </div>
 
-                                {{-- unexpected --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="unexpected">{{ __('forms.unexpected') }}</label>
                                         <input type="number" min="0" name="unexpected_increase"
                                             id="unexpected_increase" class="form-control"
-                                            value="{{ old('unexpected_increase', $mandate->unexpected_increase) }}"
+                                            value="{{ old('unexpected_increase', $module->unexpected_increase) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('unexpected_increase')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -109,13 +162,12 @@
                                     </div>
                                 </div>
 
-                                {{-- additional --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="additional">{{ __('forms.additional') }}</label>
                                         <input type="number" min="0" name="additional_increase"
                                             id="additional_increase" class="form-control"
-                                            value="{{ old('additional_increase', $mandate->additional_increase) }}"
+                                            value="{{ old('additional_increase', $module->additional_increase) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('additional_increase')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -123,12 +175,11 @@
                                     </div>
                                 </div>
 
-                                {{-- decrease --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="decrease">{{ __('forms.decrease') }}</label>
                                         <input type="number" min="0" name="decrease" id="decrease"
-                                            class="form-control" value="{{ old('decrease', $mandate->decrease) }}"
+                                            class="form-control" value="{{ old('decrease', $module->decrease) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('decrease')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -136,14 +187,25 @@
                                     </div>
                                 </div>
 
-                                {{-- editorial --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="editorial">{{ __('forms.editorial') }}</label>
                                         <input type="number" min="0" name="editorial" id="editorial"
-                                            class="form-control" value="{{ old('editorial', $mandate->editorial) }}"
+                                            class="form-control" value="{{ old('editorial', $module->editorial) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('editorial')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="vDescription">{{ __('forms.document.description') }}</label>
+                                        <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                       {{ old('txtDescription', $module->txtDescription) }}</textarea>
+                                        @error('txtDescription')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -314,6 +376,195 @@
             //         maximumFractionDigits: 2
             //     });
             // }
+        });
+    </script>
+
+       <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboProgram');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboSubAccount');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            const element = document.getElementById('cboAgency');
+            let choicesInstance = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                shouldSort: false,
+            });
+
+            $('#cboAgency').on('change', function() {
+                const selected = $(this).val();
+                let message = '';
+
+                switch (selected) {
+                    case '1':
+                        message = 'You selected Choice 1';
+                        break;
+                    case '2':
+                        message = 'You selected Choice 2';
+                        break;
+                    case '3':
+                        message = 'You selected Choice 3';
+                        break;
+                    default:
+                        message = '';
+                }
+                $('#resultDisplay').text(message);
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            /* ================== Choices Instances ================== */
+            let programSubChoices = initChoices('#cboProgramSub');
+            let agencyChoices = initChoices('#cboAgency');
+            let clusterChoices = initChoices('#cboCluster');
+
+            function initChoices(selector) {
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            /* ================== Helpers ================== */
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return initChoices(selector);
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            /* ================== Handlers ================== */
+            function handleProgramChangeForProgramSub(programId, selectedId = null) {
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('mandate.edit.program_sub') }}",
+                    data: {
+                        program_id: programId,
+                        selected_id: selectedId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => {
+                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                    }
+                });
+            }
+
+            function handleProgramChangeForAgency(programId, selectedId = null) {
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('mandate.edit.agency') }}",
+                    data: {
+                        program_id: programId,
+                        selected_id: selectedId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => {
+                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                    }
+                });
+            }
+
+            function handleProgramSubChangeForCluster(programSubId, selectedId = null) {
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('mandate.edit.cluster') }}",
+                    data: {
+                        program_sub_id: programSubId,
+                        selected_id: selectedId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => {
+                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                    }
+                });
+            }
+
+            /* ================== PRELOAD EDIT DATA ================== */
+            const programId = $('#cboProgram').val();
+            const oldProgramSubId = $('#cboProgramSub').data('old');
+            const oldAgencyId = $('#cboAgency').data('old');
+            const oldClusterId = $('#cboCluster').data('old');
+
+            if (programId) {
+                handleProgramChangeForProgramSub(programId, oldProgramSubId);
+                handleProgramChangeForAgency(programId, oldAgencyId);
+
+                if (oldProgramSubId) {
+                    handleProgramSubChangeForCluster(oldProgramSubId, oldClusterId);
+                }
+            }
+
+            /* ================== EVENTS ================== */
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                handleProgramChangeForProgramSub(programId);
+                handleProgramChangeForAgency(programId);
+                handleProgramSubChangeForCluster(null);
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                handleProgramSubChangeForCluster($(this).val());
+            });
         });
     </script>
 @endsection

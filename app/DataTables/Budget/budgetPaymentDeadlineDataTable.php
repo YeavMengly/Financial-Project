@@ -24,7 +24,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-       return (new EloquentDataTable($query))
+        return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('agency', function ($row) {
                 return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
@@ -126,6 +126,12 @@ class budgetPaymentDeadlineDataTable extends DataTable
             $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
         }
 
+        if ($request->filled('CboMandate')) {
+            $model->where(
+                'budget_vouchers.day_of_number',
+                $request->CboMandate
+            );
+        }
         //Date
         // if ($request->filled('start_date') && $request->filled('end_date')) {
         //     $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
@@ -162,6 +168,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
             'budget_vouchers.legal_id',
             'budget_vouchers.legal_name',
             'budget_vouchers.temporary_id',
+            'budget_vouchers.payment_voucher_number AS pvn',
             'budget_vouchers.day_of_number',
             'budget_vouchers.is_archived',
             'budget_vouchers.expense_type_id',
@@ -184,7 +191,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
      */
     public function html(): HtmlBuilder
     {
-         return $this->builder()
+        return $this->builder()
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
@@ -196,6 +203,7 @@ class budgetPaymentDeadlineDataTable extends DataTable
                     d.cboStatus = $("#cboStatus").val();
                     d.cboExpenseType = $("#cboExpenseType").val();
                     d.cboAccountSub = $("#cboAccountSub").val();
+                    d.CboMandate = $("#CboMandate").val();
                     d.start_date = $("#start_date").val();
                     d.end_date = $("#end_date").val();
                 }',
@@ -219,19 +227,19 @@ class budgetPaymentDeadlineDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
-
-            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(90)->addClass('align-middle'),
-            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
-            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+            Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
+            Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
+            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(90)->addClass('align-middle'),
+            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
-
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

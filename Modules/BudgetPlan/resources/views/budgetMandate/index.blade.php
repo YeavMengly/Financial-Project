@@ -85,6 +85,14 @@
                         </div>
 
                         <div class="col-sm-3">
+                            <label class="visually-hidden" for="CboPaymentVoucherNumber">{{ __('menus.voucher') }}</label>
+                            <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber" class="form-control"
+                                placeholder="{{ __('menus.voucher') }}"  
+                                value="{{ request('CboPaymentVoucherNumber') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
+                        <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
                                 placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}"  
@@ -270,7 +278,7 @@
     </script>
 
     <script>
-        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date').on('change keyup', function() {
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date,#CboPaymentVoucherNumber').on('change keyup', function() {
             $('#budgetmandate-table').DataTable().ajax.reload();
         });
     </script>
@@ -287,6 +295,7 @@
                 agency: $('#agency').val(),
                 no: $('#no').val(),
                 cboTodo: $('#cboTodo').val(),
+                CboPaymentVoucherNumber: $('#CboPaymentVoucherNumber').val(),
                 cboStatus: $('#cboStatus').val(),
                 start_date: $('#start_date').val(),
                 end_date: $('#end_date').val(),
