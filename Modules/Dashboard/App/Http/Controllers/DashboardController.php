@@ -332,7 +332,7 @@ class DashboardController extends Controller
         $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
         $totalDirPayment = $expense_Record > 0 ? $expense_Record - $payment_Deadline : 0;
         $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record) : 0;
- 
+
         return view('dashboard::index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
@@ -515,33 +515,35 @@ class DashboardController extends Controller
         return response()->json($clusters);
     }
     // Modal Account Sub
-    public function getAccountSubs($accountId)
+    public function getAccountSubs(Request $request, $accountId)
     {
         // 1️⃣ Get program subs
         $accountSubs = AccountSub::where('account_id', $accountId)
             ->select('id', 'no', 'name')
             ->get();
-        // 2️⃣ Get totals grouped by account_sub_id
+
+        $Year = $request->input('year');
         $accountSubTotals = DB::table('begin_vouchers')
-            ->where('account_id', $accountId) // 🔥 IMPORTANT
-            ->groupBy('account_sub_id')
-            ->selectRaw('
-            account_sub_id,
-            SUM(fin_law) AS fin_law,
-            SUM(apply) AS apply,
-            SUM(deadline_balance) AS remain,
-            SUM(credit) AS credit,
-            COUNT(*) AS total_records
-        ')
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('ministries.year', $Year)
+            ->whereIn('begin_vouchers.account_sub_id', $accountSubs->pluck('no'))
+            ->groupBy('begin_vouchers.account_sub_id')
+            ->selectRaw("
+        begin_vouchers.account_sub_id,
+        SUM(begin_vouchers.fin_law) AS fin_law,
+        SUM(begin_vouchers.deadline_balance) AS deadline_balance,
+        SUM(begin_vouchers.credit) AS credit
+    ")
             ->get()
             ->keyBy('account_sub_id');
-        // 3️⃣ Merge totals into account subs
+
         $accountSubs = $accountSubs->map(function ($subs) use ($accountSubTotals) {
-            $total = $accountSubTotals->get($subs->id);
-            $subs->fin_law       = $total->fin_law ?? 0;
-            $subs->apply         = $total->apply ?? 0;
-            $subs->remain        = $total->remain ?? 0;
-            $subs->credit        = $total->credit ?? 0;
+            $total = $accountSubTotals->get($subs->no); // use no instead of id
+
+            $subs->fin_law = $total->fin_law ?? 0;
+            $subs->credit  = $total->credit ?? 0;
+            $subs->deadline_balance  = $total->deadline_balance ?? 0;
+
             return $subs;
         });
         return response()->json($accountSubs);

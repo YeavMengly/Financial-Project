@@ -978,7 +978,7 @@
     {{-- Modal Program Sub --}}
     <div class="modal fade" id="programSubModal" tabindex="-1" aria-labelledby="programSubModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="programSubModalLabel">Program Sub List</h5>
@@ -1012,8 +1012,8 @@
     {{-- Modal Sub-Account --}}
     <div class="modal fade" id="accountSubModal" tabindex="-1" aria-labelledby="accountSubModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="height:70vh;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="accountSubModalLabel">Account Sub List</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1279,6 +1279,7 @@
             });
         });
     </script>
+    {{-- program --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.program-card');
@@ -1397,6 +1398,7 @@
             });
         });
     </script>
+    {{-- program sub --}}
     <script>
         document.addEventListener('click', function(e) {
             const card = e.target.closest('.program-sub-card');
@@ -1611,11 +1613,9 @@
     {{-- barchart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-
             function formatCurrency(value) {
                 return new Intl.NumberFormat('en-US').format(value) + " ៛";
             }
-
             const el = document.querySelector("#bar_chart");
             const colors = JSON.parse(el.getAttribute("data-colors"));
 
@@ -1623,7 +1623,6 @@
             let finLawData = @json($finLawData);
             let remainData = @json($remainData);
             let deadlineData = @json($deadlineData);
-
             // combine data
             let combined = chapterLabels.map((label, index) => ({
                 label: label,
@@ -1631,16 +1630,13 @@
                 remain: remainData[index],
                 deadline: deadlineData[index]
             }));
-
             // sort big → small by chapter label
             combined.sort((a, b) => b.label - a.label);
-
             // rebuild arrays after sorting
             const label = combined.map(item => 'ជំពូក' + item.label);
             const sortedFinLaw = combined.map(item => item.finLaw);
             const sortedRemain = combined.map(item => item.remain);
             const sortedDeadline = combined.map(item => item.deadline);
-
             const options = {
                 chart: {
                     type: "bar",
@@ -1690,64 +1686,7 @@
                         }
                     }
                 },
-                // responsive for mobile
-                responsive: [{
-                    breakpoint: 992,
-                    options: {
-                        chart: {
-                            height: 300
-                        },
-                        plotOptions: {
-                            bar: {
-                                columnWidth: "60%"
-                            }
-                        }
-                    }
-                }, {
-                    breakpoint: 768,
-                    options: {
-                        chart: {
-                            height: 280
-                        },
-                        xaxis: {
-                            labels: {
-                                rotate: -45,
-                                style: {
-                                    fontSize: "10px"
-                                }
-                            }
-                        }
-                    }
-                }, {
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            height: 260
-                        },
-                        plotOptions: {
-                            bar: {
-                                columnWidth: "70%"
-                            }
-                        },
-                        xaxis: {
-                            labels: {
-                                rotate: -45,
-                                style: {
-                                    fontSize: "9px"
-                                }
-                            }
-                        },
-                        yaxis: {
-                            labels: {
-                                style: {
-                                    fontSize: "9px"
-                                }
-                            }
-                        }
-                    }
-                }]
             };
-
             new ApexCharts(el, options).render();
         });
     </script>
@@ -1797,7 +1736,7 @@
                 card.addEventListener('click', function() {
                     const accountId = this.dataset.accountId;
                     const accountTitle = this.dataset.accountTitle;
-
+                    const year = document.getElementById('year').value;
                     // Set modal title
                     document.getElementById('accountSubModalLabel').innerText = accountTitle;
 
@@ -1813,7 +1752,7 @@
                     const modal = new bootstrap.Modal(modalElement);
                     modal.show();
                     // Fetch programSubs via AJAX
-                    fetch(`/dashboard/account/${accountId}/subs`)
+                    fetch(`/dashboard/account/${accountId}/subs?year=${year}`)
                         .then(res => res.json())
                         .then(data => {
                             if (data.length === 0) {
@@ -1824,8 +1763,8 @@
                             // Build HTML grid
                             let html = `
                                 <div class="card-body">
-                                    <div data-simplebar style="max-height: 380px;">
-                                        <div class="table-responsive table-scroll">
+                                    <div data-simplebar style="height:60vh;">
+                                        <div class="table-responsive" style="height:50vh;">
                                             <table class="table table-bordered table-striped table-hover align-middle">
                                                 <thead class="text-center table-light sticky-header">
                                                     <tr>
@@ -1842,7 +1781,7 @@
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
                                         <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
-                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.deadline_balance ?? 0).toLocaleString()} ៛</td>
                                         <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
                                     </tr>
                                 `;
