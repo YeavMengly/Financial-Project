@@ -146,6 +146,7 @@ class BeginExport
                         $totalInc   = $item->loan_total_increase      ?? ($internal + $unexpected + $additional);
                         $decrease   = $item->loan_decrease            ?? 0;
                         $editorial  = $item->loan_editorial           ?? 0;
+                        
 
                         $sheet->setCellValue("H{$row}", $internal);
                         $sheet->setCellValue("I{$row}", $unexpected);
@@ -155,7 +156,8 @@ class BeginExport
                         $sheet->setCellValue("M{$row}", $editorial);
                         $sheet->setCellValue("N{$row}", $item->new_credit_status);
                         $sheet->setCellValue("O{$row}", $item->early_balance);
-                        $sheet->setCellValue("P{$row}", $item->apply);
+                        // $sheet->setCellValue("P{$row}", $item->apply);
+                        $sheet->setCellValue("P{$row}", $item->buget);
                         $sheet->setCellValue("Q{$row}", $item->deadline_balance);
                         $sheet->setCellValue("R{$row}", $item->credit);
                         $sheet->setCellValue("S{$row}", $item->law_average);
@@ -174,7 +176,8 @@ class BeginExport
                             'editorial'          => (float) $editorial,
                             'new_credit_status'  => (float) $item->new_credit_status,
                             'early_balance'      => (float) $item->early_balance,
-                            'apply'              => (float) $item->apply,
+                            // 'apply'              => (float) $item->apply,
+                            'budget'             => (float) $item->budget,
                             'deadline_balance'   => (float) $item->deadline_balance,
                             'credit'             => (float) $item->credit,
                             'law_average'        => (float) $item->law_average,
@@ -273,7 +276,8 @@ class BeginExport
             'editorial'          => 0,
             'new_credit_status'  => 0,
             'early_balance'      => 0,
-            'apply'              => 0,
+            // 'apply'              => 0,
+            'budget'             => 0,
             'deadline_balance'   => 0,
             'credit'             => 0,
             'law_average'        => 0,
@@ -305,7 +309,8 @@ class BeginExport
         $sheet->setCellValue("M{$row}", $totals['editorial']);
         $sheet->setCellValue("N{$row}", $totals['new_credit_status']);
         $sheet->setCellValue("O{$row}", $totals['early_balance']);
-        $sheet->setCellValue("P{$row}", $totals['apply']);
+        // $sheet->setCellValue("P{$row}", $totals['apply']);
+        $sheet->setCellValue("P{$row}", $totals['budget']);
         $sheet->setCellValue("Q{$row}", $totals['deadline_balance']);
         $sheet->setCellValue("R{$row}", $totals['credit']);
         $sheet->setCellValue("S{$row}", $totals['law_average']);

@@ -240,13 +240,13 @@ class LoanBudgetMandateController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('agency_id', $validatedData['cboAgency'])
+                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
             if (!$beginMandate) {
                 flash()->translate('en')->option('timeout', 2000)
-                    ->error('មិនមានទិន្ន័យ', 'បញ្ហា')->flash();
+                    ->error('មិនមានទិន្ន័យឥណទាន', 'បញ្ហា')->flash();
                 return back()->withInput();
             }
             $total_increase = $validatedData['internal_increase']
@@ -275,7 +275,7 @@ class LoanBudgetMandateController extends Controller
                 ->where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
-                ->where('agency_id', $validatedData['cboAgency'])
+                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->selectRaw('
                 COALESCE(SUM(internal_increase),0)   AS internal_increase_sum,
@@ -290,18 +290,19 @@ class LoanBudgetMandateController extends Controller
                 + (float)$agg->unexpected_increase_sum
                 + (float)$agg->additional_increase_sum;
 
-            $currentApplyTotal = BudgetMandate::where('no', $valueNo)
-                ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('agency_id', $validatedData['cboAgency'])
-                ->where('ministry_id', $ministry->id)
-                ->sum('budget');
-
-            $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
-            $deadline_balance = $early_balance + $currentApplyTotal;
-
             $new_credit_status = $beginMandate->current_loan
                 + $totalIncreaseSum
                 - ((float)$agg->decrease_sum + (float)$agg->editorial_sum);
+
+            // $currentApplyTotal = BudgetMandate::where('no', $valueNo)
+            //     ->where('account_sub_id', $validatedData['cboSubAccount'])
+            //     ->where('agency_id', $validatedData['cboAgency'])
+            //     ->where('ministry_id', $ministry->id)
+            //     ->sum('budget');
+
+            // $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
+            $early_balance = $beginMandate->early_balance ?? 0;
+            $deadline_balance = $early_balance + $beginMandate->apply;
 
             $credit        = $new_credit_status - $deadline_balance;
             $law_average   = $beginMandate->fin_law ? ($deadline_balance / $beginMandate->fin_law) * 100 : 0;
@@ -310,12 +311,14 @@ class LoanBudgetMandateController extends Controller
             $beginMandate->update([
                 'current_loan'     => $beginMandate->current_loan,
                 'new_credit_status' => $new_credit_status,
-                'apply'            => $currentApplyTotal,
-                'deadline_balance' => $deadline_balance,
+                // 'early_balance'    => $early_balance,
+                // 'apply'            => $currentApplyTotal,
+                // 'deadline_balance' => $deadline_balance,
                 'credit'           => $credit,
                 'law_average'      => $law_average,
                 'law_correction'   => $law_correction,
             ]);
+            $beginMandate->save();
 
             DB::commit();
             flash()->translate('en')->option('timeout', 2000)
@@ -419,9 +422,11 @@ class LoanBudgetMandateController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('agency_id', $validatedData['cboAgency'])
+                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
+
+            // dd($beginMandate);
 
             if (!$beginMandate) {
                 flash()->translate('en')->option('timeout', 2000)
@@ -432,17 +437,25 @@ class LoanBudgetMandateController extends Controller
             $fin_law = $beginMandate->fin_law;
             $current_loan = $beginMandate->current_loan;
 
+            $validatedData['internal_increase'] = $validatedData['internal_increase'] ?? 0;
+            $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
+            $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
+            $validatedData['editorial'] = $validatedData['editorial'] ?? 0;
+            $validatedData['decrease'] = $validatedData['decrease'] ?? 0;
+
             $total_increase = $validatedData['internal_increase'] + $validatedData['unexpected_increase'] + $validatedData['additional_increase'];
             $new_credit_status = $current_loan + $total_increase - $validatedData['decrease'] - $validatedData['editorial'];
 
-            $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
+            // $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
 
-            $currentApplyTotal = BudgetMandate::where('no', $valueNo)
-                ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('ministry_id', $ministry->id)
-                ->sum('budget');
+            // $currentApplyTotal = BudgetMandate::where('program_id', $validatedData['cboProgram'])
+            //     ->where('program_sub_id', $validatedData['cboProgramSub'])
+            //     ->where('cluster_id', $validatedData['cboCluster'])
+            //     ->where('account_sub_id', $validatedData['cboSubAccount'])
+            //     ->where('ministry_id', $ministry->id)
+            //     ->sum('budget');
 
-            $deadline_balance = $currentApplyTotal;
+            $deadline_balance = $beginMandate->early_balance + $beginMandate->apply;
             $credit = $new_credit_status - $deadline_balance;
 
             $law_average = $fin_law ? ($deadline_balance / $fin_law) * 100 : 0;
@@ -463,16 +476,20 @@ class LoanBudgetMandateController extends Controller
                 'total_increase' => $total_increase,
                 'txtDescription' => strip_tags($validatedData['txtDescription']),
             ]);
+            $mandateLoan->save();
 
             $beginMandate->update([
                 'current_loan' => $beginMandate->current_loan,
                 'new_credit_status' => $new_credit_status,
-                'apply' => $currentApplyTotal,
+                'apply' => $beginMandate->apply,
                 'deadline_balance' => $deadline_balance,
                 'credit' => $credit,
                 'law_average' => $law_average,
                 'law_correction' => $law_correction,
             ]);
+
+            $beginMandate->save();
+
 
             DB::commit();
             flash()
@@ -506,20 +523,15 @@ class LoanBudgetMandateController extends Controller
             $id   = decode_params($id);
             $ministry = Ministry::where('id', decode_params($params))->first();
             $mandateLoan = BudgetMandateLoan::where('id', $id)->first();
-
-            $beginMandate = BeginMandate::query()
-                ->where('no', $mandateLoan->no)
+            $mandateLoan->delete();
+            $beginMandate = BeginMandate::where('no', $mandateLoan->no)
                 ->where('account_sub_id', $mandateLoan->account_sub_id)
-                ->where('agency_id',     $mandateLoan->agency_id)
                 ->where('ministry_id',   $ministry->id)
                 ->first();
-
-            $mandateLoan->delete();
 
             if ($beginMandate) {
                 $bvl = BudgetMandateLoan::query()
                     ->where('ministry_id',   $ministry->id)
-                    ->where('agency_id',     $beginMandate->agency_id)
                     ->where('account_sub_id', $beginMandate->account_sub_id)
                     ->where('no',            $beginMandate->no)
                     ->selectRaw('
@@ -533,38 +545,31 @@ class LoanBudgetMandateController extends Controller
                 $totalIncreaseSum = (float)$bvl->internal_increase_sum
                     + (float)$bvl->unexpected_increase_sum
                     + (float)$bvl->additional_increase_sum;
-
-                $currentApplyTotal = BudgetMandate::query()
-                    ->where('no',            $beginMandate->no)
-                    ->where('account_sub_id', $beginMandate->account_sub_id)
-                    ->where('agency_id',     $beginMandate->agency_id)
-                    ->where('ministry_id',   $ministry->id)
-                    ->sum('budget');
-
-                $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
-                $deadline_balance = $early_balance + $currentApplyTotal;
-
                 $new_credit_status = $beginMandate->current_loan
                     + $totalIncreaseSum
                     - ((float)$bvl->decrease_sum + (float)$bvl->editorial_sum);
 
+                $deadline_balance = $beginMandate->early_balance + $beginMandate->apply;
                 $credit         = $new_credit_status - $deadline_balance;
                 $law_average    = $beginMandate->fin_law ? ($deadline_balance / $beginMandate->fin_law) * 100 : 0;
                 $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
 
                 $beginMandate->update([
                     'new_credit_status' => $new_credit_status,
-                    'apply'             => $currentApplyTotal,
                     'deadline_balance'  => $deadline_balance,
                     'credit'            => $credit,
                     'law_average'       => $law_average,
                     'law_correction'    => $law_correction,
                 ]);
+                $beginMandate->save();
             }
 
             DB::commit();
-            flash()->translate('en')->option('timeout', 2000)
-                ->success('success_msg', 'successful')->flash();
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('delete_msg', 'delete')
+                ->flash();
 
             return redirect()->route('mandate.index', $params);
         } catch (\Throwable $e) {

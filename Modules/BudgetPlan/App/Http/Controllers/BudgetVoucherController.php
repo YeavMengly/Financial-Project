@@ -1538,7 +1538,8 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.credit',
                 'begin_vouchers.law_average',
                 'begin_vouchers.law_correction',
-                DB::raw('SUM(budget_vouchers.budget) as apply')
+                // 'budget_vouchers.budget'
+                DB::raw('SUM(budget_vouchers.budget) as budget')
             );
             $query->groupBy(
                 'budget_vouchers.program_id',
@@ -1601,20 +1602,20 @@ class BudgetVoucherController extends Controller
                 $query->where('budget_vouchers.is_archived', 2);
             }
             //Date
-            // if ($request->filled('start_date') && $request->filled('end_date')) {
-            //     $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
-            //         ->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
-            // } else {
-            //     if ($request->filled('start_date')) {
-            //         $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
-            //     }
-            //     if ($request->filled('end_date')) {
-            //         $query->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
-            //     }
-            // }
-
-
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_vouchers.request_date', '>=', $request->start_date)
+                    ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_vouchers.request_date', '>=', $request->start_date);
+                }
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+                }
+            }
             $data = $query->get();
+
+            // dd($data);
 
             Log::info('Exported BeginVoucher Count', [
                 'ministry_id' => $ministryId,

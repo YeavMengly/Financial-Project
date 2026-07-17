@@ -294,7 +294,7 @@
         });
     </script>
     <script>
-        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboPaymentVoucherNumber, #CboMandate').on('change keyup',
+        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboPaymentVoucherNumber, #CboMandate, #start_date, #end_date').on('change keyup',
             function() {
                 $('#budgetvoucher-table').DataTable().ajax.reload();
             });
