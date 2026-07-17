@@ -240,7 +240,6 @@ class LoanBudgetMandateController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -275,7 +274,6 @@ class LoanBudgetMandateController extends Controller
                 ->where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
-                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->selectRaw('
                 COALESCE(SUM(internal_increase),0)   AS internal_increase_sum,
@@ -422,11 +420,8 @@ class LoanBudgetMandateController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
-
-            // dd($beginMandate);
 
             if (!$beginMandate) {
                 flash()->translate('en')->option('timeout', 2000)
@@ -477,7 +472,6 @@ class LoanBudgetMandateController extends Controller
                 'txtDescription' => strip_tags($validatedData['txtDescription']),
             ]);
             $mandateLoan->save();
-
             $beginMandate->update([
                 'current_loan' => $beginMandate->current_loan,
                 'new_credit_status' => $new_credit_status,
@@ -487,9 +481,7 @@ class LoanBudgetMandateController extends Controller
                 'law_average' => $law_average,
                 'law_correction' => $law_correction,
             ]);
-
             $beginMandate->save();
-
 
             DB::commit();
             flash()

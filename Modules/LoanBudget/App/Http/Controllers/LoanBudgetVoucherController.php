@@ -248,7 +248,6 @@ class LoanBudgetVoucherController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -284,7 +283,6 @@ class LoanBudgetVoucherController extends Controller
                 ->where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
-                ->where('agency_id', $validatedData['cboAgency'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->selectRaw('
                 COALESCE(SUM(internal_increase),0)   AS internal_increase_sum,
@@ -431,10 +429,9 @@ class LoanBudgetVoucherController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                // ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
-            dd($beginVoucher);
+
             if (!$beginVoucher) {
                 flash()->translate('en')->option('timeout', 2000)
                     ->error('មិនមានទិន្ន័យត្រឹមត្រូវ', 'បញ្ហា')->flash();
@@ -444,17 +441,23 @@ class LoanBudgetVoucherController extends Controller
             $fin_law = $beginVoucher->fin_law;
             $current_loan = $beginVoucher->current_loan;
 
+            $validatedData['internal_increase'] = $validatedData['internal_increase'] ?? 0;
+            $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
+            $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
+            $validatedData['editorial'] = $validatedData['editorial'] ?? 0;
+            $validatedData['decrease'] = $validatedData['decrease'] ?? 0;
+
             $total_increase = $validatedData['internal_increase'] + $validatedData['unexpected_increase'] + $validatedData['additional_increase'];
             $new_credit_status = $current_loan + $total_increase - $validatedData['decrease'] - $validatedData['editorial'];
 
-            $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
+            // $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
 
-            $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
-                ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('ministry_id', $ministry->id)
-                ->sum('budget');
+            // $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
+            //     ->where('account_sub_id', $validatedData['cboSubAccount'])
+            //     ->where('ministry_id', $ministry->id)
+            //     ->sum('budget');
 
-            $deadline_balance = $currentApplyTotal;
+            $deadline_balance = $beginVoucher->early_balance + $beginVoucher->apply;
             $credit = $new_credit_status - $deadline_balance;
 
             $law_average = $fin_law ? ($deadline_balance / $fin_law) * 100 : 0;
@@ -466,7 +469,7 @@ class LoanBudgetVoucherController extends Controller
                 'program_sub_id'      => $validatedData['cboProgramSub'],
                 'cluster_id'          => $validatedData['cboCluster'],
                 'account_sub_id' => $validatedData['cboSubAccount'],
-                'no' => $valueNo,
+                'no' => $beginVoucher->no,
                 'internal_increase' => $validatedData['internal_increase'],
                 'unexpected_increase' => $validatedData['unexpected_increase'],
                 'additional_increase' => $validatedData['additional_increase'],
@@ -475,16 +478,17 @@ class LoanBudgetVoucherController extends Controller
                 'total_increase' => $total_increase,
                 'txtDescription' => strip_tags($validatedData['txtDescription']),
             ]);
-
+            $voucherLoan->save();
             $beginVoucher->update([
                 'current_loan' => $beginVoucher->current_loan,
                 'new_credit_status' => $new_credit_status,
-                // 'apply' => $currentApplyTotal,
-                // 'deadline_balance' => $deadline_balance,
+                'apply' => $beginVoucher->apply,
+                'deadline_balance' => $deadline_balance,
                 'credit' => $credit,
                 'law_average' => $law_average,
                 'law_correction' => $law_correction,
             ]);
+            $beginVoucher->save();
 
             DB::commit();
             flash()
@@ -527,7 +531,6 @@ class LoanBudgetVoucherController extends Controller
             if ($beginVoucher) {
                 $bvl = BudgetVoucherLoan::query()
                     ->where('ministry_id',   $ministry->id)
-                    ->where('agency_id',     $beginVoucher->agency_id)
                     ->where('account_sub_id', $beginVoucher->account_sub_id)
                     ->where('no',            $beginVoucher->no)
                     ->selectRaw('
