@@ -7,31 +7,37 @@
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
+    
+    <style>
+        /* Turn border green when Pristine marks the form-group as valid / skipped */
+        .has-success .form-control,
+        .has-success .form-select,
+        .has-success .choices__inner {
+            border-color: #198754 !important;
+        }
+    </style>
 @endsection
+
 @section('content')
     <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18"> {{ __('menus.advance.payment') }}</h4>
-
                 <div class="page-title-right">
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">
-                                    {{ __('menus.advance.payment') }}</a></li>
-                            <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
-                        </ol>
-                    </div>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.advance.payment') }}</a></li>
+                        <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
+                    </ol>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="flashMessage"></div>
+
     <!-- end page title -->
     <div class="row">
-        <div class="col-12"></div>
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
@@ -73,39 +79,27 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label>{{ __('forms.legal.number') }}</label>
-                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="number" class="form-control"
-                                            placeholder="{{ __('forms.legal.number') }}" name="legalNumber"
-                                            tabindex="2" />
-                                    </div>
-                                </div> --}}
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.legal.number') }}</label>
-
-                                        <div class="d-flex align-items-center gap-2">
-                                            <input class="form-control" id="legalNumber"
-                                                data-pristine-required-message="{{ __('messages.required') }}"
-                                                data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                                data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0"
-                                                min="1" type="number" placeholder="{{ __('forms.legal.number') }}"
-                                                name="legalNumber" tabindex="2">
-
-                                            <div class="form-check mb-0">
-                                                <input class="form-check-input" type="checkbox" id="skipLegalNumber">
-                                                <label class="form-check-label" for="skipLegalNumber">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="legalNumber" class="form-label mb-0">{{ __('forms.legal.number') }}</label>
+                                            
+                                            <!-- Modern Skip Switch -->
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch" id="skipLegalNumber" style="cursor: pointer;">
+                                                <label class="form-check-label font-size-12 text-muted" for="skipLegalNumber" style="cursor: pointer;">
                                                     រំលង / មិនបញ្ចូលលេខ
                                                 </label>
                                             </div>
                                         </div>
+
+                                        <input class="form-control" id="legalNumber" name="legalNumber"
+                                            data-pristine-required-message="{{ __('messages.required') }}"
+                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0"
+                                            min="1" type="number" placeholder="{{ __('forms.legal.number') }}" required tabindex="2">
                                     </div>
                                 </div>
-
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -118,16 +112,12 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboProgram" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.program') }}
-                                        </label>
+                                        <label for="cboProgram" class="form-label font-size-13 text-muted">{{ __('forms.program') }}</label>
                                         <select class="form-select" id="cboProgram" name="cboProgram" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($program as $p)
-                                                <option value="{{ $p->id }}">
-                                                    {{ $p->no }}-
-                                                    {{ $p->title }}</option>
+                                                <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
                                             @endforeach
                                         </select>
                                         @error('cboProgram')
@@ -138,9 +128,7 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.program.sub') }}
-                                        </label>
+                                        <label for="cboProgramSub" class="form-label font-size-13 text-muted">{{ __('forms.program.sub') }}</label>
                                         <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
@@ -153,14 +141,11 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboCluster" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.cluster') }}
-                                        </label>
+                                        <label for="cboCluster" class="form-label font-size-13 text-muted">{{ __('forms.cluster') }}</label>
                                         <select id="cboCluster" class="form-select" name="cboCluster" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
-
                                         @error('cboCluster')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
@@ -169,9 +154,7 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.agency') }}
-                                        </label>
+                                        <label for="cboAgency" class="form-label font-size-13 text-muted">{{ __('forms.agency') }}</label>
                                         <select id="cboAgency" class="form-select" name="cboAgency" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
@@ -184,17 +167,11 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.sub.account') }}
-                                        </label>
-
+                                        <label for="cboSubAccount" class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
-
                                             @foreach ($accountSub as $bv)
-                                                <option value="{{ $bv->no }}">
-                                                    {{ $bv->no }}-{{ $bv->name }}
-                                                </option>
+                                                <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -209,24 +186,9 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="col-lg-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="cboExpenseType"
-                                            class="form-label text-muted">{{ __('forms.voucher.type') }}</label>
-                                        <select class="form-control" name="cboExpenseType" id="cboExpenseType" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($expenseType as $ts)
-                                                <option value="{{ $ts->id }}">{{ $ts->name_kh }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div> --}}
-
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="transactionDate"
-                                            class="form-label">{{ __('forms.select_date') }}</label>
+                                        <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}</label>
                                         <input type="text" id="transactionDate" name="transactionDate"
                                             class="form-control" placeholder="{{ __('forms.select_transaction_date') }}"
                                             required data-pristine-required-message="{{ __('messages.required') }}" />
@@ -259,26 +221,19 @@
                                         data-pristine-required-message="{{ __('messages.required') }}"></textarea>
                                 </div>
                             </div>
+
                             <div class="d-flex flex-wrap gap-2">
-                                {{-- <button type="submit" class="btn btn-primary"
-                                    id="insertToTableBtn">{{ __('buttons.save') }}</button>
-                                <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    {{ __('buttons.delete') }}
-                                </a> --}}
-                                <button class="btn btn-primary" type="submit" name="submit"
-                                    value="save">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-primary" type="submit" name="submit" value="save">{{ __('buttons.save') }}</button>
                                 <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                     <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
-                                <a class="btn btn-dark"
-                                    href="{{ route('budgetAdvancePayment.index', $params) }}">{{ __('buttons.back') }}</a>
-
+                                <a class="btn btn-dark" href="{{ route('budgetAdvancePayment.index', $params) }}">{{ __('buttons.back') }}</a>
                             </div>
                         </form>
-
                     </div>
                 </div>
+
                 <div class="card-body">
                     <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
@@ -309,132 +264,186 @@
         </div>
     </div>
 @endsection
+
 @section('script')
-    <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
-    <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
-    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
+    <!-- Master Libraries (Loaded Once) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
+
+    <!-- Unified Execution Script -->
     <script>
-        const transactionDateInput = document.getElementById('transactionDate');
-        if (transactionDateInput) {
-            flatpickr(transactionDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: transactionDateInput.value || null
-            });
-        }
-    </script>
-
-    <script>
-        const requestDateInput = document.getElementById('requestDate');
-        if (requestDateInput) {
-            flatpickr(requestDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: requestDateInput.value || null
-            });
-        }
-    </script>
-
-    <script>
-        const legalDateInput = document.getElementById('legalDate');
-        if (legalDateInput) {
-            flatpickr(legalDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: legalDateInput.value || null
-            });
-        }
-    </script>
-
-    <script>
-        // ---------- helpers ----------
-        function initChoicesOnce(selectEl, opts = {}) {
-            if (!selectEl) return null;
-            if (selectEl.dataset.choicesInit === '1') return null; // our own guard
-            selectEl.dataset.choicesInit = '1';
-            return new Choices(selectEl, Object.assign({
-                searchEnabled: true,
-                itemSelectText: '',
-                shouldSort: false
-            }, opts));
-        }
-        const n = v => (isNaN(+v) ? 0 : +v);
-        const fmt = v => n(v).toLocaleString('en-US', {
-            maximumFractionDigits: 2
-        });
-
-        function setText(id, val) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = fmt(val);
-        }
-
-        function resetNumbers() {
-            ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying',
-                'remaining_credit'
-            ]
-            .forEach(id => setText(id, 0));
-        }
-
-        // ---------- init once DOM ready ----------
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
-            const subAccount = document.getElementById('cboSubAccount');
-            // const programInput = document.getElementById('programInput'); // readonly "no"
-            const budgetInput = document.getElementById('budget');
+            if (!form) return;
 
-            // named route -> correct URL always
-            const earlyEP = "{{ route('budgetAdvancePayment.getEarlyBalance', ['params' => $params]) }}";
-
-            // Pristine
-            if (form) {
-                const pristine = new Pristine(form);
-                form.addEventListener('submit', (e) => {
-                    if (!pristine.validate()) e.preventDefault();
+            // ==========================================
+            // 1. PRISTINE INITIALIZATION
+            // ==========================================
+            const createPristineInstance = () => {
+                return new Pristine(form, {
+                    classTo: 'form-group',
+                    errorClass: 'has-danger',
+                    successClass: 'has-success',
+                    errorTextParent: 'form-group',
+                    errorTextTag: 'div',
+                    errorTextClass: 'pristine-error text-help text-danger font-size-14 mt-1'
                 });
-            }
+            };
 
-            // Summernote
+            let pristine = createPristineInstance();
+            const refreshPristine = () => {
+                pristine.destroy();
+                pristine = createPristineInstance();
+            };
+
+            // ==========================================
+            // 2. FLATPICKR SYNC
+            // ==========================================
+            const initFlatpickr = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                flatpickr(el, {
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    defaultDate: el.value || null,
+                    onChange: () => pristine.validate(el),
+                    onClose: () => pristine.validate(el)
+                });
+            };
+            initFlatpickr('transactionDate');
+            initFlatpickr('requestDate');
+            initFlatpickr('legalDate');
+
+            // ==========================================
+            // 3. SUMMERNOTE SYNC
+            // ==========================================
             if (window.jQuery) {
-                jQuery('#vDescription').summernote({
+                $('#vDescription').summernote({
                     height: 150,
                     toolbar: [
                         ['style', ['bold', 'italic', 'underline', 'clear']],
                         ['para', ['ul', 'ol', 'paragraph']],
                         ['color', ['color']]
-                    ]
+                    ],
+                    callbacks: {
+                        onChange: function(contents) {
+                            const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                            document.getElementById('vDescription').value = clean === '' ? '' : contents;
+                            pristine.validate(document.getElementById('vDescription'));
+                        }
+                    }
                 });
             }
 
-            // Choices — once per element
-            // initChoicesOnce(document.getElementById('cboExpenseType'), {
-            //     placeholderValue: 'ជ្រើសរើស',
-            //     searchPlaceholderValue: 'ស្វែងរក...'
-            // });
-            initChoicesOnce(subAccount, {
+            // ==========================================
+            // 4. CHOICES.JS INITIALIZATION
+            // ==========================================
+            const defaultChoicesOpts = {
+                searchEnabled: true,
+                itemSelectText: '',
                 placeholder: true,
-                placeholderValue: 'ស្វែងរក...'
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            };
+
+            let programChoices = new Choices('#cboProgram', defaultChoicesOpts);
+            let programSubChoices = new Choices('#cboProgramSub', defaultChoicesOpts);
+            let clusterChoices = new Choices('#cboCluster', defaultChoicesOpts);
+            let agencyChoices = new Choices('#cboAgency', defaultChoicesOpts);
+            let subAccountChoices = new Choices('#cboSubAccount', defaultChoicesOpts);
+
+            const resetSelect = (selector) => $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            const resetChoices = (selector, instance) => {
+                instance.destroy();
+                return new Choices(selector, defaultChoicesOpts);
+            };
+
+            const loadOptions = ({ url, data, targetSelect, instanceRefSetter }) => {
+                $.ajax({
+                    url, type: "GET", data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: () => resetSelect(targetSelect)
+                });
+            };
+
+            // Trigger Pristine validation when any select changes
+            form.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', () => pristine.validate(select));
             });
 
-            // compute remaining credit
-            function recomputeRemaining() {
+            // ==========================================
+            // 5. CASCADING AJAX DROPDOWNS
+            // ==========================================
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+                
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetAdvancePayment.by.program_sub') }}",
+                    data: { program_id: programId },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub', programSubChoices)
+                });
+
+                loadOptions({
+                    url: "{{ route('budgetAdvancePayment.by.agency') }}",
+                    data: { program_id: programId },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency', agencyChoices)
+                });
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+                
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: "{{ route('budgetAdvancePayment.by.cluster') }}",
+                    data: { program_sub_id: programSubId },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster', clusterChoices)
+                });
+            });
+
+            // ==========================================
+            // 6. CREDIT CALCULATIONS
+            // ==========================================
+            const n = v => (isNaN(+v) ? 0 : +v);
+            const fmt = v => n(v).toLocaleString('en-US', { maximumFractionDigits: 2 });
+            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = fmt(val); };
+            const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying', 'remaining_credit'].forEach(id => setText(id, 0));
+
+            const budgetInput = document.getElementById('budget');
+            const recomputeRemaining = () => {
                 const apply = n(budgetInput?.value);
                 const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
                 setText('applying', apply);
                 setText('remaining_credit', Math.max(credit - apply, 0));
                 if (credit - apply < 0) budgetInput.value = '';
-            }
+            };
 
-            // fetch numbers
-            async function fetchEarlyBalance() {
-
+            const fetchEarlyBalance = async () => {
                 const programId = document.getElementById('cboProgram').value;
                 const programSubId = document.getElementById('cboProgramSub').value;
                 const clusterId = document.getElementById('cboCluster').value;
@@ -445,229 +454,114 @@
                     return;
                 }
 
-                const url = new URL(earlyEP, window.location.origin);
-
+                const url = new URL("{{ route('budgetAdvancePayment.getEarlyBalance', ['params' => $params]) }}", window.location.origin);
                 url.searchParams.set('program_id', programId);
                 url.searchParams.set('program_sub_id', programSubId);
                 url.searchParams.set('cluster_id', clusterId);
                 url.searchParams.set('account_sub_id', accountSubId);
 
                 try {
-
-                    const res = await fetch(url.toString(), {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-
+                    const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
                     const data = await res.json();
-
                     setText('fin_law', data.fin_law);
                     setText('credit_movement', data.credit_movement);
                     setText('new_credit_status', data.new_credit_status);
                     setText('credit', data.credit);
                     setText('deadline_balance', data.deadline_balance);
-
                     recomputeRemaining();
-
                 } catch (err) {
-                    console.error(err);
+                    console.error("Failed to fetch balance:", err);
                     resetNumbers();
                 }
-            }
-            document.getElementById('cboProgram').addEventListener('change', fetchEarlyBalance);
-            document.getElementById('cboProgramSub').addEventListener('change', fetchEarlyBalance);
-            document.getElementById('cboCluster').addEventListener('change', fetchEarlyBalance);
-            document.getElementById('cboSubAccount').addEventListener('change', fetchEarlyBalance);
+            };
 
-            subAccount?.addEventListener('change', function() {
-                const opt = this.options[this.selectedIndex];
-                const subId = this.value || '';
-                const programNo = opt ? (opt.getAttribute('data-program') || '') : '';
-
-                if (programInput) programInput.value = programNo;
-
-                fetchEarlyBalance(subId, programNo);
+            ['cboProgram', 'cboProgramSub', 'cboCluster', 'cboSubAccount'].forEach(id => {
+                document.getElementById(id)?.addEventListener('change', fetchEarlyBalance);
             });
-
             budgetInput?.addEventListener('input', recomputeRemaining);
-        });
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboProgram');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
+            // ==========================================
+            // 7. SKIP LEGAL NUMBER LOGIC (With Green UI)
+            // ==========================================
+            const legalInput = document.getElementById('legalNumber');
+            const skipLegalCheckbox = document.getElementById('skipLegalNumber');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboSubAccount');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+            if (skipLegalCheckbox && legalInput) {
+                skipLegalCheckbox.addEventListener('change', function() {
+                    const parentGroup = legalInput.closest('.form-group');
 
-            // ========= Choices Instances =========
-            let programSubChoices = new Choices('#cboProgramSub', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
+                    if (this.checked) {
+                        legalInput.value = '';
+                        legalInput.disabled = true; 
+                        legalInput.readOnly = true;
 
-            let agencyChoices = new Choices('#cboAgency', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
+                        // Visual Updates
+                        legalInput.classList.remove('bg-light', 'text-muted');
+                        legalInput.classList.add('border-success', 'bg-success-subtle');
+                        parentGroup?.classList.add('has-success');
 
-            let clusterChoices = new Choices('#cboCluster', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
+                        // Remove Validation Rules
+                        legalInput.removeAttribute('required');
+                        legalInput.removeAttribute('min');
+                        legalInput.removeAttribute('data-pristine-required-message');
+                        legalInput.removeAttribute('data-pristine-min-message');
+                        legalInput.removeAttribute('data-pristine-integer-message');
+                        pristine.reset(legalInput);
+                    } else {
+                        legalInput.value = '0';
+                        legalInput.disabled = false;
+                        legalInput.readOnly = false;
 
-            // ========= Helpers =========
-            function resetSelect(selector) {
-                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
-            }
+                        // Restore Visuals
+                        legalInput.classList.remove('border-success', 'bg-success-subtle');
+                        parentGroup?.classList.remove('has-success');
 
-            function resetChoices(selector, instance) {
-                instance.destroy();
-                return new Choices(selector, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក..."
-                });
-            }
-
-            function loadOptions({
-                url,
-                data,
-                targetSelect,
-                instanceRefSetter
-            }) {
-                $.ajax({
-                    url,
-                    type: "GET",
-                    data,
-                    success: function(html) {
-                        $(targetSelect).html(html);
-                        instanceRefSetter();
-                    },
-                    error: function() {
-                        // optional: keep empty if error
-                        resetSelect(targetSelect);
+                        // Restore Validation Rules
+                        legalInput.setAttribute('required', 'true');
+                        legalInput.setAttribute('min', '1');
+                        legalInput.setAttribute('data-pristine-required-message', "{{ __('messages.required') }}");
+                        legalInput.setAttribute('data-pristine-min-message', 'លំដាប់ ត្រូវតែធំជាងសូន្យ');
+                        legalInput.setAttribute('data-pristine-integer-message', 'លំដាប់ ត្រូវតែលេខ');
                     }
+                    refreshPristine();
                 });
             }
 
-            // ========= Script 1: Program -> ProgramSub =========
-            function handleProgramChangeForProgramSub(programId) {
-                resetSelect('#cboProgramSub');
-                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+            // ==========================================
+            // 8. MASTER FORM SUBMIT GATEKEEPER
+            // ==========================================
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // Stop native submission immediately
 
-                if (!programId) return;
+                // Pre-Submit Safety check
+                if (skipLegalCheckbox && skipLegalCheckbox.checked && legalInput) {
+                    legalInput.disabled = true;
+                    legalInput.removeAttribute('required');
+                    legalInput.removeAttribute('min');
+                    pristine.reset(legalInput);
+                }
 
-                loadOptions({
-                    url: "{{ route('budgetAdvancePayment.by.program_sub') }}",
-                    data: {
-                        program_id: programId
-                    },
-                    targetSelect: '#cboProgramSub',
-                    instanceRefSetter: () => {
-                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                // Force Summernote sync 
+                if ($('#vDescription').length) {
+                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $('#vDescription').summernote('code');
+                    document.getElementById('vDescription').value = summernoteContent;
+                }
+
+                const isValid = pristine.validate();
+
+                if (isValid) {
+                    // Temporarily unlock disabled fields to prevent missing key errors in Laravel
+                    if (legalInput && skipLegalCheckbox && skipLegalCheckbox.checked) {
+                        legalInput.disabled = false; 
                     }
-                });
-            }
-
-            // ========= Script 2: Program -> Agency =========
-            function handleProgramChangeForAgency(programId) {
-                resetSelect('#cboAgency');
-                agencyChoices = resetChoices('#cboAgency', agencyChoices);
-
-                if (!programId) return;
-
-                loadOptions({
-                    url: "{{ route('budgetAdvancePayment.by.agency') }}",
-                    data: {
-                        program_id: programId
-                    },
-                    targetSelect: '#cboAgency',
-                    instanceRefSetter: () => {
-                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
-                    }
-                });
-            }
-
-            // ========= Script 3: ProgramSub -> Cluster =========
-            function handleProgramSubChangeForCluster(programSubId) {
-                resetSelect('#cboCluster');
-                clusterChoices = resetChoices('#cboCluster', clusterChoices);
-
-                if (!programSubId) return;
-
-                loadOptions({
-                    url: "{{ route('budgetAdvancePayment.by.cluster') }}",
-                    data: {
-                        program_sub_id: programSubId
-                    },
-                    targetSelect: '#cboCluster',
-                    instanceRefSetter: () => {
-                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
-                    }
-                });
-            }
-
-            // ========= Events =========
-            $('#cboProgram').on('change', function() {
-                const programId = $(this).val();
-
-                // when program changes -> always clear cluster too
-                handleProgramChangeForProgramSub(programId);
-                handleProgramChangeForAgency(programId);
-                handleProgramSubChangeForCluster(null); // reset cluster
-            });
-
-            $('#cboProgramSub').on('change', function() {
-                const programSubId = $(this).val();
-                handleProgramSubChangeForCluster(programSubId);
-            });
-
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const checkbox = document.getElementById('skipTemporaryId');
-            const input = document.getElementById('temporaryId');
-
-            checkbox.addEventListener('change', function() {
-
-                if (this.checked) {
-                    input.value = '';
-                    input.disabled = true;
-                    input.removeAttribute('required');
+                    
+                    // Safe form submission
+                    HTMLFormElement.prototype.submit.call(form);
                 } else {
-                    input.disabled = false;
-                    input.setAttribute('required', 'required');
-                    input.value = 0;
+                    const firstError = form.querySelector('.has-danger');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 }
             });
         });

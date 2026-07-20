@@ -210,33 +210,59 @@ class BudgetVoucherController extends Controller
 
         return response($html);
     }
+
+    // public function getByExpenseId(Request $request)
+    // {
+    //     if ($request->expense_type_id) {
+
+    //         $data = BudgetMandate::select('id', 'payment_voucher_number', 'legal_name')
+    //             ->where('expense_type_id', $request->expense_type_id)
+    //             ->where('is_archived', 1)
+    //             ->where('status', 'todo')
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+
+    //         foreach ($data as $d) {
+
+    //             $selected = $selectedId == $d->payment_voucher_number ? 'selected' : '';
+
+    //             $html .= "<option value='{$d->payment_voucher_number}' {$selected}>{$d->payment_voucher_number} </option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
     public function getByExpenseId(Request $request)
     {
-        if ($request->expense_type_id) {
-
-            $data = BudgetMandate::select('id', 'payment_voucher_number')
-                ->where('expense_type_id', $request->expense_type_id)
-                ->where('is_archived', 1)
-                ->where('status', 'todo')
-                ->get();
-
-            $selectedId = $request->selected_id ?? null;
-
-            $html = '';
-
-            foreach ($data as $d) {
-
-                $selected = $selectedId == $d->payment_voucher_number ? 'selected' : '';
-
-                $html .= "<option value='{$d->payment_voucher_number}' {$selected}>{$d->payment_voucher_number}</option>";
-            }
-
-            return response($html);
+        if (!$request->filled('expense_type_id')) {
+            return response()->json([]);
         }
 
-        return response('');
-    }
+        $data = BudgetMandate::select('id', 'payment_voucher_number', 'legal_name', 'description')
+            ->where('expense_type_id', $request->expense_type_id)
+            ->where('is_archived', 1)
+            ->where('status', 'todo')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'value' => $item->payment_voucher_number,
+                    'label' => $item->payment_voucher_number,
+                    // Store both legal_name and description in customProperties
+                    'customProperties' => [
+                        'legal_name' => $item->legal_name,
+                        'description' => $item->description,
+                    ]
+                ];
+            });
 
+        return response()->json($data);
+    }
+    
     public function getByExpenseIdPayment(Request $request)
     {
         if ($request->expense_type_id) {
@@ -263,6 +289,7 @@ class BudgetVoucherController extends Controller
 
         return response('');
     }
+
     public function editByExpenseId(Request $request)
     {
         if (!$request->expense_type_id) {
@@ -486,7 +513,7 @@ class BudgetVoucherController extends Controller
     //     ]);
     // }
 
-        public function editEarlyBalance(Request $request, $params)
+    public function editEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
 
