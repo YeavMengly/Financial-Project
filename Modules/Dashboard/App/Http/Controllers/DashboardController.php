@@ -93,6 +93,26 @@ class DashboardController extends Controller
         $chartTotalIncrease   = $loanReport->pluck('total_increase')->toArray();
         $loanCount            = $loanReport->count();
 
+        $total_decrease = $loanReport->sum('decrease');
+        $chartTotalDecrease = $loanReport->pluck('decrease')->toArray();
+        $decreaseCount = $loanReport->where('decrease', '>', 0)->count();
+
+        $total_editorial = $loanReport->sum('editorial');
+        $chartTotalEditorial = $loanReport->pluck('editorial')->toArray();
+        $editorialCount = $loanReport->where('editorial', '>', 0)->count();
+
+        // dd(
+        //     $total_total_increase,s
+        //     $chartTotalIncrease,
+        //     $loanCount,
+        //     $total_decrease,
+        //     $chartTotalDecrease,
+        //     $decreaseCount,
+        //     $total_editorial,
+        //     $chartTotalEditorial,
+        //     $editorialCount
+        // );
+
         // DUEL Entry
         $duelEntries = DB::table('duel_entries')
             ->join('ministries', 'duel_entries.ministry_id', '=', 'ministries.id')
@@ -352,6 +372,12 @@ class DashboardController extends Controller
             'total_total_increase' => $total_total_increase,
             'chartTotalIncrease' => $chartTotalIncrease,
             'loanCount' => $loanCount,
+            'total_decrease' => $total_decrease,
+            'chartTotalDecrease' => $chartTotalDecrease,
+            'decreaseCount' => $decreaseCount,
+            'total_editorial' => $total_editorial,
+            'chartTotalEditorial' => $chartTotalEditorial,
+            'editorialCount' => $editorialCount,
             'qtyFuel' => $qtyFuel,
             'qtyDiesel' => $qtyDiesel,
             'qtyOil' => $qtyOil,

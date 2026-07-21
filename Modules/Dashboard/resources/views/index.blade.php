@@ -175,6 +175,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -208,6 +209,180 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.decrease') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $decreaseCount }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_decrease }}">
+                                    {{ number_format($total_decrease) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_decrease) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.editorial') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $editorialCount }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_editorial }}">
+                                    {{ number_format($total_editorial) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_editorial) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- @props([
+            'titleOne' => __('tables.th.decrease'),
+            'countOne' => $decreaseCount,
+            'totalOne' => $total_decrease,
+            'chartIdOne' => 'mini-chart-1',
+            'titleTwo' => __('tables.th.editorial'),
+            'countTwo' => $editorialCount,
+            'totalTwo' => $total_editorial,
+            'chartIdTwo' => 'mini-chart-2',
+            'unit' => 'រៀល',
+            'colClass' => 'col-xl-3 col-md-6',
+        ]) --}}
+
+        {{-- <div class="{{ $colClass }}">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <!-- Segmented Pill Switcher -->
+                    <ul class="nav nav-pills nav-justified bg-light rounded p-1 mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active btn-sm py-1 font-size-13 fw-semibold" data-bs-toggle="pill"
+                                data-bs-target="#pane-{{ $chartIdOne }}" type="button" role="tab">
+                                {{ $titleOne }}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link btn-sm py-1 font-size-13 fw-semibold" data-bs-toggle="pill"
+                                data-bs-target="#pane-{{ $chartIdTwo }}" type="button" role="tab">
+                                {{ $titleTwo }}
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Option 1: Decrease Pane -->
+                        <div class="tab-pane fade show active" id="pane-{{ $chartIdOne }}" role="tabpanel">
+                            <div class="row align-items-center">
+                                <div class="d-flex flex-wrap align-items-center mb-3 w-100">
+                                    <span class="text-muted lh-4 d-block text-truncate">
+                                        {{ $titleOne }}
+                                    </span>
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-soft-primary btn-sm">
+                                            {{ is_numeric($countOne) ? number_format($countOne) : $countOne }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <span class="mb-3 d-block">
+                                        <span class="counter-value font-size-18 fw-semibold"
+                                            data-target="{{ $totalOne }}">
+                                            {{ is_numeric($totalOne) ? number_format($totalOne) : $totalOne }}
+                                        </span> <span class="font-size-12 text-muted">{{ $unit }}</span>
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <div id="{{ $chartIdOne }}" data-colors='["#5156be"]' class="apex-charts mb-2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-nowrap">
+                                <span class="badge bg-success-subtle text-success">
+                                    {{ is_numeric($totalOne) ? number_format($totalOne) : $totalOne }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Editorial Pane -->
+                        <div class="tab-pane fade" id="pane-{{ $chartIdTwo }}" role="tabpanel">
+                            <div class="row align-items-center">
+                                <div class="d-flex flex-wrap align-items-center mb-3 w-100">
+                                    <span class="text-muted lh-4 d-block text-truncate">
+                                        {{ $titleTwo }}
+                                    </span>
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-soft-primary btn-sm">
+                                            {{ is_numeric($countTwo) ? number_format($countTwo) : $countTwo }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <span class="mb-3 d-block">
+                                        <span class="counter-value font-size-18 fw-semibold"
+                                            data-target="{{ $totalTwo }}">
+                                            {{ is_numeric($totalTwo) ? number_format($totalTwo) : $totalTwo }}
+                                        </span> <span class="font-size-12 text-muted">{{ $unit }}</span>
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <div id="{{ $chartIdTwo }}" data-colors='["#5156be"]' class="apex-charts mb-2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-nowrap">
+                                <span class="badge bg-success-subtle text-success">
+                                    {{ is_numeric($totalTwo) ? number_format($totalTwo) : $totalTwo }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div> --}}
+
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -707,7 +882,8 @@
                     <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
                         <option selected="">ជំពូក</option>
                         @foreach ($chapterLabels as $ch)
-                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                            <option value="{{ $ch }}"
+                                {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
                                 {{ $ch }}
                             </option>
                         @endforeach
@@ -1805,3 +1981,26 @@
             });
         });
     </script>
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Update dropdown button text and active class when an item is picked
+            document.querySelectorAll('.dropdown-tab-switch').forEach(item => {
+                item.addEventListener('show.bs.tab', function(e) {
+                    // Find the parent dropdown button and update its label text
+                    const dropdown = this.closest('.dropdown');
+                    const labelSpan = dropdown.querySelector('.dropdown-label');
+                    if (labelSpan) {
+                        labelSpan.textContent = this.getAttribute('data-label');
+                    }
+
+                    // Remove 'active' styling from all siblings, add to the selected one
+                    dropdown.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+
+                    // 2. CRITICAL: Force window resize so hidden ApexCharts render at 100% width
+                    window.dispatchEvent(new Event('resize'));
+                });
+            });
+        });
+    </script> --}}

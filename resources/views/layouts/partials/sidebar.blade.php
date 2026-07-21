@@ -161,7 +161,7 @@
                         Request::routeIs('voucher.*') ||
                         Request::routeIs('mandate.*');
                 @endphp
-                <li class="{{ $budgetControlActive ? 'mm-active' : '' }}">
+                {{-- <li class="{{ $budgetControlActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="pie-chart"></i>
                         <span data-key="t-pages">{{ __('menus.budget.control') }}</span>
@@ -191,7 +191,19 @@
                             </li>
                         @endif
                     </ul>
-                </li>
+                </li> --}}
+
+                @if (hasPermission('voucherLoan.index'))
+                    <li>
+                        <a href="{{ route('voucherLoan.index') }}"
+                            class="{{ Request::routeIs('voucherLoan.*') ? 'active' : '' }}">
+                            <i data-feather="pie-chart"></i>
+                            <span data-key="t-budget.control.voucherLoan">
+                                {{ __('menus.budget.control') }}
+                            </span>
+                        </a>
+                    </li>
+                @endif
 
                 {{-- ========== Duel ========== --}}
                 @php
