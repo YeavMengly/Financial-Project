@@ -210,31 +210,57 @@ class BudgetVoucherController extends Controller
 
         return response($html);
     }
+
+    // public function getByExpenseId(Request $request)
+    // {
+    //     if ($request->expense_type_id) {
+
+    //         $data = BudgetMandate::select('id', 'payment_voucher_number', 'legal_name')
+    //             ->where('expense_type_id', $request->expense_type_id)
+    //             ->where('is_archived', 1)
+    //             ->where('status', 'todo')
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+
+    //         foreach ($data as $d) {
+
+    //             $selected = $selectedId == $d->payment_voucher_number ? 'selected' : '';
+
+    //             $html .= "<option value='{$d->payment_voucher_number}' {$selected}>{$d->payment_voucher_number} </option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
     public function getByExpenseId(Request $request)
     {
-        if ($request->expense_type_id) {
-
-            $data = BudgetMandate::select('id', 'payment_voucher_number')
-                ->where('expense_type_id', $request->expense_type_id)
-                ->where('is_archived', 1)
-                ->where('status', 'todo')
-                ->get();
-
-            $selectedId = $request->selected_id ?? null;
-
-            $html = '';
-
-            foreach ($data as $d) {
-
-                $selected = $selectedId == $d->payment_voucher_number ? 'selected' : '';
-
-                $html .= "<option value='{$d->payment_voucher_number}' {$selected}>{$d->payment_voucher_number}</option>";
-            }
-
-            return response($html);
+        if (!$request->filled('expense_type_id')) {
+            return response()->json([]);
         }
 
-        return response('');
+        $data = BudgetMandate::select('id', 'payment_voucher_number', 'legal_name', 'description')
+            ->where('expense_type_id', $request->expense_type_id)
+            ->where('is_archived', 1)
+            ->where('status', 'todo')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'value' => $item->payment_voucher_number,
+                    'label' => $item->payment_voucher_number,
+                    // Store both legal_name and description in customProperties
+                    'customProperties' => [
+                        'legal_name' => $item->legal_name,
+                        'description' => $item->description,
+                    ]
+                ];
+            });
+
+        return response()->json($data);
     }
 
     public function getByExpenseIdPayment(Request $request)
@@ -263,6 +289,7 @@ class BudgetVoucherController extends Controller
 
         return response('');
     }
+
     public function editByExpenseId(Request $request)
     {
         if (!$request->expense_type_id) {
@@ -397,6 +424,94 @@ class BudgetVoucherController extends Controller
             ->with('program', $program);
     }
 
+    // public function getEarlyBalance(Request $request, $params)
+    // {
+    //     $ministryId = decode_params($params);
+
+    //     $request->validate([
+    //         'account_sub_id' => 'required',
+    //         'program_id'     => 'required',
+    //         'program_sub_id' => 'required',
+    //         'cluster_id'     => 'required',
+    //     ]);
+
+    //     $beginVoucher = BeginVoucher::with('loans')
+    //         ->where('ministry_id', $ministryId)
+    //         ->where('program_id', $request->program_id)
+    //         ->where('program_sub_id', $request->program_sub_id)
+    //         ->where('cluster_id', $request->cluster_id)
+    //         ->where('account_sub_id', $request->account_sub_id)
+    //         ->first();
+
+    //     if (!$beginVoucher) {
+    //         return response()->json([
+    //             'fin_law'            => 0,
+    //             'credit_movement'    => 0,
+    //             'new_credit_status'  => 0,
+    //             'credit'             => 0,
+    //             'deadline_balance'   => 0,
+    //             'exists'             => false,
+    //             'message'           => 'No voucher data found for this selection.'
+    //         ]);
+    //     }
+
+    //     $loan = $beginVoucher->loans;
+    //     $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+
+    //     return response()->json([
+    //         'fin_law'            => (float) ($beginVoucher->fin_law ?? 0),
+    //         'credit_movement'    => (float) $credit_movement,
+    //         'new_credit_status'  => (float) ($beginVoucher->new_credit_status ?? 0),
+    //         'credit'             => (float) ($beginVoucher->credit ?? 0),
+    //         'deadline_balance'   => (float) ($beginVoucher->deadline_balance ?? 0),
+    //         'exists'             => true,
+    //     ]);
+    // }
+
+    // public function getEarlyBalance(Request $request, $params)
+    // {
+    //     $ministryId = decode_params($params);
+
+    //     $request->validate([
+    //         'account_sub_id' => 'required',
+    //         'program_id'     => 'required',
+    //         'program_sub_id' => 'required',
+    //         'cluster_id'     => 'required',
+    //     ]);
+
+    //     $beginVoucher = BeginVoucher::where('ministry_id', $ministryId)
+    //         ->where('program_id', $request->program_id)
+    //         ->where('program_sub_id', $request->program_sub_id)
+    //         ->where('cluster_id', $request->cluster_id)
+    //         ->where('account_sub_id', $request->account_sub_id)
+    //         ->first();
+
+    //     if (!$beginVoucher) {
+    //         return response()->json([
+    //             'fin_law'           => 0,
+    //             'credit_movement'   => 0,
+    //             'new_credit_status' => 0,
+    //             'credit'            => 0,
+    //             'deadline_balance'  => 0,
+    //             'exists'            => false,
+    //             'message'           => 'No voucher data found for this selection.'
+    //         ]);
+    //     }
+
+    //     // FIX: Use the relationship query builder to sum across all related loans
+    //     $totalIncrease = $beginVoucher->loans()->sum('total_increase');
+    //     $totalDecrease = $beginVoucher->loans()->sum('decrease');
+    //     $credit_movement = $totalIncrease - $totalDecrease;
+
+    //     return response()->json([
+    //         'fin_law'           => (float) ($beginVoucher->fin_law ?? 0),
+    //         'credit_movement'   => (float) $credit_movement,
+    //         'new_credit_status' => (float) ($beginVoucher->new_credit_status ?? 0),
+    //         'credit'            => (float) ($beginVoucher->credit ?? 0),
+    //         'deadline_balance'  => (float) ($beginVoucher->deadline_balance ?? 0),
+    //         'exists'            => true,
+    //     ]);
+    // }
     public function getEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
@@ -418,29 +533,37 @@ class BudgetVoucherController extends Controller
 
         if (!$beginVoucher) {
             return response()->json([
-                'fin_law'            => 0,
-                'credit_movement'    => 0,
-                'new_credit_status'  => 0,
-                'credit'             => 0,
-                'deadline_balance'   => 0,
-                'exists'             => false,
+                'fin_law'           => 0,
+                'credit_movement'   => 0,
+                'new_credit_status' => 0,
+                'credit'            => 0,
+                'deadline_balance'  => 0,
+                'exists'            => false,
                 'message'           => 'No voucher data found for this selection.'
             ]);
         }
 
-        $loan = $beginVoucher->loans;
-        $credit_movement = (($loan->total_increase ?? 0) - ($loan->decrease ?? 0));
+        // THE FIX: Safely calculate loan movement whether relationship is a Collection or a single Model
+        $credit_movement = 0;
+        $loans = $beginVoucher->loans;
+
+        if ($loans) {
+            if ($loans instanceof \Illuminate\Support\Collection || is_iterable($loans)) {
+                $credit_movement = collect($loans)->sum('total_increase') - collect($loans)->sum('decrease');
+            } elseif (is_object($loans)) {
+                $credit_movement = ($loans->total_increase ?? 0) - ($loans->decrease ?? 0);
+            }
+        }
 
         return response()->json([
-            'fin_law'            => (float) ($beginVoucher->fin_law ?? 0),
-            'credit_movement'    => (float) $credit_movement,
-            'new_credit_status'  => (float) ($beginVoucher->new_credit_status ?? 0),
-            'credit'             => (float) ($beginVoucher->credit ?? 0),
-            'deadline_balance'   => (float) ($beginVoucher->deadline_balance ?? 0),
-            'exists'             => true,
+            'fin_law'           => (float) ($beginVoucher->fin_law ?? 0),
+            'credit_movement'   => (float) $credit_movement,
+            'new_credit_status' => (float) ($beginVoucher->new_credit_status ?? 0),
+            'credit'            => (float) ($beginVoucher->credit ?? 0),
+            'deadline_balance'  => (float) ($beginVoucher->deadline_balance ?? 0),
+            'exists'            => true,
         ]);
     }
-
     // public function editEarlyBalance(Request $request, $params)
     // {
     //     $ministryId = decode_params($params);
@@ -486,7 +609,7 @@ class BudgetVoucherController extends Controller
     //     ]);
     // }
 
-        public function editEarlyBalance(Request $request, $params)
+    public function editEarlyBalance(Request $request, $params)
     {
         $ministryId = decode_params($params);
 
