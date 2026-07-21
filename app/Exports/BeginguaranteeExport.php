@@ -150,21 +150,43 @@ class BeginguaranteeExport
                         $sheet->setCellValue("D{$row}", $item->budget_no);
                         $sheet->setCellValue("E{$row}", $item->txtDescription);
                         $sheet->setCellValue("F{$row}", $item->fin_law);
-                        $sheet->setCellValue("G{$row}", $item->current_loan);
-                        $internal   = $item->loan_internal_increase   ?? 0;
-                        $unexpected = $item->loan_unexpected_increase ?? 0;
-                        $additional = $item->loan_additional_increase ?? 0;
-                        $totalInc   = $item->loan_total_increase      ?? ($internal + $unexpected + $additional);
-                        $decrease   = $item->loan_decrease            ?? 0;
-                        $editorial  = $item->loan_editorial           ?? 0;
+                        /////G -> N
+                        if ($request->filled('start_date') && $request->filled('end_date')) {
+                            // Current loan is already calculated by the SQL query
+                            $currentLoan = (float) $item->current_loan;
+                            // Recalculate values when a date range is selected
+                            $internal   = $item->loan_internal_increase ?? 0;
+                            $unexpected = $item->loan_unexpected_increase ?? 0;
+                            $additional = $item->loan_additional_increase ?? 0;
+                            $totalInc   = $item->loan_total_increase ?? ($internal + $unexpected + $additional);
+                            $decrease   = $item->loan_decrease ?? 0;
+                            $editorial  = $item->loan_editorial ?? 0;
+
+                            $newCreditStatus = $currentLoan
+                                + $totalInc
+                                - $decrease
+                                + $editorial;
+                        } else {
+
+                            // Use values from the database
+                            $currentLoan = (float) $item->current_loan;
+                            $internal        = $item->loan_internal_increase ?? 0;
+                            $unexpected      = $item->loan_unexpected_increase ?? 0;
+                            $additional      = $item->loan_additional_increase ?? 0;
+                            $totalInc        = $item->loan_total_increase ?? ($internal + $unexpected + $additional);
+                            $decrease        = $item->loan_decrease ?? 0;
+                            $editorial       = $item->loan_editorial ?? 0;
+                            $newCreditStatus = $item->new_credit_status;
+                        }
+                        $sheet->setCellValue("G{$row}", $currentLoan);
                         $sheet->setCellValue("H{$row}", $internal);
                         $sheet->setCellValue("I{$row}", $unexpected);
                         $sheet->setCellValue("J{$row}", $additional);
                         $sheet->setCellValue("K{$row}", $totalInc);
                         $sheet->setCellValue("L{$row}", $decrease);
                         $sheet->setCellValue("M{$row}", $editorial);
-                        $sheet->setCellValue("N{$row}", $item->new_credit_status);
-
+                        $sheet->setCellValue("N{$row}", $newCreditStatus);
+                        /////O -> Q
                         $totalBudget     = $item->budget;
                         $totalApply      = $item->apply;
 
@@ -202,7 +224,6 @@ class BeginguaranteeExport
                                 $applyValue = $totalBudget + $item->archived_last_month_budget;
                                 $earlyBalance = $item->deadline_balance - $applyValue;
                                 $deadlineBalance = $item->deadline_balance;
-                               
                             } else {
 
                                 $applyValue = 0;
@@ -213,28 +234,49 @@ class BeginguaranteeExport
                         $sheet->setCellValue("O{$row}", $earlyBalance);
                         $sheet->setCellValue("P{$row}", $applyValue);
                         $sheet->setCellValue("Q{$row}", $deadlineBalance);
-                        $sheet->setCellValue("R{$row}", $item->credit);
-                        $sheet->setCellValue("S{$row}", $item->law_average);
-                        $sheet->setCellValue("T{$row}", $item->law_correction);
+                        ////R -> T
+                        if ($request->filled('start_date') && $request->filled('end_date')) {
+
+                            $credit = $newCreditStatus - $deadlineBalance;
+
+                            $lawAverage = $item->fin_law != 0
+                                ? ($deadlineBalance / $item->fin_law) * 100
+                                : 0;
+
+                            $lawCorrection = $newCreditStatus != 0
+                                ? ($deadlineBalance / $newCreditStatus) * 100
+                                : 0;
+                        } else {
+
+                            $credit        = $item->credit;
+                            $lawAverage    = $item->law_average;
+                            $lawCorrection = $item->law_correction;
+                        }
+                        $sheet->setCellValue("R{$row}", $credit);
+                        $sheet->setCellValue("S{$row}", $lawAverage);
+                        $sheet->setCellValue("T{$row}", $lawCorrection);
+                        $sheet->getStyle("S{$row}:T{$row}")
+                            ->getNumberFormat()
+                            ->setFormatCode('0.00"%"');
                         $sheet->getStyle("S{$row}:T{$row}")
                             ->getNumberFormat()
                             ->setFormatCode('0.00"%"');
                         $values = [
-                            'fin_law'            => (float) $item->fin_law,
-                            'current_loan'       => (float) $item->current_loan,
-                            'internal_increase'  => (float) $internal,
-                            'unexpected_increase' => (float) $unexpected,
-                            'additional_increase' => (float) $additional,
-                            'total_increase'     => (float) $totalInc,
-                            'decrease'           => (float) $decrease,
-                            'editorial'          => (float) $editorial,
-                            'new_credit_status'  => (float) $item->new_credit_status,
-                            'early_balance'    =>  (float) $earlyBalance,
-                            'apply'            =>  (float) $applyValue,
-                            'deadline_balance' =>  (float) $deadlineBalance,
-                            'credit'             => (float) $item->credit,
-                            'law_average'        => (float) $item->law_average,
-                            'law_correction'     => (float) $item->law_correction,
+                            'fin_law'              => (float) $item->fin_law,
+                            'current_loan'         => (float) $currentLoan,
+                            'internal_increase'    => (float) $internal,
+                            'unexpected_increase'  => (float) $unexpected,
+                            'additional_increase'  => (float) $additional,
+                            'total_increase'       => (float) $totalInc,
+                            'decrease'             => (float) $decrease,
+                            'editorial'            => (float) $editorial,
+                            'new_credit_status'    => (float) $newCreditStatus,
+                            'early_balance'        => (float) $earlyBalance,
+                            'apply'                => (float) $applyValue,
+                            'deadline_balance'     => (float) $deadlineBalance,
+                            'credit'               => (float) $credit,
+                            'law_average'          => (float) $lawAverage,
+                            'law_correction'       => (float) $lawCorrection,
                         ];
 
                         $this->addToTotals($subTotals,     $values);
