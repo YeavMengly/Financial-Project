@@ -21,6 +21,7 @@ use App\Models\Content\Cluster;
 use App\Models\Content\ExpenseType;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
+use App\Models\Loans\BudgetMandateLoan;
 use App\Models\TaskType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1834,10 +1835,123 @@ class BudgetMandateController extends Controller
                     ) AS archived_last_month_budget
                     ";
 
+            // G -> N caculate by date
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+
+                $loanInternal = "
+                        MAX(
+                            CASE
+                                WHEN DATE(budget_mandate_loans.updated_at)
+                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+                                THEN budget_mandate_loans.internal_increase
+                                ELSE 0
+                            END
+                        ) AS loan_internal_increase
+                    ";
+
+                $loanUnexpected = "
+                        MAX(
+                            CASE
+                                WHEN DATE(budget_mandate_loans.updated_at)
+                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+                                THEN budget_mandate_loans.unexpected_increase
+                                ELSE 0
+                            END
+                        ) AS loan_unexpected_increase
+                    ";
+
+                $loanAdditional = "
+                        MAX(
+                            CASE
+                                WHEN DATE(budget_mandate_loans.updated_at)
+                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+                                THEN budget_mandate_loans.additional_increase
+                                ELSE 0
+                            END
+                        ) AS loan_additional_increase
+                    ";
+
+                $loanTotal = "
+                        MAX(
+                            CASE
+                                WHEN DATE(budget_mandate_loans.updated_at)
+                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+                                THEN budget_mandate_loans.total_increase
+                                ELSE 0
+                            END
+                        ) AS loan_total_increase
+                    ";
+
+                $loanDecrease = "
+                        MAX(
+                            CASE
+                                WHEN DATE(budget_mandate_loans.updated_at)
+                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+                                THEN budget_mandate_loans.decrease
+                                ELSE 0
+                            END
+                        ) AS loan_decrease
+                    ";
+
+                $loanEditorial = "
+                        MAX(
+                            CASE
+                                WHEN DATE(budget_mandate_loans.updated_at)
+                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+                                THEN budget_mandate_loans.editorial
+                                ELSE 0
+                            END
+                        ) AS loan_editorial
+                    ";
+            } else {
+                $loanInternal = "MAX(COALESCE(budget_mandate_loans.internal_increase,0)) AS loan_internal_increase";
+                $loanUnexpected = "MAX(COALESCE(budget_mandate_loans.unexpected_increase,0)) AS loan_unexpected_increase";
+                $loanAdditional = "MAX(COALESCE(budget_mandate_loans.additional_increase,0)) AS loan_additional_increase";
+                $loanTotal = "MAX(COALESCE(budget_mandate_loans.total_increase,0)) AS loan_total_increase";
+                $loanDecrease = "MAX(COALESCE(budget_mandate_loans.decrease,0)) AS loan_decrease";
+                $loanEditorial = "MAX(COALESCE(budget_mandate_loans.editorial,0)) AS loan_editorial";
+            }
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $currentLoan = "
+                    MAX(
+                        begin_mandates.current_loan
+
+                        + COALESCE((
+                            SELECT SUM(COALESCE(bml.total_increase,0))
+                            FROM budget_mandate_loans bml
+                            WHERE bml.no = begin_mandates.no
+                            AND bml.program_id = begin_mandates.program_id
+                            AND bml.account_sub_id = begin_mandates.account_sub_id
+                            AND DATE(bml.updated_at) < '{$request->start_date}'
+                        ),0)
+
+                        - COALESCE((
+                            SELECT SUM(COALESCE(bml.decrease,0))
+                            FROM budget_mandate_loans bml
+                            WHERE bml.no = begin_mandates.no
+                            AND bml.program_id = begin_mandates.program_id
+                            AND bml.account_sub_id = begin_mandates.account_sub_id
+                            AND DATE(bml.updated_at) < '{$request->start_date}'
+                        ),0)
+
+                        + COALESCE((
+                            SELECT SUM(COALESCE(bml.editorial,0))
+                            FROM budget_mandate_loans bml
+                            WHERE bml.no = begin_mandates.no
+                            AND bml.program_id = begin_mandates.program_id
+                            AND bml.account_sub_id = begin_mandates.account_sub_id
+                            AND DATE(bml.updated_at) < '{$request->start_date}'
+                        ),0)
+
+                    ) AS current_loan
+                    ";
+            } else {
+
+                $currentLoan = "MAX(begin_mandates.current_loan) AS current_loan";
+            }
             $query->select([
                 'budget_mandates.no as budget_no',
                 'begin_mandates.no as begin_no',
-
                 'begin_mandates.chapter_id',
                 'budget_mandates.program_id',
                 'budget_mandates.account_sub_id',
@@ -1846,30 +1960,25 @@ class BudgetMandateController extends Controller
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
                 'begin_mandates.deadline_balance',
-                'begin_mandates.current_loan',
                 'begin_mandates.early_balance',
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-
-                'budget_mandate_loans.internal_increase as loan_internal_increase',
-                'budget_mandate_loans.unexpected_increase as loan_unexpected_increase',
-                'budget_mandate_loans.additional_increase as loan_additional_increase',
-                'budget_mandate_loans.total_increase as loan_total_increase',
-                'budget_mandate_loans.decrease as loan_decrease',
-                'budget_mandate_loans.editorial as loan_editorial',
-
+                DB::raw($currentLoan),
+                DB::raw($loanInternal),
+                DB::raw($loanUnexpected),
+                DB::raw($loanAdditional),
+                DB::raw($loanTotal),
+                DB::raw($loanDecrease),
+                DB::raw($loanEditorial),
                 DB::raw('MAX(begin_mandates.apply) AS apply'),
                 DB::raw($budgetSum),
                 DB::raw('MAX(budget_mandates.transaction_date) AS transaction_date'),
-
                 DB::raw($earlyBudget),
                 DB::raw($lastMonthBudget),
-
                 DB::raw($archivedEarlyBudget),
                 DB::raw($archivedLastMonthBudget),
             ]);
-
             $query->groupBy(
                 'budget_mandates.no',
                 'begin_mandates.no',
@@ -1881,19 +1990,12 @@ class BudgetMandateController extends Controller
                 'begin_mandates.fin_law',
                 'begin_mandates.new_credit_status',
                 'begin_mandates.deadline_balance',
-                'begin_mandates.current_loan',
                 'begin_mandates.early_balance',
                 'begin_mandates.credit',
                 'begin_mandates.law_average',
                 'begin_mandates.law_correction',
-                'budget_mandate_loans.internal_increase',
-                'budget_mandate_loans.unexpected_increase',
-                'budget_mandate_loans.additional_increase',
-                'budget_mandate_loans.total_increase',
-                'budget_mandate_loans.decrease',
-                'budget_mandate_loans.editorial',
-
             );
+            $query->orderBy('budget_mandates.transaction_date');
             // === Filters (PREFIX table name!) ===
             // Account
             if ($request->filled('subAccountNumber')) {
