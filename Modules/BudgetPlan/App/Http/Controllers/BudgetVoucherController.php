@@ -263,11 +263,38 @@ class BudgetVoucherController extends Controller
         return response()->json($data);
     }
 
+    // public function getByExpenseIdPayment(Request $request)
+    // {
+    //     if ($request->expense_type_id) {
+
+    //         $data = BudgetMandate::select('id', 'legal_id', 'description')
+    //             ->where('expense_type_id', $request->expense_type_id)
+    //             ->where('is_archived', 1)
+    //             ->where('status', 'todo')
+    //             ->get();
+
+    //         $selectedId = $request->selected_id ?? null;
+
+    //         $html = '';
+
+    //         foreach ($data as $d) {
+
+    //             $selected = $selectedId == $d->legal_id ? 'selected' : '';
+
+    //             $html .= "<option value='{$d->legal_id}' {$selected}>{$d->legal_id}</option>";
+    //         }
+
+    //         return response($html);
+    //     }
+
+    //     return response('');
+    // }
+
     public function getByExpenseIdPayment(Request $request)
     {
         if ($request->expense_type_id) {
-
-            $data = BudgetMandate::select('id', 'legal_id')
+            // Ensure you include your legal name column here (assuming 'legal_name')
+            $data = BudgetMandate::select('id', 'legal_id', 'legal_name', 'description')
                 ->where('expense_type_id', $request->expense_type_id)
                 ->where('is_archived', 1)
                 ->where('status', 'todo')
@@ -275,19 +302,23 @@ class BudgetVoucherController extends Controller
 
             $selectedId = $request->selected_id ?? null;
 
-            $html = '';
+            // Map data directly into the format Choices.js expects
+            $options = $data->map(function ($d) use ($selectedId) {
+                return [
+                    'value' => $d->legal_id,
+                    'label' => $d->legal_id,
+                    'selected' => $selectedId == $d->legal_id, // Handles pre-selecting for viewing/editing
+                    'customProperties' => [
+                        'legal_name' => $d->legal_name,
+                        'description' => $d->description
+                    ]
+                ];
+            });
 
-            foreach ($data as $d) {
-
-                $selected = $selectedId == $d->legal_id ? 'selected' : '';
-
-                $html .= "<option value='{$d->legal_id}' {$selected}>{$d->legal_id}</option>";
-            }
-
-            return response($html);
+            return response()->json($options);
         }
 
-        return response('');
+        return response()->json([]);
     }
 
     public function editByExpenseId(Request $request)
@@ -967,7 +998,7 @@ class BudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->latest()->first();
 
-            $dataCheck = BudgetVoucher::where('legal_number', $validated['cboLegalNumber'])
+            $dataCheck = BudgetVoucher::where('legal_id', $validated['cboLegalId'])
                 ->where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])
                 ->where('program_sub_id', $validated['cboProgramSub'])
@@ -1258,7 +1289,7 @@ class BudgetVoucherController extends Controller
         $validated = $request->validate([
             'cboLegalNumber' =>   'nullable',
             'cboLegalId' =>  'required',
-            'cbotemporaryId' =>  'required',
+            'cbotemporaryId' =>  'nullable',
             'cbodayOfNumber' =>  'required',
             'legalName' =>  'required',
             'cboProgram'       => 'required',
@@ -1287,7 +1318,7 @@ class BudgetVoucherController extends Controller
                 ->where('program_id', $validated['cboProgram'])
                 ->where('program_sub_id', $validated['cboProgramSub'])
                 ->where('cluster_id', $validated['cboCluster'])
-                ->where('agency_id', $validated['cboAgency'])
+                // ->where('agency_id', $validated['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
@@ -1335,7 +1366,7 @@ class BudgetVoucherController extends Controller
                 // 'legal_number'    => $validated['cboLegalNumber'],
                 'legal_id'    => $validated['cboLegalId'],
                 'legal_name'    => $validated['legalName'],
-                'temporary_id'      => $validated['cbotemporaryId'],
+                'temporary_id'      => $validated['cbotemporaryId'] ?? null,
                 'day_of_number'      => $validated['cbodayOfNumber'],
                 // 'status' => 'done',
                 // 'is_archived' => 2,
@@ -1436,7 +1467,7 @@ class BudgetVoucherController extends Controller
         $voucher = BudgetVoucher::where('id', $id)
             ->where('ministry_id', $ministry->id)
             ->first();
-
+            
         $mandate = BudgetMandate::where('legal_id', $voucher->legal_id)
             ->where('account_sub_id', $voucher->account_sub_id)
             ->where('program_id', $voucher->program_id)

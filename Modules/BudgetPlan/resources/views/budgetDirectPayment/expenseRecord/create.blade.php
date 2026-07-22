@@ -7,7 +7,7 @@
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
-    
+
     <style>
         /* Optional: Turn border green when Pristine marks the form-group as valid */
         .has-success .form-control,
@@ -26,7 +26,8 @@
                 <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expense.record.book') }}</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.expense.record.book') }}</a></li>
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.expense.record.book') }}</a>
+                        </li>
                         <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                     </ol>
                 </div>
@@ -70,12 +71,12 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.payment.voucher') }}</label>
+                                        <label>{{ __('forms.th.code') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
                                             type="number" class="form-control"
-                                            placeholder="{{ __('forms.payment.voucher.number') }}" name="paymentVoucher"
+                                            placeholder="{{ __('forms.th.code') }}" name="paymentVoucher"
                                             tabindex="2" />
                                     </div>
                                 </div>
@@ -98,7 +99,8 @@
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($program as $p)
-                                                <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
+                                                <option value="{{ $p->id }}">
+                                                    {{ $p->no }}-{{ $p->title }}</option>
                                             @endforeach
                                         </select>
                                         @error('cboProgram')
@@ -160,7 +162,8 @@
                                         <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($accountSub as $bv)
-                                                <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
+                                                <option value="{{ $bv->no }}">
+                                                    {{ $bv->no }}-{{ $bv->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -203,9 +206,12 @@
                             </div>
 
                             <div class="d-flex flex-wrap gap-2">
-                                <button type="submit" class="btn btn-primary" id="insertToTableBtn">{{ __('buttons.save') }}</button>
-                                <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">{{ __('buttons.delete') }}</a>
-                                <a class="btn btn-dark" href="{{ route('budgetDirectPayment.expenseRecord.index', $params) }}">{{ __('buttons.back') }}</a>
+                                <button type="submit" class="btn btn-primary"
+                                    id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                                <a href="{{ url()->current() }}" class="btn btn-danger"
+                                    style="width: 80px;">{{ __('buttons.delete') }}</a>
+                                <a class="btn btn-dark"
+                                    href="{{ route('budgetDirectPayment.expenseRecord.index', $params) }}">{{ __('buttons.back') }}</a>
                             </div>
                         </form>
                     </div>
@@ -302,7 +308,8 @@
                     callbacks: {
                         onChange: function(contents) {
                             const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                            document.getElementById('vDescription').value = clean === '' ? '' : contents;
+                            document.getElementById('vDescription').value = clean === '' ? '' :
+                            contents;
                             pristine.validate(document.getElementById('vDescription'));
                         }
                     }
@@ -326,15 +333,23 @@
             let agencyChoices = new Choices('#cboAgency', defaultChoicesOpts);
             let subAccountChoices = new Choices('#cboSubAccount', defaultChoicesOpts);
 
-            const resetSelect = (selector) => $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            const resetSelect = (selector) => $(selector).html(
+                `<option value="">{{ __('forms.search...') }}</option>`);
             const resetChoices = (selector, instance) => {
                 instance.destroy();
                 return new Choices(selector, defaultChoicesOpts);
             };
 
-            const loadOptions = ({ url, data, targetSelect, instanceRefSetter }) => {
+            const loadOptions = ({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) => {
                 $.ajax({
-                    url, type: "GET", data,
+                    url,
+                    type: "GET",
+                    data,
                     success: function(html) {
                         $(targetSelect).html(html);
                         instanceRefSetter();
@@ -364,16 +379,22 @@
 
                 loadOptions({
                     url: "{{ route('budgetDirectPayment.expenseRecord.by.program_sub') }}",
-                    data: { program_id: programId },
+                    data: {
+                        program_id: programId
+                    },
                     targetSelect: '#cboProgramSub',
-                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub', programSubChoices)
+                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub',
+                        programSubChoices)
                 });
 
                 loadOptions({
                     url: "{{ route('budgetDirectPayment.expenseRecord.by.agency') }}",
-                    data: { program_id: programId },
+                    data: {
+                        program_id: programId
+                    },
                     targetSelect: '#cboAgency',
-                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency', agencyChoices)
+                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency',
+                        agencyChoices)
                 });
             });
 
@@ -385,9 +406,12 @@
 
                 loadOptions({
                     url: "{{ route('budgetDirectPayment.expenseRecord.by.cluster') }}",
-                    data: { program_sub_id: programSubId },
+                    data: {
+                        program_sub_id: programSubId
+                    },
                     targetSelect: '#cboCluster',
-                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster', clusterChoices)
+                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster',
+                        clusterChoices)
                 });
             });
 
@@ -395,9 +419,16 @@
             // 6. EARLY BALANCE & CREDIT CALCULATIONS
             // ==========================================
             const n = v => (isNaN(+v) ? 0 : +v);
-            const fmt = v => n(v).toLocaleString('en-US', { maximumFractionDigits: 2 });
-            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = fmt(val); };
-            const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying', 'remaining_credit'].forEach(id => setText(id, 0));
+            const fmt = v => n(v).toLocaleString('en-US', {
+                maximumFractionDigits: 2
+            });
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = fmt(val);
+            };
+            const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
+                'deadline_balance', 'applying', 'remaining_credit'
+            ].forEach(id => setText(id, 0));
 
             const budgetInput = document.getElementById('budget');
             const recomputeRemaining = () => {
@@ -419,14 +450,20 @@
                     return;
                 }
 
-                const url = new URL("{{ route('budgetDirectPayment.expenseRecord.getEarlyBalance', ['params' => $params]) }}", window.location.origin);
+                const url = new URL(
+                    "{{ route('budgetDirectPayment.expenseRecord.getEarlyBalance', ['params' => $params]) }}",
+                    window.location.origin);
                 url.searchParams.set('program_id', programId);
                 url.searchParams.set('program_sub_id', programSubId);
                 url.searchParams.set('cluster_id', clusterId);
                 url.searchParams.set('account_sub_id', accountSubId);
 
                 try {
-                    const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
                     const data = await res.json();
                     setText('fin_law', data.fin_law);
                     setText('credit_movement', data.credit_movement);
@@ -453,7 +490,8 @@
 
                 // Force Summernote sync just in case
                 if ($('#vDescription').length) {
-                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $('#vDescription').summernote('code');
+                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
+                        '#vDescription').summernote('code');
                     document.getElementById('vDescription').value = summernoteContent;
                 }
 
@@ -465,7 +503,10 @@
                 } else {
                     const firstError = form.querySelector('.has-danger');
                     if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                     }
                 }
             });

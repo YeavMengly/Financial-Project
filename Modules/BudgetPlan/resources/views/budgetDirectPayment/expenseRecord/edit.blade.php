@@ -61,12 +61,12 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.payment.voucher') }}</label>
+                                        <label>{{ __('forms.th.code') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
                                             value="{{ old('paymentVoucher', $module->payment_voucher_number) }}"
-                                            class="form-control" placeholder="{{ __('forms.payment.voucher.number') }}"
+                                            class="form-control" placeholder="{{ __('forms.th.code') }}"
                                             name="paymentVoucher" tabindex="2" />
                                     </div>
                                 </div>

@@ -149,7 +149,18 @@
                                 @endif
                             </ul>
                         </li>
-
+                        {{-- @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
+                            <li>
+                                <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
+                                    class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
+                                    <i data-feather="file-plus"></i>
+                                    <span data-key="t-budget-control-voucher">
+                                        {{ __('menus.payment.deadline') }}
+                                
+                                    </span>
+                                </a>
+                            </li>
+                        @endif --}}
                     </ul>
                 </li>
 
