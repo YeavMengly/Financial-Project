@@ -74,7 +74,7 @@
                                         value="{{ old('legalName', $module->legal_name) }}" tabindex="2" />
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-md-6">
+                            {{-- <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.temporary.id') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
@@ -83,6 +83,32 @@
                                         value="{{ old('cbotemporaryId', $module->temporary_id) }}" type="number"
                                         class="form-control" placeholder="{{ __('forms.temporary.id') }}"
                                         name="cbotemporaryId" tabindex="2" />
+                                </div>
+                            </div> --}}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="cbotemporaryId"
+                                            class="form-label mb-0">{{ __('forms.temporary.id') }}</label>
+                                        <!-- Modern Skip Switch -->
+                                        <div class="form-check form-switch mb-0">
+                                            <!-- If the value from DB or old input is 0, check the toggle automatically -->
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="skipCboTemporaryId" style="cursor: pointer;"
+                                                {{ old('cbotemporaryId', $module->temporary_id) == '0' ? 'checked' : '' }}>
+                                            <label class="form-check-label font-size-12 text-muted" for="skipCboTemporaryId"
+                                                style="cursor: pointer;">
+                                                រំលង / មិនបញ្ចូល
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- Note: I added id="cbotemporaryId" here to map with your JS -->
+                                    <input required id="cbotemporaryId" name="cbotemporaryId" type="number"
+                                        class="form-control" data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
+                                        value="{{ old('cbotemporaryId', $module->temporary_id) }}" min="0"
+                                        placeholder="{{ __('forms.temporary.id') }}" tabindex="2" />
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-6">
@@ -1121,6 +1147,207 @@
             $('#cboExpenseType').on('change', function() {
                 loadLegalId($(this).val());
             });
+
+        });
+
+        // 1. Register the field
+        // setupSkipToggle('skipCboTemporaryId', 'cbotemporaryId', '0');
+
+        // // 2. FORCE TRIGGER ON PAGE LOAD (For Edit View)
+        // // This checks if Laravel rendered the checkbox as 'checked', and applies the green/disabled styles instantly
+        // const setupSkipToggle = (checkboxId, inputId, skippedValue = '0') => {
+        //     const checkbox = document.getElementById(checkboxId);
+        //     const input = document.getElementById(inputId);
+        //     if (!checkbox || !input) return;
+
+        //     const formGroup = input.closest('.form-group');
+
+        //     // Cache original validation messages
+        //     const origReqMsg = input.getAttribute('data-pristine-required-message') || "{{ __('messages.required') }}";
+        //     const origMinMsg = input.getAttribute('data-pristine-min-message');
+        //     const origIntMsg = input.getAttribute('data-pristine-integer-message');
+
+        //     const toggleState = () => {
+        //         if (checkbox.checked) {
+        //             // ==========================================
+        //             // TRUE: Green, Not Required, Can Submit
+        //             // ==========================================
+        //             input.value = skippedValue;
+        //             input.readOnly = true;
+        //             input.disabled = false; // MUST be false so the '0' sends to the server!
+
+        //             // Apply Green Styling
+        //             input.style.setProperty('background-color', '#d1e7dd', 'important');
+        //             input.style.setProperty('border-color', '#198754', 'important');
+        //             input.style.setProperty('color', '#0f5132', 'important');
+
+        //             // Strip validation rules completely
+        //             input.required = false;
+        //             input.removeAttribute('required');
+        //             input.removeAttribute('min');
+        //             input.removeAttribute('data-pristine-required-message');
+        //             input.removeAttribute('data-pristine-min-message');
+        //             input.removeAttribute('data-pristine-integer-message');
+
+        //             // Force clear Pristine errors
+        //             if (typeof pristine !== 'undefined') {
+        //                 pristine.reset(input);
+        //             }
+        //             if (formGroup) {
+        //                 formGroup.classList.remove('has-danger', 'has-success');
+        //                 const errorHelp = formGroup.querySelector('.pristine-error');
+        //                 if (errorHelp) errorHelp.style.display = 'none';
+        //             }
+        //         } else {
+        //             // ==========================================
+        //             // FALSE: Normal, Required, Cannot Submit if empty
+        //             // ==========================================
+        //             if (input.value === skippedValue) {
+        //                 input.value = ''; // Clear so user has to type
+        //             }
+
+        //             input.readOnly = false;
+        //             input.disabled = false;
+
+        //             // Remove Green Styling
+        //             input.style.removeProperty('background-color');
+        //             input.style.removeProperty('border-color');
+        //             input.style.removeProperty('color');
+
+        //             // Restore validation rules (Blocks Submit)
+        //             input.required = true;
+        //             input.setAttribute('required', 'true');
+        //             input.setAttribute('min', '1');
+        //             input.setAttribute('data-pristine-required-message', origReqMsg);
+        //             if (origMinMsg) input.setAttribute('data-pristine-min-message', origMinMsg);
+        //             if (origIntMsg) input.setAttribute('data-pristine-integer-message', origIntMsg);
+
+        //             // Restore error display capability
+        //             if (formGroup) {
+        //                 const errorHelp = formGroup.querySelector('.pristine-error');
+        //                 if (errorHelp) errorHelp.style.display = '';
+        //             }
+        //         }
+
+        //         // Re-initialize Pristine to recognize the changes
+        //         if (typeof refreshPristine === 'function') {
+        //             refreshPristine();
+        //         }
+        //     };
+
+        //     // 1. Listen for user clicking the switch
+        //     checkbox.addEventListener('change', toggleState);
+
+        //     // 2. Run immediately on page load (Crucial for Edit view)
+        //     toggleState();
+        // };
+
+        // // Initialize your fields:
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     setupSkipToggle('skipCboTemporaryId', 'cbotemporaryId', '0');
+        //     // setupSkipToggle('skipDayNumber', 'cbodayOfNumber', '0'); 
+        // });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // 1. FIRST, DEFINE THE FUNCTION
+            const setupSkipToggle = (checkboxId, inputId, skippedValue = '0') => {
+                const checkbox = document.getElementById(checkboxId);
+                const input = document.getElementById(inputId);
+                if (!checkbox || !input) return;
+
+                const formGroup = input.closest('.form-group');
+
+                // Cache original validation messages & rules
+                const origReqMsg = input.getAttribute('data-pristine-required-message') ||
+                    "{{ __('messages.required') }}";
+                const origMinMsg = input.getAttribute('data-pristine-min-message') ||
+                "លំដាប់ ត្រូវតែធំជាងសូន្យ";
+                const origIntMsg = input.getAttribute('data-pristine-integer-message') || "លំដាប់ ត្រូវតែលេខ";
+
+                // Cache the original min value (which is '1')
+                const origMin = input.getAttribute('min') || "0";
+
+                const toggleState = () => {
+                    if (checkbox.checked) {
+                        // ==========================================
+                        // TRUE: Green, Not Required, CAN SUBMIT
+                        // ==========================================
+                        input.value = skippedValue; // Sets value to '0'
+                        input.readOnly = true;
+                        input.disabled = false; // MUST be false to send '0' to server
+
+                        // Apply Green Styling
+                        input.style.setProperty('background-color', '#d1e7dd', 'important');
+                        input.style.setProperty('border-color', '#198754', 'important');
+                        input.style.setProperty('color', '#0f5132', 'important');
+
+                        // Completely STRIP rules so validation passes and allows submit
+                        input.required = false;
+                        input.removeAttribute('required');
+                        input.removeAttribute('min'); // Removes min="1" so '0' is accepted!
+                        input.removeAttribute('data-pristine-required-message');
+                        input.removeAttribute('data-pristine-min-message');
+                        input.removeAttribute('data-pristine-integer-message');
+
+                        // Force clear Pristine errors visually
+                        if (typeof pristine !== 'undefined') {
+                            pristine.reset(input);
+                        }
+                        if (formGroup) {
+                            formGroup.classList.remove('has-danger', 'has-success');
+                            const errorHelp = formGroup.querySelector('.pristine-error');
+                            if (errorHelp) errorHelp.style.display = 'none';
+                        }
+                    } else {
+                        // ==========================================
+                        // FALSE: Normal, Required, CANNOT SUBMIT if empty
+                        // ==========================================
+                        if (input.value === skippedValue) {
+                            input.value = ''; // Clear so user has to type
+                        }
+
+                        input.readOnly = false;
+                        input.disabled = false;
+
+                        // Remove Green Styling
+                        input.style.removeProperty('background-color');
+                        input.style.removeProperty('border-color');
+                        input.style.removeProperty('color');
+
+                        // RESTORE rules so it blocks submit if empty
+                        input.required = true;
+                        input.setAttribute('required', 'required');
+                        input.setAttribute('min', origMin); // Restores min="1"
+                        input.setAttribute('data-pristine-required-message', origReqMsg);
+                        input.setAttribute('data-pristine-min-message', origMinMsg);
+                        input.setAttribute('data-pristine-integer-message', origIntMsg);
+
+                        // Restore error display capability
+                        if (formGroup) {
+                            const errorHelp = formGroup.querySelector('.pristine-error');
+                            if (errorHelp) errorHelp.style.display = '';
+                        }
+                    }
+
+                    // Re-initialize Pristine so it learns that the rules have changed
+                    if (typeof refreshPristine === 'function') {
+                        refreshPristine();
+                    }
+                };
+
+                // Listen for user clicking the switch
+                checkbox.addEventListener('change', toggleState);
+
+                // Run immediately on page load (Crucial for Edit view)
+                toggleState();
+            };
+
+            // 2. NOW CALL THE FUNCTION (After it has been defined)
+            setupSkipToggle('skipCboTemporaryId', 'cbotemporaryId', '0');
+            // setupSkipToggle('skipDayNumber', 'cbodayOfNumber', '0'); 
 
         });
     </script>
