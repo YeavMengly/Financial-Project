@@ -47,6 +47,7 @@ return [
   'th.name.en' => 'ឈ្មោះ (អង់គ្លេស)',
 
   'th.budget' => 'ថវិកា',
+  'th.voucher.budgeted' => 'ថវិកាបញ្ជាក់(បានទូទាត់)',
   'th.type' => 'ប្រភេទ',
   'th.date' => 'កាលបរិច្ឆេទ',
   'th.date.transaction' => 'កាលបរិច្ឆេទកិច្ចបញ្ជីការ',
