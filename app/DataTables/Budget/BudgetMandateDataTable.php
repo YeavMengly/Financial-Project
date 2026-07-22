@@ -32,6 +32,9 @@ class BudgetMandateDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0) . ' ៛';
             })
+            ->editColumn('voucher_budget', function ($row) {
+                return number_format($row->voucher_budget ?? 0) . ' ៛';
+            })
             ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
 
