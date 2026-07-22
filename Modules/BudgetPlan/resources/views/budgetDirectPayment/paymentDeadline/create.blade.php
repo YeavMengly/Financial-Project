@@ -2,8 +2,11 @@
 @section('css')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- preloader css -->
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
@@ -88,7 +91,7 @@
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboLegalId" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.legal.id') }}
+                                            {{ __('forms.th.code') }}
                                         </label>
                                         <select id="cboLegalId" class="form-select" name="cboLegalId" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
@@ -327,9 +330,9 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script src="{{ asset('assets/libs/summernote/summernote.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
-    <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
+    <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -369,8 +372,8 @@
                     altFormat: 'd/m/Y',
                     allowInput: true,
                     defaultDate: el.value || null,
-                    onChange: () => pristine.validate(el),
-                    onClose: () => pristine.validate(el)
+                    onChange: (dates, str, inst) => pristine.validate(inst.element),
+                    onClose: (dates, str, inst) => pristine.validate(inst.element)
                 });
             };
             initFlatpickr('transactionDate');
@@ -445,30 +448,107 @@
             // ==========================================
             // 5. AJAX CASCADING DROPDOWNS
             // ==========================================
-            $('#cboExpenseType').on('change', function() {
-                const expenseTypeId = $(this).val();
-                cboLegalChoices.clearStore();
-                cboLegalChoices.clearChoices();
-                if (!expenseTypeId) return;
+            // $('#cboExpenseType').on('change', function() {
+            //     const expenseTypeId = $(this).val();
+            //     cboLegalChoices.clearStore();
+            //     cboLegalChoices.clearChoices();
+            //     if (!expenseTypeId) return;
 
-                $.ajax({
-                    url: "{{ route('budgetDirectPayment.paymentDeadline.get.expense_type_id') }}",
-                    type: 'GET',
-                    data: {
-                        expense_type_id: expenseTypeId
-                    },
-                    success: function(data) {
-                        let options = [];
-                        $(data).filter('option').each(function() {
-                            options.push({
-                                value: $(this).val(),
-                                label: $(this).text()
-                            });
-                        });
-                        cboLegalChoices.clearChoices();
-                        cboLegalChoices.setChoices(options, 'value', 'label', true);
+            //     $.ajax({
+            //         url: "{{ route('budgetDirectPayment.paymentDeadline.get.expense_type_id') }}",
+            //         type: 'GET',
+            //         data: {
+            //             expense_type_id: expenseTypeId
+            //         },
+            //         success: function(data) {
+            //             let options = [];
+            //             $(data).filter('option').each(function() {
+            //                 options.push({
+            //                     value: $(this).val(),
+            //                     label: $(this).text()
+            //                 });
+            //             });
+            //             cboLegalChoices.clearChoices();
+            //             cboLegalChoices.setChoices(options, 'value', 'label', true);
+            //         }
+            //     });
+            // });
+
+            $(document).ready(function() {
+
+                // ==========================================
+                // 1. AJAX CASCADING DROPDOWNS (Expense -> Legal ID)
+                // ==========================================
+                $('#cboExpenseType').on('change', function(e, preSelectedLegalId = null) {
+                    const expenseTypeId = $(this).val();
+
+                    cboLegalChoices.clearStore();
+                    cboLegalChoices.clearChoices();
+
+                    // Clear the text fields if expense type is cleared
+                    $('input[name="legalName"]').val('');
+                    $('#vDescription').summernote('code', '');
+
+                    if (!expenseTypeId) return;
+
+                    $.ajax({
+                        url: "{{ route('budgetDirectPayment.paymentDeadline.get.expense_type_id') }}",
+                        type: 'GET',
+                        data: {
+                            expense_type_id: expenseTypeId,
+                            selected_id: preSelectedLegalId
+                        },
+                        success: function(data) {
+                            // Pass the JSON data directly into Choices.js
+                            cboLegalChoices.setChoices(data, 'value', 'label', true);
+
+                            // If we passed a pre-selected ID (Viewing mode), trigger the Legal ID change to populate text fields
+                            if (preSelectedLegalId) {
+                                $('#cboLegalId').trigger('change');
+                            }
+                        }
+                    });
+                });
+
+                // ==========================================
+                // 2. AUTO-FILL FIELDS ON LEGAL ID SELECTION
+                // ==========================================
+                $('#cboLegalId').on('change', function() {
+                    const selectedChoice = cboLegalChoices.getValue();
+
+                    if (selectedChoice && selectedChoice.customProperties) {
+                        // Standard input uses .val()
+                        $('input[name="legalName"]').val(selectedChoice.customProperties
+                            .legal_name);
+
+                        // Summernote uses the 'code' method to set content
+                        $('#vDescription').summernote('code', selectedChoice.customProperties
+                            .description || '');
+                    } else {
+                        // Clear fields if nothing is selected
+                        $('input[name="legalName"]').val('');
+                        $('#vDescription').summernote('code', '');
+                    }
+
+                    // (Optional) Trigger Pristine validation manually if it doesn't fire automatically
+                    if (typeof pristine !== 'undefined') {
+                        pristine.validate(document.getElementById('vDescription'));
                     }
                 });
+
+                // ==========================================
+                // 3. CHECK VIEWING / EDITING ON PAGE LOAD
+                // ==========================================
+                // Check if there is already an expense type selected when the page loads
+                const initialExpenseTypeId = $('#cboExpenseType').val();
+
+                // Pass the existing Legal ID from your Blade template if it exists
+                const initialLegalId = "{{ $existingLegalId ?? '' }}";
+
+                if (initialExpenseTypeId) {
+                    // Trigger the cascade and pass the ID that needs to be selected
+                    $('#cboExpenseType').trigger('change', [initialLegalId]);
+                }
             });
 
             $('#cboProgram').on('change', function() {
@@ -596,11 +676,16 @@
             if (skipCboTempCheckbox && cboTempIdInput) {
                 const handleSkipToggle = () => {
                     const formGroup = cboTempIdInput.closest('.form-group');
+
                     if (skipCboTempCheckbox.checked) {
                         cboTempIdInput.value = '';
                         cboTempIdInput.disabled = true;
                         cboTempIdInput.readOnly = true;
-                        cboTempIdInput.classList.add('bg-light', 'text-muted');
+
+                        // Make the field green
+                        cboTempIdInput.style.backgroundColor = '#d1e7dd'; // Light green background
+                        cboTempIdInput.style.borderColor = '#198754'; // Green border
+                        cboTempIdInput.classList.remove('bg-light', 'text-muted');
 
                         cboTempIdInput.removeAttribute('required');
                         cboTempIdInput.removeAttribute('min');
@@ -618,7 +703,10 @@
                         }
                         cboTempIdInput.disabled = false;
                         cboTempIdInput.readOnly = false;
-                        cboTempIdInput.classList.remove('bg-light', 'text-muted');
+
+                        // Remove the green color to restore default
+                        cboTempIdInput.style.backgroundColor = '';
+                        cboTempIdInput.style.borderColor = '';
 
                         cboTempIdInput.setAttribute('required', 'true');
                         cboTempIdInput.setAttribute('min', '1');
@@ -627,6 +715,7 @@
                         cboTempIdInput.setAttribute('data-pristine-min-message', 'លំដាប់ ត្រូវតែធំជាងសូន្យ');
                         cboTempIdInput.setAttribute('data-pristine-integer-message', 'លំដាប់ ត្រូវតែលេខ');
                     }
+
                     refreshPristine();
 
                     // Ensure clean neutral state after Pristine re-initializes
