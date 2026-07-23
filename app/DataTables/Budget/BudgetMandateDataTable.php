@@ -159,7 +159,7 @@ class BudgetMandateDataTable extends DataTable
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_mandates.expense_type_id', '=', 'expense_types.id');
-        $model->leftJoin('budget_vouchers', 'budget_mandates.payment_voucher_number', '=', 'budget_vouchers.payment_voucher_number');
+        $model->leftJoin('budget_vouchers', 'budget_mandates.legal_id', '=', 'budget_vouchers.legal_id');
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);

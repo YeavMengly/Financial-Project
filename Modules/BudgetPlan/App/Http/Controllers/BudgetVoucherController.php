@@ -787,6 +787,7 @@ class BudgetVoucherController extends Controller
                 'no'             => $beginVoucher->no,
                 'budget'         => $applyValue,
                 'expense_type_id'      => $validated['cboExpenseType'],
+                'legal_id'      => $budgetMandate->legal_id,
                 'legal_name'      => $validated['legalName'],
                 'temporary_id'      => $validated['cbotemporaryId'] ?? null,
                 'payment_voucher_number'      => $validated['cboPaymentVoucherNumber'],
@@ -1467,7 +1468,7 @@ class BudgetVoucherController extends Controller
         $voucher = BudgetVoucher::where('id', $id)
             ->where('ministry_id', $ministry->id)
             ->first();
-            
+
         $mandate = BudgetMandate::where('legal_id', $voucher->legal_id)
             ->where('account_sub_id', $voucher->account_sub_id)
             ->where('program_id', $voucher->program_id)
