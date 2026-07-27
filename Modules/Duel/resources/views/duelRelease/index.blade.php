@@ -58,6 +58,13 @@
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboNumber">{{ __('menus.receipt.number') }}</label>
+                            <input type="text" id="cboNumber" name="cboNumber" class="form-control"
+                                placeholder="{{ __('menus.receipt.number') }}" value="{{ request('cboNumber') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 
                             {{-- Search --}}
@@ -177,6 +184,12 @@
 
             $('#duelrelease-table').DataTable().ajax.reload();
         });
+    </script>
+    <script>
+        $('#cboNumber, #start_date, #end_date').on('change keyup',
+            function() {
+                $('#duelrelease-table').DataTable().ajax.reload();
+            });
     </script>
 
     {!! $dataTable->scripts() !!}

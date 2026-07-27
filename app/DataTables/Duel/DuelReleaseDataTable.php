@@ -95,6 +95,10 @@ class DuelReleaseDataTable extends DataTable
             $model->whereDate('duel_releases.date_release', '<=', $end);
         }
 
+        if ($request->filled('cboNumber')) {
+            $model->where('duel_releases.receipt_number', $request->cboNumber);
+        }
+
         $model->get();
 
         $model->select([
@@ -131,6 +135,19 @@ class DuelReleaseDataTable extends DataTable
         return $this->builder()
             ->setTableId('duelrelease-table')
             ->columns($this->getColumns())
+            ->ajax([
+                'data' => 'function(d) {
+                d.cboNumber = $("#cboNumber").val();
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
+                }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#duelrelease-table").DataTable().ajax.reload();
+                });
+            }')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
