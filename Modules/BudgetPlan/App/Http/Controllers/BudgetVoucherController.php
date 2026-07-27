@@ -1840,8 +1840,6 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.chapter_id',
                 'budget_vouchers.program_id',
                 'budget_vouchers.account_sub_id',
-                'budget_vouchers.payment_voucher_number',
-                'budget_vouchers.day_of_number',
                 'begin_vouchers.account_id',
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
@@ -1870,8 +1868,6 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.chapter_id',
                 'budget_vouchers.program_id',
                 'budget_vouchers.account_sub_id',
-                'budget_vouchers.payment_voucher_number',
-                'budget_vouchers.day_of_number',
                 'begin_vouchers.account_id',
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
@@ -1935,7 +1931,7 @@ class BudgetVoucherController extends Controller
                 $query->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
             }
             $data = $query->get();
-
+ 
             Log::info('Exported BeginVoucher Count', [
                 'ministry_id' => $ministryId,
                 'count'       => $data->count(),
