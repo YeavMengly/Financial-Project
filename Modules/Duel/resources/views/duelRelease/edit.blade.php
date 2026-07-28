@@ -108,7 +108,7 @@
                                                     {{ __('forms.agency') }}
                                                 </label>
                                                 <select class="form-control" data-trigger id="dropAgency" name="agency"
-                                                    required
+                                                    {{-- required --}}
                                                     data-pristine-required-message="{{ __('messages.required') }}">
                                                     <option value="">{{ __('forms.search...') }}</option>
                                                     @foreach ($agency as $item)
@@ -256,7 +256,7 @@
             });
         }
     </script>
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dropStockNumber = document.getElementById('dropStockNumber');
             const dropStockNumberChoice = new Choices(dropStockNumber, {
@@ -315,6 +315,75 @@
         });
 
         // ✅ On edit: auto trigger change once if value exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const stockSelect = document.getElementById('dropStockNumber');
+            if (stockSelect && stockSelect.value) {
+                $('#dropStockNumber').trigger('change');
+            }
+        });
+    </script> --}}
+    <script>
+        // 1. Declare globally at the top of your scripts
+        let programSubChoices = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropStockNumber = document.getElementById('dropStockNumber');
+            new Choices(dropStockNumber, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+
+            const dropAgency = document.getElementById('dropAgency');
+            new Choices(dropAgency, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+
+            // 2. Assign to the global variable instead of a local const
+            const cboDuel = document.getElementById('cboDuel');
+            if (cboDuel) {
+                programSubChoices = new Choices(cboDuel, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
+        });
+
+        $('#dropStockNumber').change(function() {
+            var id = $(this).val();
+            $.ajax({
+                url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
+                type: 'get',
+                data: {
+                    stock_number: id
+                },
+                success: function(data) {
+                    // 3. Now safely destroy the previous Choices instance
+                    if (programSubChoices) {
+                        programSubChoices.destroy();
+                    }
+                    $('#cboDuel').html(data);
+                    programSubChoices = new Choices('#cboDuel', {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: "ស្វែងរក...",
+                        shouldSort: false
+                    });
+                }
+            });
+        });
+
+        // Auto trigger change once on edit
         document.addEventListener('DOMContentLoaded', function() {
             const stockSelect = document.getElementById('dropStockNumber');
             if (stockSelect && stockSelect.value) {

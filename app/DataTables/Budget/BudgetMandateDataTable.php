@@ -159,7 +159,7 @@ class BudgetMandateDataTable extends DataTable
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_mandates.expense_type_id', '=', 'expense_types.id');
-        $model->leftJoin('budget_vouchers', 'budget_mandates.legal_id', '=', 'budget_vouchers.legal_id');
+        // $model->leftJoin('budget_vouchers', 'budget_mandates.payment_voucher_number', '=', 'budget_vouchers.payment_voucher_number');
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
@@ -189,7 +189,7 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.legal_date',
             'budget_mandates.created_at',
             'budget_mandates.deleted_at',
-            'budget_vouchers.budget AS voucher_budget',
+            // 'budget_vouchers.budget AS voucher_budget',
         ]);
 
         $model->orderByDesc('budget_mandates.created_at');
@@ -243,7 +243,7 @@ class BudgetMandateDataTable extends DataTable
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            Column::make('voucher_budget')->title(__('tables.th.voucher.budgeted'))->width(80)->addClass('align-middle'),
+            // Column::make('voucher_budget')->title(__('tables.th.voucher.budgeted'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
