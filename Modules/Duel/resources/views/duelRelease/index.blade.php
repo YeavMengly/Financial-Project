@@ -65,6 +65,42 @@
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboUserRequest">{{ __('menus.user.request') }}</label>
+                            <input type="text" id="cboUserRequest" name="cboUserRequest" class="form-control"
+                                placeholder="{{ __('menus.user.request') }}" value="{{ request('cboUserRequest') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboDuelType">{{ __('menus.item.name') }}</label>
+                            <select id="cboDuelType" name="cboDuelType" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">{{ __('menus.item.name') }}</option>
+                                @foreach ($duelType as $type)
+                                    <option value="{{ $type->id }}"
+                                        {{ request('cboDuelType') == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name_km }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden"
+                                for="cboExecutiveUnit">{{ __('menus.content.agency.executive.unit') }}</label>
+                            <select id="cboExecutiveUnit" name="cboExecutiveUnit" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">{{ __('menus.content.agency.executive.unit') }}</option>
+                                @foreach ($executiveUnits as $executiveUnit)
+                                    <option value="{{ $executiveUnit->id }}"
+                                        {{ request('cboExecutiveUnit') == $executiveUnit->id ? 'selected' : '' }}>
+                                        {{ $executiveUnit->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 
                             {{-- Search --}}
@@ -186,7 +222,7 @@
         });
     </script>
     <script>
-        $('#cboNumber, #start_date, #end_date').on('change keyup',
+        $('#cboNumber, #cboUserRequest, #cboDuelType, #cboExecutiveUnit, #start_date, #end_date').on('change keyup',
             function() {
                 $('#duelrelease-table').DataTable().ajax.reload();
             });

@@ -99,6 +99,18 @@ class DuelReleaseDataTable extends DataTable
             $model->where('duel_releases.receipt_number', $request->cboNumber);
         }
 
+        if ($request->filled('cboUserRequest')) {
+            $model->where('duel_releases.user_request', $request->cboUserRequest);
+        }
+
+        if ($request->filled('cboDuelType')) {
+            $model->where('duel_releases.item_name', $request->cboDuelType);
+        }
+        if ($request->filled('cboExecutiveUnit')) {
+            $model->where('duel_releases.executive_unit', $request->cboExecutiveUnit);
+        }
+
+
         $model->get();
 
         $model->select([
@@ -140,6 +152,9 @@ class DuelReleaseDataTable extends DataTable
                 d.cboNumber = $("#cboNumber").val();
                 d.start_date = $("#start_date").val();
                 d.end_date = $("#end_date").val();
+                d.cboUserRequest = $("#cboUserRequest").val();
+                d.cboDuelType = $("#cboDuelType").val();
+                d.cboExecutiveUnit = $("#cboExecutiveUnit").val();
                 }',
             ])
             ->initComplete('function () {
