@@ -61,6 +61,7 @@
                                 <option value="1">ជ្រើសរើស ស្ថានភាព</option>
                                 <option value="2">ធានាចំណាយ</option>
                                 <option value="3">បុរេប្រទាន</option>
+                                <option value="4">ទូទាត់ត្រង់</option>
                             </select>
                         </div>
 
@@ -238,7 +239,28 @@
                 shouldSort: false
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('CboPaymentVoucherNumber');
 
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Submit the form
+                    this.form.submit();
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('CboMandate');
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Submit the form
+                    this.form.submit();
+                }
+            });
+        });
         document.addEventListener('DOMContentLoaded', function() {
             const taskTypeSelect = document.getElementById('cboExpenseType');
             const taskTypeChoices = new Choices(taskTypeSelect, {
@@ -282,6 +304,8 @@
             let params = new URLSearchParams({
                 cboExpenseType: $('#cboExpenseType').val(),
                 cboAccountSub: $('#cboAccountSub').val(),
+                CboPaymentVoucherNumber: $('#CboPaymentVoucherNumber').val(),
+                CboMandate: $('#CboMandate').val(),
                 no: $('#no').val(),
                 cboTodo: $('#cboTodo').val(),
                 cboStatus: $('#cboStatus').val(),
@@ -294,9 +318,10 @@
         });
     </script>
     <script>
-        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboPaymentVoucherNumber, #CboMandate, #start_date, #end_date').on('change keyup',
-            function() {
-                $('#budgetvoucher-table').DataTable().ajax.reload();
-            });
+        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboPaymentVoucherNumber, #CboMandate, #start_date, #end_date')
+            .on('change keyup',
+                function() {
+                    $('#budgetvoucher-table').DataTable().ajax.reload();
+                });
     </script>
 @endsection

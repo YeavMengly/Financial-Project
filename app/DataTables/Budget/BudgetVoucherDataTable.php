@@ -124,10 +124,8 @@ class BudgetVoucherDataTable extends DataTable
         if ($request->cboAccountSub) {
             $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
         }
-        if ($request->filled('CboPaymentVoucherNumber')) {
-            $model->where(
-                'budget_vouchers.payment_voucher_number',
-                $request->CboPaymentVoucherNumber
+        if ($request->CboPaymentVoucherNumber) {
+            $model->where('budget_vouchers.payment_voucher_number', $request->CboPaymentVoucherNumber
             );
         }
         if ($request->filled('CboMandate')) {
@@ -160,17 +158,17 @@ class BudgetVoucherDataTable extends DataTable
 
 
         if ($request->filled('cboExpenseType')) {
-            $expenseType = intval($request->cboExpenseType); // ensure integer
 
-            if ($expenseType === 2) {
-                $model->where('budget_vouchers.expense_type_id', 1);
-            } elseif ($expenseType === 3) {
-                $model->where('budget_vouchers.expense_type_id', 2);
-            } elseif ($expenseType === 1) {
-                // Only filter if the value is positive and valid
-                $model->where('budget_vouchers.expense_type_id', $expenseType);
+            $expenseType = (int) $request->cboExpenseType;
+
+            if ($expenseType > 1) {
+                // 2 -> expense_type_id = 1
+                // 3 -> expense_type_id = 2
+                // 4 -> expense_type_id = 3
+                $model->where('budget_vouchers.expense_type_id', $expenseType - 1);
             }
-            // If $expenseType <= 0, skip filtering
+
+            // expenseType == 1 -> no filter (show all)
         }
 
         // ===== FIXED CONDITION =====
