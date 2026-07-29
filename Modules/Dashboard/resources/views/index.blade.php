@@ -900,6 +900,7 @@
                                     <th>{{ __('tables.th.fin_law') }}</th>
                                     <th>{{ __('tables.th.deadline_balance') }}</th>
                                     <th>{{ __('tables.th.remaining_credit') }}</th>
+                                    <th>ភាគរយ %</th>
                                     <th>បន្ថែម</th>
                                 </tr>
                             </thead>
@@ -910,6 +911,7 @@
                                         <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->percent, 2) }} %</td>
                                         <td>
                                             <div class="dropdown text-center account-card"
                                                 data-account-id="{{ $acc->id }}"
@@ -1632,7 +1634,13 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    <!-- Percent -->
+                                    <div class="mt-3 text-center">
+                                        <small class="text-muted d-block">
+                                            អនុវត្ត:
+                                            <strong>${Number(cluster.percent ?? 0).toFixed(2)}%</strong>
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1948,6 +1956,7 @@
                                                         <th>ច្បាប់ហិរញ្ញវត្ថុ</th>
                                                         <th>អនុវត្ត</th>
                                                         <th>នៅសល់</th>
+                                                        <th>ភាគរយ %</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1959,6 +1968,7 @@
                                         <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
                                         <td>${Number(subs.deadline_balance ?? 0).toLocaleString()} ៛</td>
                                         <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.percent ?? 0).toFixed(2)} %</td>
                                     </tr>
                                 `;
                             });

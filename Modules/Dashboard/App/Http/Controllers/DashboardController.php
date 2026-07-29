@@ -297,6 +297,9 @@ class DashboardController extends Controller
             $account->fin_law  = $total->fin_law ?? 0;
             $account->deadline_balance  = $total->deadline_balance ?? 0;
             $account->credit        = $total->credit ?? 0;
+            $account->percent       = $account->fin_law > 0
+                ? ($account->deadline_balance / $account->fin_law) * 100
+                : 0;
             return $account;
         });
         // expense Type donut chart
@@ -569,7 +572,9 @@ class DashboardController extends Controller
             $subs->fin_law = $total->fin_law ?? 0;
             $subs->credit  = $total->credit ?? 0;
             $subs->deadline_balance  = $total->deadline_balance ?? 0;
-
+            $subs->percent       = $subs->fin_law > 0
+                ? ($subs->deadline_balance / $subs->fin_law) * 100
+                : 0;
             return $subs;
         });
         return response()->json($accountSubs);
