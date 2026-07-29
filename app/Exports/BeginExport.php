@@ -269,7 +269,7 @@ class BeginExport
                             'editorial'            => (float) $editorial,
                             'new_credit_status'    => (float) $newCreditStatus,
                             'early_balance'        => (float) $earlyBalance,
-                            'apply'                => (float) $applyValue,
+                            'budget'                => (float) $applyValue,
                             'deadline_balance'     => (float) $deadlineBalance,
                             'credit'               => (float) $credit,
                             'law_average'          => (float) $lawAverage,
