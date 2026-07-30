@@ -381,6 +381,7 @@ class BudgetVoucherController extends Controller
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $expenseType = ExpenseType::where('id', 1)
             ->orWhere('id', 2)
+            ->orWhere('id', 4)
             ->get();
 
         $beginVoucher = BeginVoucher::query()

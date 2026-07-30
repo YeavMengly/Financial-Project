@@ -62,6 +62,7 @@
                                 <option value="2">ធានាចំណាយ</option>
                                 <option value="3">បុរេប្រទាន</option>
                                 <option value="4">ទូទាត់ត្រង់</option>
+                                <option value="4">លទ្ធកម្ម</option>
                             </select>
                         </div>
 
