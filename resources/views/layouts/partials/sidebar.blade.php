@@ -96,13 +96,13 @@
                             </li>
                         @endif
 
-                        @if (hasPermission('initialAdvancePayment.index'))
+                        @if (hasPermission('initialProcurement.index'))
                             <li>
-                                <a href="{{ route('initialAdvancePayment.index') }}"
-                                    class="{{ Request::routeIs('initialAdvancePayment.*') ? 'active' : '' }}">
+                                <a href="{{ route('initialProcurement.index') }}"
+                                    class="{{ Request::routeIs('initialProcurement.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-advance-payment">
-                                        {{ __('menus.expenditure.guarantee.procurement') }}
+                                    <span data-key="t-budget-control-procurement">
+                                        {{ __('menus.expenditure.procurement') }}
                                     </span>
                                 </a>
                             </li>
