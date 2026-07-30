@@ -35,14 +35,20 @@ return [
     'budget.plan' => 'ចុះបញ្ជី',
     'initial.voucher' => 'កម្រងសលាកបត្រ',
     'initial.mandate' => 'កម្រងអាណត្តិ',
-    'procurement' => 'លទ្ធកម្ម',
     'budget.control.voucher' => 'សលាកបត្រ',
     'budget.control.mandate' => 'អាណត្តិ',
     'voucher' => 'សលាកបត្រ',
     'mandate' => 'អាណត្តិ',
 
     'expenditure.guarantee' => 'ធានាចំណាយ',
+    'expenditure.guarantee.procurement' => 'ធានាចំណាយលទ្ធកម្ម',
     'advance.payment' => 'បុរេប្រទាន',
+    'procurement' => 'លទ្ធកម្ម',
+    'procurement.plan' => 'ផែនការលទ្ធកម្ម',
+    'pre.financing' => 'បើកផ្តល់មុន',
+    'per.diem' => 'រជ្ជទេយ្យ',
+    'missions' => 'បេសកកម្ម',
+    'training' => 'ប្រជុំបណ្ដុះបណ្ដាល',
     'payment' => 'ទូទាត់',
     'direct.payment' => 'ទូទាត់ត្រង់',
     'expense.record.book' => 'សលកបត្រកត់ត្រាចំណាយ',
@@ -111,7 +117,7 @@ return [
     'release' => 'នាំចេញ',
 
 
-        // Reports
+    // Reports
     'report.program' => 'របាយការណ៍តាមកម្មវិធី',
     'report.account.sub' => 'រាយការណ៍តាមអនុគណនី',
     'report.account' => 'របាយការណ៍តាមគណនី',
