@@ -319,16 +319,21 @@ class DashboardController extends Controller
         $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
         $advance_Payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
         $expense_Record = $budgetMandate->where('expense_type_id', '3')->pluck('budget');
+        $procurement = $budgetMandate->where('expense_type_id', '4')->pluck('budget');
 
         $direct_Payment = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
         $payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
         $payment_Deadline = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
+        $expenditure_Procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
+
         $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
         $advance_Payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
         $expense_Record = round($budgetMandate->where('expense_type_id', '3')->sum('budget'), 2);
+        $procurement = round($budgetMandate->where('expense_type_id', '4')->sum('budget'), 2);
         $direct_Payment = round($budgetVouchers->where('expense_type_id', '1')->sum('budget'), 2);
         $payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
         $payment_Deadline = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
+        $expenditure_Procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
 
         $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
         $totalCountDir = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
@@ -336,6 +341,8 @@ class DashboardController extends Controller
         $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
         $totalCountExpenseR   = $budgetMandate->where('expense_type_id', '3')->where('is_archived', '1')->where('status', 'todo')->count();
         $totalCountPaymentD   = $budgetVouchers->where('expense_type_id', '3')->where('is_archived', ' 2')->where('status', 'done')->count();
+        $totalCountPro   = $budgetMandate->where('expense_type_id', '4')->where('is_archived', '1')->where('status', 'todo')->count();
+        $totalCountExp   = $budgetVouchers->where('expense_type_id', '4')->where('is_archived', ' 2')->where('status', 'done')->count();
 
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
@@ -347,13 +354,16 @@ class DashboardController extends Controller
         $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
         $percent_expense_record = $total_fin_law > 0 ? ($expense_Record / $total_fin_law) * 100 : 0;
         $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
+        $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
         $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
         $percent_Payment = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
         $percent_Payment_Deadline = $total_fin_law > 0 ? ($payment_Deadline / $total_fin_law) * 100 : 0;
+        $percent_expenditure_Procurement = $total_fin_law > 0 ? ($expenditure_Procurement / $total_fin_law) * 100 : 0;
 
         $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
         $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
         $totalDirPayment = $expense_Record > 0 ? $expense_Record - $payment_Deadline : 0;
+        $totalExpenditureProcurement = $procurement > 0 ? $procurement - $expenditure_Procurement : 0;
         $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record) : 0;
 
         return view('dashboard::index', [
@@ -414,16 +424,22 @@ class DashboardController extends Controller
             'accounts' => $accounts,
             'expenditure_Guarantee' => $expenditure_Guarantee,
             'advance_Payment' => $advance_Payment,
+            'procurement' => $procurement,
             'direct_Payment' => $direct_Payment,
             'payment' => $payment,
             'expense_Record' => $expense_Record,
             'payment_Deadline' => $payment_Deadline,
+            'expenditure_Procurement' => $expenditure_Procurement,
+
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
             'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
             'percent_Payment' => $percent_Payment,
             'percent_expense_record' => $percent_expense_record,
             'percent_Payment_Deadline' => $percent_Payment_Deadline,
+            'percent_procurement' => $percent_procurement,
+            'percent_expenditure_Procurement' => $percent_expenditure_Procurement,
+            
             'totalCountArch' => $totalCountArch,
             'totalCountDir' => $totalCountDir,
             'totalDir' => $totalDir,
@@ -433,6 +449,9 @@ class DashboardController extends Controller
             'totalCountPayment' => $totalCountPayment,
             'totalCountExpenseR' => $totalCountExpenseR,
             'totalCountPaymentD' => $totalCountPaymentD,
+            'totalCountPro' => $totalCountPro,
+            'totalCountExp' => $totalCountExp,
+            'totalExpenditureProcurement' => $totalExpenditureProcurement,
             'totalFinLaw' => $totalFinLaw
         ]);
     }
