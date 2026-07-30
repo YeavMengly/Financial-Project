@@ -12,6 +12,12 @@ Route::middleware('PermissionCheck')
         Route::get('mandate/{params}/edit/{id}', 'edit')->name('budgetMandate.edit');
         Route::get('mandate/{params}/destroy/{id}', 'destroy')->name('budgetMandate.destroy');
 
+        Route::get('procurement/', 'getIndexProcurement')->name('initialProcurement.index');
+        Route::get('procurement/{params}', 'indexProcurement')->name('budgetProcurement.index');
+        Route::get('procurement/{params}/create', 'createProcurement')->name('budgetProcurement.create');
+        Route::get('procurement/{params}/edit/{id}', 'editProcurement')->name('budgetProcurement.edit');
+        Route::get('procurement/{params}/destroy/{id}', 'destroyProcurement')->name('budgetProcurement.destroy');
+
         Route::get('advance/payment/', 'getIndexAdvancePay')->name('initialAdvancePayment.index');
         Route::get('advance/payment/{params}', 'getIndexAdvancePayment')->name('budgetAdvancePayment.index');
         Route::get('advance/payment/{params}/create', 'createAdvancePayment')->name('budgetAdvancePayment.create');
@@ -26,11 +32,19 @@ Route::middleware('PermissionCheck')
     });
 
 Route::controller(BudgetMandateController::class)->group(function () {
+    // Expenditure Gurantee 
     Route::post('mandate/{params}/store', 'store')->name('budgetMandate.store');
     Route::post('mandate/{params}/update/{id}', 'update')->name('budgetMandate.update');
     Route::get('mandate/{params}/restore/{id}', 'restore')->name('budgetMandate.restore');
 
+    // Pexpenditure Procurement 
+    Route::post('procurement/{params}/store', 'storeProcurement')->name('budgetProcurement.store');
+    Route::post('procurement/{params}/update/{id}', 'updateProcurement')->name('budgetProcurement.update');
+    Route::get('procurement/{params}/restore/{id}', 'restoreProcurement')->name('budgetProcurement.restore');
+
+    // Report Export
     Route::get('mandate/{params}/export', 'export')->name('budgetMandate.export');
+    Route::get('procurement/{params}/exportProcurement', 'exportProcurement')->name('budgetProcurement.exportProcurement');
     Route::get('mandate/{params}/exportAdvancePayment', 'exportAdvancePayment')->name('budgetAdvancePayment.exportAdvancePayment');
 
     Route::post('advance/payment/{params}/store', 'storeAdvancePayment')->name('budgetAdvancePayment.store');
@@ -50,6 +64,21 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetMandate.getEarlyBalance');
     Route::get('mandate/{params}/edit-early-balance', 'editEarlyBalance')
         ->name('budgetMandate.editEarlyBalance');
+
+    // Procurement
+    // These routes are for ajax request
+    Route::get('procurement/get-by-program/program-subs', 'getByProgramId')->name('budgetProcurement.by.program_sub');
+    Route::get('procurement/get-by-program/agencies', 'getByAgency')->name('budgetProcurement.by.agency');
+    Route::get('procurement/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetProcurement.by.cluster');
+    // These routes are for edit page ajax request
+    Route::get('procurement/edit-by-program/program-subs', 'editByProgramId')->name('budgetProcurement.edit.program_sub');
+    Route::get('procurement/edit-by-program/agencies', 'editByAgency')->name('budgetProcurement.edit.agency');
+    Route::get('procurement/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetProcurement.edit.cluster');
+
+    Route::get('procurement/{params}/get-early-balance', 'getEarlyBalance')
+        ->name('budgetProcurement.getEarlyBalance');
+    Route::get('procurement/{params}/edit-early-balance', 'editEarlyBalance')
+        ->name('budgetProcurement.editEarlyBalance');
 
     //Advance Payment
     // These routes are for ajax request
@@ -85,5 +114,4 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetDirectPayment.expenseRecord.editEarlyBalance');
 
     Route::get('direct/payment/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.exportExpenseRecordBook');
-
 });
