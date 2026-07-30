@@ -644,12 +644,17 @@ class DuelReleaseController extends Controller
             $ministryId = decode_params($params);
             $query = DuelRelease::query()
                 ->where('duel_releases.ministry_id', $ministryId)
+                ->leftJoin('duel_entries', function ($join) use ($ministryId) {
+                    $join->on('duel_entries.stock_number', '=', 'duel_releases.stock_number')
+                        ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
+                        ->where('duel_entries.ministry_id', '=', $ministryId);
+                })
                 ->select(
                     'duel_releases.*',
-                );
-            $data = $query->get();
-
-            $query->orderBy('receipt_number', 'ASC');
+                    'duel_entries.quantity as quantity'
+                )
+                ->orderBy('duel_releases.date_release', 'ASC')
+                ->orderBy('duel_releases.receipt_number', 'ASC');
 
             $data = $query->get();
 

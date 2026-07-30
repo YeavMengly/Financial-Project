@@ -175,102 +175,158 @@ class DuelReleaseExport
         | Detail Table (Data List)
         |--------------------------------------------------------
         */
-        $startRow = 11;
+        $startRow = 10;
         $row      = $startRow;
 
         $totalEA = 0;
         $totalDO = 0;
         $totalMO = 0;
+        $stockGroups = $release->groupBy('stock_number');
 
         $groupedReleases = $release->groupBy(function ($item) {
             return $item->date_release . '_' . $item->receipt_number . '_' . $item->refer;
         });
+        $typeMap = [
+            1 => 'EA',
+            2 => 'DO',
+            3 => 'MO',
+        ];
 
+        $columnMap = [
+            'EA' => ['E', 'F', 'G'],
+            'DO' => ['H', 'I', 'J'],
+            'MO' => ['K', 'L', 'M'],
+        ];
         $index = 1;
 
-        foreach ($groupedReleases as $group) {
-            $firstItem = $group->first();
+        foreach ($stockGroups as $stockNumber => $stockGroup) {
 
-            $sheet->setCellValue("A{$row}", $index);
-            $sheet->setCellValue("B{$row}", $firstItem->date_release);
-            $sheet->setCellValue("C{$row}", $firstItem->receipt_number);
-            $sheet->setCellValue("D{$row}", $firstItem->refer);
+            // Print stock header once
+            $row++;
+            $runningBalance = [];
 
-            $typeMap = [
-                1 => 'EA',
-                2 => 'DO',
-                3 => 'MO',
-            ];
+            foreach ($stockGroup->unique('item_name') as $item) {
 
-            $columnMap = [
-                'EA' => ['E', 'F', 'G'],
-                'DO' => ['H', 'I', 'J'],
-                'MO' => ['K', 'L', 'M'],
-            ];
+                $typeCode = $typeMap[$item->item_name];
+                [$colTotal,, $colRemain] = $columnMap[$typeCode];
 
-            foreach ($group as $item) {
-                $typeCode = $typeMap[$item->item_name] ?? 'EA';
-                $cols     = $columnMap[$typeCode] ?? $columnMap['EA'];
+                $initialQty = (float) $item->quantity;
 
-                [$colTotal, $colReq, $colRemain] = $cols;
+                $sheet->setCellValue("C{$row}", " ស្តុកដើមគ្រា ");
+                $sheet->setCellValue("{$colTotal}{$row}", $initialQty);
+                $sheet->setCellValue("{$colRemain}{$row}", $initialQty);
 
-                $sheet->setCellValue("{$colTotal}{$row}", $item->quantity_total);
-                $sheet->setCellValue("{$colReq}{$row}",   $item->quantity_request);
-                $sheet->setCellValue("{$colRemain}{$row}", $item->duel_total);
-
-                $sumValue = (float) $item->quantity_request;
-
-                switch ($typeCode) {
-                    case 'EA':
-                        $totalEA += $sumValue;
-                        break;
-                    case 'DO':
-                        $totalDO += $sumValue;
-                        break;
-                    case 'MO':
-                        $totalMO += $sumValue;
-                        break;
-                }
+                // Save the initial balance for this type
+                $runningBalance[$typeCode] = $initialQty;
             }
-
-            // Let Excel auto-calculate row height based on wrapped text content
-            $sheet->getRowDimension($row)->setRowHeight(-1);
-
-            // Base font, vertical alignment, and borders for the row
-            $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
+            $sheet->getStyle("A{$row}:D{$row}")->applyFromArray([
                 'font' => [
-                    'name'  => 'Khmer OS Battambang',
-                    'size'  => 9,
-                    'color' => ['rgb' => '000000'],
+                    'name' => 'Khmer OS Battambang',
+                    'size' => 9,
                 ],
                 'alignment' => [
-                    'vertical' => Alignment::VERTICAL_CENTER,
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'wrapText'   => true,
+                ],
+            ]);
+            $sheet->getRowDimension($row)->setRowHeight(-1);
+            $sheet->getStyle("E{$row}:N{$row}")->applyFromArray([
+                'font' => [
+                    'name' => 'Khmer OS Battambang',
+                    'size' => 9,
+                ],
+                'alignment' => [
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'wrapText'   => true,
                 ],
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => Border::BORDER_THIN,
+                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                         'color'       => ['rgb' => '000000'],
                     ],
                 ],
             ]);
-
-            // Column A-C: Centered
-            $sheet->getStyle("A{$row}:C{$row}")->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            // Column D: Left-aligned, wrap text enabled for multi-line support
-            $sheet->getStyle("D{$row}")->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_LEFT)
-                ->setWrapText(true);
-
-            // Column E-N: Right-aligned for numbers
-            $sheet->getStyle("E{$row}:N{$row}")->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
+            $sheet->getRowDimension($row)->setRowHeight(-1);
             $row++;
-            $index++;
-        }
+            // Receipts for this stock only
+            $groupedReleases = $stockGroup
+                ->sortBy([
+                    ['date_release', 'asc'],
+                    ['receipt_number', 'asc'],
+                ])
+                ->groupBy(function ($item) {
+                    return $item->date_release . '_' .
+                        $item->receipt_number . '_' .
+                        $item->refer;
+                });
 
+            foreach ($groupedReleases as $group) {
+
+                $firstItem = $group->first();
+
+                $sheet->setCellValue("A{$row}", $index);
+                $sheet->setCellValue("B{$row}", $firstItem->date_release);
+                $sheet->setCellValue("C{$row}", $firstItem->receipt_number);
+                $sheet->setCellValue("D{$row}", $firstItem->refer);
+
+                foreach ($group as $item) {
+
+                    $typeCode = $typeMap[$item->item_name];
+                    [$colTotal, $colReq, $colRemain] = $columnMap[$typeCode];
+
+                    // Previous balance
+                    $quantityTotal = $runningBalance[$typeCode];
+
+                    $quantityRequest = (float) $item->quantity_request;
+
+                    // New balance
+                    $duelTotal = $quantityTotal - $quantityRequest;
+
+                    $sheet->setCellValue("{$colTotal}{$row}", $quantityTotal);
+                    $sheet->setCellValue("{$colReq}{$row}", $quantityRequest);
+                    $sheet->setCellValue("{$colRemain}{$row}", $duelTotal);
+
+                    // Save for the next receipt
+                    $runningBalance[$typeCode] = $duelTotal;
+
+                    switch ($typeCode) {
+                        case 'EA':
+                            $totalEA += $quantityRequest;
+                            break;
+                        case 'DO':
+                            $totalDO += $quantityRequest;
+                            break;
+                        case 'MO':
+                            $totalMO += $quantityRequest;
+                            break;
+                    }
+                }
+                // Apply style to this receipt row
+                $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
+                    'font' => [
+                        'name' => 'Khmer OS Battambang',
+                        'size' => 9,
+                    ],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical'   => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        'wrapText'   => true,
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color'       => ['rgb' => '000000'],
+                        ],
+                    ],
+                ]);
+                $sheet->getRowDimension($row)->setRowHeight(-1);
+
+                $row++;
+                $index++;
+            }
+        }
         /*
         |--------------------------------------------------------
         | Total Row
@@ -279,9 +335,13 @@ class DuelReleaseExport
         $sheet->mergeCells("A{$row}:D{$row}");
         $sheet->setCellValue("A{$row}", 'សរុប');
 
-        $sheet->setCellValue("G{$row}", $totalEA);
-        $sheet->setCellValue("J{$row}", $totalDO);
-        $sheet->setCellValue("M{$row}", $totalMO);
+        $sheet->setCellValue("F{$row}", $totalEA);
+        $sheet->setCellValue("I{$row}", $totalDO);
+        $sheet->setCellValue("L{$row}", $totalMO);
+
+        $sheet->setCellValue("G{$row}", $runningBalance['EA'] ?? 0);
+        $sheet->setCellValue("J{$row}", $runningBalance['DO'] ?? 0);
+        $sheet->setCellValue("M{$row}", $runningBalance['MO'] ?? 0);
 
         $sheet->getRowDimension($row)->setRowHeight(24);
 
