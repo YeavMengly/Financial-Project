@@ -41,7 +41,7 @@ return [
     'mandate' => 'អាណត្តិ',
 
     'expenditure.guarantee' => 'ធានាចំណាយ',
-    'expenditure.guarantee.procurement' => 'ធានាចំណាយលទ្ធកម្ម',
+    'expenditure.procurement' => 'ធានាចំណាយលទ្ធកម្ម',
     'advance.payment' => 'បុរេប្រទាន',
     'procurement' => 'លទ្ធកម្ម',
     'procurement.plan' => 'ផែនការលទ្ធកម្ម',
