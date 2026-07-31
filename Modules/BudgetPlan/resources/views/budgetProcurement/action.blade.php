@@ -12,8 +12,8 @@
                         <i class="bx bx-edit"></i> {{ __('buttons.edit') }}
                     </a>
                 @endif
-                @if (hasPermission('garantee.edit.doc'))
-                    <a href="{{ route('garantee.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                @if (hasPermission('procurement.edit.doc'))
+                    <a href="{{ route('procurement.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}
                     </a>
