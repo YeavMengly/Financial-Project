@@ -730,7 +730,7 @@
                         </div>
                         <div class="col-sm">
                             <div id="Expense-Type"
-                                data-colors='["#1fad12" ,"#f6ff00","#fa2314","#00fff2","#faad14","#2200ff"]'
+                                data-colors='["#1fad12" ,"#f6ff00","#fa2314","#00fff2","#faad14","#2200ff","#fa14fa","#65203e"]'
                                 class="apex-charts">
                             </div>
                         </div>
@@ -807,6 +807,82 @@
                                             {{ number_format($direct_Payment) }} រៀល
                                         </span>
                                     </h6>
+                                </div>
+                            </div>
+                            {{-- procurement --}}
+                            <div class="col-sm align-self-center mt-5">
+                                <div class="mt-4 mt-sm-0">
+                                    <div>
+                                        <p class="mb-2">
+                                            <i class="mdi mdi-circle align-middle font-size-10 me-3"
+                                                style="color:#fa14fa"></i>
+                                            <span class="me-3">{{ __('menus.expenditure.procurement') }}</span>
+                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                                {{ $totalCountPro }}
+                                            </button>
+                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                                {{ $totalCountExp }}
+                                            </button>
+                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                                type="button">
+                                                <span class="dropdown">
+                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true">
+                                                        នៅសល់
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
+                                                        style="min-width:250px;">
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                            <i class="mdi mdi-circle"
+                                                                style="color:#c0341e; font-size:10px;"></i>
+                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        </p>
+                                        <h6>
+                                            <span class="text-muted font-size-14 fw-normal">
+                                                {{ number_format($procurement) }} រៀល
+                                            </span>
+                                        </h6>
+                                    </div>
+                                    <div class="mt-10 pt-2">
+                                        <p class="mb-2">
+                                            <i class="mdi mdi-circle align-middle font-size-10 me-3"
+                                                style="color:#65203e"></i>
+                                            <span class="me-3">{{ __('menus.payment') }}</span>
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                                {{ $totalCountExp }}
+                                            </button>
+                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
+                                                type="button">
+                                                <span class="dropdown w-100">
+                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
+                                                        data-bs-toggle="dropdown" aria-haspopup="true">
+                                                        នៅសល់
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
+                                                        style="min-width:250px;">
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
+                                                            <i class="mdi mdi-circle"
+                                                                style="color:#c0341e; font-size:10px;"></i>
+                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
+                                                                {{ number_format($totalExpenditureProcurement) }} រៀល</h6>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        </p>
+                                        <h6>
+                                            <span class="text-muted font-size-14 fw-normal">
+                                                {{ number_format($expenditure_Procurement) }} រៀល
+                                            </span>
+                                        </h6>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1745,6 +1821,8 @@
                     {{ round($percent_Payment_Deadline, 2) }},
                     {{ round($percent_expenditure_Guarantee, 2) }},
                     {{ round($percent_direct_Payment, 2) }},
+                    {{ round($percent_procurement, 2) }},
+                    {{ round($percent_expenditure_Procurement, 2) }},
                 ],
                 labels: [
                     "{{ __('menus.advance.payment') }}",
@@ -1752,6 +1830,8 @@
                     "{{ __('menus.direct.payment') }}",
                     "{{ __('menus.payment') }}",
                     "{{ __('menus.expenditure.guarantee') }}",
+                    "{{ __('menus.payment') }}",
+                    "{{ __('menus.expenditure.procurement') }}",
                     "{{ __('menus.payment') }}",
                 ],
                 colors: colors,

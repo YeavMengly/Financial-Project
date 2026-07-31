@@ -96,6 +96,18 @@
                             </li>
                         @endif
 
+                        @if (hasPermission('initialProcurement.index'))
+                            <li>
+                                <a href="{{ route('initialProcurement.index') }}"
+                                    class="{{ Request::routeIs('initialProcurement.*') ? 'active' : '' }}">
+                                    <i data-feather="file-plus"></i>
+                                    <span data-key="t-budget-control-procurement">
+                                        {{ __('menus.expenditure.procurement') }}
+                                    </span>
+                                </a>
+                            </li>
+                        @endif
+
                         @if (hasPermission('initialAdvancePayment.index'))
                             <li>
                                 <a href="{{ route('initialAdvancePayment.index') }}"
@@ -108,6 +120,9 @@
                             </li>
                         @endif
 
+                        <li class="menu-title" data-key="t-inventory">{{ __('menus.payment') }}</li>
+
+
                         @if (hasPermission('initialVoucher.index'))
                             <li>
                                 <a href="{{ route('initialVoucher.index') }}"
@@ -119,6 +134,7 @@
                                 </a>
                             </li>
                         @endif
+
                         <li>
                             <a href="javascript: void(0);" class="has-arrow">
                                 <i data-feather="sliders"></i>
@@ -149,6 +165,50 @@
                                 @endif
                             </ul>
                         </li>
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow">
+                                <i data-feather="sliders"></i>
+                                <span data-key="t-budget-plan">{{ __('menus.pre.financing') }}</span>
+                            </a>
+                            <ul>
+                                @if (hasPermission('initialDirectPayment.expenseRecord.index'))
+                                    <li>
+                                        <a href="{{ route('initialDirectPayment.expenseRecord.index') }}"
+                                            class="{{ Request::routeIs('initialDirectPayment.expenseRecord.*') ? 'active' : '' }}">
+                                            <i data-feather="file-plus"></i>
+                                            <span data-key="t-budget-control-voucher">
+                                                {{ __('menus.per.diem') }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endif
+                                @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
+                                    <li>
+                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
+                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
+                                            <i data-feather="file-plus"></i>
+                                            <span data-key="t-budget-control-voucher">
+                                                {{ __('menus.missions') }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endif
+
+                                @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
+                                    <li>
+                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
+                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
+                                            <i data-feather="file-plus"></i>
+                                            <span data-key="t-budget-control-voucher">
+                                                {{ __('menus.training') }}
+                                            </span>
+                                        </a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
+
                         {{-- @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
                             <li>
                                 <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
@@ -161,6 +221,8 @@
                                 </a>
                             </li>
                         @endif --}}
+
+
                     </ul>
                 </li>
 

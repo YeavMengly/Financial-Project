@@ -8,6 +8,7 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
@@ -15,15 +16,17 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.payment') }}
-                </h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.procurement') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $data->year }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $data->name }}</li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.budget.plan') }}</a>
+                            </li>
+
+                            <li class="breadcrumb-item active">{{ __('menus.expenditure.procurement') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -39,10 +42,10 @@
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
-                            <select class="form-select" id="cboTodo" name="cboTodo">
+                            <select class="form-control" id="cboTodo" name="cboTodo">
                                 <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
-                                <option value="2">កំពុងធ្វើ</option>
-                                <option value="3" selected>បានបញ្ចប់</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
                             </select>
                         </div>
 
@@ -56,25 +59,26 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboExpenseType">{{ __('menus.task') }}</label>
-                            <select class="form-select" id="cboExpenseType" name="cboExpenseType">
-                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
-                                <option value="2">ធានាចំណាយ</option>
-                                <option value="3">បុរេប្រទាន</option>
-                                <option value="4">ទូទាត់ត្រង់</option>
-                                <option value="5">លទ្ធកម្ម</option>
+                            <label class="visually-hidden" for="cboProgram">{{ __('menus.content.program') }}</label>
+                            <select class="form-control" name="cboProgram" id="cboProgram">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($program as $p)
+                                    <option value="{{ $p->id }}"
+                                        {{ request('cboProgram') == $p->id ? 'selected' : '' }}>
+                                        {{ $p->no }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
-                        <!-- Sub Account Number -->
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboAccountSub">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="cboAccountSub" id="cboAccountSub">
+                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
+                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
                                 <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($budgetVoucher as $ts)
-                                    <option value="{{ $ts->account_sub_id }}"
-                                        {{ request('cboAccountSub') == $ts->account_sub_id ? 'selected' : '' }}>
-                                        {{ $ts->account_sub_id }}
+                                @foreach ($accountSub as $as)
+                                    <option value="{{ $as->no }}"
+                                        {{ request('subAccountNumber') == $as->no ? 'selected' : '' }}>
+                                        {{ $as->no }}
                                     </option>
                                 @endforeach
                             </select>
@@ -89,25 +93,16 @@
                         </div>
 
                         <div class="col-sm-3">
-                            <label class="visually-hidden" for="CboMandate">{{ __('menus.mandate') }}</label>
-                            <input type="text" id="CboMandate" name="CboMandate" class="form-control"
-                                placeholder="{{ __('menus.mandate') }}" value="{{ request('CboMandate') }}"
-                                data-pristine-required-message="{{ __('messages.required') }}" />
-                        </div>
-
-                        <!-- Start Date -->
-                        <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
-                                placeholder="{{ __('forms.select_date') }}" value="{{ request('start_date') }}"
+                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <!-- End Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
-                                placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
+                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}" value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
@@ -116,14 +111,13 @@
                             <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                             </a>
-                            {{-- Export --}}
 
                             <a id="btnExport"
                                 href="{{ route(
-                                    'budgetVoucher.export',
+                                    'budgetProcurement.exportProcurement',
                                     array_merge(
                                         ['params' => $params],
-                                        request()->only(['cboTodo', 'cboStatus', 'cboExpenseType', 'cboAccountSub', 'start_date', 'end_date']),
+                                        request()->only(['cboProgram', 'cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
                                     ),
                                 ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
@@ -132,7 +126,6 @@
 
                         </div>
                     </form>
-
                 </div>
             </div>
         </div>
@@ -141,11 +134,12 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    @if (hasPermission('budgetVoucher.create'))
+                    @if (hasPermission('budgetProcurement.create'))
                         <div class="col-sm">
                             <div class="mb-4">
                                 <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('budgetVoucher.create', $params) }}"><i class="bx bx-plus me-1"></i>
+                                    href="{{ route('budgetProcurement.create', $params) }}"><i
+                                        class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -165,31 +159,9 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
-
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
-    <script>
-        const startDateInput = document.getElementById('start_date');
-        const endDateInput = document.getElementById('end_date');
-        if (startDateInput) {
-            flatpickr(startDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: startDateInput.value || null
-            });
-        }
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-        if (endDateInput) {
-            flatpickr(endDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: endDateInput.value || null
-            });
-        }
-    </script>
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -223,92 +195,107 @@
             }
         }
     </script>
-    {!! $dataTable->scripts() !!}
 
-    <!-- Choices.js (dropdowns) -->
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        const startDateInput = document.getElementById('start_date');
+        const endDateInput = document.getElementById('end_date');
+        if (startDateInput) {
+            flatpickr(startDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: startDateInput.value || null
+            });
+        }
+        if (endDateInput) {
+            flatpickr(endDateInput, {
+                dateFormat: 'Y-m-d', // value submitted to backend
+                altInput: true,
+                altFormat: 'd/m/Y', // pretty display for users
+                allowInput: true,
+                defaultDate: endDateInput.value || null
+            });
+        }
+    </script>
 
-    <!-- Custom logic for BeginCredit loading -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const cboAccountSub = document.getElementById('cboAccountSub');
-            const cboAccountSubChoices = new Choices(cboAccountSub, {
+            const cboTodoSelect = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodoSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើស កំណត់ចំណាំ', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
         });
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('CboPaymentVoucherNumber');
 
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    // Submit the form
-                    this.form.submit();
-                }
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatusSelect = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatusSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស ស្ថានភាព', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
             });
         });
-        document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('CboMandate');
 
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    // Submit the form
-                    this.form.submit();
-                }
-            });
-        });
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('cboExpenseType');
+            const taskTypeSelect = document.getElementById('subAccountNumber');
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const cboTodo = document.getElementById('cboTodo');
-            const cboTodoChoices = new Choices(cboTodo, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: '',
-                searchPlaceholderValue: 'ស្វែងរក...',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
+                searchPlaceholderValue: 'ជ្រើសរើស អនុគណនី', // Khmer search placeholder
                 shouldSort: false
             });
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const cboStatus = document.getElementById('cboStatus');
-            const cboStatusChoices = new Choices(cboStatus, {
+            const taskTypeSelect = document.getElementById('program');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: '',
-                searchPlaceholderValue: 'ស្វែងរក...',
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសកម្មវិធី', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboProgramSelect = document.getElementById('cboProgram');
+            const cboProgramChoices = new Choices(cboProgramSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer placeholder
+                searchPlaceholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer search placeholder
                 shouldSort: false
             });
         });
     </script>
+
+    <script>
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date,#CboPaymentVoucherNumber')
+            .on('change keyup', function() {
+                $('#budgetprocurement-table').DataTable().ajax.reload();
+            });
+    </script>
+
     <script>
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
 
-            let baseUrl = "{{ route('budgetVoucher.export', ['params' => $params]) }}";
+            let baseUrl = "{{ route('budgetProcurement.exportProcurement', ['params' => $params]) }}";
 
             let params = new URLSearchParams({
-                cboExpenseType: $('#cboExpenseType').val(),
-                cboAccountSub: $('#cboAccountSub').val(),
-                CboPaymentVoucherNumber: $('#CboPaymentVoucherNumber').val(),
-                CboMandate: $('#CboMandate').val(),
+                cboProgram: $('#cboProgram').val(),
+                subAccountNumber: $('#subAccountNumber').val(),
+                agency: $('#agency').val(),
                 no: $('#no').val(),
                 cboTodo: $('#cboTodo').val(),
+                CboPaymentVoucherNumber: $('#CboPaymentVoucherNumber').val(),
                 cboStatus: $('#cboStatus').val(),
                 start_date: $('#start_date').val(),
                 end_date: $('#end_date').val(),
@@ -318,11 +305,6 @@
             window.location.href = baseUrl + '?' + params.toString();
         });
     </script>
-    <script>
-        $('#cboTodo, #cboStatus, #cboExpenseType, #cboAccountSub, #CboPaymentVoucherNumber, #CboMandate, #start_date, #end_date')
-            .on('change keyup',
-                function() {
-                    $('#budgetvoucher-table').DataTable().ajax.reload();
-                });
-    </script>
+
+    {!! $dataTable->scripts() !!}
 @endsection
