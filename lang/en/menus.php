@@ -12,7 +12,6 @@ return [
     'credit' => 'ឥណទានអនុម័ត',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
-
     'beginning.credit' => 'ឥណទានអនុម័ត',
     // Content
     'content' => 'មាតិកា',
@@ -46,9 +45,11 @@ return [
     'procurement' => 'លទ្ធកម្ម',
     'procurement.plan' => 'ផែនការលទ្ធកម្ម',
     'pre.financing' => 'បើកផ្តល់មុន',
-    'per.diem' => 'រជ្ជទេយ្យ',
+    'royalty' => 'រជ្ជទេយ្យ',
+    'royalty.voucher' => 'សលាកបត្ររជ្ជទេយ្យ',
+    'royalty.mandate' => 'អាណត្តិរជ្ជទេយ្យ',
     'missions' => 'បេសកកម្ម',
-    'training' => 'ប្រជុំបណ្ដុះបណ្ដាល',
+    'training' => 'ប្រជុំ និង បណ្ដុះបណ្ដាល',
     'payment' => 'ទូទាត់',
     'direct.payment' => 'ទូទាត់ត្រង់',
     'expense.record.book' => 'សលកបត្រកត់ត្រាចំណាយ',

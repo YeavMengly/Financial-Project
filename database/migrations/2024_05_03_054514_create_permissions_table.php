@@ -52,6 +52,14 @@ return new class extends Migration
                 'delete' => 'budgetMandate.destroy',
             ],
 
+            'expenditure.procurement'                  => [
+                'show'   => 'initialProcurement.index',
+                'view'   => 'budgetProcurement.index',
+                'create' => 'budgetProcurement.create',
+                'edit'   => 'budgetProcurement.edit',
+                'delete' => 'budgetProcurement.destroy',
+            ],
+
             'advance.payment'                  => [
                 'show'   => 'initialAdvancePayment.index',
                 'view'   => 'budgetAdvancePayment.index',
@@ -82,6 +90,34 @@ return new class extends Migration
                 'create' => 'budgetDirectPayment.paymentDeadline.create',
                 'edit'   => 'budgetDirectPayment.paymentDeadline.edit',
                 'delete' => 'budgetDirectPayment.paymentDeadline.destroy',
+            ],
+
+            // Royalty
+
+            'royalty.voucher'                  => [
+                'show'   => 'initialRoyaltyVoucher.index',
+                'view'   => 'royaltyVoucher.index',
+                'create' => 'royaltyVoucher.create',
+                'edit'   => 'royaltyVoucher.edit',
+                'delete' => 'royaltyVoucher.destroy',
+            ],
+
+            'royalty.mandate'                  => [
+                'show'   => 'initialRoyaltyMandate.index',
+                'view'   => 'royaltyMandate.index',
+                'create' => 'royaltyMandate.create',
+                'edit'   => 'royaltyMandate.edit',
+                'delete' => 'royaltyMandate.destroy',
+            ],
+
+            // Training
+
+            'training'                  => [
+                'show'   => 'initialTraining.index',
+                'view'   => 'training.index',
+                'create' => 'training.create',
+                'edit'   => 'training.edit',
+                'delete' => 'training.destroy',
             ],
 
             // Duel
