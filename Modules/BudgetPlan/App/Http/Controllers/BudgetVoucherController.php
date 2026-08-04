@@ -43,16 +43,16 @@ class BudgetVoucherController extends Controller
     {
         return $dataTable->render('budgetplan::initialDirectPayment.paymentDeadline.index');
     }
-<<<<<<< HEAD
 
     public function getIndexRoyaltyVoucher(InitialRoyaltyVoucherDataTable $dataTable)
     {
+        return $dataTable->render('budgetplan::royalty.initialRoyaltyVoucher.index');
     }
 
-=======
-    public function getPaymentDeadlineTraining(InitialDeadlineTrainingDataTable $dataTable)
-    {
-        return $dataTable->render('budgetplan::initialTraining.paymentDeadline.index');
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(BudgetVoucherDataTable $dataTable, $params)
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
@@ -2591,14 +2591,12 @@ class BudgetVoucherController extends Controller
         }
     }
 
-<<<<<<< HEAD
     public function indexRoyaltyVoucher(RoyaltyVoucherDataTable $dataTable, $params)
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
         $expenseType = ExpenseType::where('id', 7)->get();
         $program = Program::where('ministry_id', $data->id)->get();
-
         $accountSub = AccountSub::where('ministry_id', $data->id)->get();
         $agency = Agency::all();
         $budgetMandate = BudgetMandate::where('ministry_id', $data->id)->get();
@@ -3105,9 +3103,6 @@ class BudgetVoucherController extends Controller
     }
 
     public function exportRoyaltyVoucher(Request $request, $params)
-=======
-    public function exportPaymentDeadlineTraining(Request $request, $params)
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
     {
         try {
             $ministryId = decode_params($params);
@@ -3117,7 +3112,6 @@ class BudgetVoucherController extends Controller
             $query->leftJoin('begin_vouchers', function ($join) use ($ministryId) {
                 $join->on('budget_vouchers.account_sub_id', '=', 'begin_vouchers.account_sub_id')
                     ->on('budget_vouchers.no', '=', 'begin_vouchers.no')
-<<<<<<< HEAD
                     ->where('begin_vouchers.ministry_id', $ministryId);
             });
 
@@ -3127,220 +3121,16 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.account_id',
                 'begin_vouchers.chapter_id',
                 'budget_vouchers.no',
-=======
-                    ->on('budget_vouchers.program_id', '=', 'begin_vouchers.program_id')
-                    ->where('begin_vouchers.ministry_id', $ministryId);
-            });
-            $query->leftJoin('budget_voucher_loans', function ($join) {
-                $join->on('budget_voucher_loans.account_sub_id', '=', 'begin_vouchers.account_sub_id')
-                    ->on('budget_voucher_loans.no', '=', 'begin_vouchers.no')
-                    ->on('budget_voucher_loans.program_id', '=', 'begin_vouchers.program_id');
-            });
-
-            /**
-             * Current Budget
-             */
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-
-                $budgetSum = "
-                        SUM(
-                            CASE
-                                WHEN budget_vouchers.transaction_date
-                                    BETWEEN '{$request->start_date}'
-                                    AND '{$request->end_date}'
-                                AND budget_vouchers.is_archived = 2
-                                THEN budget_vouchers.budget
-                                ELSE 0
-                            END
-                        ) AS budget
-                    ";
-                $endDate = Carbon::parse($request->end_date);
-            } else {
-
-                $month = now()->month;
-                $year  = now()->year;
-
-                $budgetSum = "
-                            SUM(
-                                CASE
-                                    WHEN MONTH(budget_vouchers.transaction_date) = {$month}
-                                    AND YEAR(budget_vouchers.transaction_date) = {$year}
-                                    THEN budget_vouchers.budget
-                                    ELSE 0
-                                END
-                            ) AS budget
-                        ";
-
-                $endDate = now();
-            }
-            $start = Carbon::parse($request->start_date);
-            $end   = Carbon::parse($request->end_date);
-
-            $lastMonthStart = $end->copy()->startOfMonth()->toDateString();
-
-            /**
-             * Early Budget (Normal)
-             */
-            $earlyBudget = "
-                    SUM(
-                        CASE
-                            WHEN budget_vouchers.transaction_date >= '{$start->toDateString()}'
-                            AND budget_vouchers.transaction_date < '{$lastMonthStart}'
-                            AND budget_vouchers.is_archived = 2
-                            THEN budget_vouchers.budget
-                            ELSE 0
-                        END
-                    ) AS early_budget
-                ";
-
-            $lastMonthBudget = "
-                SUM(
-                    CASE
-                        WHEN YEAR(budget_vouchers.transaction_date) = {$end->year}
-                        AND MONTH(budget_vouchers.transaction_date) = {$end->month}
-                        AND budget_vouchers.is_archived = 2
-                        THEN budget_vouchers.budget
-                        ELSE 0
-                    END
-                ) AS last_month_budget
-                ";
-
-            // G -> N caculate by date
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-
-                $loanInternal = "
-                        MAX(
-                            CASE
-                                WHEN DATE(budget_voucher_loans.updated_at)
-                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
-                                THEN budget_voucher_loans.internal_increase
-                                ELSE 0
-                            END
-                        ) AS loan_internal_increase
-                    ";
-
-                $loanUnexpected = "
-                        MAX(
-                            CASE
-                                WHEN DATE(budget_voucher_loans.updated_at)
-                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
-                                THEN budget_voucher_loans.unexpected_increase
-                                ELSE 0
-                            END
-                        ) AS loan_unexpected_increase
-                    ";
-
-                $loanAdditional = "
-                        MAX(
-                            CASE
-                                WHEN DATE(budget_voucher_loans.updated_at)
-                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
-                                THEN budget_voucher_loans.additional_increase
-                                ELSE 0
-                            END
-                        ) AS loan_additional_increase
-                    ";
-
-                $loanTotal = "
-                        MAX(
-                            CASE
-                                WHEN DATE(budget_voucher_loans.updated_at)
-                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
-                                THEN budget_voucher_loans.total_increase
-                                ELSE 0
-                            END
-                        ) AS loan_total_increase
-                    ";
-
-                $loanDecrease = "
-                        MAX(
-                            CASE
-                                WHEN DATE(budget_voucher_loans.updated_at)
-                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
-                                THEN budget_voucher_loans.decrease
-                                ELSE 0
-                            END
-                        ) AS loan_decrease
-                    ";
-
-                $loanEditorial = "
-                        MAX(
-                            CASE
-                                WHEN DATE(budget_voucher_loans.updated_at)
-                                    BETWEEN '{$request->start_date}' AND '{$request->end_date}'
-                                THEN budget_voucher_loans.editorial
-                                ELSE 0
-                            END
-                        ) AS loan_editorial
-                    ";
-            } else {
-                $loanInternal = "MAX(COALESCE(budget_voucher_loans.internal_increase,0)) AS loan_internal_increase";
-                $loanUnexpected = "MAX(COALESCE(budget_voucher_loans.unexpected_increase,0)) AS loan_unexpected_increase";
-                $loanAdditional = "MAX(COALESCE(budget_voucher_loans.additional_increase,0)) AS loan_additional_increase";
-                $loanTotal = "MAX(COALESCE(budget_voucher_loans.total_increase,0)) AS loan_total_increase";
-                $loanDecrease = "MAX(COALESCE(budget_voucher_loans.decrease,0)) AS loan_decrease";
-                $loanEditorial = "MAX(COALESCE(budget_voucher_loans.editorial,0)) AS loan_editorial";
-            }
-            if ($request->filled('start_date') && $request->filled('end_date')) {
-                $currentLoan = "
-                    MAX(
-                        begin_vouchers.current_loan
-
-                        + COALESCE((
-                            SELECT SUM(COALESCE(bml.total_increase,0))
-                            FROM budget_voucher_loans bml
-                            WHERE bml.no = begin_vouchers.no
-                            AND bml.program_id = begin_vouchers.program_id
-                            AND bml.account_sub_id = begin_vouchers.account_sub_id
-                            AND DATE(bml.updated_at) < '{$request->start_date}'
-                        ),0)
-
-                        - COALESCE((
-                            SELECT SUM(COALESCE(bml.decrease,0))
-                            FROM budget_voucher_loans bml
-                            WHERE bml.no = begin_vouchers.no
-                            AND bml.program_id = begin_vouchers.program_id
-                            AND bml.account_sub_id = begin_vouchers.account_sub_id
-                            AND DATE(bml.updated_at) < '{$request->start_date}'
-                        ),0)
-
-                        + COALESCE((
-                            SELECT SUM(COALESCE(bml.editorial,0))
-                            FROM budget_voucher_loans bml
-                            WHERE bml.no = begin_vouchers.no
-                            AND bml.program_id = begin_vouchers.program_id
-                            AND bml.account_sub_id = begin_vouchers.account_sub_id
-                            AND DATE(bml.updated_at) < '{$request->start_date}'
-                        ),0)
-
-                    ) AS current_loan
-                    ";
-            } else {
-
-                $currentLoan = "MAX(begin_vouchers.current_loan) AS current_loan";
-            }
-            $query->select([
-                'budget_vouchers.no as budget_no',
-                'begin_vouchers.no as begin_no',
-                'begin_vouchers.chapter_id',
-                'budget_vouchers.program_id',
-                'budget_vouchers.account_sub_id',
-                'begin_vouchers.account_id',
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
                 'begin_vouchers.new_credit_status',
                 'begin_vouchers.deadline_balance',
-<<<<<<< HEAD
                 'begin_vouchers.current_loan',
                 'begin_vouchers.new_credit_status',
-=======
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
                 'begin_vouchers.early_balance',
                 'begin_vouchers.credit',
                 'begin_vouchers.law_average',
                 'begin_vouchers.law_correction',
-<<<<<<< HEAD
                 DB::raw('SUM(budget_vouchers.budget) as apply')
             );
             $query->groupBy(
@@ -3349,63 +3139,18 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.account_id',
                 'begin_vouchers.chapter_id',
                 'budget_vouchers.no',
-=======
-                DB::raw($currentLoan),
-                DB::raw($loanInternal),
-                DB::raw($loanUnexpected),
-                DB::raw($loanAdditional),
-                DB::raw($loanTotal),
-                DB::raw($loanDecrease),
-                DB::raw($loanEditorial),
-                DB::raw('MAX(begin_vouchers.apply) AS apply'),
-                DB::raw($budgetSum),
-                DB::raw('MAX(budget_vouchers.transaction_date) AS transaction_date'),
-                DB::raw($earlyBudget),
-                DB::raw($lastMonthBudget),
-            ]);
-            $query->groupBy(
-                'budget_vouchers.no',
-                'begin_vouchers.no',
-                'begin_vouchers.chapter_id',
-                'budget_vouchers.program_id',
-                'budget_vouchers.account_sub_id',
-                'begin_vouchers.account_id',
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
                 'begin_vouchers.txtDescription',
                 'begin_vouchers.fin_law',
                 'begin_vouchers.new_credit_status',
                 'begin_vouchers.deadline_balance',
-<<<<<<< HEAD
                 'begin_vouchers.current_loan',
                 'begin_vouchers.new_credit_status',
-=======
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
                 'begin_vouchers.early_balance',
                 'begin_vouchers.credit',
                 'begin_vouchers.law_average',
                 'begin_vouchers.law_correction',
             );
-<<<<<<< HEAD
 
-=======
-            $query->orderBy('budget_vouchers.transaction_date');
-            // $query->where('budget_vouchers.expense_types', 8);
-
-            // Sub voucher number
-            if ($request->filled('CboPaymentVoucherNumber')) {
-                $query->where(
-                    'budget_vouchers.payment_voucher_number',
-                    $request->CboPaymentVoucherNumber
-                );
-            }
-            // Sub voucher number
-            if ($request->filled('CboMandate')) {
-                $query->where(
-                    'budget_vouchers.day_of_number',
-                    $request->CboMandate
-                );
-            }
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
             // Sub Account filter
             if ($request->filled('cboAccountSub')) {
                 $query->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
@@ -3427,7 +3172,6 @@ class BudgetVoucherController extends Controller
                 $query->whereNull('budget_vouchers.deleted_at');
             }
             //To do
-<<<<<<< HEAD
             if ($request->cboTodo) {
                 if ($request->cboTodo == 2) {
                     $query->where('budget_vouchers.is_archived', 1);
@@ -3450,25 +3194,7 @@ class BudgetVoucherController extends Controller
             //     }
             // }
 
-            $query->where('budget_vouchers.expense_type_id', 7);
 
-=======
-            if ($request->filled('cboExpenseType')) {
-
-                $expenseType = (int) $request->cboExpenseType;
-
-                if ($expenseType > 1) {
-                    $query->where('budget_vouchers.expense_type_id', $expenseType - 1);
-                }
-
-                // expenseType == 1 -> no filter
-            }
-            //Date
-            // Date filter
-            if ($request->filled('end_date')) {
-                $query->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
-            }
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
             $data = $query->get();
 
             Log::info('Exported BeginVoucher Count', [
@@ -3476,16 +3202,7 @@ class BudgetVoucherController extends Controller
                 'count'       => $data->count(),
             ]);
 
-<<<<<<< HEAD
             $export = new paymentDeadlineExport($data, $ministryId);
-=======
-            $export = new PaymentDeadlineTrainingExport(
-                $data,
-                $ministryId,
-                $request->start_date,
-                $request->end_date
-            );
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
 
             return $export->export($request);
         } catch (\Throwable $e) {
@@ -3499,11 +3216,7 @@ class BudgetVoucherController extends Controller
                 ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-<<<<<<< HEAD
             return redirect()->route('royaltyVoucher.index', $params);
-=======
-            return redirect()->route('budgetVoucher.index', $params);
->>>>>>> 78ee4f6b714db2513db6f451b30ae5b645b26cf6
         }
     }
 }
