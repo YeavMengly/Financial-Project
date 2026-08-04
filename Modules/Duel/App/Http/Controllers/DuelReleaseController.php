@@ -656,8 +656,37 @@ class DuelReleaseController extends Controller
                 ->orderBy('duel_releases.date_release', 'ASC')
                 ->orderBy('duel_releases.receipt_number', 'ASC');
 
-            $data = $query->get();
 
+            if ($request->filled('start_date')) {
+                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+                $query->whereDate('duel_releases.date_release', '>=', $startDate);
+            }
+
+            if ($request->filled('end_date')) {
+                $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+                $query->whereDate('duel_releases.date_release', '<=', $endDate);
+            }
+            $data = $query->get();
+            if ($request->filled('start_date')) {
+
+                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+
+                foreach ($data as $item) {
+
+                    $releasedBefore = DuelRelease::where('ministry_id', $ministryId)
+                        ->where('stock_number', $item->stock_number)
+                        ->where('item_name', $item->item_name)
+                        ->whereDate('date_release', '<', $startDate)
+                        ->sum('quantity_request');
+
+                    $item->opening_quantity = max(0, $item->quantity - $releasedBefore);
+                }
+            } else {
+
+                foreach ($data as $item) {
+                    $item->opening_quantity = $item->quantity;
+                }
+            }
             Log::info('Exported DuelExport Count', [
                 'ministry_id' => $ministryId,
                 'count'       => $data->count(),
@@ -672,8 +701,13 @@ class DuelReleaseController extends Controller
 
                 return redirect()->route('duelRelease.index', $params);
             }
-            $export = new DuelReleaseExport($data, $ministryId);
-
+           
+            $export = new DuelReleaseExport(
+                $data,
+                $ministryId,
+                $request->start_date,
+                $request->end_date
+            );
             return $export->export($request);
             // return view('maintenance.maintenance');
         } catch (\Throwable $e) {
