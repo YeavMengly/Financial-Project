@@ -13,11 +13,15 @@ class DuelReleaseExport
 {
     protected $data;
     protected $ministryId;
+    protected $startDate;
+    protected $endDate;
 
-    public function __construct($data, $ministryId)
+    public function __construct($data, $ministryId, $startDate = null, $endDate = null)
     {
-        $this->data       = $data;
+        $this->data = $data;
         $this->ministryId = $ministryId;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     public function export(Request $request)
@@ -37,13 +41,29 @@ class DuelReleaseExport
         | Header (city + date)
         |--------------------------------------------------------
         */
-        $currentDay   = date('d');
-        $currentMonth = date('m');
-        $currentYear  = date('Y');
+        $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
+        $currentMonth =  $khmerMonths[date('n') - 1];
+        $khmerNumbers = ['0' => '០', '1' => '១', '2' => '២', '3' => '៣', '4' => '៤', '5' => '៥', '6' => '៦', '7' => '៧', '8' => '៨', '9' => '៩'];
+        $currentYear = strtr(date('Y'), $khmerNumbers);
+        $currentDay = strtr(date('d'), $khmerNumbers);
 
-        $dateRangeText = 'រាជធានីភ្នំពេញថ្ងៃទី ' . $currentDay .
-            ' ខែ' . $currentMonth .
-            ' ឆ្នាំ ' . $currentYear;
+        if ($this->startDate && $this->endDate) {
+
+            $start = strtotime($this->startDate);
+            $end = strtotime($this->endDate);
+
+            $startDay = strtr(date('d', $start), $khmerNumbers);
+            $startMonth = $khmerMonths[date('n', $start) - 1];
+            $startYear = strtr(date('Y', $start), $khmerNumbers);
+
+            $endDay = strtr(date('d', $end), $khmerNumbers);
+            $endMonth = $khmerMonths[date('n', $end) - 1];
+            $endYear = strtr(date('Y', $end), $khmerNumbers);
+
+            $dateRangeText = "រាជធានីភ្នំពេញចាប់ពីថ្ងៃទី {$startDay} ខែ {$startMonth} ឆ្នាំ {$startYear} ដល់ថ្ងៃទី {$endDay} ខែ {$endMonth} ឆ្នាំ {$endYear}";
+        } else {
+            $dateRangeText = "រាជធានីភ្នំពេញថ្ងៃទី {$currentDay} ខែ {$currentMonth} ឆ្នាំ {$currentYear}";
+        }
 
         $row = 8;
         $sheet->setCellValue("A{$row}", $dateRangeText);
@@ -210,12 +230,14 @@ class DuelReleaseExport
                 $typeCode = $typeMap[$item->item_name];
                 [$colTotal,, $colRemain] = $columnMap[$typeCode];
 
-                $initialQty = (float) $item->quantity;
+                $initialQty = (float) $item->opening_quantity;
 
                 $sheet->setCellValue("C{$row}", " ស្តុកដើមគ្រា ");
                 $sheet->setCellValue("{$colTotal}{$row}", $initialQty);
                 $sheet->setCellValue("{$colRemain}{$row}", $initialQty);
-
+                $sheet->getStyle("E{$row}:N{$row}")
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
                 // Save the initial balance for this type
                 $runningBalance[$typeCode] = $initialQty;
             }
@@ -304,6 +326,9 @@ class DuelReleaseExport
                     }
                 }
                 // Apply style to this receipt row
+                $sheet->getStyle("E{$row}:N{$row}")
+                    ->getNumberFormat()
+                    ->setFormatCode('#,##0');
                 $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
                     'font' => [
                         'name' => 'Khmer OS Battambang',

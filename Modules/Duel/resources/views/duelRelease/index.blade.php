@@ -114,7 +114,7 @@
                             </a>
 
                             {{-- Export --}}
-                            <a href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
+                            <a id="btnExport" href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
@@ -226,6 +226,25 @@
             function() {
                 $('#duelrelease-table').DataTable().ajax.reload();
             });
+    </script>
+    <script>
+        $('#btnExport').on('click', function(e) {
+            e.preventDefault();
+
+            let baseUrl = "{{ route('duelRelease.export', ['params' => $params]) }}";
+
+            let params = new URLSearchParams({
+                cboNumber: $('#cboNumber').val(),
+                cboUserRequest: $('#cboUserRequest').val(),
+                cboDuelType: $('#cboDuelType').val(),
+                cboExecutiveUnit: $('#cboExecutiveUnit').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+            });
+
+            // ✅ Redirect with correct query string
+            window.location.href = baseUrl + '?' + params.toString();
+        });
     </script>
 
     {!! $dataTable->scripts() !!}
