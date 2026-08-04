@@ -29,6 +29,12 @@ Route::middleware('PermissionCheck')
         Route::get('direct/payment/expense-record/{params}/create', 'createExpenseRecord')->name('budgetDirectPayment.expenseRecord.create');
         Route::get('direct/payment/expense-record/{params}/edit/{id}', 'editExpenseRecord')->name('budgetDirectPayment.expenseRecord.edit');
         Route::get('direct/payment/expense-record/{params}/destroy/{id}', 'destroyExpenseRecord')->name('budgetDirectPayment.expenseRecord.destroy');
+        //training
+        Route::get('training/expense-record', 'getIndexExpenseRecordTraining')->name('initialTraining.expenseRecord.index');
+        Route::get('training/expense-record/{params}', 'getIndexExpenseRecordBookTraining')->name('budgetTraining.expenseRecord.index');
+        Route::get('training/expense-record/{params}/create', 'createExpenseRecordTraining')->name('budgetTraining.expenseRecord.create');
+        Route::get('training/expense-record/{params}/edit/{id}', 'editExpenseRecordTraining')->name('budgetTraining.expenseRecord.edit');
+        Route::get('training/expense-record/{params}/destroy/{id}', 'destroyExpenseRecordTraining')->name('budgetTraining.expenseRecord.destroy');
     });
 
 Route::controller(BudgetMandateController::class)->group(function () {
@@ -114,4 +120,23 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetDirectPayment.expenseRecord.editEarlyBalance');
 
     Route::get('direct/payment/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.exportExpenseRecordBook');
+    //Training
+    Route::post('training/expense-record/{params}/store', 'storeExpenseRecordTraing')->name('budgetTraining.expenseRecord.store');
+    Route::post('training/expense-record/{params}/update/{id}', 'updateExpenseRecordTraining')->name('budgetTraining.expenseRecord.update');
+    Route::get('training/expense-record/{params}/restore/{id}', 'restoreExpenseRecordTraining')->name('budgetTraining.expenseRecord.restore');
+
+    Route::get('training/expense-record/get-by-program/program-subs', 'getByProgramId')->name('budgetTraining.expenseRecord.by.program_sub');
+    Route::get('training/expense-record/get-by-program/agencies', 'getByAgency')->name('budgetTraining.expenseRecord.by.agency');
+    Route::get('training/expense-record/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetTraining.expenseRecord.by.cluster');
+
+    Route::get('training/expense-record/edit-by-program/program-subs', 'editByProgramId')->name('budgetTraining.expenseRecord.edit.program_sub');
+    Route::get('training/expense-record/edit-by-program/agencies', 'editByAgency')->name('budgetTraining.expenseRecord.edit.agency');
+    Route::get('training/expense-record/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetTraining.expenseRecord.edit.cluster');
+
+    Route::get('training/expense-record/{params}/get-early-balance', 'getEarlyBalance')
+        ->name('budgetTraining.expenseRecord.getEarlyBalance');
+    Route::get('training/expense-record/{params}/edit-early-balance', 'editEarlyBalance')
+        ->name('budgetTraining.expenseRecord.editEarlyBalance');
+
+    Route::get('training/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBookTraining')->name('budgetTraining.expenseRecord.exportExpenseRecordBook');
 });

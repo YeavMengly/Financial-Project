@@ -1,4 +1,5 @@
-@if (hasPermission('budgetProcurement.edit') or hasPermission('budgetProcurement.destroy'))
+
+@if (hasPermission('budgetTraining.expenseRecord.edit') or hasPermission('budgetTraining.expenseRecord.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
@@ -6,29 +7,29 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('budgetProcurement.edit'))
-                    <a href="{{ route('budgetProcurement.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                @if (hasPermission('budgetTraining.expenseRecord.edit'))
+                    <a href="{{ route('budgetTraining.expenseRecord.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit') }}
                     </a>
                 @endif
-                @if (hasPermission('procurement.edit.doc'))
-                    <a href="{{ route('procurement.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                @if (hasPermission('expenseRecordTraining.edit.doc'))
+                    <a href="{{ route('expenseRecordTraining.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}
                     </a>
                 @endif
-                @if (hasPermission('budgetProcurement.destroy'))
+                @if (hasPermission('budgetTraining.expenseRecord.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetProcurement.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
+                        onclick="confirm('{{ route('budgetTraining.expenseRecord.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
                         class="dropdown-item">
                         <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
                     </a>
                 @endif
             @else
-                @if (hasPermission('budgetProcurement.destroy'))
+                @if (hasPermission('budgetTraing.expenseRecord.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('budgetProcurement.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
+                        onclick="confirm('{{ route('budgetTraining.expenseRecord.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
                         class="dropdown-item">
                         <i class="bx bx-undo"></i> {{ __('buttons.restore') }}
                     </a>
