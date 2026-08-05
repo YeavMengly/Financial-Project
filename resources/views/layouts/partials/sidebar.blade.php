@@ -42,10 +42,13 @@
                         'budgetDirectPayment.*',
                         'royaltyMandate.*',
                         'royaltyVoucher.*',
+                        'initialTraining.*',
+                        'budgetTraining.*',
                     ]);
 
                     $directPaymentActive = Request::routeIs('initialDirectPayment.*');
                     $preFinancingActive = Request::routeIs(['initialRoyaltyMandate.*', 'initialRoyaltyVoucher.*']);
+                    $training = Request::routeIs('initialTraining.*');
                 @endphp
 
                 <li class="{{ $budgetPlanActive ? 'mm-active' : '' }}">
@@ -192,40 +195,38 @@
                                         </a>
                                     </li>
                                 @endif
+                                
+                                <li class="{{ $training ? 'mm-active' : '' }}">
+                                    <a href="javascript: void(0);"
+                                        class="has-arrow {{ $training ? 'active' : '' }}">
+                                        <i data-feather="sliders"></i>
+                                        <span data-key="t-direct-payment">{{ __('menus.training') }}</span>
+                                    </a>
+                                    <ul class="sub-menu {{ $training ? 'mm-show' : '' }}"
+                                        aria-expanded="{{ $training ? 'true' : 'false' }}">
+                                        @if (hasPermission('initialTraining.expenseRecord.index'))
+                                            <li>
+                                                <a href="{{ route('initialTraining.expenseRecord.index') }}"
+                                                    class="{{ Request::routeIs('initialTraining.expenseRecord.*') ? 'active' : '' }}">
+                                                    <i data-feather="file-plus"></i>
+                                                    <span
+                                                        data-key="t-direct-expense-record">{{ __('menus.expense.record.book') }}</span>
+                                                </a>
+                                            </li>
+                                        @endif
 
-                                @if (hasPermission('initialTraining.expenseRecord.index'))
-                                    <li>
-                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
-                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
-                                            <i data-feather="file-plus"></i>
-                                            <span data-key="t-training">{{ __('menus.training') }}</span>
-                                        </a>
-                                        <ul>
-                                            @if (hasPermission('initialTraining.expenseRecord.index'))
-                                                <li>
-                                                    <a href="{{ route('initialTraining.expenseRecord.index') }}"
-                                                        class="{{ Request::routeIs('initialTraining.expenseRecord.*') ? 'active' : '' }}">
-                                                        <i data-feather="file-plus"></i>
-                                                        <span data-key="t-budget-control-voucher">
-                                                            {{ __('menus.expense.record.book') }}
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            @endif
-                                            @if (hasPermission('initialTraining.paymentDeadline.index'))
-                                                <li>
-                                                    <a href="{{ route('initialTraining.paymentDeadline.index') }}"
-                                                        class="{{ Request::routeIs('initialTraining.paymentDeadline.*') ? 'active' : '' }}">
-                                                        <i data-feather="file-plus"></i>
-                                                        <span data-key="t-budget-control-voucher">
-                                                            {{ __('menus.payment.deadline') }}
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </li>
-                                @endif
+                                        @if (hasPermission('initialTraining.paymentDeadline.index'))
+                                            <li>
+                                                <a href="{{ route('initialTraining.paymentDeadline.index') }}"
+                                                    class="{{ Request::routeIs('initialTraining.paymentDeadline.*') ? 'active' : '' }}">
+                                                    <i data-feather="file-plus"></i>
+                                                    <span
+                                                        data-key="t-direct-payment-deadline">{{ __('menus.payment.deadline') }}</span>
+                                                </a>
+                                            </li>
+                                        @endif
+                                    </ul>
+                                </li>
                             </ul>
                         </li>
 
