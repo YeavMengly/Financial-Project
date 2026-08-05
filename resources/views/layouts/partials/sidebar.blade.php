@@ -24,182 +24,181 @@
                         </a>
                     </li>
                 @endif
-                {{-- @php
-                    $beginCreditActive =
-                        Request::routeIs('initialBudgetVoucher.*') ||
-                        Request::routeIs('initialBudgetMandate.*') ||
-                        Request::routeIs('beginVoucher.*') ||
-                        Request::routeIs('beginMandate.*');
-                @endphp --}}
-
-                {{-- <li class="{{ $beginCreditActive ? 'mm-active' : '' }}">
-                    <a href="javascript: void(0);" class="has-arrow">
-                        <i data-feather="credit-card"></i>
-                        <span data-key="t-beginning-credit">{{ __('menus.credit') }}</span>
-                    </a>
-                    <ul class="sub-menu {{ $beginCreditActive ? 'mm-show' : '' }}"
-                        aria-expanded="{{ $beginCreditActive ? 'true' : 'false' }}">
-
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialBudgetVoucher.index') }}"
-                                    class="{{ Request::routeIs('initialBudgetVoucher.*') ? 'active' : '' }}">
-                                    <i data-feather="book"></i>
-                                    <span data-key="t-initialVoucher">{{ __('menus.initial.voucher') }}</span>
-                                </a>
-                            </li>
-                        @endif
-
-                        @if (hasPermission('ministries.index'))
-                            <li>
-                                <a href="{{ route('initialBudgetMandate.index') }}"
-                                    class="{{ Request::routeIs('initialBudgetMandate.*') ? 'active' : '' }}">
-                                    <i data-feather="book"></i>
-                                    <span data-key="t-initialMandate">{{ __('menus.initial.mandate') }}</span>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-                </li> --}}
 
                 {{-- ========== Budget Plan ========== --}}
                 @php
-                    $budgetPlanActive =
-                        Request::routeIs('initialVoucher.*') ||
-                        Request::routeIs('initialMandate.*') ||
-                        Request::routeIs('initialAdvancePayment.*') ||
-                        Request::routeIs('initialDirectPayment.expenseRecord.*') ||
-                        Request::routeIs('initialDirectPayment.paymentDeadline.*') ||
-                        Request::routeIs('budgetVoucher.*') ||
-                        Request::routeIs('budgetMandate.*') ||
-                        Request::routeIs('budgetAdvancePayment.*') ||
-                        Request::routeIs('budgetDirectPayment.expenseRecord.*') ||
-                        Request::routeIs('budgetDirectPayment.paymentDeadline.*');
+                    // Refactored to pass an array to routeIs() for clean readability
+                    $budgetPlanActive = Request::routeIs([
+                        'initialMandate.*',
+                        'initialProcurement.*',
+                        'initialAdvancePayment.*',
+                        'initialVoucher.*',
+                        'initialDirectPayment.*',
+                        'initialRoyaltyMandate.*',
+                        'initialRoyaltyVoucher.*',
+                        'budgetVoucher.*',
+                        'budgetMandate.*',
+                        'budgetAdvancePayment.*',
+                        'budgetDirectPayment.*',
+                        'royaltyMandate.*',
+                        'royaltyVoucher.*',
+                    ]);
+
+                    $directPaymentActive = Request::routeIs('initialDirectPayment.*');
+                    $preFinancingActive = Request::routeIs(['initialRoyaltyMandate.*', 'initialRoyaltyVoucher.*']);
                 @endphp
+
                 <li class="{{ $budgetPlanActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="sliders"></i>
                         <span data-key="t-budget-plan">{{ __('menus.budget.plan') }}</span>
                     </a>
+
                     <ul class="sub-menu {{ $budgetPlanActive ? 'mm-show' : '' }}"
                         aria-expanded="{{ $budgetPlanActive ? 'true' : 'false' }}">
 
+                        {{-- Guarantee / Mandate --}}
                         @if (hasPermission('initialMandate.index'))
                             <li>
                                 <a href="{{ route('initialMandate.index') }}"
                                     class="{{ Request::routeIs('initialMandate.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-mandate">
-                                        {{ __('menus.expenditure.guarantee') }}
-                                    </span>
+                                    <span
+                                        data-key="t-budget-control-mandate">{{ __('menus.expenditure.guarantee') }}</span>
                                 </a>
                             </li>
                         @endif
 
+                        {{-- Procurement --}}
                         @if (hasPermission('initialProcurement.index'))
                             <li>
                                 <a href="{{ route('initialProcurement.index') }}"
                                     class="{{ Request::routeIs('initialProcurement.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-procurement">
-                                        {{ __('menus.expenditure.procurement') }}
-                                    </span>
+                                    <span
+                                        data-key="t-budget-control-procurement">{{ __('menus.expenditure.procurement') }}</span>
                                 </a>
                             </li>
                         @endif
 
+                        {{-- Advance Payment --}}
                         @if (hasPermission('initialAdvancePayment.index'))
                             <li>
                                 <a href="{{ route('initialAdvancePayment.index') }}"
                                     class="{{ Request::routeIs('initialAdvancePayment.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-advance-payment">
-                                        {{ __('menus.advance.payment') }}
-                                    </span>
+                                    <span
+                                        data-key="t-budget-control-advance-payment">{{ __('menus.advance.payment') }}</span>
                                 </a>
                             </li>
                         @endif
 
-                        <li class="menu-title" data-key="t-inventory">{{ __('menus.payment') }}</li>
+                        {{-- Section Divider --}}
+                        <li class="menu-title" data-key="t-payment-title">{{ __('menus.payment') }}</li>
 
-
+                        {{-- Voucher Payment --}}
                         @if (hasPermission('initialVoucher.index'))
                             <li>
                                 <a href="{{ route('initialVoucher.index') }}"
                                     class="{{ Request::routeIs('initialVoucher.*') ? 'active' : '' }}">
                                     <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-voucher">
-                                        {{ __('menus.payment') }}
-                                    </span>
+                                    <span data-key="t-budget-control-voucher">{{ __('menus.payment') }}</span>
                                 </a>
                             </li>
                         @endif
 
-                        <li>
-                            <a href="javascript: void(0);" class="has-arrow">
+                        {{-- Direct Payment Submenu --}}
+                        <li class="{{ $directPaymentActive ? 'mm-active' : '' }}">
+                            <a href="javascript: void(0);"
+                                class="has-arrow {{ $directPaymentActive ? 'active' : '' }}">
                                 <i data-feather="sliders"></i>
-                                <span data-key="t-budget-plan">{{ __('menus.direct.payment') }}</span>
+                                <span data-key="t-direct-payment">{{ __('menus.direct.payment') }}</span>
                             </a>
-                            <ul>
+                            <ul class="sub-menu {{ $directPaymentActive ? 'mm-show' : '' }}"
+                                aria-expanded="{{ $directPaymentActive ? 'true' : 'false' }}">
                                 @if (hasPermission('initialDirectPayment.expenseRecord.index'))
                                     <li>
                                         <a href="{{ route('initialDirectPayment.expenseRecord.index') }}"
                                             class="{{ Request::routeIs('initialDirectPayment.expenseRecord.*') ? 'active' : '' }}">
                                             <i data-feather="file-plus"></i>
-                                            <span data-key="t-budget-control-voucher">
-                                                {{ __('menus.expense.record.book') }}
-                                            </span>
+                                            <span
+                                                data-key="t-direct-expense-record">{{ __('menus.expense.record.book') }}</span>
                                         </a>
                                     </li>
                                 @endif
+
                                 @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
                                     <li>
                                         <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
                                             class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
                                             <i data-feather="file-plus"></i>
-                                            <span data-key="t-budget-control-voucher">
-                                                {{ __('menus.payment.deadline') }}
-                                            </span>
+                                            <span
+                                                data-key="t-direct-payment-deadline">{{ __('menus.payment.deadline') }}</span>
                                         </a>
                                     </li>
                                 @endif
                             </ul>
                         </li>
 
-                        <li>
-                            <a href="javascript: void(0);" class="has-arrow">
+                        {{-- Pre-Financing Submenu --}}
+                        <li class="{{ $preFinancingActive ? 'mm-active' : '' }}">
+                            <a href="javascript: void(0);" class="has-arrow {{ $preFinancingActive ? 'active' : '' }}">
                                 <i data-feather="sliders"></i>
-                                <span data-key="t-budget-plan">{{ __('menus.pre.financing') }}</span>
+                                <span data-key="t-pre-financing">{{ __('menus.pre.financing') }}</span>
                             </a>
-                            <ul>
-                                @if (hasPermission('initialDirectPayment.expenseRecord.index'))
-                                    <li>
-                                        <a href="{{ route('initialDirectPayment.expenseRecord.index') }}"
-                                            class="{{ Request::routeIs('initialDirectPayment.expenseRecord.*') ? 'active' : '' }}">
+                            <ul class="sub-menu {{ $preFinancingActive ? 'mm-show' : '' }}"
+                                aria-expanded="{{ $preFinancingActive ? 'true' : 'false' }}">
+
+                                {{-- Nested Royalty Menu --}}
+                                @if (hasPermission('initialRoyaltyMandate.index') || hasPermission('initialRoyaltyVoucher.index'))
+                                    <li class="{{ $preFinancingActive ? 'mm-active' : '' }}">
+                                        <a href="javascript:void(0);"
+                                            class="has-arrow {{ $preFinancingActive ? 'active' : '' }}">
                                             <i data-feather="file-plus"></i>
-                                            <span data-key="t-budget-control-voucher">
-                                                {{ __('menus.per.diem') }}
-                                            </span>
+                                            <span data-key="t-royalty-menu">{{ __('menus.royalty') }}</span>
                                         </a>
+                                        <ul class="sub-menu {{ $preFinancingActive ? 'mm-show' : '' }}"
+                                            aria-expanded="{{ $preFinancingActive ? 'true' : 'false' }}">
+                                            @if (hasPermission('initialRoyaltyMandate.index'))
+                                                <li>
+                                                    <a href="{{ route('initialRoyaltyMandate.index') }}"
+                                                        class="{{ Request::routeIs('initialRoyaltyMandate.*') ? 'active' : '' }}">
+                                                        <i data-feather="file-plus"></i>
+                                                        {{ __('menus.expense.record.book') }}
+                                                    </a>
+                                                </li>
+                                            @endif
+
+                                            @if (hasPermission('initialRoyaltyVoucher.index'))
+                                                <li>
+                                                    <a href="{{ route('initialRoyaltyVoucher.index') }}"
+                                                        class="{{ Request::routeIs('initialRoyaltyVoucher.*') ? 'active' : '' }}">
+                                                        <i data-feather="file-plus"></i>
+                                                        {{ __('menus.payment.deadline') }}
+                                                    </a>
+                                                </li>
+                                            @endif
+                                        </ul>
                                     </li>
                                 @endif
+
+                                {{-- Note: Update these route names/permissions if you have separate ones for Missions and Training --}}
                                 @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
                                     <li>
                                         <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
                                             class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
                                             <i data-feather="file-plus"></i>
-                                            <span data-key="t-budget-control-voucher">
-                                                {{ __('menus.missions') }}
-                                            </span>
+                                            <span data-key="t-missions">{{ __('menus.missions') }}</span>
                                         </a>
                                     </li>
                                 @endif
 
                                 @if (hasPermission('initialTraining.expenseRecord.index'))
                                     <li>
-                                        <a href="javascript: void(0);" class="has-arrow">
-                                            <i data-feather="sliders"></i>
-                                            <span data-key="t-budget-plan"> {{ __('menus.training') }}</span>
+                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
+                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
+                                            <i data-feather="file-plus"></i>
+                                            <span data-key="t-training">{{ __('menus.training') }}</span>
                                         </a>
                                         <ul>
                                             @if (hasPermission('initialTraining.expenseRecord.index'))
@@ -230,20 +229,6 @@
                             </ul>
                         </li>
 
-                        {{-- @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
-                            <li>
-                                <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
-                                    class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
-                                    <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget-control-voucher">
-                                        {{ __('menus.payment.deadline') }}
-                                
-                                    </span>
-                                </a>
-                            </li>
-                        @endif --}}
-
-
                     </ul>
                 </li>
 
@@ -255,37 +240,6 @@
                         Request::routeIs('voucher.*') ||
                         Request::routeIs('mandate.*');
                 @endphp
-                {{-- <li class="{{ $budgetControlActive ? 'mm-active' : '' }}">
-                    <a href="javascript: void(0);" class="has-arrow">
-                        <i data-feather="pie-chart"></i>
-                        <span data-key="t-pages">{{ __('menus.budget.control') }}</span>
-                    </a>
-                    <ul class="sub-menu {{ $budgetControlActive ? 'mm-show' : '' }}"
-                        aria-expanded="{{ $budgetControlActive ? 'true' : 'false' }}">
-
-                        @if (hasPermission('voucherLoan.index'))
-                            <li>
-                                <a href="{{ route('voucherLoan.index') }}"
-                                    class="{{ Request::routeIs('voucherLoan.*') ? 'active' : '' }}">
-                                    <i data-feather="file-plus"></i>
-                                    <span data-key="t-budget.control.voucherLoan">
-                                        {{ __('menus.initial.voucher') }}
-                                    </span>
-                                </a>
-                            </li>
-                        @endif
-
-                        @if (hasPermission('mandateLoan.index'))
-                            <li>
-                                <a href="{{ route('mandateLoan.index') }}"
-                                    class="{{ Request::routeIs('mandateLoan.*') ? 'active' : '' }}">
-                                    <i data-feather="briefcase"></i>
-                                    <span data-key="t-dashboard">{{ __('menus.initial.mandate') }}</span>
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-                </li> --}}
 
                 @if (hasPermission('voucherLoan.index'))
                     <li>
@@ -307,11 +261,13 @@
                         Request::routeIs('duelEntry.*') ||
                         Request::routeIs('duelRelease.*');
                 @endphp
+
                 <li class="{{ $duelActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="file-text"></i>
                         <span data-key="t-duel">{{ __('menus.duel') }}</span>
                     </a>
+
                     <ul class="sub-menu {{ $duelActive ? 'mm-show' : '' }}"
                         aria-expanded="{{ $duelActive ? 'true' : 'false' }}">
 
@@ -320,7 +276,7 @@
                                 <a href="{{ route('initialDuelEntry.index') }}"
                                     class="{{ Request::routeIs('initialDuelEntry.*') ? 'active' : '' }}">
                                     <i data-feather="crosshair"></i>
-                                    <span data-key="t-duel">{{ __('menus.duel.entry') }}</span>
+                                    <span data-key="t-duel-entry">{{ __('menus.duel.entry') }}</span>
                                 </a>
                             </li>
                         @endif
@@ -330,10 +286,11 @@
                                 <a href="{{ route('initialDuelRelease.index') }}"
                                     class="{{ Request::routeIs('initialDuelRelease.*') ? 'active' : '' }}">
                                     <i data-feather="package"></i>
-                                    <span data-key="t-duel">{{ __('menus.duel.release') }}</span>
+                                    <span data-key="t-duel-release">{{ __('menus.duel.release') }}</span>
                                 </a>
                             </li>
                         @endif
+
                     </ul>
                 </li>
 
@@ -345,33 +302,38 @@
                         Request::routeIs('materialEntry.*') ||
                         Request::routeIs('materialRelease.*');
                 @endphp
+
                 <li class="{{ $materialActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="file-text"></i>
-                        <span data-key="t-inventory">{{ __('menus.material') }}</span>
+                        <span data-key="t-material">{{ __('menus.material') }}</span>
                     </a>
+
                     <ul class="sub-menu {{ $materialActive ? 'mm-show' : '' }}"
                         aria-expanded="{{ $materialActive ? 'true' : 'false' }}">
 
-                        @if (hasPermission('ministries.index'))
+                        {{-- Material Entry --}}
+                        @if (hasPermission('initialMaterialEntry.index'))
                             <li>
                                 <a href="{{ route('initialMaterialEntry.index') }}"
                                     class="{{ Request::routeIs('initialMaterialEntry.*') ? 'active' : '' }}">
                                     <i data-feather="git-merge"></i>
-                                    <span data-key="t-duel">{{ __('menus.material.entry') }}</span>
+                                    <span data-key="t-material-entry">{{ __('menus.material.entry') }}</span>
                                 </a>
                             </li>
                         @endif
 
-                        @if (hasPermission('ministries.index'))
+                        {{-- Material Release --}}
+                        @if (hasPermission('initialMaterialRelease.index'))
                             <li>
                                 <a href="{{ route('initialMaterialRelease.index') }}"
                                     class="{{ Request::routeIs('initialMaterialRelease.*') ? 'active' : '' }}">
                                     <i data-feather="package"></i>
-                                    <span data-key="t-material">{{ __('menus.material.release') }}</span>
+                                    <span data-key="t-material-release">{{ __('menus.material.release') }}</span>
                                 </a>
                             </li>
                         @endif
+
                     </ul>
                 </li>
 

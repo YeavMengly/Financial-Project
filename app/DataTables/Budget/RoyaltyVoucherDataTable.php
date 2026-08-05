@@ -3,18 +3,19 @@
 namespace App\DataTables\Budget;
 
 use App\Models\BudgetPlan\BudgetVoucher;
-use Carbon\Carbon;
+use App\Models\RoyaltyVoucher;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Illuminate\Http\Request;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class BudgetVoucherDataTable extends DataTable
+class RoyaltyVoucherDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -56,7 +57,7 @@ class BudgetVoucherDataTable extends DataTable
                 return $row->name_kh ?? '-';
             })
             ->addColumn('action', function ($module) {
-                return view('budgetplan::budgetVoucher.action', ['module' => $module]);
+                return view('budgetplan::royalty.royaltyvoucher.action', ['module' => $module]);
             })
             ->editColumn('is_archived', function ($module) {
                 $notes = ($module->is_archived == 2) ? '<button class="btn btn-sm btn-outline-success">បានបញ្ចប់</button>' : '<button class="btn btn-sm btn-outline-primary">កំពុងធ្វើ</button>';
@@ -124,33 +125,25 @@ class BudgetVoucherDataTable extends DataTable
         if ($request->cboAccountSub) {
             $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
         }
-        if ($request->CboPaymentVoucherNumber) {
-            $model->where(
-                'budget_vouchers.payment_voucher_number',
-                $request->CboPaymentVoucherNumber
-            );
-        }
+
         if ($request->filled('CboMandate')) {
             $model->where(
                 'budget_vouchers.day_of_number',
                 $request->CboMandate
             );
         }
-
-
         //Date
-        if ($request->filled('start_date') && $request->filled('end_date')) {
-            $model->whereDate('budget_vouchers.request_date', '>=', $request->start_date)
-                ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
-        } else {
-            if ($request->filled('start_date')) {
-                $model->whereDate('budget_vouchers.request_date', '>=', $request->start_date);
-            }
-            if ($request->filled('end_date')) {
-                $model->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
-            }
-        }
-
+        // if ($request->filled('start_date') && $request->filled('end_date')) {
+        //     $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
+        //         ->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
+        // } else {
+        //     if ($request->filled('start_date')) {
+        //         $model->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
+        //     }
+        //     if ($request->filled('end_date')) {
+        //         $model->whereDate('budget_vouchers.request_date', '<=', $request->end_date);
+        //     }
+        // }
         $model->leftJoin('account_subs', function ($join) use ($id) {
             $join->on('budget_vouchers.account_sub_id', '=', 'account_subs.no')
                 ->where('account_subs.ministry_id', '=', $id);
@@ -158,23 +151,9 @@ class BudgetVoucherDataTable extends DataTable
         $model->leftJoin('agencies', 'budget_vouchers.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_vouchers.expense_type_id', '=', 'expense_types.id');
 
-
-        if ($request->filled('cboExpenseType')) {
-
-            $expenseType = (int) $request->cboExpenseType;
-
-            if ($expenseType > 1) {
-                // 2 -> expense_type_id = 1
-                // 3 -> expense_type_id = 2
-                // 4 -> expense_type_id = 3
-                $model->where('budget_vouchers.expense_type_id', $expenseType - 1);
-            }
-
-            // expenseType == 1 -> no filter (show all)
-        }
-
         // ===== FIXED CONDITION =====
         $model->where('budget_vouchers.ministry_id', $id);
+        $model->where('budget_vouchers.expense_type_id', 7);
 
         // ===== SELECT =====
         $model->select([
@@ -186,9 +165,10 @@ class BudgetVoucherDataTable extends DataTable
             'budget_vouchers.no',
             'budget_vouchers.budget',
             'budget_vouchers.legal_number',
+            'budget_vouchers.legal_id',
             'budget_vouchers.legal_name',
             'budget_vouchers.temporary_id',
-            'budget_vouchers.payment_voucher_number',
+            'budget_vouchers.payment_voucher_number AS pvn',
             'budget_vouchers.day_of_number',
             'budget_vouchers.is_archived',
             'budget_vouchers.expense_type_id',
@@ -215,7 +195,6 @@ class BudgetVoucherDataTable extends DataTable
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
-                    'emptyTable' => 'Invalid Payment Voucher Number or no data found.'
                 ],
             ])
             ->ajax([
@@ -223,9 +202,8 @@ class BudgetVoucherDataTable extends DataTable
                     d.cboTodo = $("#cboTodo").val();
                     d.cboStatus = $("#cboStatus").val();
                     d.cboExpenseType = $("#cboExpenseType").val();
-                    d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
-                    d.CboMandate = $("#CboMandate").val();
                     d.cboAccountSub = $("#cboAccountSub").val();
+                    d.CboMandate = $("#CboMandate").val();
                     d.start_date = $("#start_date").val();
                     d.end_date = $("#end_date").val();
                 }',
@@ -233,10 +211,10 @@ class BudgetVoucherDataTable extends DataTable
             ->initComplete('function () {
                 $("#filter").submit(function(event) {
                     event.preventDefault();
-                    $("#budgetvoucher-table").DataTable().ajax.reload();
+                    $("#royaltyvoucher-table").DataTable().ajax.reload();
                 });
             }')
-            ->setTableId('budgetvoucher-table')
+            ->setTableId('royaltyvoucher-table')
             ->columns($this->getColumns());
     }
 
@@ -249,18 +227,18 @@ class BudgetVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
-            Column::make('payment_voucher_number')->title(__('tables.th.pvn'))->width(30)->addClass('align-middle'),
-            Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
+            // Column::make('pvn')->title(__('tables.th.code'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.id'))->width(30)->addClass('align-middle'),
+            Column::make('day_of_number')->title(__('tables.th.code'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
+            Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
-            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.id'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
-            Column::make('temporary_id')->title(__('tables.th.temporary.id'))->width(30)->addClass('align-middle'),
-            Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
@@ -269,12 +247,11 @@ class BudgetVoucherDataTable extends DataTable
         ];
     }
 
-
     /**
      * Get the filename for export.
      */
     protected function filename(): string
     {
-        return 'BudgetVoucher_' . date('YmdHis');
+        return 'RoyaltyVoucher_' . date('YmdHis');
     }
 }

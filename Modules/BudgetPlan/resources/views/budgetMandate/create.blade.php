@@ -8,7 +8,7 @@
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
-    
+
     <style>
         /* Green border feedback for optional/skipped/valid fields */
         .has-success .form-control,
@@ -27,7 +27,8 @@
                 <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.guarantee') }}</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.expenditure.guarantee') }}</a></li>
+                        <li class="breadcrumb-item"><a
+                                href="javascript: void(0);">{{ __('menus.expenditure.guarantee') }}</a></li>
                         <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
                     </ol>
                 </div>
@@ -41,8 +42,8 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form id="pristine-valid-example" action="{{ route('budgetMandate.store', $params) }}"
-                        method="POST" enctype="multipart/form-data" novalidate>
+                    <form id="pristine-valid-example" action="{{ route('budgetMandate.store', $params) }}" method="POST"
+                        enctype="multipart/form-data" novalidate>
                         @csrf
 
                         <div class="row">
@@ -81,12 +82,15 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label for="legalNumber" class="form-label mb-0">{{ __('forms.legal.number') }}</label>
-                                        
+                                        <label for="legalNumber"
+                                            class="form-label mb-0">{{ __('forms.legal.number') }}</label>
+
                                         <!-- Skip Switch -->
                                         <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="skipLegalNumber" style="cursor: pointer;">
-                                            <label class="form-check-label font-size-12 text-muted" for="skipLegalNumber" style="cursor: pointer;">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="skipLegalNumber" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted" for="skipLegalNumber"
+                                                style="cursor: pointer;">
                                                 រំលង / មិនបញ្ចូលលេខ
                                             </label>
                                         </div>
@@ -95,8 +99,9 @@
                                     <input class="form-control" id="legalNumber" name="legalNumber"
                                         data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1" 
-                                        type="number" placeholder="{{ __('forms.legal.number') }}" required tabindex="2">
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
+                                        type="number" placeholder="{{ __('forms.legal.number') }}" required
+                                        tabindex="2">
                                 </div>
                             </div>
 
@@ -111,12 +116,14 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboProgram" class="form-label font-size-13 text-muted">{{ __('forms.program') }}</label>
+                                    <label for="cboProgram"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.program') }}</label>
                                     <select class="form-select" id="cboProgram" name="cboProgram" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($program as $p)
-                                            <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
+                                            <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -124,7 +131,8 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboProgramSub" class="form-label font-size-13 text-muted">{{ __('forms.program.sub') }}</label>
+                                    <label for="cboProgramSub"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.program.sub') }}</label>
                                     <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
@@ -134,7 +142,8 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboCluster" class="form-label font-size-13 text-muted">{{ __('forms.cluster') }}</label>
+                                    <label for="cboCluster"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.cluster') }}</label>
                                     <select id="cboCluster" class="form-select" name="cboCluster" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
@@ -144,7 +153,8 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboAgency" class="form-label font-size-13 text-muted">{{ __('forms.agency') }}</label>
+                                    <label for="cboAgency"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.agency') }}</label>
                                     <select id="cboAgency" class="form-select" name="cboAgency" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
@@ -154,12 +164,14 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboSubAccount" class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
+                                    <label for="cboSubAccount"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
                                     <select class="form-select" id="cboSubAccount" name="cboSubAccount" required
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($accountSub as $bv)
-                                            <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
+                                            <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -177,9 +189,9 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}</label>
-                                    <input type="text" id="transactionDate" name="transactionDate" class="form-control" 
-                                        placeholder="{{ __('forms.select_transaction_date') }}" required 
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
+                                    <input type="text" id="transactionDate" name="transactionDate"
+                                        class="form-control" placeholder="{{ __('forms.select_transaction_date') }}"
+                                        required data-pristine-required-message="{{ __('messages.required') }}" />
                                 </div>
                             </div>
 
@@ -211,12 +223,14 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <button class="btn btn-primary" type="submit" name="submit" value="save">{{ __('buttons.save') }}</button>
+                            <button class="btn btn-primary" type="submit" name="submit"
+                                value="save">{{ __('buttons.save') }}</button>
                             <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
                             <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                             </a>
-                            <a class="btn btn-dark" href="{{ route('budgetMandate.index', $params) }}">{{ __('buttons.back') }}</a>
+                            <a class="btn btn-dark"
+                                href="{{ route('budgetMandate.index', $params) }}">{{ __('buttons.back') }}</a>
                         </div>
                     </form>
                 </div>
@@ -321,7 +335,8 @@
                     callbacks: {
                         onChange: function(contents) {
                             const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                            document.getElementById('vDescription').value = clean === '' ? '' : contents;
+                            document.getElementById('vDescription').value = clean === '' ? '' :
+                            contents;
                             pristine.validate(document.getElementById('vDescription'));
                         }
                     }
@@ -345,15 +360,23 @@
             let agencyChoices = new Choices('#cboAgency', defaultChoicesOpts);
             let subAccountChoices = new Choices('#cboSubAccount', defaultChoicesOpts);
 
-            const resetSelect = (selector) => $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            const resetSelect = (selector) => $(selector).html(
+                `<option value="">{{ __('forms.search...') }}</option>`);
             const resetChoices = (selector, instance) => {
                 instance.destroy();
                 return new Choices(selector, defaultChoicesOpts);
             };
 
-            const loadOptions = ({ url, data, targetSelect, instanceRefSetter }) => {
+            const loadOptions = ({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) => {
                 $.ajax({
-                    url, type: "GET", data,
+                    url,
+                    type: "GET",
+                    data,
                     success: function(html) {
                         $(targetSelect).html(html);
                         instanceRefSetter();
@@ -372,7 +395,7 @@
             // ==========================================
             $('#cboProgram').on('change', function() {
                 const programId = $(this).val();
-                
+
                 resetSelect('#cboProgramSub');
                 programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
                 resetSelect('#cboAgency');
@@ -384,16 +407,22 @@
 
                 loadOptions({
                     url: "{{ route('budgetMandate.by.program_sub') }}",
-                    data: { program_id: programId },
+                    data: {
+                        program_id: programId
+                    },
                     targetSelect: '#cboProgramSub',
-                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub', programSubChoices)
+                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub',
+                        programSubChoices)
                 });
 
                 loadOptions({
                     url: "{{ route('budgetMandate.by.agency') }}",
-                    data: { program_id: programId },
+                    data: {
+                        program_id: programId
+                    },
                     targetSelect: '#cboAgency',
-                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency', agencyChoices)
+                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency',
+                        agencyChoices)
                 });
             });
 
@@ -401,14 +430,17 @@
                 const programSubId = $(this).val();
                 resetSelect('#cboCluster');
                 clusterChoices = resetChoices('#cboCluster', clusterChoices);
-                
+
                 if (!programSubId) return;
 
                 loadOptions({
                     url: "{{ route('budgetMandate.by.cluster') }}",
-                    data: { program_sub_id: programSubId },
+                    data: {
+                        program_sub_id: programSubId
+                    },
                     targetSelect: '#cboCluster',
-                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster', clusterChoices)
+                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster',
+                        clusterChoices)
                 });
             });
 
@@ -416,9 +448,16 @@
             // 6. EARLY BALANCE & CREDIT CALCULATIONS
             // ==========================================
             const n = v => (isNaN(+v) ? 0 : +v);
-            const fmt = v => n(v).toLocaleString('en-US', { maximumFractionDigits: 2 });
-            const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = fmt(val); };
-            const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying', 'remaining_credit'].forEach(id => setText(id, 0));
+            const fmt = v => n(v).toLocaleString('en-US', {
+                maximumFractionDigits: 2
+            });
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = fmt(val);
+            };
+            const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
+                'deadline_balance', 'applying', 'remaining_credit'
+            ].forEach(id => setText(id, 0));
 
             const budgetInput = document.getElementById('budget');
             const recomputeRemaining = () => {
@@ -440,14 +479,19 @@
                     return;
                 }
 
-                const url = new URL("{{ route('budgetMandate.getEarlyBalance', ['params' => $params]) }}", window.location.origin);
+                const url = new URL("{{ route('budgetMandate.getEarlyBalance', ['params' => $params]) }}",
+                    window.location.origin);
                 url.searchParams.set('program_id', programId);
                 url.searchParams.set('program_sub_id', programSubId);
                 url.searchParams.set('cluster_id', clusterId);
                 url.searchParams.set('account_sub_id', accountSubId);
 
                 try {
-                    const res = await fetch(url.toString(), { headers: { 'Accept': 'application/json' } });
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
                     const data = await res.json();
                     setText('fin_law', data.fin_law);
                     setText('credit_movement', data.credit_movement);
@@ -478,7 +522,7 @@
 
                     if (this.checked) {
                         legalInput.value = '';
-                        legalInput.disabled = true; 
+                        legalInput.disabled = true;
                         legalInput.readOnly = true;
 
                         // Add Green success styling
@@ -505,7 +549,8 @@
                         // Restore Rules
                         legalInput.setAttribute('required', 'true');
                         legalInput.setAttribute('min', '1');
-                        legalInput.setAttribute('data-pristine-required-message', "{{ __('messages.required') }}");
+                        legalInput.setAttribute('data-pristine-required-message',
+                            "{{ __('messages.required') }}");
                         legalInput.setAttribute('data-pristine-min-message', 'លំដាប់ ត្រូវតែធំជាងសូន្យ');
                         legalInput.setAttribute('data-pristine-integer-message', 'លំដាប់ ត្រូវតែលេខ');
                     }
@@ -529,7 +574,8 @@
 
                 // Force Summernote HTML to sync before validation
                 if ($('#vDescription').length) {
-                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $('#vDescription').summernote('code');
+                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
+                        '#vDescription').summernote('code');
                     document.getElementById('vDescription').value = summernoteContent;
                 }
 
@@ -538,15 +584,18 @@
                 if (isValid) {
                     // Unlock disabled fields before posting so Laravel does not throw a missing key error
                     if (legalInput && skipLegalCheckbox && skipLegalCheckbox.checked) {
-                        legalInput.disabled = false; 
+                        legalInput.disabled = false;
                     }
-                    
+
                     // Safe form submission
                     HTMLFormElement.prototype.submit.call(form);
                 } else {
                     const firstError = form.querySelector('.has-danger');
                     if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                     }
                 }
             });
