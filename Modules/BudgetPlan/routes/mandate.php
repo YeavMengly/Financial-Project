@@ -120,7 +120,7 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetDirectPayment.expenseRecord.editEarlyBalance');
 
     Route::get('direct/payment/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.exportExpenseRecordBook');
-    //Training
+    /// Training
     Route::post('training/expense-record/{params}/store', 'storeExpenseRecordTraing')->name('budgetTraining.expenseRecord.store');
     Route::post('training/expense-record/{params}/update/{id}', 'updateExpenseRecordTraining')->name('budgetTraining.expenseRecord.update');
     Route::get('training/expense-record/{params}/restore/{id}', 'restoreExpenseRecordTraining')->name('budgetTraining.expenseRecord.restore');

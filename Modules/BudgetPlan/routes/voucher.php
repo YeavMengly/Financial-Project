@@ -76,7 +76,7 @@ Route::controller(BudgetVoucherController::class)->group(function () {
     Route::get('direct/payment/payment-deadline/edit-by-program/agencies', 'editByAgency')->name('budgetDirectPayment.paymentDeadline.edit.agency');
     Route::get('direct/payment/payment-deadline/edit-by-program-sub/clusters', 'editByProgramSubId')->name('budgetDirectPayment.paymentDeadline.edit.cluster');
     Route::get('direct/payment/payment-deadline/edit-by-expense/legal-id', 'editByExpenseIdPayment')->name('budgetDirectPayment.paymentDeadline.edit.expense_type_id');
-    //training
+    ///training
     Route::get('training/payment-deadline/get-by-program/program-subs', 'getByProgramId')->name('budgetTraining.paymentDeadline.by.program_sub');
     Route::get('training/payment-deadline/get-by-program/agencies', 'getByAgency')->name('budgetTraining.paymentDeadline.by.agency');
     Route::get('training/payment-deadline/get-by-program-sub/clusters', 'getByProgramSubId')->name('budgetTraining.paymentDeadline.by.cluster');
