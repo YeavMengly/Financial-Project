@@ -8,7 +8,7 @@ use App\Livewire\Document\EditFileDocument;
 use App\Livewire\BudgetPlan\GaranteeFile;
 use App\Livewire\BudgetPlan\ProcurementFile;
 use App\Livewire\BudgetPlan\ExpenseRecordTrainingFile;
-use App\Livewire\BudgetPlan\paymentDeadlineTraining;
+use App\Livewire\BudgetPlan\PaymentDeadlineTraining;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +44,6 @@ Route::prefix('budgetplan/mandates')->middleware(['auth'])->group(function () {
 Route::prefix('budgetplan/voucher')->middleware(['auth'])->group(function () {
     Route::get('{params}/payment-file/{id}', Payment::class)->name('payment.edit.doc');
     Route::get('{params}/payment-deadline-file/{id}', PaymentDeadline::class)->name('paymentDeadline.edit.doc');
-    Route::get('{params}/payment-deadline-training-file/{id}', paymentDeadlineTraining::class)->name('paymentDeadlineTraining.edit.doc');
+    Route::get('{params}/payment-deadline-training-file/{id}', PaymentDeadlineTraining::class)->name('paymentDeadlineTraining.edit.doc');
 });
 

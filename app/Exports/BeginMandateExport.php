@@ -29,7 +29,7 @@ class BeginMandateExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('template_advance.xlsx');
+        $templatePath = storage_path('excel/template/template_advance.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 

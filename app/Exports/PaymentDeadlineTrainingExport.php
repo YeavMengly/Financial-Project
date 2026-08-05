@@ -33,7 +33,7 @@ class PaymentDeadlineTrainingExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('template_deadline_training.xlsx');
+        $templatePath = storage_path('excel/template/template_deadline_training.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
