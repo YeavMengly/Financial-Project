@@ -34,7 +34,7 @@ class AnnualReport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('template_annual_report.xlsx');
+        $templatePath = storage_path('excel/template/template_annual_report.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->getStyle("A1:EX4")->applyFromArray([

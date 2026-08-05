@@ -29,7 +29,7 @@ class ExpenseRecordExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('template_expense_record_book.xlsx');
+        $templatePath = storage_path('excel/template/template_expense_record_book.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 

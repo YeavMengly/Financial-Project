@@ -34,7 +34,7 @@ class BeginguaranteeExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('template_guarantee.xlsx');
+        $templatePath = storage_path('excel/template/template_guarantee.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
         $khmerMonths = ['មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា', 'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'];
