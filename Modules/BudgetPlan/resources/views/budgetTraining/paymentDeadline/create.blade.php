@@ -10,39 +10,6 @@
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
-    <style>
-        /* Turn border green when Pristine marks the form-group as valid / optional */
-        .has-success .form-control,
-        .has-success .form-select,
-        .has-success .choices__inner {
-            border-color: #198754 !important;
-            /* Bootstrap 5 Success Green */
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.4-1.4 1-1l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right calc(0.375em + 0.1875rem) center;
-            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-        }
-
-        /* Adjust padding for standard inputs so typed text doesn't overlap the green checkmark icon */
-        .has-success .form-control {
-            padding-right: calc(1.5em + 0.75rem);
-        }
-
-        /* Remove checkmark icon from Choices.js boxes to prevent overlapping the dropdown arrow */
-        .has-success .choices__inner {
-            background-image: none !important;
-        }
-
-        /* Prevent green border and checkmark icon on disabled or readonly inputs (when skipped) */
-        .has-success .form-control:disabled,
-        .has-success .form-control[readonly],
-        .form-control:disabled,
-        .form-control[readonly] {
-            border-color: #ced4da !important;
-            background-image: none !important;
-            box-shadow: none !important;
-        }
-    </style>
 @endsection
 @section('content')
     <!-- start page title -->
@@ -50,12 +17,14 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.payment.deadline') }}</h4>
+
                 <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.payment.deadline') }}</a>
-                        </li>
-                        <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
-                    </ol>
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.payment.deadline') }}</a></li>
+                            <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,13 +34,13 @@
 
     <!-- end page title -->
     <div class="row">
+        <div class="col-12"></div>
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example"
-                            action="{{ route('budgetTraining.paymentDeadline.store', $params) }}" method="POST"
-                            enctype="multipart/form-data" novalidate>
+                        <form id="pristine-valid-example" action="{{ route('budgetVoucher.store', $params) }}"
+                            method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
@@ -90,14 +59,16 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="cboLegalId" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.th.code') }}
+                                        <label for="cboPaymentVoucherNumber" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.payment.voucher') }}
                                         </label>
-                                        <select id="cboLegalId" class="form-select" name="cboLegalId" required
+                                        <select id="cboPaymentVoucherNumber" class="form-select"
+                                            name="cboPaymentVoucherNumber" required
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
-                                        @error('cboLegalId')
+
+                                        @error('cboPaymentVoucherNumber')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -107,42 +78,59 @@
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.name') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            type="text" class="form-control" name="legalName" tabindex="2" />
+                                            type="text" class="form-control" id="legalName" name="legalName"
+                                            tabindex="2" />
                                     </div>
                                 </div>
-
+                               
+                                <!-- Temporary ID Field -->
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="cbotemporaryId"
+                                            <label for="temporaryId"
                                                 class="form-label mb-0">{{ __('forms.temporary.id') }}</label>
-                                            <!-- Modern Skip Switch -->
                                             <div class="form-check form-switch mb-0">
                                                 <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="skipCboTemporaryId" style="cursor: pointer;">
+                                                    id="skipTemporaryId" style="cursor: pointer;">
                                                 <label class="form-check-label font-size-12 text-muted"
-                                                    for="skipCboTemporaryId" style="cursor: pointer;">
+                                                    for="skipTemporaryId" style="cursor: pointer;">
                                                     រំលង / មិនបញ្ចូល
                                                 </label>
                                             </div>
                                         </div>
-                                        <input required id="cbotemporaryId" name="cbotemporaryId" type="number"
-                                            class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            placeholder="{{ __('forms.temporary.id') }}" tabindex="2" />
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted">#</span>
+                                            <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                                data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                                data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value=""
+                                                min="1" type="number" class="form-control" id="temporaryId"
+                                                placeholder="{{ __('forms.temporary.id') }}" name="temporaryId"
+                                                tabindex="2" />
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- Day Number Field -->
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.day.number') }}</label>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="cbodayOfNumber"
+                                                class="form-label mb-0">{{ __('forms.day.number') }}</label>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="skipDayNumber" style="cursor: pointer;">
+                                                <label class="form-check-label font-size-12 text-muted"
+                                                    for="skipDayNumber" style="cursor: pointer;">
+                                                    រំលង / មិនបញ្ចូល
+                                                </label>
+                                            </div>
+                                        </div>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="text" class="form-control" placeholder="{{ __('forms.day.number') }}"
-                                            name="cbodayOfNumber" tabindex="2" />
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value=""
+                                            min="1" type="number" class="form-control" id="cbodayOfNumber"
+                                            placeholder="{{ __('forms.day.number') }}" name="cbodayOfNumber"
+                                            tabindex="2" />
                                     </div>
                                 </div>
 
@@ -215,16 +203,22 @@
                                         <label for="cboSubAccount" class="form-label font-size-13 text-muted">
                                             {{ __('forms.sub.account') }}
                                         </label>
-                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
+                                        <select class="form-control" id="cboSubAccount" name="cboSubAccount" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($accountSub as $bv)
+                                                <!-- THE FIX: Must send $bv->no to match the account code string stored in begin_vouchers -->
                                                 <option value="{{ $bv->no }}">
-                                                    {{ $bv->no }}-{{ $bv->name }}</option>
+                                                    {{ $bv->no }}-{{ $bv->name }}
+                                                </option>
                                             @endforeach
                                         </select>
+                                        @error('cboSubAccount')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
-
+                                {{-- Program Code (auto-filled from JS) --}}
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="budget">{{ __('forms.budget') }}</label>
@@ -258,17 +252,36 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="fileInput">{{ __('forms.file.type') }}</label>
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="fileInput"
+                                                class="form-label mb-0">{{ __('forms.file.type') }}</label>
+
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="skipFileInput" style="cursor: pointer;">
+                                                <label class="form-check-label font-size-12 text-muted"
+                                                    for="skipFileInput" style="cursor: pointer;">
+                                                    រំលង / មិនភ្ជាប់
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
                                         <input type="file" id="fileInput" name="attachments[]" class="form-control"
-                                            accept=".pdf,.doc,.docx" multiple />
-                                        <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
+                                            accept=".pdf,.doc,.docx" multiple required data-max-size="5"
+                                            data-allowed-extensions="pdf,doc,docx"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
+                                            file)</small>
+
                                         @error('attachments.*')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
 
+
+                            </div>
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
@@ -279,20 +292,21 @@
                                     @enderror
                                 </div>
                             </div>
-
                             <div class="d-flex flex-wrap gap-2">
-                                <button type="submit" class="btn btn-primary"
-                                    id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-primary" type="submit" name="submit"
+                                    value="save">{{ __('buttons.save') }}</button>
+                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    {{ __('buttons.delete') }}
+                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
                                 <a class="btn btn-dark"
-                                    href="{{ route('budgetTraining.paymentDeadline.index', $params) }}">{{ __('buttons.back') }}</a>
+                                    href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
+
                             </div>
                         </form>
+
                     </div>
                 </div>
-
                 <div class="card-body">
                     <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
@@ -323,9 +337,8 @@
         </div>
     </div>
 @endsection
-
 @section('script')
-    <!-- Consolidated Single Imports (No Duplicates) -->
+    <!-- Vendor Scripts (Loaded exactly once) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
@@ -333,16 +346,15 @@
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
 
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
             if (!form) return;
 
-            // ==========================================
-            // 1. MASTER PRISTINE INITIALIZATION
-            // ==========================================
-            const createPristineInstance = () => {
+            // =========================================================================
+            // 1. MASTER PRISTINE VALIDATION ENGINE
+            // =========================================================================
+            const createPristine = () => {
                 return new Pristine(form, {
                     classTo: 'form-group',
                     errorClass: 'has-danger',
@@ -353,16 +365,121 @@
                 });
             };
 
-            let pristine = createPristineInstance();
+            let pristine = createPristine();
 
             const refreshPristine = () => {
                 pristine.destroy();
-                pristine = createPristineInstance();
+                pristine = createPristine();
+                applyCustomFileValidators();
             };
 
-            // ==========================================
-            // 2. FLATPICKR (With Auto-Validation Sync)
-            // ==========================================
+            // =========================================================================
+            // 2. UNIVERSAL SKIP TOGGLE ENGINE (WITH GREEN HIGHLIGHT)
+            // =========================================================================
+            const setupSkipToggle = (checkboxId, inputId, skippedValue = '0', isFile = false) => {
+                const checkbox = document.getElementById(checkboxId);
+                const input = document.getElementById(inputId);
+                if (!checkbox || !input) return;
+
+                // Cache original validation attributes
+                const origRequiredMsg = input.getAttribute('data-pristine-required-message') ||
+                    "{{ __('messages.required') }}";
+                const origMinMsg = input.getAttribute('data-pristine-min-message');
+                const origIntMsg = input.getAttribute('data-pristine-integer-message');
+                const origMin = input.getAttribute('min');
+
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        // SKIP STATE: Apply green highlight, set skipped value, lock input
+                        input.value = skippedValue;
+                        input.disabled = true;
+                        input.readOnly = true;
+
+                        // Apply soft green styling (#d1e7dd background, dark green text/border)
+                        input.classList.add('bg-success-subtle', 'text-success-emphasis',
+                            'border-success');
+                        input.style.setProperty('background-color', '#d1e7dd', 'important');
+                        input.style.setProperty('border-color', '#198754', 'important');
+                        input.style.setProperty('color', '#0f5132', 'important');
+
+                        // Strip validation rules so Pristine ignores it
+                        input.removeAttribute('required');
+                        input.removeAttribute('data-pristine-required-message');
+                        if (origMinMsg) input.removeAttribute('data-pristine-min-message');
+                        if (origIntMsg) input.removeAttribute('data-pristine-integer-message');
+                        if (origMin) input.removeAttribute('min');
+
+                        pristine.reset(input); // Wipe any active red error text instantly
+                    } else {
+                        // ACTIVE STATE: Remove green styling, restore default empty state and rules
+                        input.value = '';
+                        input.disabled = false;
+                        input.readOnly = false;
+
+                        input.classList.remove('bg-success-subtle', 'text-success-emphasis',
+                            'border-success');
+                        input.style.removeProperty('background-color');
+                        input.style.removeProperty('border-color');
+                        input.style.removeProperty('color');
+
+                        input.setAttribute('required', 'true');
+                        input.setAttribute('data-pristine-required-message', origRequiredMsg);
+                        if (origMinMsg) input.setAttribute('data-pristine-min-message', origMinMsg);
+                        if (origIntMsg) input.setAttribute('data-pristine-integer-message', origIntMsg);
+                        if (origMin) input.setAttribute('min', origMin);
+                    }
+                    refreshPristine();
+                });
+
+                if (isFile) {
+                    input.addEventListener('change', () => pristine.validate(input));
+                }
+            };
+
+            // Register all skippable fields here:
+            setupSkipToggle('skipTemporaryId', 'temporaryId', '0');
+            setupSkipToggle('skipDayNumber', 'cbodayOfNumber', '0');
+            setupSkipToggle('skipFileInput', 'fileInput', '', true);
+
+            // =========================================================================
+            // 3. CUSTOM FILE VALIDATORS (SIZE & EXTENSION)
+            // =========================================================================
+            const fileInput = document.getElementById('fileInput');
+            const skipFileCheckbox = document.getElementById('skipFileInput');
+
+            const applyCustomFileValidators = () => {
+                if (!fileInput) return;
+                const maxMB = parseFloat(fileInput.getAttribute('data-max-size')) || 5;
+                const maxBytes = maxMB * 1024 * 1024;
+                const allowedExts = (fileInput.getAttribute('data-allowed-extensions') || '').toLowerCase()
+                    .split(',').map(ext => ext.trim());
+
+                pristine.addValidator(fileInput, function(value) {
+                    if ((skipFileCheckbox && skipFileCheckbox.checked) || fileInput.disabled ||
+                        fileInput.files.length === 0) return true;
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        if (fileInput.files[i].size > maxBytes) return false;
+                    }
+                    return true;
+                }, `ទំហំឯកសារនីមួយៗមិនត្រូវលើសពី ${maxMB}MB ឡើយ`, 2, false);
+
+                pristine.addValidator(fileInput, function(value) {
+                        if ((skipFileCheckbox && skipFileCheckbox.checked) || fileInput.disabled ||
+                            fileInput.files.length === 0) return true;
+                        for (let i = 0; i < fileInput.files.length; i++) {
+                            const fileExt = fileInput.files[i].name.split('.').pop().toLowerCase();
+                            if (!allowedExts.includes(fileExt)) return false;
+                        }
+                        return true;
+                    }, `ប្រភេទឯកសារមិនត្រឹមត្រូវ! អនុញ្ញាតតែ (${allowedExts.join(', '.toUpperCase())})`, 2,
+                    false);
+            };
+
+            applyCustomFileValidators();
+
+            // =========================================================================
+            // 5. FLATPICKR DATEPICKERS & SUMMERNOTE EDITOR
+            // =========================================================================
             const initFlatpickr = (id) => {
                 const el = document.getElementById(id);
                 if (!el) return;
@@ -376,13 +493,11 @@
                     onClose: (dates, str, inst) => pristine.validate(inst.element)
                 });
             };
+
             initFlatpickr('transactionDate');
             initFlatpickr('requestDate');
 
-            // ==========================================
-            // 3. SUMMERNOTE (With Auto-Validation Sync)
-            // ==========================================
-            if (window.jQuery) {
+            if ($('#vDescription').length) {
                 $('#vDescription').summernote({
                     height: 150,
                     toolbar: [
@@ -401,208 +516,192 @@
                 });
             }
 
-            // ==========================================
-            // 4. CHOICES.JS INITIALIZATION
-            // ==========================================
-            const defaultChoicesOpts = {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            };
+            // =========================================================================
+            // 7. MASTER FORM SUBMIT GATEKEEPER
+            // =========================================================================
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-            let cboExpenseChoices = new Choices('#cboExpenseType', defaultChoicesOpts);
-            let cboLegalChoices = new Choices('#cboLegalId', defaultChoicesOpts);
-            let programChoices = new Choices('#cboProgram', defaultChoicesOpts);
-            let programSubChoices = new Choices('#cboProgramSub', defaultChoicesOpts);
-            let clusterChoices = new Choices('#cboCluster', defaultChoicesOpts);
-            let agencyChoices = new Choices('#cboAgency', defaultChoicesOpts);
-            let subAccountChoices = new Choices('#cboSubAccount', defaultChoicesOpts);
+                if ($('#vDescription').length) {
+                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
+                        '#vDescription').summernote('code');
+                    document.getElementById('vDescription').value = summernoteContent;
+                }
 
-            const resetSelect = (selector) => $(selector).html(
-                `<option value="">{{ __('forms.search...') }}</option>`);
-            const resetChoices = (selector, instance) => {
-                instance.destroy();
-                return new Choices(selector, defaultChoicesOpts);
-            };
+                const isValid = pristine.validate();
 
-            const loadOptions = ({
-                url,
-                data,
-                targetSelect,
-                instanceRefSetter
-            }) => {
-                $.ajax({
-                    url,
-                    type: "GET",
-                    data,
-                    success: function(html) {
-                        $(targetSelect).html(html);
-                        instanceRefSetter();
-                    },
-                    error: () => resetSelect(targetSelect)
-                });
-            };
-
-            // ==========================================
-            // 5. AJAX CASCADING DROPDOWNS
-            // ==========================================
-            // $('#cboExpenseType').on('change', function() {
-            //     const expenseTypeId = $(this).val();
-            //     cboLegalChoices.clearStore();
-            //     cboLegalChoices.clearChoices();
-            //     if (!expenseTypeId) return;
-
-            //     $.ajax({
-            //         url: "{{ route('budgetDirectPayment.paymentDeadline.get.expense_type_id') }}",
-            //         type: 'GET',
-            //         data: {
-            //             expense_type_id: expenseTypeId
-            //         },
-            //         success: function(data) {
-            //             let options = [];
-            //             $(data).filter('option').each(function() {
-            //                 options.push({
-            //                     value: $(this).val(),
-            //                     label: $(this).text()
-            //                 });
-            //             });
-            //             cboLegalChoices.clearChoices();
-            //             cboLegalChoices.setChoices(options, 'value', 'label', true);
-            //         }
-            //     });
-            // });
-
-            $(document).ready(function() {
-
-                // ==========================================
-                // 1. AJAX CASCADING DROPDOWNS (Expense -> Legal ID)
-                // ==========================================
-                $('#cboExpenseType').on('change', function(e, preSelectedLegalId = null) {
-                    const expenseTypeId = $(this).val();
-
-                    cboLegalChoices.clearStore();
-                    cboLegalChoices.clearChoices();
-
-                    // Clear the text fields if expense type is cleared
-                    $('input[name="legalName"]').val('');
-                    $('#vDescription').summernote('code', '');
-
-                    if (!expenseTypeId) return;
-
-                    $.ajax({
-                        url: "{{ route('budgetTraining.paymentDeadline.get.expense_type_id') }}",
-                        type: 'GET',
-                        data: {
-                            expense_type_id: expenseTypeId,
-                            selected_id: preSelectedLegalId
-                        },
-                        success: function(data) {
-                            // Pass the JSON data directly into Choices.js
-                            cboLegalChoices.setChoices(data, 'value', 'label', true);
-
-                            // If we passed a pre-selected ID (Viewing mode), trigger the Legal ID change to populate text fields
-                            if (preSelectedLegalId) {
-                                $('#cboLegalId').trigger('change');
-                            }
-                        }
+                if (isValid) {
+                    // THE CRITICAL FIX: Re-enable disabled fields right before submit
+                    // Browsers ignore disabled inputs during POST requests. Enabling them ensures Laravel receives clean '0' or null values instead of throwing missing parameter errors.
+                    form.querySelectorAll(':disabled').forEach(el => {
+                        el.disabled = false;
                     });
-                });
-
-                // ==========================================
-                // 2. AUTO-FILL FIELDS ON LEGAL ID SELECTION
-                // ==========================================
-                $('#cboLegalId').on('change', function() {
-                    const selectedChoice = cboLegalChoices.getValue();
-
-                    if (selectedChoice && selectedChoice.customProperties) {
-                        // Standard input uses .val()
-                        $('input[name="legalName"]').val(selectedChoice.customProperties
-                            .legal_name);
-
-                        // Summernote uses the 'code' method to set content
-                        $('#vDescription').summernote('code', selectedChoice.customProperties
-                            .description || '');
-                    } else {
-                        // Clear fields if nothing is selected
-                        $('input[name="legalName"]').val('');
-                        $('#vDescription').summernote('code', '');
+                    if ($('#vDescription').length && $('#vDescription').summernote('isDisabled')) {
+                        $('#vDescription').summernote('enable');
                     }
 
-                    // (Optional) Trigger Pristine validation manually if it doesn't fire automatically
-                    if (typeof pristine !== 'undefined') {
-                        pristine.validate(document.getElementById('vDescription'));
+                    HTMLFormElement.prototype.submit.call(form);
+                } else {
+                    const firstError = form.querySelector('.has-danger');
+                    if (firstError) {
+                        firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
                     }
-                });
-
-                // ==========================================
-                // 3. CHECK VIEWING / EDITING ON PAGE LOAD
-                // ==========================================
-                // Check if there is already an expense type selected when the page loads
-                const initialExpenseTypeId = $('#cboExpenseType').val();
-
-                // Pass the existing Legal ID from your Blade template if it exists
-                const initialLegalId = "{{ $existingLegalId ?? '' }}";
-
-                if (initialExpenseTypeId) {
-                    // Trigger the cascade and pass the ID that needs to be selected
-                    $('#cboExpenseType').trigger('change', [initialLegalId]);
                 }
             });
 
+            // =========================================================================
+            // 4. CHOICES.JS DROPDOWNS & AJAX DEPENDENCY ROUTING
+            // =========================================================================
+            const initChoices = (selector, opts = {}) => {
+                const el = document.querySelector(selector);
+                if (!el) return null;
+                return new Choices(el, Object.assign({
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                }, opts));
+            };
+
+            let voucherChoices = initChoices('#cboPaymentVoucherNumber');
+            let programSubChoices = initChoices('#cboProgramSub');
+            let clusterChoices = initChoices('#cboCluster');
+            let agencyChoices = initChoices('#cboAgency');
+            initChoices('#cboExpenseType');
+            initChoices('#cboProgram');
+            initChoices('#cboSubAccount');
+
+            // HELPER 1: Wipes out a dropdown and sets it back to default "Search..."
+            const clearDropdown = (selector, instanceRef) => {
+                if (instanceRef) instanceRef.destroy();
+                const el = document.querySelector(selector);
+                if (el) el.innerHTML = `<option value="">{{ __('forms.search...') }}</option>`;
+                return initChoices(selector);
+            };
+
+            // HELPER 2: Safely destroys Choices, injects server HTML, and re-initializes WITHOUT erasing data
+            const setDropdownHtml = (selector, instanceRef, htmlContent) => {
+                if (instanceRef) instanceRef.destroy();
+                const el = document.querySelector(selector);
+                if (el) el.innerHTML = htmlContent;
+                return initChoices(selector);
+            };
+
+            // AJAX Dependency Loader
+            const loadDependentOptions = (url, data, targetSelector, instanceRef, onSuccessCallback) => {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    data: data,
+                    success: function(response) {
+                        const newInstance = setDropdownHtml(targetSelector, instanceRef, response);
+                        if (onSuccessCallback) onSuccessCallback(newInstance);
+                    },
+                    error: () => clearDropdown(targetSelector, instanceRef)
+                });
+            };
+
+            // Expense Type -> Payment Voucher Number
+            $('#cboExpenseType').on('change', function() {
+                const expenseTypeId = $(this).val();
+                voucherChoices.clearStore();
+                voucherChoices.clearChoices();
+                $('#legalName').val('').prop('readonly', false);
+                if ($('#vDescription').length) {
+                    $('#vDescription').summernote('code', '');
+                    $('#vDescription').summernote('enable');
+                }
+                if (!expenseTypeId) return;
+
+                voucherChoices.setChoices([{
+                    value: '',
+                    label: 'កំពុងផ្ទុក...',
+                    disabled: true,
+                    selected: true
+                }], 'value', 'label', true);
+
+                $.ajax({
+                    url: "{{ route('budgetTraining.paymentDeadline.get.expense_type_id') }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        expense_type_id: expenseTypeId
+                    },
+                    success: (data) => {
+                        voucherChoices.clearChoices();
+                        voucherChoices.setChoices(data, 'value', 'label', true);
+                    },
+                    error: () => voucherChoices.clearChoices()
+                });
+            });
+
+            // Auto-fill Legal Name & Description
+            const voucherEl = document.getElementById('cboPaymentVoucherNumber');
+            if (voucherEl && voucherChoices) {
+                voucherEl.addEventListener('change', function() {
+                    const selected = voucherChoices.getValue();
+                    const legalNameInput = document.getElementById('legalName');
+                    if (selected && selected.customProperties && selected.value !== '') {
+                        if (legalNameInput) {
+                            legalNameInput.value = selected.customProperties.legal_name || '';
+                            legalNameInput.readOnly = true;
+                        }
+                        if ($('#vDescription').length) {
+                            $('#vDescription').summernote('code', selected.customProperties.description ||
+                                '');
+                            $('#vDescription').summernote('disable');
+                        }
+                    } else {
+                        if (legalNameInput) {
+                            legalNameInput.value = '';
+                            legalNameInput.readOnly = false;
+                        }
+                        if ($('#vDescription').length) {
+                            $('#vDescription').summernote('code', '');
+                            $('#vDescription').summernote('enable');
+                        }
+                    }
+                    pristine.validate(legalNameInput);
+                });
+            }
+
+            // Program -> ProgramSub & Agency
             $('#cboProgram').on('change', function() {
                 const programId = $(this).val();
-                resetSelect('#cboProgramSub');
-                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-                resetSelect('#cboAgency');
-                agencyChoices = resetChoices('#cboAgency', agencyChoices);
-                resetSelect('#cboCluster');
-                clusterChoices = resetChoices('#cboCluster', clusterChoices);
-
+                programSubChoices = clearDropdown('#cboProgramSub', programSubChoices);
+                agencyChoices = clearDropdown('#cboAgency', agencyChoices);
+                clusterChoices = clearDropdown('#cboCluster', clusterChoices);
                 if (!programId) return;
 
-                loadOptions({
-                    url: "{{ route('budgetTraining.paymentDeadline.by.program_sub') }}",
-                    data: {
-                        program_id: programId
-                    },
-                    targetSelect: '#cboProgramSub',
-                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub',
-                        programSubChoices)
-                });
-
-                loadOptions({
-                    url: "{{ route('budgetTraining.paymentDeadline.by.agency') }}",
-                    data: {
-                        program_id: programId
-                    },
-                    targetSelect: '#cboAgency',
-                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency',
-                        agencyChoices)
-                });
+                loadDependentOptions("{{ route('budgetTraining.paymentDeadline.by.program_sub') }}", {
+                    program_id: programId
+                }, '#cboProgramSub', programSubChoices, (inst) => programSubChoices = inst);
+                loadDependentOptions("{{ route('budgetTraining.paymentDeadline.by.agency') }}", {
+                    program_id: programId
+                }, '#cboAgency', agencyChoices, (inst) => agencyChoices = inst);
             });
 
+            // ProgramSub -> Cluster
             $('#cboProgramSub').on('change', function() {
                 const programSubId = $(this).val();
-                resetSelect('#cboCluster');
-                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+                clusterChoices = clearDropdown('#cboCluster', clusterChoices);
                 if (!programSubId) return;
-
-                loadOptions({
-                    url: "{{ route('budgetTraining.paymentDeadline.by.cluster') }}",
-                    data: {
-                        program_sub_id: programSubId
-                    },
-                    targetSelect: '#cboCluster',
-                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster',
-                        clusterChoices)
-                });
+                loadDependentOptions("{{ route('budgetTraining.paymentDeadline.by.cluster') }}", {
+                    program_sub_id: programSubId
+                }, '#cboCluster', clusterChoices, (inst) => clusterChoices = inst);
             });
 
-            // ==========================================
-            // 6. EARLY BALANCE & CREDIT CALCULATIONS
-            // ==========================================
+            form.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', () => pristine.validate(select));
+            });
+
+            // =========================================================================
+            // 6. LIVE BUDGET BALANCE CALCULATOR (WITH CONSOLE LOGGING)
+            // =========================================================================
             const n = v => (isNaN(+v) ? 0 : +v);
             const fmt = v => n(v).toLocaleString('en-US', {
                 maximumFractionDigits: 2
@@ -615,209 +714,74 @@
                 'deadline_balance', 'applying', 'remaining_credit'
             ].forEach(id => setText(id, 0));
 
-            const budgetInput = document.getElementById('budget');
             const recomputeRemaining = () => {
+                const budgetInput = document.getElementById('budget');
                 const apply = n(budgetInput?.value);
                 const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
                 setText('applying', apply);
                 setText('remaining_credit', Math.max(credit - apply, 0));
-                if (credit - apply < 0) budgetInput.value = '';
+                if (credit - apply < 0 && budgetInput) budgetInput.value = '';
             };
 
-            const fetchEarlyBalance = async () => {
-                const programId = document.getElementById('cboProgram').value;
-                const programSubId = document.getElementById('cboProgramSub').value;
-                const clusterId = document.getElementById('cboCluster').value;
-                const accountSubId = document.getElementById('cboSubAccount').value;
+            function fetchEarlyBalance() {
+                const programId = $('#cboProgram').val();
+                const programSubId = $('#cboProgramSub').val();
+                const clusterId = $('#cboCluster').val();
+                const accountSubId = $('#cboSubAccount').val();
+
+                // Debug print to your browser console (Press F12 to view)
+                console.log("Checking Balance IDs:", {
+                    programId,
+                    programSubId,
+                    clusterId,
+                    accountSubId
+                });
 
                 if (!programId || !programSubId || !clusterId || !accountSubId) {
+                    console.warn("Balance check aborted: One or more required accounting fields are still empty.");
                     resetNumbers();
                     return;
                 }
 
-                const url = new URL(
-                    "{{ route('budgetTraining.paymentDeadline.getEarlyBalance', ['params' => $params]) }}",
-                    window.location.origin);
-                url.searchParams.set('program_id', programId);
-                url.searchParams.set('program_sub_id', programSubId);
-                url.searchParams.set('cluster_id', clusterId);
-                url.searchParams.set('account_sub_id', accountSubId);
+                console.info("Sending AJAX balance request to Laravel...");
 
-                try {
-                    const res = await fetch(url.toString(), {
-                        headers: {
-                            'Accept': 'application/json'
+                $.ajax({
+                    url: "{{ route('budgetTraining.paymentDeadline.getEarlyBalance', ['params' => $params]) }}",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        program_id: programId,
+                        program_sub_id: programSubId,
+                        cluster_id: clusterId,
+                        account_sub_id: accountSubId
+                    },
+                    success: function(data) {
+                        console.log("Laravel Balance Response:", data);
+                        if (data && data.exists !== false) {
+                            setText('fin_law', data.fin_law);
+                            setText('credit_movement', data.credit_movement);
+                            setText('new_credit_status', data.new_credit_status);
+                            setText('credit', data.credit);
+                            setText('deadline_balance', data.deadline_balance);
+                            recomputeRemaining();
+                        } else {
+                            console.warn("No matching voucher row found in database for these 4 IDs.");
+                            resetNumbers();
                         }
-                    });
-                    const data = await res.json();
-                    setText('fin_law', data.fin_law);
-                    setText('credit_movement', data.credit_movement);
-                    setText('new_credit_status', data.new_credit_status);
-                    setText('credit', data.credit);
-                    setText('deadline_balance', data.deadline_balance);
-                    recomputeRemaining();
-                } catch (err) {
-                    console.error(err);
-                    resetNumbers();
-                }
-            };
-
-            ['cboProgram', 'cboProgramSub', 'cboCluster', 'cboSubAccount'].forEach(id => {
-                document.getElementById(id)?.addEventListener('change', fetchEarlyBalance);
-            });
-            budgetInput?.addEventListener('input', recomputeRemaining);
-
-            // ==========================================
-            // 7. SKIP TEMPORARY ID LOGIC
-            // ==========================================
-            const cboTempIdInput = document.getElementById('cbotemporaryId');
-            const skipCboTempCheckbox = document.getElementById('skipCboTemporaryId');
-
-            if (skipCboTempCheckbox && cboTempIdInput) {
-                const handleSkipToggle = () => {
-                    const formGroup = cboTempIdInput.closest('.form-group');
-
-                    if (skipCboTempCheckbox.checked) {
-                        cboTempIdInput.value = '';
-                        cboTempIdInput.disabled = true;
-                        cboTempIdInput.readOnly = true;
-
-                        // Make the field green
-                        cboTempIdInput.style.backgroundColor = '#d1e7dd'; // Light green background
-                        cboTempIdInput.style.borderColor = '#198754'; // Green border
-                        cboTempIdInput.classList.remove('bg-light', 'text-muted');
-
-                        cboTempIdInput.removeAttribute('required');
-                        cboTempIdInput.removeAttribute('min');
-                        cboTempIdInput.removeAttribute('data-pristine-required-message');
-                        cboTempIdInput.removeAttribute('data-pristine-min-message');
-                        cboTempIdInput.removeAttribute('data-pristine-integer-message');
-
-                        pristine.reset(cboTempIdInput);
-                        if (formGroup) {
-                            formGroup.classList.remove('has-success', 'has-danger');
-                        }
-                    } else {
-                        if (cboTempIdInput.value === '') {
-                            cboTempIdInput.value = '0';
-                        }
-                        cboTempIdInput.disabled = false;
-                        cboTempIdInput.readOnly = false;
-
-                        // Remove the green color to restore default
-                        cboTempIdInput.style.backgroundColor = '';
-                        cboTempIdInput.style.borderColor = '';
-
-                        cboTempIdInput.setAttribute('required', 'true');
-                        cboTempIdInput.setAttribute('min', '1');
-                        cboTempIdInput.setAttribute('data-pristine-required-message',
-                            "{{ __('messages.required') }}");
-                        cboTempIdInput.setAttribute('data-pristine-min-message', 'លំដាប់ ត្រូវតែធំជាងសូន្យ');
-                        cboTempIdInput.setAttribute('data-pristine-integer-message', 'លំដាប់ ត្រូវតែលេខ');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error details:", status, error, xhr.responseText);
+                        resetNumbers();
                     }
-
-                    refreshPristine();
-
-                    // Ensure clean neutral state after Pristine re-initializes
-                    if (skipCboTempCheckbox.checked && formGroup) {
-                        pristine.reset(cboTempIdInput);
-                        formGroup.classList.remove('has-success', 'has-danger');
-                    }
-                };
-
-                skipCboTempCheckbox.addEventListener('change', handleSkipToggle);
+                });
             }
 
-            // ==========================================
-            // 8. MASTER FORM SUBMIT GATEKEEPER
-            // ==========================================
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formGroup = cboTempIdInput?.closest('.form-group');
-
-                // Pre-submit safety check
-                if (skipCboTempCheckbox && skipCboTempCheckbox.checked && cboTempIdInput) {
-                    cboTempIdInput.disabled = true;
-                    cboTempIdInput.removeAttribute('required');
-                    cboTempIdInput.removeAttribute('min');
-                }
-
-                // Sync Summernote code before final check
-                if ($('#vDescription').length) {
-                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
-                        '#vDescription').summernote('code');
-                    document.getElementById('vDescription').value = summernoteContent;
-                }
-
-                const isValid = pristine.validate();
-
-                // Post-validation cleanup for skipped field:
-                // When skip is ON, pristine.validate() marks the empty optional field with 'has-success'.
-                // We strip those classes immediately so the disabled field stays neutral gray!
-                if (skipCboTempCheckbox && skipCboTempCheckbox.checked && cboTempIdInput) {
-                    pristine.reset(cboTempIdInput);
-                    if (formGroup) {
-                        formGroup.classList.remove('has-success', 'has-danger');
-                    }
-                }
-
-                if (isValid) {
-                    // Unlock disabled fields instantly so Laravel receives empty values instead of throwing missing key exceptions
-                    if (cboTempIdInput && skipCboTempCheckbox && skipCboTempCheckbox.checked) {
-                        cboTempIdInput.disabled = false;
-                    }
-                    HTMLFormElement.prototype.submit.call(form);
-                } else {
-                    const firstError = form.querySelector('.has-danger');
-                    if (firstError) {
-                        firstError.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                }
+            // Event delegation guarantees this fires even after Choices.js reloads DOM elements
+            $(document).on('change', '#cboProgram, #cboProgramSub, #cboCluster, #cboSubAccount', function() {
+                fetchEarlyBalance();
             });
 
-            // ==========================================
-            // 8. MASTER FORM SUBMIT GATEKEEPER
-            // ==========================================
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                // Pre-submit safety check
-                if (skipCboTempCheckbox && skipCboTempCheckbox.checked && cboTempIdInput) {
-                    cboTempIdInput.disabled = true;
-                    cboTempIdInput.removeAttribute('required');
-                    cboTempIdInput.removeAttribute('min');
-                    pristine.reset(cboTempIdInput);
-                }
-
-                // Sync Summernote code before final check
-                if ($('#vDescription').length) {
-                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
-                        '#vDescription').summernote('code');
-                    document.getElementById('vDescription').value = summernoteContent;
-                }
-
-                const isValid = pristine.validate();
-
-                if (isValid) {
-                    // Unlock disabled fields instantly so Laravel receives empty values instead of throwing missing key exceptions
-                    if (cboTempIdInput && skipCboTempCheckbox && skipCboTempCheckbox.checked) {
-                        cboTempIdInput.disabled = false;
-                    }
-                    HTMLFormElement.prototype.submit.call(form);
-                } else {
-                    const firstError = form.querySelector('.has-danger');
-                    if (firstError) {
-                        firstError.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                }
-            });
+            document.getElementById('budget')?.addEventListener('input', recomputeRemaining);
         });
     </script>
 @endsection

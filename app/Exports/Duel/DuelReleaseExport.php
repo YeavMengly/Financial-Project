@@ -32,7 +32,7 @@ class DuelReleaseExport
         // Use passed data or load by ministry_id
         $release = $this->data ?: DuelRelease::where('ministry_id', $id)->get();
 
-        $templatePath = public_path('duel_release_template.xlsx');
+        $templatePath = storage_path('excel/template/duel_release_template.xlsx');
         $spreadsheet  = IOFactory::load($templatePath);
         $sheet        = $spreadsheet->getActiveSheet();
 
