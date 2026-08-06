@@ -77,7 +77,7 @@ class Agency extends Model
             ->useLogName('menus.content.agency')
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => __("Event: :event", ['event' => $eventName]));
+            ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Modules\BeginningCredit\App\Http\Controllers;
 
 use App\DataTables\AnnualOpen\InitialBudgetVoucherDataTable;
 use App\DataTables\BeginVoucherDataTable;
+use App\DataTables\BudgetAllocationDataTable;
 use App\Exports\AnnualReport;
 use App\Exports\ReportBook;
 use App\Http\Controllers\Controller;
@@ -12,11 +13,13 @@ use App\Models\Content\Account;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BudgetAllocation;
 use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Chapter;
 use App\Models\Content\Cluster;
+use App\Models\Content\ExpenseType;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
@@ -748,5 +751,283 @@ class BeginVoucherController extends Controller
 
             return redirect()->route('beginVoucher.index', $params);
         }
+    }
+
+    /**
+     * Budget Allocation Section.
+     */
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function indexBudgetAllocation(BudgetAllocationDataTable $dataTable, $params, $budgetAllocationId)
+    {
+        $id   = decode_params($params);
+        $ministry = Ministry::where('id', $id)->first();
+        $expenseTypes = ExpenseType::all();
+        $module = BeginVoucher::where('id', decode_params($budgetAllocationId))
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        return $dataTable->render('beginningcredit::beginVoucher.budgetAllocation.index', [
+            'ministry'   => $ministry,
+            'params' => $params,
+            'budgetAllocationId' => $budgetAllocationId,
+            'expenseTypes' => $expenseTypes,
+            'module' => $module
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+
+    // public function createBudgetAllocation($params, $budgetAllocationId)
+    // {
+    //     $id        = decode_params($params);
+    //     $ministry  = Ministry::where('id', $id)->first();
+    //     $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+    //         ->where('ministry_id', $ministry->id)
+    //         ->first();
+
+    //     $module = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
+    //         ->where('ministry_id', $ministry->id)
+    //         ->first();
+
+    //     $expenseTypes = ExpenseType::all();
+
+    //     return view('beginningcredit::beginVoucher.budgetAllocation.create')
+    //         ->with('ministry', $ministry)
+    //         ->with('ministry', $ministry)
+    //         ->with('params', $params)
+    //         ->with('beginVoucher', $beginVoucher)
+    //         ->with('module', $module)
+    //         ->with('expenseTypes', $expenseTypes)
+    //         ->with('budgetAllocationId', $budgetAllocationId);
+    // }
+    public function createBudgetAllocation($params, $budgetAllocationId)
+    {
+        $id = decode_params($params);
+
+        $ministry = Ministry::where('id', $id)->first();
+
+        $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        // Get existing allocation
+        $module = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        // Calculate total allocated amount
+        $allocatedAmount = BudgetAllocation::where('ministry_id', $ministry->id)
+            ->where('budget_begin_voucher_id', $beginVoucher->id)
+            ->sum('amount');
+
+        // Remaining fin law
+        $remainingFinLaw = $beginVoucher->fin_law - $allocatedAmount;
+
+        $expenseTypes = ExpenseType::whereIn('id', [2, 3, 4, 5, 7])->get();
+
+        return view('beginningcredit::beginVoucher.budgetAllocation.create')
+            ->with('ministry', $ministry)
+            ->with('params', $params)
+            ->with('beginVoucher', $beginVoucher)
+            ->with('module', $module)
+            ->with('expenseTypes', $expenseTypes)
+            ->with('budgetAllocationId', $budgetAllocationId)
+            ->with('remainingFinLaw', $remainingFinLaw);
+    }
+
+    public function storeBudgetAllocation(Request $request, $params, $budgetAllocationId)
+    {
+        $validatedData = $request->validate([
+            'amount'          => 'required|numeric|min:0',
+            'cboExpenseType' => 'required|exists:expense_types,id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Fetch the ministry safely
+            $ministry = Ministry::where('id', decode_params($params))->first();
+
+            // Fetch the begin voucher
+            $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if (!$beginVoucher) {
+                throw new \Exception('ការស្វែងរកមិនបានជោគជ័យ។');
+            }
+            // Create a new Budget Allocation entry
+            BudgetAllocation::create([
+                'ministry_id'      => $ministry->id,
+                'budget_begin_voucher_id' => $beginVoucher->id,
+                'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+                'amount'           => $validatedData['amount'],
+            ]);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 1000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            return redirect()->route('budgetAllocation.index', [
+                'params' => $params,
+                'budgetAllocationId' => $budgetAllocationId
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->back()->withInput();
+        }
+    }
+
+    public function editBudgetAllocation($params, $budgetAllocationId, $id)
+    {
+
+        $ministry = Ministry::where('id', decode_params($params))->first();
+        $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+            ->where('ministry_id', decode_params($params))
+            ->first();
+
+        $expenseTypes = ExpenseType::whereIn('id', [2, 3, 4, 5, 7])->get();
+        // Fetch the specific Budget Allocation entry
+        $module = BudgetAllocation::where('id', decode_params($id))
+            ->where('budget_begin_voucher_id', $beginVoucher->id)
+            ->first();
+
+        if (!$module) {
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('ការស្វែងរកមិនបានជោគជ័យ។', 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetAllocation.index', [
+                'params' => $params,
+                'budgetAllocationId' => $budgetAllocationId
+            ]);
+        }
+
+        return view('beginningcredit::beginVoucher.budgetAllocation.edit')
+            ->with('ministry', $ministry)
+            ->with('params', $params)
+            ->with('beginVoucher', $beginVoucher)
+            ->with('expenseTypes', $expenseTypes)
+            ->with('budgetAllocationId', $budgetAllocationId)
+            ->with('module', $module);
+    }
+
+    public function updateBudgetAllocation(Request $request, $params, $budgetAllocationId, $id)
+    {
+
+        $validatedData = $request->validate([
+            'amount'          => 'required|numeric|min:0',
+            'cboExpenseType' => 'required|exists:expense_types,id',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Fetch the ministry safely
+            $ministry = Ministry::where('id', decode_params($params))->first();
+
+            // Fetch the begin voucher
+            $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            // Fetch the specific Budget Allocation entry
+            $module = BudgetAllocation::where('id', $id)
+                ->where('budget_begin_voucher_id', $beginVoucher->id)
+                ->first();
+
+            if (!$module) {
+                throw new \Exception('ការស្វែងរកមិនបានជោគជ័យ។');
+            }
+
+            // Update the Budget Allocation entry
+            $module->update([
+                'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+                'amount'           => $validatedData['amount'],
+            ]);
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 1000)
+                ->success('success_msg', 'successful')
+                ->flash();
+
+            return redirect()->route('budgetAllocation.index', [
+                'params' => $params,
+                'budgetAllocationId' => $budgetAllocationId
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការធ្វើបច្ចុប្បន្នភាព: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->back()->withInput();
+        }
+    }
+
+    public function destroyBudgetAllocation($params, $budgetAllocationId, $id)
+    {
+
+        $ministry = Ministry::where('id', decode_params($params))->first();
+
+        // Fetch the begin voucher
+        $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+            ->where('ministry_id', $ministry->id)
+            ->first();
+
+        // Fetch the specific Budget Allocation entry
+        $module = BudgetAllocation::where('id', decode_params($id))
+            ->where('budget_begin_voucher_id', $beginVoucher->id)
+            ->first();
+
+        if (!$module) {
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('ការស្វែងរកមិនបានជោគជ័យ។', 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('budgetAllocation.index', [
+                'params' => $params,
+                'budgetAllocationId' => $budgetAllocationId
+            ]);
+        }
+
+        $module->delete();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->error('delete_msg', 'delete')
+            ->flash();
+
+        return redirect()->route('budgetAllocation.index', [
+            'params' => $params,
+            'budgetAllocationId' => $budgetAllocationId
+        ]);
     }
 }

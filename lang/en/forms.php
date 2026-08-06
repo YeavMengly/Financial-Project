@@ -3,6 +3,7 @@
 return [
     'ministries' => 'ស្ថាប័ន',
     'username' => 'អ្នកប្រើប្រាស់',
+    'current.password' => 'ពាក្យសម្ងាត់បច្ចុប្បន្ន',
     'password' => 'ពាក្យសម្ងាត់',
     'password.confirm' => 'បញ្ជាក់ ពាក្យសម្ងាត់',
     'category' => 'ប្រភេទ',
@@ -47,7 +48,8 @@ return [
     'program.code' => 'កូដកម្មវិធី',
     'fin.law' => 'ច្បាប់ហិរញ្ញវត្ថុ',
     'current.loan' => 'ឥណទានបច្ចុប្បន្ន',
-    'voucher.type' => 'ប្រភេទ',
+    'budget.allocation' => 'ការបែងចែកឥណទាន',
+    'expense.type' => 'ប្រភេទចំណាយ',
     'budget' => 'ថវិកា',
     'internal' => 'កើនផ្ទៃក្នុង',
     'unexpected'  => 'មិនបានគ្រោងទុក',

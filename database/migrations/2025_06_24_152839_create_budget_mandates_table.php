@@ -25,8 +25,8 @@ return new class extends Migration
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legal_id');
             $table->string('payment_voucher_number');
-            $table->string('legal_number', 100);
-            $table->string('legal_name');
+            $table->string('legal_number', 100)->nullable();
+            $table->string('legal_name')->nullable();
             $table->enum('status', ['todo', 'done'])->default('todo');
             $table->integer('is_archived')->default(1);
             $table->text('description');

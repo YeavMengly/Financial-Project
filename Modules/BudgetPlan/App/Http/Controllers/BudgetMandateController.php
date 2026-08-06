@@ -525,22 +525,22 @@ class BudgetMandateController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'legalID' =>   'required',
-            'paymentVoucher' => 'required',
-            'legalNumber' => 'nullable|integer|min:1',
-            'legalName' =>  'required',
+            'legalID'          => 'required',
+            'paymentVoucher'   => 'required',
+            'legalNumber'      => 'nullable|integer|min:1',
+            'legalName'        => 'nullable|string',
             'cboProgram'       => 'required',
-            'cboProgramSub'       => 'required',
+            'cboProgramSub'    => 'required',
             'cboCluster'       => 'required',
-            'cboAgency'       => 'required',
-            'cboSubAccount'   => 'required',
-            'budget'          => 'required|numeric|min:0',
-            'txtDescription'  => 'required',
-            'attachments'     => 'nullable|array',
-            'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
-            'transactionDate'            => 'required|date',
-            'requestDate'            => 'required|date',
-            'legalDate'            => 'required|date',
+            'cboAgency'        => 'required',
+            'cboSubAccount'    => 'required',
+            'budget'           => 'required|numeric|min:0',
+            'txtDescription'   => 'required',
+            'attachments'      => 'nullable|array',
+            'attachments.*'    => 'file|mimes:pdf,doc,docx|max:2048',
+            'transactionDate'  => 'required|date',
+            'requestDate'      => 'required|date',
+            'legalDate'        => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -573,7 +573,7 @@ class BudgetMandateController extends Controller
                 flash()
                     ->translate('en')
                     ->option('timeout', 2000)
-                    ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')
+                    ->error('ឥណទានមិនគ្រប់គ្រាន់។', 'បញ្ហា')
                     ->flash();
 
                 return back();
@@ -600,16 +600,16 @@ class BudgetMandateController extends Controller
                 'budget'           => $applyValue,
                 'expense_type_id'  => 1,
                 'legal_id'         => $validated['legalID'],
-                'payment_voucher_number'         => $validated['paymentVoucher'],
+                'payment_voucher_number' => $validated['paymentVoucher'],
                 'legal_number'     => $validated['legalNumber'] ?? null,
-                'legal_name'       => $validated['legalName'],
+                'legal_name'       => $validated['legalName'] ?? null,
                 'status'           => 'todo',
                 'is_archived'      => 1,
                 'description'      => strip_tags($validated['txtDescription']),
                 'attachments'      => json_encode($stored),
                 'transaction_date' => $validated['transactionDate'],
                 'request_date'     => $validated['requestDate'],
-                'legal_date'     => $validated['legalDate'],
+                'legal_date'       => $validated['legalDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginMandate);
@@ -632,7 +632,9 @@ class BudgetMandateController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            if ($request->has('submit')) {
+            $action = $request->input('action');
+
+            if ($action === 'save') {
                 return redirect()->route('budgetMandate.index', $params);
             }
             return redirect()->route('budgetMandate.create', $params);
@@ -1268,20 +1270,23 @@ class BudgetMandateController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
-            'legalID' =>   'required',
-            'paymentVoucher' => 'required',
-            'legalNumber' =>   'required',
-            'legalName' =>  'required',
+            'legalID'          => 'required',
+            'paymentVoucher'   => 'required',
+            'legalNumber'      => 'nullable|integer|min:1',
+            'legalName'        => 'nullable|string|max:255',
+
             'cboProgram'       => 'required',
-            'cboProgramSub'       => 'required',
+            'cboProgramSub'    => 'required',
             'cboCluster'       => 'required',
-            'cboAgency'       => 'required',
-            'cboSubAccount'   => 'required',
-            'budget'          => 'numeric|min:0',
-            'txtDescription'  => 'required',
-            'transactionDate'            => 'required|date',
-            'requestDate'            => 'required|date',
-            'legalDate'            => 'required|date',
+            'cboAgency'        => 'required',
+            'cboSubAccount'    => 'required',
+
+            'budget'           => 'required|numeric|min:0',
+            'txtDescription'   => 'required',
+
+            'transactionDate'  => 'required|date',
+            'requestDate'      => 'required|date',
+            'legalDate'        => 'required|date',
         ]);
 
         DB::beginTransaction();
@@ -1315,7 +1320,7 @@ class BudgetMandateController extends Controller
 
                 return back();
             }
-            $storedFilePaths = json_decode($voucher->attachments ?? '[]', true);
+            $storedFilePaths = json_decode($mandate->attachments ?? '[]', true);
 
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
@@ -1326,23 +1331,33 @@ class BudgetMandateController extends Controller
             }
 
             $mandate->update([
-                'ministry_id'    => $ministry->id,
-                'agency_id'      => $validated['cboAgency'],
-                'program_id'      => $validated['cboProgram'],
-                'program_sub_id'      => $validated['cboProgramSub'],
-                'cluster_id'      => $validated['cboCluster'],
-                'account_sub_id' => $validated['cboSubAccount'],
-                'no'             => $beginCredit->no,
-                'budget'         => $applyValue,
-                'legal_id'      => $validated['legalID'],
-                'legal_number'      => $validated['legalNumber'],
-                'legal_name'      => $validated['legalName'],
-                'status' => 'todo',
-                'is_archived' => 1,
-                'description' => strip_tags($validated['txtDescription']),
-                'attachments'    => json_encode($storedFilePaths),
-                'transaction_date'           => $validated['transactionDate'],
+                'ministry_id'            => $ministry->id,
+                'agency_id'              => $validated['cboAgency'],
+                'program_id'             => $validated['cboProgram'],
+                'program_sub_id'         => $validated['cboProgramSub'],
+                'cluster_id'             => $validated['cboCluster'],
+                'account_sub_id'         => $validated['cboSubAccount'],
+
+                'no'                     => $beginCredit->no,
+                'fin_law'                => $beginCredit->fin_law,
+                'budget'                 => $applyValue,
+
+                'expense_type_id'        => $mandate->expense_type_id,
+
+                'legal_id'               => $validated['legalID'],
+                'payment_voucher_number' => $validated['paymentVoucher'],
+
+                'legal_number'           => $validated['legalNumber'] ?? null,
+                'legal_name'             => $validated['legalName'] ?? null,
+
+                'status'                 => 'todo',
+                'is_archived'            => 1,
+
+                'description'            => strip_tags($validated['txtDescription']),
+                
+                'transaction_date'       => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
+                'legal_date'             => $validated['legalDate'],
             ]);
 
             $this->recalculateAndSaveReport($beginCredit);
