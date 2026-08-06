@@ -201,7 +201,7 @@
                                             <span data-key="t-training">{{ __('menus.training') }}</span>
                                         </a>
                                         <ul>
-                                            @if (hasPermission('initialTraining.expenseRecord.index'))
+                                            {{-- @if (hasPermission('initialTraining.expenseRecord.index'))
                                                 <li>
                                                     <a href="{{ route('initialTraining.expenseRecord.index') }}"
                                                         class="{{ Request::routeIs('initialTraining.expenseRecord.*') ? 'active' : '' }}">
@@ -211,8 +211,8 @@
                                                         </span>
                                                     </a>
                                                 </li>
-                                            @endif
-                                            @if (hasPermission('initialTraining.paymentDeadline.index'))
+                                            @endif --}}
+                                            {{-- @if (hasPermission('initialTraining.paymentDeadline.index'))
                                                 <li>
                                                     <a href="{{ route('initialTraining.paymentDeadline.index') }}"
                                                         class="{{ Request::routeIs('initialTraining.paymentDeadline.*') ? 'active' : '' }}">
@@ -222,7 +222,7 @@
                                                         </span>
                                                     </a>
                                                 </li>
-                                            @endif
+                                            @endif --}}
                                         </ul>
                                     </li>
                                 @endif

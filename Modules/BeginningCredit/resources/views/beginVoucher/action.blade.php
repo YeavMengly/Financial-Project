@@ -6,6 +6,16 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+
+                @if (hasPermission('beginVoucher.index'))
+                    <a href="{{ route('budgetAllocation.index', ['params' => encode_params($module->ministry_id), 'budgetAllocationId' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-folder"></i> {{ __('buttons.budget.allocation') }}</a>
+                @endif
+                @if (hasPermission('beginVoucher.index') and
+                        (hasPermission('beginVoucher.edit') or hasPermission('beginVoucher.destroy')))
+                    <hr />
+                @endif
+
                 @if (hasPermission('beginVoucher.edit'))
                     <a href="{{ route('beginVoucher.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">

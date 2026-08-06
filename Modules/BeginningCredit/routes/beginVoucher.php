@@ -11,6 +11,12 @@ Route::middleware('PermissionCheck')->controller(BeginVoucherController::class)-
     Route::get('{params}/credit-approved/create', 'create')->name('beginVoucher.create');
     Route::get('{params}/credit-approved/edit/{id}', 'edit')->name('beginVoucher.edit');
     Route::get('{params}/credit-approved/destroy/{id}', 'destroy')->name('beginVoucher.destroy');
+
+    // Route for show budget allocation
+    Route::get('{params}/credit-approved/{budgetAllocationId}/budget-allocation', 'indexBudgetAllocation')->name('budgetAllocation.index');
+    Route::get('{params}/credit-approved/{budgetAllocationId}/budget-allocation/create', 'createBudgetAllocation')->name('budgetAllocation.create');
+    Route::get('{params}/credit-approved/{budgetAllocationId}/budget-allocation/edit/{id}', 'editBudgetAllocation')->name('budgetAllocation.edit');
+    Route::get('{params}/credit-approved/{budgetAllocationId}/budget-allocation/destroy/{id}', 'destroyBudgetAllocation')->name('budgetAllocation.destroy');
 });
 
 // These routes are for form submit and ajax request, so no need to apply PermissionCheck middleware
@@ -29,4 +35,8 @@ Route::controller(BeginVoucherController::class)->group(function () {
     Route::get('/begin-voucher/edit-by-program/program-subs', 'editByProgramId')->name('beginVoucher.edit.program_sub');
     Route::get('/begin-voucher/edit-by-program/agencies', 'editByAgency')->name('beginVoucher.edit.agency');
     Route::get('/begin-voucher/edit-by-program-sub/clusters', 'editByProgramSubId')->name('beginVoucher.edit.cluster');
+
+    Route::post('{params}/credit-approved/{budgetAllocationId}/budget-allocation/store', 'storeBudgetAllocation')->name('budgetAllocation.store');
+    Route::post('{params}/credit-approved/{budgetAllocationId}/budget-allocation/update/{id}', 'updateBudgetAllocation')->name('budgetAllocation.update');
+
 });

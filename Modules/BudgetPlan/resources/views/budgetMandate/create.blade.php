@@ -8,9 +8,7 @@
     <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
-
     <style>
-        /* Green border feedback for optional/skipped/valid fields */
         .has-success .form-control,
         .has-success .form-select,
         .has-success .choices__inner {
@@ -54,16 +52,17 @@
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                         data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
                                         type="number" class="form-control" placeholder="{{ __('forms.legal.id') }}"
-                                        name="legalID" tabindex="2" />
+                                        name="legalID" tabindex="1" name="legalID" min="0" max="999"
+                                        oninput="if(this.value.length > 3) this.value = this.value.slice(0,3)" />
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="legalDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                    <label for="legalDate" class="form-label">{{ __('forms.select_legal_date') }}</label>
                                     <input type="text" id="legalDate" name="legalDate" class="form-control"
                                         placeholder="{{ __('forms.select_legal_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
+                                        data-pristine-required-message="{{ __('messages.required') }}" tabindex="2" />
                                 </div>
                             </div>
 
@@ -73,9 +72,10 @@
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                         data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                        type="number" class="form-control"
+                                        type="text" class="form-control"
                                         placeholder="{{ __('forms.payment.voucher.number') }}" name="paymentVoucher"
-                                        tabindex="2" />
+                                        tabindex="3" min="0" max="9999"
+                                        oninput="if(this.value.length > 4) this.value = this.value.slice(0,4)" />
                                 </div>
                             </div>
 
@@ -87,7 +87,7 @@
 
                                         <!-- Skip Switch -->
                                         <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch"
+                                            <input class="form-check-input" type="checkbox" role="switch" tabindex="4"
                                                 id="skipLegalNumber" style="cursor: pointer;">
                                             <label class="form-check-label font-size-12 text-muted" for="skipLegalNumber"
                                                 style="cursor: pointer;">
@@ -99,27 +99,41 @@
                                     <input class="form-control" id="legalNumber" name="legalNumber"
                                         data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                        type="number" placeholder="{{ __('forms.legal.number') }}" required
-                                        tabindex="2">
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                        placeholder="{{ __('forms.legal.number') }}" required tabindex="5">
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label>{{ __('forms.legal.name') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" placeholder="{{ __('forms.legal.name') }}"
-                                        name="legalName" tabindex="2" />
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="legalName"
+                                            class="form-label mb-0">{{ __('forms.legal.name') }}</label>
+
+                                        <!-- Skip Switch -->
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="skipLegalName" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted" for="skipLegalName"
+                                                style="cursor: pointer;">
+                                                រំលង / មិនបញ្ចូលលេខ
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <input class="form-control" id="legalName" name="legalName"
+                                        data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="text"
+                                        placeholder="{{ __('forms.legal.name') }}" required tabindex="6">
                                 </div>
                             </div>
-
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProgram"
                                         class="form-label font-size-13 text-muted">{{ __('forms.program') }}</label>
                                     <select class="form-select" id="cboProgram" name="cboProgram" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        tabindex="7" data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($program as $p)
                                             <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}
@@ -134,7 +148,7 @@
                                     <label for="cboProgramSub"
                                         class="form-label font-size-13 text-muted">{{ __('forms.program.sub') }}</label>
                                     <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        tabindex="8" data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
                                     </select>
                                 </div>
@@ -145,7 +159,7 @@
                                     <label for="cboCluster"
                                         class="form-label font-size-13 text-muted">{{ __('forms.cluster') }}</label>
                                     <select id="cboCluster" class="form-select" name="cboCluster" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        data-pristine-required-message="{{ __('messages.required') }}" tabindex="9">
                                         <option value="">{{ __('forms.search...') }}</option>
                                     </select>
                                 </div>
@@ -156,7 +170,7 @@
                                     <label for="cboAgency"
                                         class="form-label font-size-13 text-muted">{{ __('forms.agency') }}</label>
                                     <select id="cboAgency" class="form-select" name="cboAgency" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        data-pristine-required-message="{{ __('messages.required') }}" tabindex="10">
                                         <option value="">{{ __('forms.search...') }}</option>
                                     </select>
                                 </div>
@@ -167,7 +181,7 @@
                                     <label for="cboSubAccount"
                                         class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
                                     <select class="form-select" id="cboSubAccount" name="cboSubAccount" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        data-pristine-required-message="{{ __('messages.required') }}" tabindex="11">
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($accountSub as $bv)
                                             <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}
@@ -181,15 +195,16 @@
                                 <div class="form-group mb-3">
                                     <label for="budget">{{ __('forms.budget') }}</label>
                                     <input type="number" min="0" name="budget" id="budget" required
-                                        class="form-control" placeholder="{{ __('forms.budget') }}"
+                                        tabindex="12" class="form-control" placeholder="{{ __('forms.budget') }}"
                                         data-pristine-required-message="{{ __('messages.required') }}" />
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}</label>
-                                    <input type="text" id="transactionDate" name="transactionDate"
+                                    <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}( PO
+                                        FMIS )</label>
+                                    <input type="text" id="transactionDate" name="transactionDate" tabindex="13"
                                         class="form-control" placeholder="{{ __('forms.select_transaction_date') }}"
                                         required data-pristine-required-message="{{ __('messages.required') }}" />
                                 </div>
@@ -197,19 +212,41 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="requestDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                    <label for="requestDate" class="form-label">{{ __('forms.select_date') }}( PO FMIS
+                                        )</label>
                                     <input type="text" id="requestDate" name="requestDate" class="form-control"
-                                        placeholder="{{ __('forms.select_request_date') }}" required
+                                        tabindex="14" placeholder="{{ __('forms.select_request_date') }}" required
                                         data-pristine-required-message="{{ __('messages.required') }}" />
                                 </div>
                             </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="fileInput">{{ __('forms.file.type') }}</label>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="fileInput"
+                                            class="form-label mb-0">{{ __('forms.file.type') }}</label>
+
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="skipFileInput" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted" for="skipFileInput"
+                                                style="cursor: pointer;">
+                                                រំលង / មិនភ្ជាប់
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
                                     <input type="file" id="fileInput" name="attachments[]" class="form-control"
-                                        accept=".pdf,.doc,.docx" multiple />
-                                    <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
+                                        tabindex="15" accept=".pdf,.doc,.docx" multiple required data-max-size="5"
+                                        data-allowed-extensions="pdf,doc,docx"
+                                        data-pristine-required-message="{{ __('messages.required') }}" />
+                                    <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
+                                        file)</small>
+
+                                    @error('attachments.*')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -217,20 +254,28 @@
                         <div class="col-md-12">
                             <div class="form-group mb-3">
                                 <label for="vDescription">{{ __('forms.document.description') }}</label>
-                                <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required
+                                <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required tabindex="16"
                                     data-pristine-required-message="{{ __('messages.required') }}"></textarea>
                             </div>
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <button class="btn btn-primary" type="submit" name="submit"
-                                value="save">{{ __('buttons.save') }}</button>
-                            <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                            <button class="btn btn-primary" type="submit" name="action" value="save">
+                                {{ __('buttons.save') }}
+                            </button>
+
+                            <button class="btn btn-info" type="submit" name="action" value="save_create">
+                                {{ __('buttons.save.create') }}
+                            </button>
+
+                            <a href="{{ url()->current() }}" class="btn btn-danger">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                {{ __('buttons.delete') }}
                             </a>
-                            <a class="btn btn-dark"
-                                href="{{ route('budgetMandate.index', $params) }}">{{ __('buttons.back') }}</a>
+
+                            <a class="btn btn-dark" href="{{ route('budgetMandate.index', $params) }}">
+                                {{ __('buttons.back') }}
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -336,7 +381,7 @@
                         onChange: function(contents) {
                             const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
                             document.getElementById('vDescription').value = clean === '' ? '' :
-                            contents;
+                                contents;
                             pristine.validate(document.getElementById('vDescription'));
                         }
                     }
@@ -516,89 +561,146 @@
             const legalInput = document.getElementById('legalNumber');
             const skipLegalCheckbox = document.getElementById('skipLegalNumber');
 
-            if (skipLegalCheckbox && legalInput) {
-                skipLegalCheckbox.addEventListener('change', function() {
-                    const parentGroup = legalInput.closest('.form-group');
+            const legalNameInput = document.getElementById('legalName');
+            const skipLegalNameCheckbox = document.getElementById('skipLegalName');
+
+            const fileInput = document.getElementById('fileInput');
+            const skipFileCheckbox = document.getElementById('skipFileInput');
+            const setupSkipField = ({
+                checkbox,
+                input,
+                defaultValue = '',
+                restoreValidation = () => {}
+            }) => {
+
+                if (!checkbox || !input) return;
+
+                checkbox.addEventListener('change', function() {
+
+                    const parentGroup = input.closest('.form-group');
 
                     if (this.checked) {
-                        legalInput.value = '';
-                        legalInput.disabled = true;
-                        legalInput.readOnly = true;
+                        input.value = '';
+                        input.disabled = true;
 
-                        // Add Green success styling
-                        legalInput.classList.remove('bg-light', 'text-muted');
-                        legalInput.classList.add('border-success', 'bg-success-subtle');
+                        input.classList.add('border-success', 'bg-success-subtle');
                         parentGroup?.classList.add('has-success');
 
-                        // Remove Pristine rules
-                        legalInput.removeAttribute('required');
-                        legalInput.removeAttribute('min');
-                        legalInput.removeAttribute('data-pristine-required-message');
-                        legalInput.removeAttribute('data-pristine-min-message');
-                        legalInput.removeAttribute('data-pristine-integer-message');
-                        pristine.reset(legalInput);
-                    } else {
-                        legalInput.value = '0';
-                        legalInput.disabled = false;
-                        legalInput.readOnly = false;
+                        input.removeAttribute('required');
+                        input.removeAttribute('min');
+                        input.removeAttribute('data-pristine-required-message');
 
-                        // Remove Green styling
-                        legalInput.classList.remove('border-success', 'bg-success-subtle');
+                        pristine.reset(input);
+                    } else {
+                        input.value = defaultValue;
+                        input.disabled = false;
+
+                        input.classList.remove('border-success', 'bg-success-subtle');
                         parentGroup?.classList.remove('has-success');
 
-                        // Restore Rules
-                        legalInput.setAttribute('required', 'true');
-                        legalInput.setAttribute('min', '1');
-                        legalInput.setAttribute('data-pristine-required-message',
-                            "{{ __('messages.required') }}");
-                        legalInput.setAttribute('data-pristine-min-message', 'លំដាប់ ត្រូវតែធំជាងសូន្យ');
-                        legalInput.setAttribute('data-pristine-integer-message', 'លំដាប់ ត្រូវតែលេខ');
+                        restoreValidation();
                     }
+
                     refreshPristine();
                 });
-            }
+            };
+            setupSkipField({
+                checkbox: skipLegalCheckbox,
+                input: legalInput,
+                defaultValue: '0',
+                restoreValidation: () => {
+                    legalInput.setAttribute('required', true);
+                    legalInput.setAttribute('min', '1');
+                    legalInput.setAttribute(
+                        'data-pristine-required-message',
+                        "{{ __('messages.required') }}"
+                    );
+                    legalInput.setAttribute(
+                        'data-pristine-min-message',
+                        'លំដាប់ ត្រូវតែធំជាងសូន្យ'
+                    );
+                }
+            });
 
+            setupSkipField({
+                checkbox: skipLegalNameCheckbox,
+                input: legalNameInput,
+                defaultValue: '',
+                restoreValidation: () => {
+                    legalNameInput.setAttribute('required', true);
+                    legalNameInput.setAttribute(
+                        'data-pristine-required-message',
+                        "{{ __('messages.required') }}"
+                    );
+                }
+            });
+
+            setupSkipField({
+                checkbox: skipFileCheckbox,
+                input: fileInput,
+                restoreValidation: () => {
+                    fileInput.setAttribute('required', true);
+                    fileInput.setAttribute(
+                        'data-pristine-required-message',
+                        "{{ __('messages.required') }}"
+                    );
+                }
+            });
             // ==========================================
             // 8. MASTER FORM SUBMIT GATEKEEPER
             // ==========================================
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // Stop native submission immediately
+                // 1. Stop the normal form submission
+                e.preventDefault();
 
-                // Ensure skipped fields don't accidentally validate
-                if (skipLegalCheckbox && skipLegalCheckbox.checked && legalInput) {
-                    legalInput.disabled = true;
-                    legalInput.removeAttribute('required');
-                    legalInput.removeAttribute('min');
-                    pristine.reset(legalInput);
+                // 2. Capture which button was clicked (Save vs Save & Create)
+                const submitter = e.submitter;
+                if (submitter && submitter.name === 'action') {
+                    let hidden = form.querySelector('input[name="action"]');
+
+                    // If the hidden input doesn't exist, create it
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+                        form.appendChild(hidden);
+                    }
+                    hidden.value = submitter.value;
                 }
 
-                // Force Summernote HTML to sync before validation
-                if ($('#vDescription').length) {
-                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
-                        '#vDescription').summernote('code');
-                    document.getElementById('vDescription').value = summernoteContent;
-                }
+                // 3. Handle the "skip" checkboxes to bypass Pristine validation
+                [
+                    [skipLegalCheckbox, legalInput],
+                    [skipLegalNameCheckbox, legalNameInput],
+                    [skipFileCheckbox, fileInput]
+                ].forEach(([checkbox, input]) => {
+                    if (checkbox?.checked && input) {
+                        input.disabled = true; // Disable so Pristine ignores it
+                        input.removeAttribute('required');
+                        pristine.reset(input); // Clear any existing error messages for this field
+                    }
+                });
 
+                // 4. Run Pristine validation
                 const isValid = pristine.validate();
 
-                if (isValid) {
-                    // Unlock disabled fields before posting so Laravel does not throw a missing key error
-                    if (legalInput && skipLegalCheckbox && skipLegalCheckbox.checked) {
-                        legalInput.disabled = false;
-                    }
-
-                    // Safe form submission
-                    HTMLFormElement.prototype.submit.call(form);
-                } else {
-                    const firstError = form.querySelector('.has-danger');
-                    if (firstError) {
-                        firstError.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
+                // 5. If validation fails, stop here (do not submit)
+                if (!isValid) {
+                    return;
                 }
+
+                // 6. Re-enable the skipped inputs just before submitting!
+                // We must do this so Laravel receives the empty/null values instead of missing keys.
+                [legalInput, legalNameInput, fileInput].forEach(input => {
+                    if (input) {
+                        input.disabled = false;
+                    }
+                });
+
+                // 7. Finally, submit the form natively to Laravel
+                HTMLFormElement.prototype.submit.call(form);
             });
+
         });
     </script>
 @endsection

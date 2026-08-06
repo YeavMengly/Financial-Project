@@ -13,6 +13,7 @@ return [
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'beginning.credit' => 'ឥណទានអនុម័ត',
+    'budget.allocation' => 'ការបែងចែកឥណទាន',
     // Content
     'content' => 'មាតិកា',
     'content.ministries' => 'កំណត់ឆ្នាំ',
@@ -25,7 +26,7 @@ return [
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
     'content.expense.type' => 'ប្រភេទចំណាយ',
-
+    
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
     'expense.type' => 'ប្រភេទចំណាយ',
