@@ -15,6 +15,7 @@ class DuelRelease extends Model
         'stock_number',
         'agency',
         'user_request',
+        'receiver',
         'unit',
         'title',
         'quantity_total',

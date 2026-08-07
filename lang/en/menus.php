@@ -115,8 +115,8 @@ return [
     'date.entry' => 'កាលបរិច្ឆេទបញ្ចូល',
     'date.release' => 'កាលបរិច្ឆេទនាំចេញ',
     'file' => 'ឯកសារ',
-    'entry' => 'នាំចូល',
-    'release' => 'នាំចេញ',
+    // 'entry' => 'នាំចូល',
+    // 'release' => 'នាំចេញ',
 
 
     // Reports

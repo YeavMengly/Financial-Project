@@ -112,10 +112,16 @@
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
-                                                <input type="text" name="receipt_number" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                <input type="text" id="receipt_number" name="receipt_number"
+                                                    value="{{ old('receipt_number') }}" required maxlength="4"
+                                                    inputmode="numeric" class="form-control"
+                                                    data-pristine-required-message="{{ __('messages.required') }}"
+                                                    data-pristine-pattern="/^\d{4}$/"
+                                                    data-pristine-pattern-message="សូមបញ្ចូលលេខ ៤ ខ្ទង់"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" />
                                                 @error('receipt_number')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">{{ $message }}
+                                                    </div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -125,6 +131,16 @@
                                                 <input type="text" name="user_request" required class="form-control"
                                                     data-pristine-required-message="{{ __('messages.required') }}" />
                                                 @error('user_request')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="receiver">{{ __('forms.receiver') }}</label>
+                                                <input type="text" name="receiver" required class="form-control"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('receiver')
                                                     <div class="pristine-error text-help">{{ $message }}</div>
                                                 @enderror
                                             </div>
@@ -143,18 +159,16 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-xl-4 col-md-6">
+                                      <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="title">{{ __('forms.title') }}</label>
-                                                <input type="text" name="title" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                <input type="text" name="title" required class="form-control" data-pristine-required-message="{{ __('messages.required') }}" />
                                                 @error('title')
                                                     <div class="pristine-error text-help">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
-
-                                        <div class="col-lg-4 col-md-6">
+                                         <div class="col-lg-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="file">{{ __('forms.file') }}</label>
                                                 <input type="file" id="fileInput" name="file[]" class="form-control"
@@ -165,7 +179,6 @@
                                                 @enderror
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                                 <div class="col-xl-6 col-md-6">
@@ -323,5 +336,130 @@
                 }
             });
         });
+
+        // // ==========================================
+        // //   SKIP LEGAL NUMBER LOGIC (With Visuals)
+        // // ==========================================
+        // const titleInput = document.getElementById('title');
+        // const skipTitleCheckbox = document.getElementById('skipTitle');
+
+        // const fileInput = document.getElementById('fileInput');
+        // const skipFileCheckbox = document.getElementById('skipFileInput');
+        // const setupSkipField = ({
+        //     checkbox,
+        //     input,
+        //     defaultValue = '',
+        //     restoreValidation = () => {}
+        // }) => {
+
+        //     if (!checkbox || !input) return;
+
+        //     checkbox.addEventListener('change', function() {
+
+        //         const parentGroup = input.closest('.form-group');
+
+        //         if (this.checked) {
+        //             input.value = '';
+        //             input.disabled = true;
+
+        //             input.classList.add('border-success', 'bg-success-subtle');
+        //             parentGroup?.classList.add('has-success');
+
+        //             input.removeAttribute('required');
+        //             input.removeAttribute('min');
+        //             input.removeAttribute('data-pristine-required-message');
+
+        //             pristine.reset(input);
+        //         } else {
+        //             input.value = defaultValue;
+        //             input.disabled = false;
+
+        //             input.classList.remove('border-success', 'bg-success-subtle');
+        //             parentGroup?.classList.remove('has-success');
+
+        //             restoreValidation();
+        //         }
+
+        //         refreshPristine();
+        //     });
+        // };
+        
+        // setupSkipField({
+        //     checkbox: skipTitleCheckbox,
+        //     input: titleInput,
+        //     defaultValue: '',
+        //     restoreValidation: () => {
+        //         titleInput.setAttribute('required', true);
+        //         titleInput.setAttribute(
+        //             'data-pristine-required-message',
+        //             "{{ __('messages.required') }}"
+        //         );
+        //     }
+        // });
+
+        // setupSkipField({
+        //     checkbox: skipFileCheckbox,
+        //     input: fileInput,
+        //     restoreValidation: () => {
+        //         fileInput.setAttribute('required', true);
+        //         fileInput.setAttribute(
+        //             'data-pristine-required-message',
+        //             "{{ __('messages.required') }}"
+        //         );
+        //     }
+        // });
+        // // ==========================================
+        // //   MASTER FORM SUBMIT GATEKEEPER
+        // // ==========================================
+        // form.addEventListener('submit', function(e) {
+        //     // 1. Stop the normal form submission
+        //     e.preventDefault();
+
+        //     // 2. Capture which button was clicked (Save vs Save & Create)
+        //     const submitter = e.submitter;
+        //     if (submitter && submitter.name === 'action') {
+        //         let hidden = form.querySelector('input[name="action"]');
+
+        //         // If the hidden input doesn't exist, create it
+        //         if (!hidden) {
+        //             hidden = document.createElement('input');
+        //             hidden.type = 'hidden';
+        //             hidden.name = 'action';
+        //             form.appendChild(hidden);
+        //         }
+        //         hidden.value = submitter.value;
+        //     }
+
+        //     // 3. Handle the "skip" checkboxes to bypass Pristine validation
+        //     [
+        //         [skipTitleCheckbox, titleInput],
+        //         [skipFileCheckbox, fileInput]
+        //     ].forEach(([checkbox, input]) => {
+        //         if (checkbox?.checked && input) {
+        //             input.disabled = true; // Disable so Pristine ignores it
+        //             input.removeAttribute('required');
+        //             pristine.reset(input); // Clear any existing error messages for this field
+        //         }
+        //     });
+
+        //     // 4. Run Pristine validation
+        //     const isValid = pristine.validate();
+
+        //     // 5. If validation fails, stop here (do not submit)
+        //     if (!isValid) {
+        //         return;
+        //     }
+
+        //     // 6. Re-enable the skipped inputs just before submitting!
+        //     // We must do this so Laravel receives the empty/null values instead of missing keys.
+        //     [titleInput, fileInput].forEach(input => {
+        //         if (input) {
+        //             input.disabled = false;
+        //         }
+        //     });
+
+        //     // 7. Finally, submit the form natively to Laravel
+        //     HTMLFormElement.prototype.submit.call(form);
+        // });
     </script>
 @endsection

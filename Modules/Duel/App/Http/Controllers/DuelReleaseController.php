@@ -237,11 +237,12 @@ class DuelReleaseController extends Controller
             'stock_number'     => 'required',
             'item_name'        => 'required',
             'agency'           => 'required|integer',
-            'receipt_number'   => 'required|string|max:255',
+            'receipt_number' => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
+            'receiver'     => 'required|string|max:255',
             'quantity_request' => 'required|numeric|min:0',
             'date_release'     => 'required|string',
-            'title'            => 'required|string|max:255',
+            'title'            => 'nullable|string',
             'refer'            => 'required|string',
             'note'             => 'required|string',
             'file'             => 'nullable|array',
@@ -281,6 +282,7 @@ class DuelReleaseController extends Controller
                 'agency'           => $validated['agency'],
                 'receipt_number'   => $validated['receipt_number'],
                 'user_request'     => $validated['user_request'],
+                'receiver'     => $validated['receiver'],
                 'quantity_request' => $validated['quantity_request'],
                 'quantity_total'   => 0, // Temporarily 0
                 'duel_total'       => 0, // Temporarily 0
@@ -429,8 +431,9 @@ class DuelReleaseController extends Controller
             'stock_number'     => 'required',
             'item_name'        => 'required', // DuelEntry ID from dropdown
             'agency'           => 'nullable|integer',
-            'receipt_number'   => 'required|string|max:255',
+            'receipt_number' => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
+            'receiver'     => 'required|string|max:255',
             'quantity_request' => 'required|numeric|min:0',
             'date_release'     => 'required|string',
             // 'title'            => 'required|string|max:255',
@@ -479,6 +482,7 @@ class DuelReleaseController extends Controller
                 'agency'           => $validated['agency'] ?? null,
                 'receipt_number'   => $validated['receipt_number'],
                 'user_request'     => $validated['user_request'],
+                'receiver'     => $validated['receiver'],
                 'quantity_request' => $validated['quantity_request'],
                 'date_release'     => $dateRelease,
                 // 'title'            => $validated['title'],
@@ -527,14 +531,18 @@ class DuelReleaseController extends Controller
     private function recalculateLedger($ministryId, $stockNumber, $itemName)
     {
         // Find initial stock quantity from DuelEntry
-        $duelEntry = DuelEntry::where('item_name', $itemName)->first();
+        $duelEntry = DuelEntry::where('ministry_id', $ministryId)
+            ->where('stock_number', $stockNumber)
+            ->where('item_name', $itemName)
+            ->firstOrFail();
         $runningBalance = $duelEntry ? ($duelEntry->quantity ?? 0) : 0;
 
         // Fetch all releases for this specific stock item ordered by ID (creation order)
         $releases = DuelRelease::where('ministry_id', $ministryId)
             ->where('stock_number', $stockNumber)
             ->where('item_name', $itemName)
-            ->orderBy('id', 'asc')
+            ->orderBy('date_release', 'ASC')
+            ->orderBy('receipt_number', 'ASC')
             ->get();
 
         foreach ($releases as $release) {
@@ -656,7 +664,12 @@ class DuelReleaseController extends Controller
                 ->orderBy('duel_releases.date_release', 'ASC')
                 ->orderBy('duel_releases.receipt_number', 'ASC');
 
-
+            if ($request->filled('cboDuelType')) {
+                $query->where('duel_releases.item_name', $request->cboDuelType);
+            }
+            if ($request->filled('cboExecutiveUnit')) {
+                $query->where('duel_releases.agency', $request->cboExecutiveUnit);
+            }
             if ($request->filled('start_date')) {
                 $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
                 $query->whereDate('duel_releases.date_release', '>=', $startDate);
@@ -701,7 +714,7 @@ class DuelReleaseController extends Controller
 
                 return redirect()->route('duelRelease.index', $params);
             }
-           
+
             $export = new DuelReleaseExport(
                 $data,
                 $ministryId,

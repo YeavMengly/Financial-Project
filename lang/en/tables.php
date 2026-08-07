@@ -85,6 +85,7 @@ return [
   'th.stock.name' => 'ឈ្មោះបណ្ណបញ្ចូល',
   'th.user.entry' => 'អ្នកបញ្ចូល',
   'th.user.req' => 'អ្នកស្នើសុំ',
+  'th.user.rec' => 'អ្នកទទួល',
   'th.unit' => 'ឯកតា',
   'th.quantity' => 'បរិមាណ',
   'th.quantity.remain' => 'បរិមាណនៅសល់',
