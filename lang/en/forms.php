@@ -63,6 +63,7 @@ return [
     'stock.name' => 'ឈ្មោះស្តុក',
     'user.entry' => 'ឈ្មោះអ្នកបញ្ចូល',
     'user.request' => 'ឈ្មោះអ្នកស្នើសុំ',
+    'receiver' => 'ឈ្មោះអ្នកទទួល',
     'unit' => 'ឯកតា',
     'quantity' => 'បរិមាណ',
     'quantity.request' => 'បរិមាណស្នើសុំ',

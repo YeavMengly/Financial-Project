@@ -128,11 +128,16 @@
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
-                                                <input type="text" name="receipt_number" required class="form-control"
-                                                    value="{{ old('receipt_number', $duelRelease->receipt_number) }}"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                <input type="text" id="receipt_number" name="receipt_number"
+                                                    value="{{ old('receipt_number', $duelRelease->receipt_number ?? '') }}"
+                                                    required maxlength="4" inputmode="numeric" class="form-control"
+                                                    data-pristine-required-message="{{ __('messages.required') }}"
+                                                    data-pristine-pattern="/^\d{4}$/"
+                                                    data-pristine-pattern-message="សូមបញ្ចូលលេខ ៤ ខ្ទង់"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" />
                                                 @error('receipt_number')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">{{ $message }}
+                                                    </div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -145,6 +150,18 @@
                                                     value="{{ old('user_request', $duelRelease->user_request) }}"
                                                     data-pristine-required-message="{{ __('messages.required') }}" />
                                                 @error('user_request')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        {{-- Receiver --}}
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="receiver">{{ __('forms.receiver') }}</label>
+                                                <input type="text" name="receiver" required class="form-control"
+                                                    value="{{ old('receiver', $duelRelease->receiver) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('receiver')
                                                     <div class="pristine-error text-help">{{ $message }}</div>
                                                 @enderror
                                             </div>
