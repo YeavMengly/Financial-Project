@@ -34,28 +34,6 @@
     </div>
     <!-- end page title -->
     <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
-                        <div class="col-sm-3">
-                            <label for="companyName" class="form-label font-size-13 text-muted">
-                                {{ __('forms.expense.type') }}
-                            </label>
-                            <select class="form-control" name="cboExpenseType" id="cboExpenseType">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($expenseTypes as $expenseType)
-                                    <option value="{{ $expenseType->id }}"
-                                        {{ request('cboExpenseType') == $expenseType->id ? 'selected' : '' }}>
-                                        {{ $expenseType->name_kh }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="row">
         <div class="col-12">

@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.expenditure.guarantee') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.mandate') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -26,7 +26,7 @@
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.budget.plan') }}</a>
                             </li>
 
-                            <li class="breadcrumb-item active">{{ __('menus.expenditure.guarantee') }}</li>
+                            <li class="breadcrumb-item active">{{ __('menus.mandate') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -86,8 +86,8 @@
 
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="CboPaymentVoucherNumber">{{ __('menus.voucher') }}</label>
-                            <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber" class="form-control"
-                                placeholder="{{ __('menus.voucher') }}"  
+                            <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber"
+                                class="form-control" placeholder="{{ __('menus.voucher') }}"
                                 value="{{ request('CboPaymentVoucherNumber') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
@@ -95,16 +95,14 @@
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
-                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}"  
-                                value="{{ request('start_date') }}"
+                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
-                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}"  
-                                value="{{ request('end_date') }}"
+                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}" value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
@@ -119,7 +117,7 @@
                                     'budgetMandate.export',
                                     array_merge(
                                         ['params' => $params],
-                                        request()->only(['cboProgram','cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                        request()->only(['cboProgram', 'cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
                                     ),
                                 ) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
@@ -278,9 +276,10 @@
     </script>
 
     <script>
-        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date,#CboPaymentVoucherNumber').on('change keyup', function() {
-            $('#budgetmandate-table').DataTable().ajax.reload();
-        });
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date,#CboPaymentVoucherNumber')
+            .on('change keyup', function() {
+                $('#budgetmandate-table').DataTable().ajax.reload();
+            });
     </script>
 
     <script>

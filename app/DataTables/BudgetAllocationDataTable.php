@@ -105,8 +105,9 @@ class BudgetAllocationDataTable extends DataTable
                 $query->where('budget_allocations.budget_expense_type_id', $expenseType);
             }
         }
+        $query->orderBy('begin_vouchers.no', 'ASC');
 
-        return $query->orderByDesc('budget_allocations.created_at');
+        return $query;
     }
 
     /**
@@ -143,13 +144,12 @@ class BudgetAllocationDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('agency')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('amount')->title(__('tables.th.budget'))->width(120)->addClass('align-middle'),
-            Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('expense_type_name')
                 ->title(__('tables.th.expense.type')),
+            Column::make('agency')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::make('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),

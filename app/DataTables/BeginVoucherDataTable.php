@@ -24,6 +24,9 @@ class BeginVoucherDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('agency', function ($row) {
+                return '<strong>' . $row->agency_no  . '</strong><br/><hr/>' . $row->agency_name;
+            })
             ->editColumn('fin_law', function ($row) {
                 return number_format($row->fin_law ?? 0);
             })
@@ -40,7 +43,7 @@ class BeginVoucherDataTable extends DataTable
             ->editColumn('txtDescription', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->txtDescription) . '</div>';
             })
-            ->rawColumns(['txtDescription', 'soft_delete'])
+            ->rawColumns(['txtDescription', 'soft_delete', 'agency'])
             ->addColumn('action', function ($module) {
                 return view('beginningcredit::beginVoucher.action', ['module' => $module]);
             })
@@ -94,12 +97,16 @@ class BeginVoucherDataTable extends DataTable
             'begin_vouchers.current_loan',
             'begin_vouchers.ministry_id',
             'agencies.name as agency_name',
+            'agencies.no as agency_no',
             'account_subs.no as account_sub_no',
             'clusters.decription',
             'begin_vouchers.created_at',
         ]);
 
-        $model->orderBy('begin_vouchers.created_at', 'DESC');
+        if (!$request->has('order')) {
+            $model->orderBy('begin_vouchers.account_sub_id', 'asc')
+                ->orderBy('begin_vouchers.no', 'asc');
+        }
 
         return $model;
     }
@@ -158,11 +165,11 @@ class BeginVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
-            Column::make('agency_name')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('fin_law')->title(__('tables.th.financeLaw'))->width(120)->addClass('align-middle'),
             Column::make('current_loan')->title(__('tables.th.currentCredit'))->width(120)->addClass('align-middle'),
+            Column::make('agency')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
             Column::make('txtDescription')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
 
