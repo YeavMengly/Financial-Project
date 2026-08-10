@@ -145,7 +145,6 @@
                                                 @enderror
                                             </div>
                                         </div>
-
                                         <div class="col-lg-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
@@ -158,27 +157,76 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
 
-                                      <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="title">{{ __('forms.title') }}</label>
-                                                <input type="text" name="title" required class="form-control" data-pristine-required-message="{{ __('messages.required') }}" />
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="title">{{ __('forms.title') }}</label>
+
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipTitle" style="cursor: pointer;">
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipTitle" style="cursor: pointer;">
+                                                            រំលង
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <input class="form-control" id="title" name="title" type="text"
+                                                    placeholder="{{ __('forms.title') }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
                                                 @error('title')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
                                                 @enderror
                                             </div>
                                         </div>
-                                         <div class="col-lg-4 col-md-6">
+                                        <div class="col-lg-4 col-md-6">
                                             <div class="form-group mb-3">
-                                                <label for="file">{{ __('forms.file') }}</label>
+
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="fileInput" class="form-label mb-0">
+                                                        {{ __('forms.file.type') }}
+                                                    </label>
+
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipFileInput" style="cursor: pointer;">
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipFileInput" style="cursor: pointer;">
+                                                            រំលង
+                                                        </label>
+                                                    </div>
+                                                </div>
+
                                                 <input type="file" id="fileInput" name="file[]" class="form-control"
-                                                    accept=".pdf,.doc,.docx" multiple />
-                                                <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
+                                                    tabindex="15" accept=".pdf,.doc,.docx" multiple data-max-size="5"
+                                                    data-allowed-extensions="pdf,doc,docx"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                <small class="form-text text-muted">
+                                                    Allowed types: PDF, DOC, DOCX (Max: 5MB per file)
+                                                </small>
+
                                                 @error('file')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
                                                 @enderror
+
+                                                @error('file.*')
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                                 <div class="col-xl-6 col-md-6">
@@ -207,8 +255,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
@@ -336,130 +382,175 @@
                 }
             });
         });
+        //////
+        document.addEventListener('DOMContentLoaded', function() {
 
-        // // ==========================================
-        // //   SKIP LEGAL NUMBER LOGIC (With Visuals)
-        // // ==========================================
-        // const titleInput = document.getElementById('title');
-        // const skipTitleCheckbox = document.getElementById('skipTitle');
+            // IMPORTANT:
+            // Change this to your real form ID
+            const form = document.getElementById('pristine-valid-example');
+            if (!form) {
+                console.error('Form not found');
+                return;
+            }
+            const pristine = new Pristine(form);
+            const titleInput = document.getElementById('title');
+            const skipTitleCheckbox = document.getElementById('skipTitle');
+            const fileInput = document.getElementById('fileInput');
+            const skipFileCheckbox = document.getElementById('skipFileInput');
+            // ==========================================
+            // CLEAR FIELD ERRORS
+            // ==========================================
+            function clearFieldErrors(input) {
 
-        // const fileInput = document.getElementById('fileInput');
-        // const skipFileCheckbox = document.getElementById('skipFileInput');
-        // const setupSkipField = ({
-        //     checkbox,
-        //     input,
-        //     defaultValue = '',
-        //     restoreValidation = () => {}
-        // }) => {
+                if (!input) return;
+                const parentGroup = input.closest('.form-group');
+                if (parentGroup) {
+                    parentGroup
+                        .querySelectorAll('.pristine-error, .text-help')
+                        .forEach(el => el.remove());
 
-        //     if (!checkbox || !input) return;
+                    parentGroup.classList.remove(
+                        'has-danger',
+                        'has-error'
+                    );
+                }
+                input.classList.remove(
+                    'is-invalid',
+                    'border-danger'
+                );
+            }
+            // ==========================================
+            // SETUP SKIP FIELD
+            // ==========================================
+            function setupSkipField(checkbox, input) {
 
-        //     checkbox.addEventListener('change', function() {
+                if (!checkbox || !input) return;
+                // ------------------------------------------
+                // Initial state
+                // ------------------------------------------
+                if (checkbox.checked) {
 
-        //         const parentGroup = input.closest('.form-group');
+                    input.value = '';
+                    input.disabled = true;
 
-        //         if (this.checked) {
-        //             input.value = '';
-        //             input.disabled = true;
+                } else {
 
-        //             input.classList.add('border-success', 'bg-success-subtle');
-        //             parentGroup?.classList.add('has-success');
+                    input.disabled = false;
+                    input.setAttribute('required', 'required');
+                }
+                // ------------------------------------------
+                // Add validator
+                // ------------------------------------------
+                pristine.addValidator(
+                    input,
+                    function(value) {
 
-        //             input.removeAttribute('required');
-        //             input.removeAttribute('min');
-        //             input.removeAttribute('data-pristine-required-message');
+                        // If skipped, always valid
+                        if (checkbox.checked) {
+                            return true;
+                        }
 
-        //             pristine.reset(input);
-        //         } else {
-        //             input.value = defaultValue;
-        //             input.disabled = false;
+                        // Otherwise field must contain data
+                        return value.trim() !== '';
 
-        //             input.classList.remove('border-success', 'bg-success-subtle');
-        //             parentGroup?.classList.remove('has-success');
+                    },
+                    "{{ __('messages.required') }}",
+                    1,
+                    true
+                );
+                // ------------------------------------------
+                // Skip checkbox change
+                // ------------------------------------------
+                checkbox.addEventListener('change', function() {
 
-        //             restoreValidation();
-        //         }
+                    if (this.checked) {
+                        // ==============================
+                        // SKIP
+                        // ==============================
+                        input.value = '';
+                        input.disabled = true;
 
-        //         refreshPristine();
-        //     });
-        // };
-        
-        // setupSkipField({
-        //     checkbox: skipTitleCheckbox,
-        //     input: titleInput,
-        //     defaultValue: '',
-        //     restoreValidation: () => {
-        //         titleInput.setAttribute('required', true);
-        //         titleInput.setAttribute(
-        //             'data-pristine-required-message',
-        //             "{{ __('messages.required') }}"
-        //         );
-        //     }
-        // });
+                        input.removeAttribute('required');
 
-        // setupSkipField({
-        //     checkbox: skipFileCheckbox,
-        //     input: fileInput,
-        //     restoreValidation: () => {
-        //         fileInput.setAttribute('required', true);
-        //         fileInput.setAttribute(
-        //             'data-pristine-required-message',
-        //             "{{ __('messages.required') }}"
-        //         );
-        //     }
-        // });
-        // // ==========================================
-        // //   MASTER FORM SUBMIT GATEKEEPER
-        // // ==========================================
-        // form.addEventListener('submit', function(e) {
-        //     // 1. Stop the normal form submission
-        //     e.preventDefault();
+                        clearFieldErrors(input);
 
-        //     // 2. Capture which button was clicked (Save vs Save & Create)
-        //     const submitter = e.submitter;
-        //     if (submitter && submitter.name === 'action') {
-        //         let hidden = form.querySelector('input[name="action"]');
+                        pristine.reset(input);
 
-        //         // If the hidden input doesn't exist, create it
-        //         if (!hidden) {
-        //             hidden = document.createElement('input');
-        //             hidden.type = 'hidden';
-        //             hidden.name = 'action';
-        //             form.appendChild(hidden);
-        //         }
-        //         hidden.value = submitter.value;
-        //     }
+                        input.classList.remove(
+                            'is-invalid',
+                            'border-danger'
+                        );
 
-        //     // 3. Handle the "skip" checkboxes to bypass Pristine validation
-        //     [
-        //         [skipTitleCheckbox, titleInput],
-        //         [skipFileCheckbox, fileInput]
-        //     ].forEach(([checkbox, input]) => {
-        //         if (checkbox?.checked && input) {
-        //             input.disabled = true; // Disable so Pristine ignores it
-        //             input.removeAttribute('required');
-        //             pristine.reset(input); // Clear any existing error messages for this field
-        //         }
-        //     });
+                        input.classList.add(
+                            'border-success',
+                            'bg-success-subtle'
+                        );
 
-        //     // 4. Run Pristine validation
-        //     const isValid = pristine.validate();
+                    } else {
+                        // ==============================
+                        // REQUIRED AGAIN
+                        // ==============================
+                        input.disabled = false;
 
-        //     // 5. If validation fails, stop here (do not submit)
-        //     if (!isValid) {
-        //         return;
-        //     }
+                        input.setAttribute('required', 'required');
 
-        //     // 6. Re-enable the skipped inputs just before submitting!
-        //     // We must do this so Laravel receives the empty/null values instead of missing keys.
-        //     [titleInput, fileInput].forEach(input => {
-        //         if (input) {
-        //             input.disabled = false;
-        //         }
-        //     });
+                        input.classList.remove(
+                            'border-success',
+                            'bg-success-subtle'
+                        );
 
-        //     // 7. Finally, submit the form natively to Laravel
-        //     HTMLFormElement.prototype.submit.call(form);
-        // });
+                        clearFieldErrors(input);
+
+                        pristine.reset(input);
+                    }
+                });
+            }
+            // ==========================================
+            // INITIALIZE
+            // ==========================================
+            setupSkipField(
+                skipTitleCheckbox,
+                titleInput
+            );
+            setupSkipField(
+                skipFileCheckbox,
+                fileInput
+            );
+            // ==========================================
+            // FORM SUBMIT
+            // ==========================================
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // ------------------------------------------
+                // Save which button was clicked
+                // ------------------------------------------
+                const submitter = e.submitter;
+                if (submitter && submitter.name === 'action') {
+                    let hidden = form.querySelector(
+                        'input[name="action"]'
+                    );
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+                        form.appendChild(hidden);
+                    }
+                    hidden.value = submitter.value;
+                }
+                // ------------------------------------------
+                // Validate
+                // ------------------------------------------
+                const isValid = pristine.validate();
+                console.log('Form valid:', isValid);
+                console.log('Errors:', pristine.getErrors());
+                // If invalid, STOP
+                if (!isValid) {
+                    return;
+                }
+                HTMLFormElement.prototype.submit.call(form);
+            });
+
+        });
     </script>
 @endsection

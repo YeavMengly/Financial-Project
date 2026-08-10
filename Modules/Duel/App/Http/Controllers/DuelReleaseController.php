@@ -237,16 +237,16 @@ class DuelReleaseController extends Controller
             'stock_number'     => 'required',
             'item_name'        => 'required',
             'agency'           => 'required|integer',
-            'receipt_number' => ['required', 'string', 'digits:4'],
+            'receipt_number'   => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
-            'receiver'     => 'required|string|max:255',
+            'receiver'         => 'nullable|string|max:255',
             'quantity_request' => 'required|numeric|min:0',
             'date_release'     => 'required|string',
-            'title'            => 'nullable|string',
+            'title' => 'nullable|string|max:255',
             'refer'            => 'required|string',
             'note'             => 'required|string',
             'file'             => 'nullable|array',
-            'file.*'           => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'file.*'           => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
         ]);
 
         $paths = [];
@@ -254,10 +254,9 @@ class DuelReleaseController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Save uploaded files
             if ($request->hasFile('file')) {
                 foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
+                    if ($file && $file->isValid()) {
                         $paths[] = $file->store('duelRelease', 'public');
                     }
                 }
@@ -266,34 +265,31 @@ class DuelReleaseController extends Controller
             $ministry  = Ministry::where('id', $ministryId)->firstOrFail();
             $duelEntry = DuelEntry::findOrFail($validated['item_name']);
 
-            // 2. Date parsing
             try {
                 $dateRelease = Carbon::createFromFormat('d/m/Y', $validated['date_release'])->format('Y-m-d');
             } catch (\Exception $e) {
                 $dateRelease = $validated['date_release'];
             }
 
-            // 3. Create initial record (placeholder totals, recalculated in step 4)
             $duelRelease = DuelRelease::create([
                 'ministry_id'      => $ministry->id,
                 'stock_number'     => $validated['stock_number'],
                 'item_name'        => $duelEntry->item_name,
-                'unit'             => 2, // Verify if hardcoding '2' is intended
+                'unit'             => 2,
                 'agency'           => $validated['agency'],
                 'receipt_number'   => $validated['receipt_number'],
                 'user_request'     => $validated['user_request'],
-                'receiver'     => $validated['receiver'],
+                'receiver'         => $validated['receiver'] ?? null,
                 'quantity_request' => $validated['quantity_request'],
-                'quantity_total'   => 0, // Temporarily 0
-                'duel_total'       => 0, // Temporarily 0
+                'quantity_total'   => 0,
+                'duel_total'       => 0,
                 'date_release'     => $dateRelease,
-                'title'            => $validated['title'],
+                'title'            => $validated['title'] ?? null,
                 'note'             => strip_tags($validated['note'] ?? ''),
                 'refer'            => strip_tags($validated['refer']),
-                'file'             => json_encode($paths),
+                'file'             => json_encode($paths), // Will store [] if no files uploaded
             ]);
 
-            // 4. Recalculate running totals for this stock item across all records
             $this->recalculateLedger($ministry->id, $validated['stock_number'], $duelEntry->item_name);
 
             DB::commit();
@@ -308,7 +304,6 @@ class DuelReleaseController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            // 5. Clean up any uploaded files if the transaction failed
             foreach ($paths as $path) {
                 if (Storage::disk('public')->exists($path)) {
                     Storage::disk('public')->delete($path);
@@ -436,7 +431,7 @@ class DuelReleaseController extends Controller
             'receiver'     => 'required|string|max:255',
             'quantity_request' => 'required|numeric|min:0',
             'date_release'     => 'required|string',
-            // 'title'            => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'refer'            => 'required|string',
             'note'             => 'required|string',
             'file'             => 'nullable|array',
@@ -485,7 +480,7 @@ class DuelReleaseController extends Controller
                 'receiver'     => $validated['receiver'],
                 'quantity_request' => $validated['quantity_request'],
                 'date_release'     => $dateRelease,
-                // 'title'            => $validated['title'],
+                'title'            => $validated['title'] ?? null,
                 'refer'            => strip_tags($validated['refer']),
                 'note'             => strip_tags($validated['note']),
                 'file'             => json_encode($existingFiles),

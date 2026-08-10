@@ -10,6 +10,12 @@
                     <a href="{{ route('duelRelease.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
+                 @if (hasPermission('duelRelease.edit.doc'))
+                    <a href="{{ route('duelRelease.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item">
+                        <i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}
+                    </a>
+                @endif
                 @if (hasPermission('duelRelease.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('duelRelease.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
