@@ -67,7 +67,7 @@
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="warehouse_voucher">{{ __('forms.warehouse.voucher') }}</label>
+                                        <label for="warehouse_voucher">កាលបរិច្ឆេទ{{ __('forms.warehouse.voucher') }}ក្រុមហ៊ុន</label>
                                         <input type="text" name="warehouse_voucher" required class="form-control"
                                             tabindex="4"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
@@ -93,7 +93,7 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="date" class="form-label">{{ __('forms.date') }}</label>
+                                        <label for="date" class="form-label">{{ __('forms.date') }}បញ្ចូលឃ្លាំង</label>
                                         <input type="text" id="date" name="date" class="form-control"
                                             tabindex="7" placeholder="{{ __('forms.select_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />

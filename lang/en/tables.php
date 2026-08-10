@@ -97,7 +97,7 @@ return [
   'th.date.release' => 'កាលបរិច្ឆេទបញ្ចេញ',
   'th.file' => 'ឯកសារ',
   'th.pro.code' => 'លេខកូដ​ផលិតផល',
-  'th.pro.name' => 'ឈ្មោះ​ផលិតផល',
+  'th.item.name' => 'ឈ្មោះរាយមុខទំនិញ',
   'th.pro.year' => 'ឆ្នាំ​ផលិតផល',
   'th.source' => 'ប្រភព',
   'th.total.price' => 'តម្លៃ​សរុប',

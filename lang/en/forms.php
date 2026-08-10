@@ -67,6 +67,7 @@ return [
     'receiver' => 'ឈ្មោះអ្នកទទួល',
     'date' => 'កាលបរិច្ឆេទ',
     'warehouse.voucher' => 'បណ្ណបញ្ចេញឃ្លាំង',
+    'project' => 'គម្រោង',
 
 
     'item.name' => 'ឈ្មោះទំនិញ',

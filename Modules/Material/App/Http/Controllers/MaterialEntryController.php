@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Content\Agency;
 use App\Models\Content\Ministry;
 use App\Models\Material\MaterialEntry;
+use App\Models\Material\Projects;
 use App\Models\UnitType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,11 +49,13 @@ class MaterialEntryController extends Controller
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
+        $project = Projects::where('ministry_id', $ministry->id)->get();
 
         return view('material::materialEntry.create', [
             'params' => $params,
             'unitType' => $unitType,
             'ministry' => $ministry,
+            'project' => $project
         ]);
     }
 
@@ -62,24 +65,13 @@ class MaterialEntryController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'company_name'  => 'required|string|max:255',
-            'stock_number'  => 'required',
-            'stock_name'    => 'required|string|max:255',
-            'user_entry'    => 'required|string|max:255',
-            'p_code'    => 'required|string|max:255',
+            'cboProject' => 'required',
             'p_name'    => 'required|string|max:255',
-            'p_year'    => 'required|string|max:255',
-            'title'    => 'required|string|max:255',
             'unit'          => 'required',
-            'quantity'      => 'required',
+            'qty'      => 'required',
             'price'         => 'required',
-            'note'          => 'nullable|string|max:10000',
-            'date_entry'    => 'required|date',
             'source'    => 'required|string|max:255',
-            'note'         => 'nullable|string|max:10000',
-            'refer'         => 'nullable|string|max:10000',
-            'file'          => 'nullable|array',
-            'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'p_year'    => 'required|string|max:255',
         ]);
 
         $id = decode_params($params);
@@ -88,37 +80,19 @@ class MaterialEntryController extends Controller
         try {
             $ministry = Ministry::where('id', $id)->first();
             $unitType = UnitType::where('id', $validated['unit'])->first();
-            $materialTotal = (int)$validated['quantity'] * (float)$validated['price'];
-            $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
-
-            $paths = [];
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
-                        $stored[] = $file->store('materialEntry', 'public');
-                    }
-                }
-            }
+            $project = Projects::where('id', $validated['cboProject'])->first();
+            $materialTotal = (int)$validated['qty'] * (float)$validated['price'];
 
             MaterialEntry::create([
                 'ministry_id'  => $ministry->id,
-                'company_name' => $validated['company_name'],
-                'stock_number' => $validated['stock_number'],
-                'stock_name'   => $validated['stock_name'],
-                'user_entry'   => $validated['user_entry'],
-                'p_code'   => $validated['p_code'],
+                'project_id' => $project->id,
                 'p_name'   => $validated['p_name'],
                 'p_year'   => $validated['p_year'],
-                'title'   => $validated['title'],
                 'unit'         => $unitType->name,
-                'quantity'     => $validated['quantity'],
+                'qty'     => $validated['qty'],
                 'price'        => $validated['price'],
                 'total_price'   => $materialTotal,
                 'source'        => $validated['source'],
-                'note'        => strip_tags($validated['note']),
-                'refer'        => strip_tags($validated['refer']),
-                'date_entry'   => $dateEntry,
-                'file'         => json_encode($paths),
             ]);
 
             DB::commit();
@@ -160,19 +134,17 @@ class MaterialEntryController extends Controller
     {
         $ministry = Ministry::where('id', decode_params($params))->first();
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
-        $module = MaterialEntry::where('id', decode_params($id))
+        $project = Projects::where('ministry_id', $ministry->id)->first();
+        $module = MaterialEntry::where('id', $project->id)
             ->where('ministry_id', $ministry->id)
             ->first();
 
-        return view(
-            'material::materialEntry.edit',
-            [
-                'params' => $params,
-                'unitType' => $unitType,
-                'ministry' => $ministry,
-                'module' => $module
-            ]
-        );
+        return view('material::materialEntry.edit')
+            ->with('params', $params)
+            ->with('ministry', $ministry)
+            ->with('unitType', $unitType)
+            ->with('project', $project)
+            ->with('module', $module);
     }
 
     /**
@@ -181,24 +153,13 @@ class MaterialEntryController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
-            'company_name'  => 'required|string|max:255',
-            'stock_number'  => 'required',
-            'stock_name'    => 'required|string|max:255',
-            'user_entry'    => 'required|string|max:255',
-            'p_code'    => 'required|string|max:255',
+            'cboProject' => 'required',
             'p_name'    => 'required|string|max:255',
             'p_year'    => 'required|string|max:255',
-            'title'    => 'required|string|max:255',
             'unit'          => 'required',
-            'quantity'      => 'required',
+            'qty'      => 'required',
             'price'         => 'required',
-            'note'          => 'nullable|string|max:10000',
-            'date_entry'    => 'required|date',
             'source'    => 'required|string|max:255',
-            'note'         => 'nullable|string|max:10000',
-            'refer'         => 'nullable|string|max:10000',
-            'file'          => 'nullable|array',
-            'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
         DB::beginTransaction();
@@ -206,40 +167,20 @@ class MaterialEntryController extends Controller
         try {
             $ministry = Ministry::where('id', decode_params($params))->first();
             $unitType = UnitType::where('id', $validated['unit'])->first();
-            $materialTotal = (int)$validated['quantity'] * (float)$validated['price'];
-            $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
-
+            $materialTotal = (int)$validated['qty'] * (float)$validated['price'];
             $materialEntry = MaterialEntry::where('id', $id)
                 ->where('ministry_id', $ministry->id)
                 ->first();
-            $paths = [];
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
-                        $stored[] = $file->store('materialEntry', 'public');
-                    }
-                }
-            }
 
             $materialEntry->update([
-                'ministry_id'  => $ministry->id,
-                'company_name' => $validated['company_name'],
-                'stock_number' => $validated['stock_number'],
-                'stock_name'   => $validated['stock_name'],
-                'user_entry'   => $validated['user_entry'],
-                'p_code'   => $validated['p_code'],
+                'project_id' => $validated['cboProject'],
                 'p_name'   => $validated['p_name'],
                 'p_year'   => $validated['p_year'],
-                'title'   => $validated['title'],
                 'unit'         => $unitType->name,
-                'quantity'     => $validated['quantity'],
+                'qty'     => $validated['qty'],
                 'price'        => $validated['price'],
                 'total_price'   => $materialTotal,
                 'source'        => $validated['source'],
-                'note'        => strip_tags($validated['note']),
-                'refer'        => strip_tags($validated['refer']),
-                'date_entry'   => $dateEntry,
-                'file'         => json_encode($paths),
             ]);
 
             DB::commit();

@@ -37,31 +37,8 @@ class MaterialEntryDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('material::materialEntry.action', ['module' => $module]);
             })
-            ->editColumn('note', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->note) . '</div>';
-            })
-            ->editColumn('refer', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->refer) . '</div>';
-            })
-            ->editColumn('file', function ($row) {
-                if (!$row->attachments) {
-                    return '<span class="text-muted">-</span>';
-                }
-                $files = json_decode($row->file, true);
-                if (is_array($files)) {
-                    $html = '<ul class="list-unstyled m-0">';
-                    foreach ($files as $file) {
-                        $url = asset('storage/uploads/' . $file);
-                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                } else {
-                    $url = asset('storage/uploads/' . $row->file);
-                    return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
-                }
-            })
-            ->rawColumns(['note', 'refer', 'file']);
+
+            ->rawColumns(['id']);
     }
 
     /**
@@ -76,23 +53,14 @@ class MaterialEntryDataTable extends DataTable
             ->select([
                 'material_entries.id',
                 'material_entries.ministry_id',
-                'material_entries.company_name',
-                'material_entries.stock_number',
-                'material_entries.stock_name',
-                'material_entries.user_entry',
-                'material_entries.p_code',
+                'material_entries.project_id',
                 'material_entries.p_name',
                 'material_entries.p_year',
-                'material_entries.title',
                 'material_entries.unit',
-                'material_entries.quantity',
+                'material_entries.qty',
                 'material_entries.price',
                 'material_entries.total_price',
                 'material_entries.source',
-                'material_entries.note',
-                'material_entries.refer',
-                'material_entries.date_entry',
-                'material_entries.file',
                 'material_entries.created_at',
                 'material_entries.updated_at',
             ])
@@ -125,24 +93,13 @@ class MaterialEntryDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
-            Column::make('company_name')->title(__('tables.th.company.name'))->width(90)->addClass('align-middle'),
-            Column::make('stock_number')->title(__('tables.th.stock.number'))->width(30)->addClass('align-middle'),
-            Column::make('stock_name')->title(__('tables.th.stock.name'))->width(30)->addClass('align-middle'),
-            Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
-            Column::make('p_code')->title(__('tables.th.pro.code'))->width(60)->addClass('align-middle'),
-            Column::make('p_name')->title(__('tables.th.pro.name'))->width(80)->addClass('align-middle'),
-            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
-            Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
+            Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
+            Column::make('p_year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
-            Column::make('quantity')->title(__('tables.th.quantity'))->width(80)->addClass('align-middle'),
+            Column::make('qty')->title(__('tables.th.quantity'))->width(80)->addClass('align-middle'),
             Column::make('price')->title(__('tables.th.price'))->width(80)->addClass('align-middle'),
             Column::make('total_price')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
-            Column::make('note')->title(__('tables.th.note'))->addClass('align-middle'),
-            Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
-            Column::make('date_entry')->title(__('tables.th.date.entry'))->width(200)->addClass('align-middle'),
-            Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
