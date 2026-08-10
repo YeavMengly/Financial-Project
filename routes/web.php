@@ -9,6 +9,7 @@ use App\Livewire\BudgetPlan\GaranteeFile;
 use App\Livewire\BudgetPlan\ProcurementFile;
 use App\Livewire\BudgetPlan\ExpenseRecordTrainingFile;
 use App\Livewire\BudgetPlan\PaymentDeadlineTraining;
+use App\Livewire\Duel\Release;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -45,5 +46,9 @@ Route::prefix('budgetplan/voucher')->middleware(['auth'])->group(function () {
     Route::get('{params}/payment-file/{id}', Payment::class)->name('payment.edit.doc');
     Route::get('{params}/payment-deadline-file/{id}', PaymentDeadline::class)->name('paymentDeadline.edit.doc');
     Route::get('{params}/payment-deadline-training-file/{id}', PaymentDeadlineTraining::class)->name('paymentDeadlineTraining.edit.doc');
+});
+Route::prefix('duel')->middleware(['auth'])->group(function () {
+    Route::get('{params}/duel-release-file/{id}', Release::class)->name('duelRelease.edit.doc');
+     
 });
 
