@@ -124,4 +124,8 @@ return [
   'th.motor' => 'ម៉ូតូ',
   'th.car' => 'ឡាន',
   'th.bus' => 'ឡានក្រុង',
+
+  'th.warehouse.voucher' => 'បណ្ណបញ្ចេញឃ្លាំង',
+  'th.warehouse.owner' => 'ឃ្លាំង',
+  'th.receiver' => 'អ្នកទទួល'
 ];

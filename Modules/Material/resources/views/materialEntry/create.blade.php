@@ -54,7 +54,7 @@
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="stock_number">{{ __('forms.stock.number') }}</label>
-                                        <input type="text" name="stock_number" required class="form-control"
+                                        <input type="number" name="stock_number" required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('stock_number')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -84,7 +84,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6">
+                                {{-- <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="p_code">{{ __('forms.pro.code') }}</label>
                                         <input type="text" name="p_code" required class="form-control"
@@ -93,11 +93,11 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="p_name">{{ __('forms.pro.name') }}</label>
+                                        <label for="p_name">{{ __('forms.stock.name') }}</label>
                                         <input type="text" name="p_name" required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('p_name')

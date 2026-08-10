@@ -6,6 +6,7 @@ return [
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
+
     // Inventory
     'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
@@ -14,6 +15,9 @@ return [
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'beginning.credit' => 'ឥណទានអនុម័ត',
     'budget.allocation' => 'ការបែងចែកឥណទាន',
+    'inventory_item' => 'មុខទំនិញ',
+    'project' => 'គម្រោង',
+
     // Content
     'content' => 'មាតិកា',
     'content.ministries' => 'កំណត់ឆ្នាំ',
@@ -26,7 +30,7 @@ return [
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
     'content.expense.type' => 'ប្រភេទចំណាយ',
-    
+
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
     'expense.type' => 'ប្រភេទចំណាយ',
@@ -86,19 +90,19 @@ return [
 
     // Duel
     'duel' => 'ប្រេងឥន្ធនៈ',
-    'duel.entry' => 'ប្រេងឥន្ធនៈនាំចូល',
-    'duel.release' => 'ប្រេងឥន្ធនៈនាំចេញ',
+    'duel.entry' => 'ប្រេងឥន្ធនៈបញ្ចូល',
+    'duel.release' => 'ប្រេងឥន្ធនៈបញ្ចេញ',
 
     // Material
     'material' => 'សម្ផារផ្គត់ផ្គង់',
-    'material.entry' => 'សម្ផារផ្គត់ផ្គង់នាំចូល',
-    'material.release' => 'សម្ផារផ្គត់ផ្គង់នាំចេញ',
+    'material.entry' => 'សម្ផារផ្គត់ផ្គង់បញ្ចូល',
+    'material.release' => 'សម្ផារផ្គត់ផ្គង់បញ្ចេញ',
 
     'year' => 'ឆ្នាំ',
     'create.year' => 'កំណត់ឆ្នាំ',
-    'item.name' => 'ឈ្មោះផលិតផល',
+    'item.name' => 'ឈ្មោះទំនិញ',
     'company.name' => 'ឈ្មោះក្រុមហ៊ុន',
-    'stock.number' => 'លេខស្តុក',
+    'stock.number' => 'លេខបញ្ចូលឃ្លាំង',
     'stock.name' => 'ឈ្មោះស្តុក',
     'user.entry' => 'ឈ្មោះអ្នកបញ្ចូល',
     'user.request' => 'ឈ្មោះអ្នកស្នើរសុំ',
@@ -115,8 +119,8 @@ return [
     'date.entry' => 'កាលបរិច្ឆេទបញ្ចូល',
     'date.release' => 'កាលបរិច្ឆេទនាំចេញ',
     'file' => 'ឯកសារ',
-    'entry' => 'នាំចូល',
-    'release' => 'នាំចេញ',
+    'entry' => 'បញ្ជូល',
+    'release' => 'បញ្ចេញ',
 
 
     // Reports
