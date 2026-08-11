@@ -26,229 +26,12 @@
             <div class="card">
                 <div class="card-body">
 
-                    {{-- <form id="pristine-valid-example"
-                        action="{{ route('budgetVoucher.update', ['params' => $params, 'id' => $module->id]) }}"
-                        method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
-                        @csrf
-
-                        <div class="row">
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboExpenseType"
-                                        class="form-label text-muted">{{ __('forms.expense.type') }}</label>
-                                    <select id="cboExpenseType" class="form-select" name="cboExpenseType" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($expenseType as $item)
-                                            <option value="{{ $item->id }}"
-                                                {{ $item->id == $module->expense_type_id ? 'selected' : '' }}>
-                                                {{ $item->name_kh }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboPaymentVoucherNumber" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.payment.voucher') }}
-                                    </label>
-                                    <select id="cboPaymentVoucherNumber" class="form-select" name="cboPaymentVoucherNumber"
-                                        required
-                                        data-old="{{ old('cboPaymentVoucherNumber', $module->legal_number ?? '') }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                    </select>
-
-                                    @error('cboPaymentVoucherNumber')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.legal.name') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="legalName"
-                                        value="{{ old('legalName', $module->legal_name) }}" tabindex="2" />
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.temporary.id') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
-                                        value="{{ old('cbotemporaryId', $module->temporary_id) }}" type="number"
-                                        class="form-control" placeholder="{{ __('forms.temporary.id') }}"
-                                        name="cbotemporaryId" tabindex="2" />
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.day.number') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
-                                        value="{{ old('cbodayOfNumber', $module->day_of_number) }}" type="text"
-                                        class="form-control" placeholder="{{ __('forms.day.number') }}"
-                                        name="cbodayOfNumber" tabindex="2" />
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboProgram" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.program') }}
-                                    </label>
-                                    <select id="cboProgram" class="form-select" name="cboProgram" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($program as $p)
-                                            <option value="{{ $p->id }}"
-                                                {{ $module->program_id == $p->id ? 'selected' : '' }}>
-                                                {{ $p->no }}-{{ $p->title }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('cboProgram')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboProgramSub" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.program.sub') }}
-                                    </label>
-                                    <select id="cboProgramSub" class="form-select" name="cboProgramSub" required
-                                        data-old="{{ old('cboProgramSub', $module->program_sub_id ?? '') }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                    </select>
-                                    @error('cboProgramSub')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboCluster" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.cluster') }}
-                                    </label>
-                                    <select id="cboCluster" class="form-select" name="cboCluster"
-                                        data-old="{{ old('cboCluster', $module->cluster_id ?? '') }}">
-                                        <option value="">ស្វែងរក...</option>
-                                    </select>
-
-                                    @error('cboCluster')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.agency') }}
-                                    </label>
-                                    <select id="cboAgency" class="form-select" name="cboAgency" required
-                                        data-old="{{ old('cboAgency', $module->agency_id ?? '') }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                    </select>
-                                    @error('cboAgency')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboSubAccount"
-                                        class="form-label font-size-13 text-muted">{{ __('forms.sub.account') }}</label>
-                                    <select class="form-control" id="cboSubAccount" name="cboSubAccount" required>
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($accountSub as $bv)
-                                            <option value="{{ $bv->no }}"
-                                                {{ old('cboSubAccount', $module->account_sub_id) == $bv->no ? 'selected' : '' }}>
-                                                {{ $bv->no }}-{{ $bv->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('cboSubAccount')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-xl-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="budget">{{ __('forms.budget') }}</label>
-                                    <input type="number" min="0" name="budget" id="budget" required
-                                        class="form-control" value="{{ old('budget', $module->budget) }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('budget')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}</label>
-                                    <input type="text" id="transactionDate" name="transactionDate"
-                                        class="form-control"
-                                        value="{{ old('transactionDate', $module->transaction_date) }}"
-                                        placeholder="{{ __('forms.select_transaction_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="requestDate" class="form-label">{{ __('forms.select_date') }}</label>
-                                    <input type="text" id="requestDate" name="requestDate" class="form-control"
-                                        value="{{ old('date', $module->request_date) }}"
-                                        placeholder="{{ __('forms.select_request_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('date')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12">
-                            <div class="form-group mb-3">
-                                <label for="vDescription">{{ __('forms.document.description') }}</label>
-                                <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required
-                                    data-pristine-required-message="{{ __('messages.required') }}">{{ old('txtDescription', $module->description) }}</textarea>
-                                @error('txtDescription')
-                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="d-flex flex-wrap gap-2">
-                            <button type="submit" class="btn btn-primary"
-                                id="insertToTableBtn">{{ __('buttons.save') }}</button>
-                            <a class="btn btn-dark"
-                                href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
-
-                        </div>
-                    </form> --}}
-
                     <form id="pristine-valid-example"
                         action="{{ route('budgetVoucher.update', ['params' => $params, 'id' => $module->id]) }}"
                         method="POST" enctype="multipart/form-data" novalidate autocomplete="off">
                         @csrf
 
                         <div class="row">
-
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.legal.id') }}</label>
@@ -262,7 +45,8 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="legalDate" class="form-label">{{ __('forms.select_date') }}</label>
+
+                                    <label for="legalDate" class="form-label">{{ __('forms.select_legal_date') }}</label>
                                     <input type="text" id="legalDate" name="legalDate" class="form-control"
                                         value="{{ old('legalDate', $module->legal_date) }}"
                                         placeholder="{{ __('forms.select_legal_date') }}" required
@@ -437,7 +221,25 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                    <label for="cboExpenseType"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.expense.type') }}</label>
+                                    <select class="form-select" id="cboExpenseType" name="cboExpenseType" required
+                                        tabindex="13" data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($expenseType as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ $module->expense_type_id == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name_kh }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3"> <label for="transactionDate"
+                                        class="form-label">{{ __('forms.select_date') }}( PO
+                                        FMIS )</label>
                                     <input type="text" id="transactionDate" name="transactionDate"
                                         class="form-control"
                                         value="{{ old('transactionDate', $module->transaction_date) }}"
@@ -448,7 +250,7 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="requestDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                    <label for="fileInput" class="form-label mb-0">{{ __('forms.file.type') }}</label>
                                     <input type="text" id="requestDate" name="requestDate" class="form-control"
                                         value="{{ old('requestDate', $module->request_date) }}"
                                         placeholder="{{ __('forms.select_request_date') }}" required
