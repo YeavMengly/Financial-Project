@@ -215,41 +215,6 @@
                                             </li>
                                         @endif
 
-<<<<<<< HEAD
-                                @if (hasPermission('initialTraining.expenseRecord.index'))
-                                    <li>
-                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
-                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
-                                            <i data-feather="file-plus"></i>
-                                            <span data-key="t-training">{{ __('menus.training') }}</span>
-                                        </a>
-                                        <ul>
-                                            {{-- @if (hasPermission('initialTraining.expenseRecord.index'))
-                                                <li>
-                                                    <a href="{{ route('initialTraining.expenseRecord.index') }}"
-                                                        class="{{ Request::routeIs('initialTraining.expenseRecord.*') ? 'active' : '' }}">
-                                                        <i data-feather="file-plus"></i>
-                                                        <span data-key="t-budget-control-voucher">
-                                                            {{ __('menus.expense.record.book') }}
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            @endif --}}
-                                            {{-- @if (hasPermission('initialTraining.paymentDeadline.index'))
-                                                <li>
-                                                    <a href="{{ route('initialTraining.paymentDeadline.index') }}"
-                                                        class="{{ Request::routeIs('initialTraining.paymentDeadline.*') ? 'active' : '' }}">
-                                                        <i data-feather="file-plus"></i>
-                                                        <span data-key="t-budget-control-voucher">
-                                                            {{ __('menus.payment.deadline') }}
-                                                        </span>
-                                                    </a>
-                                                </li>
-                                            @endif --}}
-                                        </ul>
-                                    </li>
-                                @endif
-=======
                                         @if (hasPermission('initialTraining.paymentDeadline.index'))
                                             <li>
                                                 <a href="{{ route('initialTraining.paymentDeadline.index') }}"
@@ -262,7 +227,6 @@
                                         @endif
                                     </ul>
                                 </li>
->>>>>>> 2a90d000ae7e0b2c95cb4855dfebd35de27c1dd9
                             </ul>
                         </li>
 
