@@ -128,11 +128,16 @@
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
-                                                <input type="text" name="receipt_number" required class="form-control"
-                                                    value="{{ old('receipt_number', $duelRelease->receipt_number) }}"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                <input type="text" id="receipt_number" name="receipt_number"
+                                                    value="{{ old('receipt_number', $duelRelease->receipt_number ?? '') }}"
+                                                    required maxlength="4" inputmode="numeric" class="form-control"
+                                                    data-pristine-required-message="{{ __('messages.required') }}"
+                                                    data-pristine-pattern="/^\d{4}$/"
+                                                    data-pristine-pattern-message="សូមបញ្ចូលលេខ ៤ ខ្ទង់"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" />
                                                 @error('receipt_number')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">{{ $message }}
+                                                    </div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -149,6 +154,18 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                        {{-- Receiver --}}
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="receiver">{{ __('forms.receiver') }}</label>
+                                                <input type="text" name="receiver" required class="form-control"
+                                                    value="{{ old('receiver', $duelRelease->receiver) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('receiver')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
 
                                         {{-- DATE RELEASE --}}
                                         <div class="col-lg-4 col-md-6">
@@ -161,6 +178,41 @@
                                                 @error('date_release')
                                                     <div class="pristine-error text-help">{{ $message }}</div>
                                                 @enderror
+                                            </div>
+                                        </div>
+                                        <!-- TITLE -->
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="title">
+                                                        {{ __('forms.title') }}
+                                                    </label>
+
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipTitle" name="skipTitle" value="1"
+                                                            style="cursor: pointer;"
+                                                            {{ old('skipTitle', empty($duelRelease->title)) ? 'checked' : '' }}>
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipTitle">
+                                                            រំលង
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <input class="form-control" id="title" name="title" type="text"
+                                                    placeholder="{{ __('forms.title') }}"
+                                                    value="{{ old('title', $duelRelease->title) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                @error('title')
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
                                             </div>
                                         </div>
                                     </div>
@@ -256,72 +308,7 @@
             });
         }
     </script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropStockNumber = document.getElementById('dropStockNumber');
-            const dropStockNumberChoice = new Choices(dropStockNumber, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropAgency = document.getElementById('dropAgency');
-            const dropAgencyChoice = new Choices(dropAgency, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
-                shouldSort: false
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const cboDuel = document.getElementById('cboDuel');
-            const cboDuelChoice = new Choices(cboDuel, {
-                searchEnabled: true,
-                itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script>
-    <script>
-        $('#dropStockNumber').change(function() {
-            var id = $(this).val();
-            $.ajax({
-                url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
-                type: 'get',
-                data: {
-                    stock_number: id
-                },
-                success: function(data) {
-                    if (programSubChoices) {
-                        programSubChoices.destroy();
-                    }
-                    $('#cboDuel').html(data);
-                    programSubChoices = new Choices('#cboDuel', {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: "ស្វែងរក..."
-                    });
-                }
-            });
-        });
-
-        // ✅ On edit: auto trigger change once if value exists
-        document.addEventListener('DOMContentLoaded', function() {
-            const stockSelect = document.getElementById('dropStockNumber');
-            if (stockSelect && stockSelect.value) {
-                $('#dropStockNumber').trigger('change');
-            }
-        });
-    </script> --}}
     <script>
         // 1. Declare globally at the top of your scripts
         let programSubChoices = null;
@@ -389,6 +376,75 @@
             if (stockSelect && stockSelect.value) {
                 $('#dropStockNumber').trigger('change');
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+            const title = document.getElementById('title');
+            const skipTitle = document.getElementById('skipTitle');
+            function showError(input) {
+                const group = input.closest('.form-group');
+                group.querySelectorAll('.custom-required-error')
+                    .forEach(el => el.remove());
+                input.classList.add('is-invalid');
+                const error = document.createElement('div');
+                error.className =
+                    'custom-required-error text-danger mt-1';
+                error.innerText =
+                    "{{ __('messages.required') }}";
+                group.appendChild(error);
+            }
+            function clearError(input) {
+                const group = input.closest('.form-group');
+                group.querySelectorAll('.custom-required-error')
+                    .forEach(el => el.remove());
+                input.classList.remove('is-invalid');
+            }
+            // =====================================
+            // TITLE STATE
+            // =====================================
+            function updateTitleState() {
+                if (skipTitle.checked) {
+                    // Disable input
+                    title.disabled = true;
+                    // KEEP INPUT VISIBLE
+                    title.style.display = 'block';
+                    // Clear error
+                    clearError(title);
+                } else {
+                    // Enable input
+                    title.disabled = false;
+
+                    title.style.display = 'block';
+                }
+            }
+            // Initial state
+            updateTitleState();
+            // When Skip changes
+            skipTitle.addEventListener('change', function() {
+                updateTitleState();
+            });
+            // =====================================
+            // FORM SUBMIT
+            // =====================================
+            form.addEventListener('submit', function(e) {
+                let valid = true;
+                if (!skipTitle.checked) {
+                    if (title.value.trim() === '') {
+                        showError(title);
+                        valid = false;
+                    } else {
+                        clearError(title);
+                    }
+                }
+                if (!valid) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
         });
     </script>
 @endsection

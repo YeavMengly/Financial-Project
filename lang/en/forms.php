@@ -72,6 +72,7 @@ return [
 
     'item.name' => 'ឈ្មោះទំនិញ',
     'user.request' => 'ឈ្មោះអ្នកស្នើសុំ',
+    'receiver' => 'ឈ្មោះអ្នកទទួល',
     'unit' => 'ឯកតា',
     'quantity' => 'បរិមាណ',
     'quantity.request' => 'បរិមាណស្នើសុំ',

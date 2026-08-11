@@ -112,10 +112,16 @@
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
-                                                <input type="text" name="receipt_number" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                <input type="text" id="receipt_number" name="receipt_number"
+                                                    value="{{ old('receipt_number') }}" required maxlength="4"
+                                                    inputmode="numeric" class="form-control"
+                                                    data-pristine-required-message="{{ __('messages.required') }}"
+                                                    data-pristine-pattern="/^\d{4}$/"
+                                                    data-pristine-pattern-message="សូមបញ្ចូលលេខ ៤ ខ្ទង់"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" />
                                                 @error('receipt_number')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">{{ $message }}
+                                                    </div>
                                                 @enderror
                                             </div>
                                         </div>
@@ -129,7 +135,16 @@
                                                 @enderror
                                             </div>
                                         </div>
-
+                                        <div class="col-xl-4 col-md-6">
+                                            <div class="form-group mb-3">
+                                                <label for="receiver">{{ __('forms.receiver') }}</label>
+                                                <input type="text" name="receiver" required class="form-control"
+                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                                                @error('receiver')
+                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
                                         <div class="col-lg-4 col-md-6">
                                             <div class="form-group mb-3">
                                                 <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
@@ -142,27 +157,73 @@
                                                 @enderror
                                             </div>
                                         </div>
-
                                         <div class="col-xl-4 col-md-6">
                                             <div class="form-group mb-3">
-                                                <label for="title">{{ __('forms.title') }}</label>
-                                                <input type="text" name="title" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
+
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="title">{{ __('forms.title') }}</label>
+
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipTitle" style="cursor: pointer;">
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipTitle" style="cursor: pointer;">
+                                                            រំលង
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <input class="form-control" id="title" name="title" type="text"
+                                                    placeholder="{{ __('forms.title') }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
                                                 @error('title')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
                                                 @enderror
                                             </div>
                                         </div>
-
                                         <div class="col-lg-4 col-md-6">
                                             <div class="form-group mb-3">
-                                                <label for="file">{{ __('forms.file') }}</label>
+
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <label for="fileInput" class="form-label mb-0">
+                                                        {{ __('forms.file.type') }}
+                                                    </label>
+
+                                                    <div class="form-check form-switch mb-0">
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipFileInput" style="cursor: pointer;">
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipFileInput" style="cursor: pointer;">
+                                                            រំលង
+                                                        </label>
+                                                    </div>
+                                                </div>
+
                                                 <input type="file" id="fileInput" name="file[]" class="form-control"
-                                                    accept=".pdf,.doc,.docx" multiple />
-                                                <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
+                                                    tabindex="15" accept=".pdf,.doc,.docx" multiple data-max-size="5"
+                                                    data-allowed-extensions="pdf,doc,docx"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                <small class="form-text text-muted">
+                                                    Allowed types: PDF, DOC, DOCX (Max: 5MB per file)
+                                                </small>
+
                                                 @error('file')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
                                                 @enderror
+
+                                                @error('file.*')
+                                                    <div class="pristine-error text-help text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
                                             </div>
                                         </div>
 
@@ -194,8 +255,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary"
                                     id="insertToTableBtn">{{ __('buttons.save') }}</button>
@@ -322,6 +381,176 @@
                     });
                 }
             });
+        });
+        //////
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // IMPORTANT:
+            // Change this to your real form ID
+            const form = document.getElementById('pristine-valid-example');
+            if (!form) {
+                console.error('Form not found');
+                return;
+            }
+            const pristine = new Pristine(form);
+            const titleInput = document.getElementById('title');
+            const skipTitleCheckbox = document.getElementById('skipTitle');
+            const fileInput = document.getElementById('fileInput');
+            const skipFileCheckbox = document.getElementById('skipFileInput');
+            // ==========================================
+            // CLEAR FIELD ERRORS
+            // ==========================================
+            function clearFieldErrors(input) {
+
+                if (!input) return;
+                const parentGroup = input.closest('.form-group');
+                if (parentGroup) {
+                    parentGroup
+                        .querySelectorAll('.pristine-error, .text-help')
+                        .forEach(el => el.remove());
+
+                    parentGroup.classList.remove(
+                        'has-danger',
+                        'has-error'
+                    );
+                }
+                input.classList.remove(
+                    'is-invalid',
+                    'border-danger'
+                );
+            }
+            // ==========================================
+            // SETUP SKIP FIELD
+            // ==========================================
+            function setupSkipField(checkbox, input) {
+
+                if (!checkbox || !input) return;
+                // ------------------------------------------
+                // Initial state
+                // ------------------------------------------
+                if (checkbox.checked) {
+
+                    input.value = '';
+                    input.disabled = true;
+
+                } else {
+
+                    input.disabled = false;
+                    input.setAttribute('required', 'required');
+                }
+                // ------------------------------------------
+                // Add validator
+                // ------------------------------------------
+                pristine.addValidator(
+                    input,
+                    function(value) {
+
+                        // If skipped, always valid
+                        if (checkbox.checked) {
+                            return true;
+                        }
+
+                        // Otherwise field must contain data
+                        return value.trim() !== '';
+
+                    },
+                    "{{ __('messages.required') }}",
+                    1,
+                    true
+                );
+                // ------------------------------------------
+                // Skip checkbox change
+                // ------------------------------------------
+                checkbox.addEventListener('change', function() {
+
+                    if (this.checked) {
+                        // ==============================
+                        // SKIP
+                        // ==============================
+                        input.value = '';
+                        input.disabled = true;
+
+                        input.removeAttribute('required');
+
+                        clearFieldErrors(input);
+
+                        pristine.reset(input);
+
+                        input.classList.remove(
+                            'is-invalid',
+                            'border-danger'
+                        );
+
+                        input.classList.add(
+                            'border-success',
+                            'bg-success-subtle'
+                        );
+
+                    } else {
+                        // ==============================
+                        // REQUIRED AGAIN
+                        // ==============================
+                        input.disabled = false;
+
+                        input.setAttribute('required', 'required');
+
+                        input.classList.remove(
+                            'border-success',
+                            'bg-success-subtle'
+                        );
+
+                        clearFieldErrors(input);
+
+                        pristine.reset(input);
+                    }
+                });
+            }
+            // ==========================================
+            // INITIALIZE
+            // ==========================================
+            setupSkipField(
+                skipTitleCheckbox,
+                titleInput
+            );
+            setupSkipField(
+                skipFileCheckbox,
+                fileInput
+            );
+            // ==========================================
+            // FORM SUBMIT
+            // ==========================================
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // ------------------------------------------
+                // Save which button was clicked
+                // ------------------------------------------
+                const submitter = e.submitter;
+                if (submitter && submitter.name === 'action') {
+                    let hidden = form.querySelector(
+                        'input[name="action"]'
+                    );
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+                        form.appendChild(hidden);
+                    }
+                    hidden.value = submitter.value;
+                }
+                // ------------------------------------------
+                // Validate
+                // ------------------------------------------
+                const isValid = pristine.validate();
+                console.log('Form valid:', isValid);
+                console.log('Errors:', pristine.getErrors());
+                // If invalid, STOP
+                if (!isValid) {
+                    return;
+                }
+                HTMLFormElement.prototype.submit.call(form);
+            });
+
         });
     </script>
 @endsection
