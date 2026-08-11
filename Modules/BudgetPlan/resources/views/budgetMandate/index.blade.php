@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.voucher') }}</h4>
+                <h4 class="mb-sm-0 font-size-18"> {{ __('menus.mandate') }}</h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -26,7 +26,7 @@
                             <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.budget.plan') }}</a>
                             </li>
 
-                            <li class="breadcrumb-item active">{{ __('menus.voucher') }}</li>
+                            <li class="breadcrumb-item active">{{ __('menus.mandate') }}</li>
                         </ol>
                     </div>
                 </div>
@@ -44,8 +44,8 @@
                             <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
                             <select class="form-control" id="cboTodo" name="cboTodo">
                                 <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
-                                <option value="2" selected>កំពុងធ្វើ</option>
-                                <option value="3">បានបញ្ចប់</option>
+                                <option value="2">កំពុងធ្វើ</option>
+                                <option value="3" selected>បានបញ្ចប់</option>
                             </select>
                         </div>
 

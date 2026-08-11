@@ -31,6 +31,9 @@ class BudgetVoucherDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0) . ' ៛';
             })
+            ->editColumn('voucher_budget', function ($row) {
+                return number_format($row->voucher_budget ?? 0) . ' ៛';
+            })
             ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
 
@@ -137,7 +140,6 @@ class BudgetVoucherDataTable extends DataTable
             );
         }
 
-
         //Date
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $model->whereDate('budget_vouchers.request_date', '>=', $request->start_date)
@@ -178,27 +180,30 @@ class BudgetVoucherDataTable extends DataTable
 
         // ===== SELECT =====
         $model->select([
+
+
             'budget_vouchers.id',
             'budget_vouchers.ministry_id',
             'agencies.no AS agency_no',
             'agencies.name AS agency_name',
+            'budget_vouchers.program_id',
             'account_subs.no as account_sub_no',
             'budget_vouchers.no',
             'budget_vouchers.budget',
+            'budget_vouchers.expense_type_id',
+            'budget_vouchers.legal_id',
+            'budget_vouchers.payment_voucher_number AS pvn',
             'budget_vouchers.legal_number',
             'budget_vouchers.legal_name',
-            'budget_vouchers.temporary_id',
-            'budget_vouchers.payment_voucher_number',
-            'budget_vouchers.day_of_number',
             'budget_vouchers.is_archived',
-            'budget_vouchers.expense_type_id',
             'expense_types.name_kh',
             'budget_vouchers.description',
             'budget_vouchers.attachments',
             'budget_vouchers.transaction_date',
             'budget_vouchers.request_date',
+            'budget_vouchers.legal_date',
             'budget_vouchers.created_at',
-            'budget_vouchers.deleted_at'
+            'budget_vouchers.deleted_at',
         ]);
 
         $model->orderByDesc('budget_vouchers.created_at');
@@ -249,18 +254,18 @@ class BudgetVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
-            Column::make('payment_voucher_number')->title(__('tables.th.pvn'))->width(30)->addClass('align-middle'),
-            Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
+            Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
+            // Column::make('voucher_budget')->title(__('tables.th.voucher.budgeted'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
+            Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
             Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
-            Column::make('temporary_id')->title(__('tables.th.temporary.id'))->width(30)->addClass('align-middle'),
-            Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
