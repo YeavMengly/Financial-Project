@@ -782,29 +782,6 @@ class BeginVoucherController extends Controller
      * Show the form for creating a new resource.
      */
 
-    // public function createBudgetAllocation($params, $budgetAllocationId)
-    // {
-    //     $id        = decode_params($params);
-    //     $ministry  = Ministry::where('id', $id)->first();
-    //     $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
-    //         ->where('ministry_id', $ministry->id)
-    //         ->first();
-
-    //     $module = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
-    //         ->where('ministry_id', $ministry->id)
-    //         ->first();
-
-    //     $expenseTypes = ExpenseType::all();
-
-    //     return view('beginningcredit::beginVoucher.budgetAllocation.create')
-    //         ->with('ministry', $ministry)
-    //         ->with('ministry', $ministry)
-    //         ->with('params', $params)
-    //         ->with('beginVoucher', $beginVoucher)
-    //         ->with('module', $module)
-    //         ->with('expenseTypes', $expenseTypes)
-    //         ->with('budgetAllocationId', $budgetAllocationId);
-    // }
     public function createBudgetAllocation($params, $budgetAllocationId)
     {
         $id = decode_params($params);
@@ -813,59 +790,62 @@ class BeginVoucherController extends Controller
 
         $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
             ->where('ministry_id', $ministry->id)
-            ->first();
-
-        // Get existing allocation
-        $module = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
-            ->where('ministry_id', $ministry->id)
-            ->first();
-
-        // Calculate total allocated amount
-        $allocatedAmount = BudgetAllocation::where('ministry_id', $ministry->id)
+            ->firstOrFail();
+        $expenseTypes = ExpenseType::all();
+        $allocations = BudgetAllocation::where('ministry_id', $ministry->id)
             ->where('budget_begin_voucher_id', $beginVoucher->id)
-            ->sum('amount');
-
-        // Remaining fin law
-        $remainingFinLaw = $beginVoucher->fin_law - $allocatedAmount;
-
-        $expenseTypes = ExpenseType::whereIn('id', [2, 3, 4, 5, 7])->get();
+            ->selectRaw('budget_expense_type_id, SUM(amount) as total_amount')
+            ->groupBy('budget_expense_type_id', 'budget_begin_voucher_id')
+            ->pluck('total_amount', 'budget_expense_type_id');
+        $allocatedAmount = $allocations->sum();
+        $remainingFinLaw = (float) $beginVoucher->fin_law - $allocatedAmount;
 
         return view('beginningcredit::beginVoucher.budgetAllocation.create')
             ->with('ministry', $ministry)
             ->with('params', $params)
             ->with('beginVoucher', $beginVoucher)
-            ->with('module', $module)
             ->with('expenseTypes', $expenseTypes)
-            ->with('budgetAllocationId', $budgetAllocationId)
-            ->with('remainingFinLaw', $remainingFinLaw);
+            ->with('remainingFinLaw', $remainingFinLaw)
+            ->with('allocatedAmount', $allocatedAmount)
+            ->with('budgetAllocationId', $budgetAllocationId);
     }
 
     public function storeBudgetAllocation(Request $request, $params, $budgetAllocationId)
     {
         $validatedData = $request->validate([
-            'amount'          => 'required|numeric|min:0',
+            'amount'         => 'required|numeric|min:0.01',
             'cboExpenseType' => 'required|exists:expense_types,id',
         ]);
 
         DB::beginTransaction();
         try {
-            // Fetch the ministry safely
+            // 1. Fetch Ministry & Voucher
             $ministry = Ministry::where('id', decode_params($params))->first();
-
-            // Fetch the begin voucher
             $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
             if (!$beginVoucher) {
-                throw new \Exception('ការស្វែងរកមិនបានជោគជ័យ។');
+                throw new \Exception('រកមិនឃើញឥណទានដើមគ្រាឡើយ');
             }
-            // Create a new Budget Allocation entry
+
+            // 2. Check remaining budget limit
+            $currentAllocated = BudgetAllocation::where('ministry_id', $ministry->id)
+                ->where('budget_begin_voucher_id', $beginVoucher->id)
+                ->sum('amount');
+
+            $remainingBudget = (float) $beginVoucher->fin_law - $currentAllocated;
+
+            if ($validatedData['amount'] > $remainingBudget) {
+                throw new \Exception('ទឹកប្រាក់បែងចែកលើសពីច្បាប់ហិរញ្ញវត្ថុដែលនៅសល់ (' . number_format($remainingBudget) . ')');
+            }
+
+            // 3. Save new allocation
             BudgetAllocation::create([
-                'ministry_id'      => $ministry->id,
+                'ministry_id'             => $ministry->id,
                 'budget_begin_voucher_id' => $beginVoucher->id,
                 'budget_expense_type_id'  => $validatedData['cboExpenseType'],
-                'amount'           => $validatedData['amount'],
+                'amount'                  => $validatedData['amount'],
             ]);
 
             DB::commit();
@@ -877,16 +857,16 @@ class BeginVoucherController extends Controller
                 ->flash();
 
             return redirect()->route('budgetAllocation.index', [
-                'params' => $params,
-                'budgetAllocationId' => $budgetAllocationId
+                'params'             => $params,
+                'budgetAllocationId' => $budgetAllocationId,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error($e->getMessage());
+            Log::error('BudgetAllocation Store Error: ' . $e->getMessage());
 
             flash()
                 ->translate('en')
-                ->option('timeout', 2000)
+                ->option('timeout', 3000)
                 ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
                 ->flash();
 

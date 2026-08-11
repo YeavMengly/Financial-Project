@@ -14,51 +14,59 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"> {{ __('menus.credit') }}</li>
-                        <li class="breadcrumb-item">{{ __('menus.budget.allocation') }}</li>
-                    </ol>
-                </h4>
-                <div class="page-title-right">
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.project') }}</h4>
+
+                {{-- <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ $ministry->year }}</a>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.initial.material') }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ $ministry->name }}</li>
                         </ol>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>
     <!-- end page title -->
     <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                            <select class="form-control" id="cboTodo" name="cboTodo">
+                                <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                <option value="2" selected>កំពុងធ្វើ</option>
+                                <option value="3">បានបញ្ចប់</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                            <select class="form-select" id="cboStatus" name="cboStatus">
+                                <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                <option value="2" selected>សកម្ម</option>
+                                <option value="3">លុប</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    {{-- @if (hasPermission('program.sub.create') && $module->is_archived != 2) --}}
-                    <div class="col-sm">
-                        <div class="mb-4 d-flex flex-wrap gap-2">
-                            @if (hasPermission('budgetAllocation.create') && $ministry->is_archived != 2)
-                                <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('budgetAllocation.create', ['params' => $params, 'budgetAllocationId' => $budgetAllocationId]) }}">
-                                    <i class="bx bx-plus me-1"></i>
-                                    {{ __('buttons.create') }}
-                                </a>
-                            @endif
-
-                            <a class="btn btn-dark"
-                                href="{{ route('beginVoucher.index', ['params' => $params]) }}">{{ __('buttons.back') }}</a>
-                        </div>
-                    </div>
-                    {{-- @endif --}}
-
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                     </div>
+
                 </div>
             </div>
         </div>
@@ -103,25 +111,47 @@
             }
         }
     </script>
-    {!! $dataTable->scripts() !!}
 
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const cboExpenseType = document.getElementById('cboExpenseType');
-            const cboExpenseTypeChoices = new Choices(cboExpenseType, {
+            const cboTodo = document.getElementById('cboTodo');
+            const cboTodoChoices = new Choices(cboTodo, {
                 searchEnabled: true,
                 itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboStatus = document.getElementById('cboStatus');
+            const cboStatusChoices = new Choices(cboStatus, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើសអនុគណនី',
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
         });
     </script>
 
+    {!! $dataTable->scripts() !!}
+    <!-- Choices.js (dropdowns) -->
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <!-- Custom logic for BeginCredit loading -->
     <script>
-        $('#cboExpenseType').on('change keyup', function() {
-            $('#budgetallocation-table').DataTable().ajax.reload();
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('year');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
         });
     </script>
 @endsection

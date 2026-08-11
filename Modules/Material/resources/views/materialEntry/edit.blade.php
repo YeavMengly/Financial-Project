@@ -39,15 +39,25 @@
                             action="{{ route('materialEntry.update', ['params' => $params, 'id' => $module->id]) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
-                            <div class="row">
+                            {{-- <div class="row">
 
-                                <div class="col-xl-4 col-md-6">
+                                <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="company_name">{{ __('forms.company.name') }}</label>
-                                        <input type="text" name="company_name" value="{{ $module->company_name }}"
-                                            required class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('company_name')
+                                        <label for="cboProject" class="form-label font-size-13 text-muted">
+                                            ជ្រើសរើស{{ __('forms.project') }}
+                                        </label>
+                                        <select class="form-select" id="cboProject" name="cboProject" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($project as $p)
+                                                <option value="{{ $p->id }}"
+                                                    {{ old('cboProject', $module->project_id == $p->id ? 'selected' : '') }}>
+                                                    
+                                                    {{ $p->stock_number }}-
+                                                    {{ $p->stock_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('cboProject')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -55,55 +65,7 @@
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="stock_number">{{ __('forms.stock.number') }}</label>
-                                        <input type="text" name="stock_number" value="{{ $module->stock_number }}"
-                                            required class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('stock_number')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="stock_name">{{ __('forms.stock.name') }}</label>
-                                        <input type="text" name="stock_name" value="{{ $module->stock_name }}" required
-                                            class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('stock_name')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="user_entry">{{ __('forms.user.entry') }}</label>
-                                        <input type="text" name="user_entry" value="{{ $module->user_entry }}"required
-                                            class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('user_entry')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="p_code">{{ __('forms.pro.code') }}</label>
-                                        <input type="text" name="p_code" value="{{ $module->p_code }}" required
-                                            class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('p_code')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="p_name">{{ __('forms.pro.name') }}</label>
+                                        <label for="p_name">{{ __('forms.item.name') }}</label>
                                         <input type="text" name="p_name" value="{{ $module->p_name }}" required
                                             class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
@@ -115,7 +77,7 @@
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="p_year">{{ __('forms.pro.year') }}</label>
+                                        <label for="p_year">{{ __('forms.year') }}</label>
                                         <input type="text" name="p_year" value="{{ $module->p_year }}" required
                                             class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
@@ -125,17 +87,6 @@
                                     </div>
                                 </div>
 
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="title">{{ __('forms.title') }}</label>
-                                        <input type="text" name="title" value="{{ $module->title }}" required
-                                            class="form-control"
-                                            data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('title')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -160,11 +111,11 @@
 
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="quantity">{{ __('forms.quantity') }}</label>
-                                        <input type="number" min="0" name="quantity"
-                                            value="{{ $module->quantity }}" required class="form-control"
+                                        <label for="qty">{{ __('forms.quantity') }}</label>
+                                        <input type="number" min="0" name="qty" value="{{ $module->qty }}"
+                                            required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('quantity')
+                                        @error('qty')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -173,8 +124,8 @@
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="price">{{ __('forms.price') }}</label>
-                                        <input type="number" min="0" name="price"
-                                            value="{{ $module->price }}" required class="form-control"
+                                        <input type="number" min="0" name="price" value="{{ $module->price }}"
+                                            required class="form-control"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         @error('price')
                                             <div class="pristine-error text-help">{{ $message }}</div>
@@ -193,53 +144,109 @@
                                         @enderror
                                     </div>
                                 </div>
-
+                            </div> --}}
+                            <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="date_entry" class="form-label">កាលបរិច្ឆេទ</label>
-                                        <input type="text" id="datepicker-basic" name="date_entry"
-                                            value="{{ old('date_entry', $module->date_entry) }}" class="form-control"
-                                            placeholder="{{ __('forms.select_date') }}" required
+                                        <label for="cboProject" class="form-label font-size-13 text-muted">
+                                            ជ្រើសរើស{{ __('forms.project') }}
+                                        </label>
+                                        <select class="form-select" id="cboProject" name="cboProject" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($project as $p)
+                                                {{-- <option value="{{ $p->id }}"
+                                                    {{ old('cboProject', $module->cboProject ?? '') == $p->id ? 'selected' : '' }}>
+                                                    {{ $p->stock_number }}-{{ $p->stock_name }}
+                                                </option> --}}
+                                            @endforeach
+                                        </select>
+                                        @error('cboProject')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="p_name">{{ __('forms.item.name') }}</label>
+                                        <input type="text" name="p_name" required class="form-control"
+                                            value="{{ old('p_name', $module->p_name ?? '') }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
-                                        @error('date_entry')
+                                        @error('p_name')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label for="file">{{ __('forms.file') }}</label>
-                                        <input type="file" id="fileInput" name="file[]" class="form-control"
-                                            accept=".pdf,.doc,.docx" multiple />
-                                        <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
-                                        @error('file')
+                                        <label for="unit" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.unit') }}
+                                        </label>
+                                        <!-- Changed loop variable from $item to $u to prevent conflicts if your edit model is named $item -->
+                                        <select class="form-control" data-trigger id="dropUnit" name="unit" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($unitType as $u)
+                                                <option value="{{ $u->id }}"
+                                                    {{ old('unit', $module->unit ?? '') == $u->id ? 'selected' : '' }}>
+                                                    {{ $u->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('unit')
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="vRefer">{{ __('forms.refer') }}</label>
-                                    <textarea name="refer" id="vRefer" rows="5" class="form-control" required
-                                        data-pristine-required-message="{{ __('messages.required') }}"> {{ $module->refer }}</textarea>
-                                    @error('txtRefer')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="quantity">{{ __('forms.quantity') }}</label>
+                                        <input type="number" min="0" name="qty" required class="form-control"
+                                            value="{{ old('qty', $module->qty ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        @error('qty')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label for="vNote">{{ __('forms.note') }}</label>
-                                    <textarea name="note" id="vNote" rows="5" class="form-control" required
-                                        data-pristine-required-message="{{ __('messages.required') }}"> {{ $module->note }} </textarea>
-                                    @error('txtNote')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="price">{{ __('forms.price') }}ឯកតា</label>
+                                        <input type="number" min="0" name="price" required class="form-control"
+                                            value="{{ old('price', $module->price ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        @error('price')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="source">{{ __('forms.source') }}</label>
+                                        <input type="text" name="source" required class="form-control"
+                                            value="{{ old('source', $module->source ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        @error('source')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="p_year">{{ __('forms.pro.year') }}</label>
+                                        <input type="text" name="p_year" required class="form-control"
+                                            value="{{ old('p_year', $module->p_year ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        @error('p_year')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
 

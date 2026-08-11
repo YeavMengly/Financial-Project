@@ -31,35 +31,36 @@
                         autocomplete="off" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-
+                            <!-- 1. Initial Remaining Fin Law (Stored in data attribute) -->
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
-                                    <label>{{ __('forms.fin.law') }}</label>
-                                    <input type="text" class="form-control" name="fin_law" readonly
-                                        value="{{ old('fin_law', $beginVoucher->fin_law ? number_format($beginVoucher->fin_law, 0) : '') }}" />
+                                    <label>{{ __('forms.fin.law') }} (ដើមគ្រា)</label>
+                                    <input type="text" class="form-control" id="base_fin_law" readonly
+                                        data-raw-value="{{ $remainingFinLaw }}"
+                                        value="{{ number_format($remainingFinLaw, 0) }}" />
                                 </div>
                             </div>
 
-
+                            <!-- 2. Input Amount (User enters value here) -->
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.budget.allocation') }}</label>
-                                    <!-- Updated name from 'budgetAllocation' to 'amount' -->
                                     <input type="number" step="any" min="0" class="form-control" name="amount"
-                                        required value="{{ old('amount') }}"
+                                        id="amount_input" required value="{{ old('amount') }}" placeholder="0"
                                         data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('amount')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
 
+                            <!-- 3. Dynamic Remaining Balance Field (Calculated automatically) -->
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
-                                    <label>{{ __('forms.fin.law') }}</label>
-
-                                    <input type="text" class="form-control" name="fin_law" readonly
-                                        value="{{ old('fin_law', number_format($remainingFinLaw, 0)) }}" />
+                                    <label>{{ __('forms.fin.law') }} (នៅសល់)</label>
+                                    <input type="text" class="form-control" id="remaining_fin_law" readonly
+                                        value="{{ number_format($remainingFinLaw, 0) }}" />
+                                    <!-- Error message if budget exceeded -->
+                                    <small id="over_budget_msg" class="text-danger d-none mt-1">
+                                        ⚠️ ទឹកប្រាក់បែងចែកលើសពីច្បាប់ហិរញ្ញវត្ថុដែលនៅសល់!
+                                    </small>
                                 </div>
                             </div>
 
@@ -101,4 +102,38 @@
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseFinLawInput = document.getElementById('base_fin_law');
+            const amountInput = document.getElementById('amount_input');
+            const remainingInput = document.getElementById('remaining_fin_law');
+            const overBudgetMsg = document.getElementById('over_budget_msg');
+
+            // Parse initial base value from data-raw-value attribute
+            const baseFinLaw = parseFloat(baseFinLawInput.getAttribute('data-raw-value')) || 0;
+
+            function calculateRemaining() {
+                // Get entered amount (default 0 if empty)
+                const enteredAmount = parseFloat(amountInput.value) || 0;
+
+                // Calculate remaining balance
+                const remaining = baseFinLaw - enteredAmount;
+
+                remainingInput.value = new Intl.NumberFormat('en-US').format(remaining);
+
+                // Check for budget overflow
+                if (remaining < 0) {
+                    remainingInput.classList.add('is-invalid', 'text-danger');
+                    overBudgetMsg.classList.remove('d-none');
+                } else {
+                    remainingInput.classList.remove('is-invalid', 'text-danger');
+                    overBudgetMsg.classList.add('d-none');
+                }
+            }
+            amountInput.addEventListener('input', calculateRemaining);
+
+            calculateRemaining();
+        });
+    </script>
 @endsection

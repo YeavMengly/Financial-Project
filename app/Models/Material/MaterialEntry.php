@@ -11,22 +11,13 @@ class MaterialEntry extends Model
 
     protected $fillable = [
         'ministry_id',
-        'company_name',
-        'stock_number',
-        'stock_name',
-        'user_entry',
-        'p_code',
+        'project_id',
         'p_name',
         'p_year',
-        'title',
         'unit',
-        'quantity',
+        'qty',
         'price',
         'total_price',
         'source',
-        'note',
-        'refer',
-        'date_entry',
-        'file',
     ];
 }
