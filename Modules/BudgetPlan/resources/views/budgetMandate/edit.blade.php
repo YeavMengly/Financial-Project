@@ -679,7 +679,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             const form = document.getElementById('pristine-valid-example');
@@ -831,5 +831,5 @@
 
 
         });
-    </script>
+    </script> --}}
 @endsection

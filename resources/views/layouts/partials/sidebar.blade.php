@@ -125,15 +125,15 @@
                 <li class="menu-title" data-key="t-inventory">{{ __('menus.material') }}</li>
 
                 {{-- ========== Duel ========== --}}
-                @php
+                {{-- @php
                     $duelActive =
                         Request::routeIs('initialDuelEntry.*') ||
                         Request::routeIs('initialDuelRelease.*') ||
                         Request::routeIs('duelEntry.*') ||
                         Request::routeIs('duelRelease.*');
-                @endphp
+                @endphp --}}
 
-                <li class="{{ $duelActive ? 'mm-active' : '' }}">
+                {{-- <li class="{{ $duelActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="file-text"></i>
                         <span data-key="t-duel">{{ __('menus.duel') }}</span>
@@ -163,18 +163,18 @@
                         @endif
 
                     </ul>
-                </li>
+                </li> --}}
 
                 {{-- ========== Material ========== --}}
-                @php
+                {{-- @php
                     $materialActive =
                         Request::routeIs('initialMaterialEntry.*') ||
                         Request::routeIs('initialMaterialRelease.*') ||
                         Request::routeIs('materialEntry.*') ||
                         Request::routeIs('materialRelease.*');
-                @endphp
+                @endphp --}}
 
-                <li class="{{ $materialActive ? 'mm-active' : '' }}">
+                {{-- <li class="{{ $materialActive ? 'mm-active' : '' }}">
                     <a href="javascript: void(0);" class="has-arrow">
                         <i data-feather="file-text"></i>
                         <span data-key="t-material">{{ __('menus.material') }}</span>
@@ -183,7 +183,7 @@
                     <ul class="sub-menu {{ $materialActive ? 'mm-show' : '' }}"
                         aria-expanded="{{ $materialActive ? 'true' : 'false' }}">
 
-                        {{-- Material Entry --}}
+                        
                         @if (hasPermission('initialMaterialEntry.index'))
                             <li>
                                 <a href="{{ route('initialMaterialEntry.index') }}"
@@ -194,7 +194,7 @@
                             </li>
                         @endif
 
-                        {{-- Material Release --}}
+                
                         @if (hasPermission('initialMaterialRelease.index'))
                             <li>
                                 <a href="{{ route('initialMaterialRelease.index') }}"
@@ -202,6 +202,116 @@
                                     <i data-feather="package"></i>
                                     <span data-key="t-material-release">{{ __('menus.material.release') }}</span>
                                 </a>
+                            </li>
+                        @endif
+
+                    </ul>
+                </li> --}}
+
+                {{-- ========== Inventory Item ========== --}}
+                @php
+                    $duelActive = Request::routeIs([
+                        'initialDuelEntry.*',
+                        'initialDuelRelease.*',
+                        'duelEntry.*',
+                        'duelRelease.*',
+                    ]);
+
+                    $materialActive = Request::routeIs([
+                        'initialMaterialEntry.*',
+                        'initialMaterialRelease.*',
+                        'materialEntry.*',
+                        'materialRelease.*',
+                    ]);
+
+                    $inventoryItemActive = $duelActive || $materialActive;
+                @endphp
+
+                <li class="{{ $inventoryItemActive ? 'mm-active' : '' }}">
+                    <a href="javascript: void(0);" class="has-arrow">
+                        <i data-feather="archive"></i>
+                        <span data-key="t-inventory-item">{{ __('menus.inventory_item') }}</span>
+                    </a>
+
+                    <ul class="sub-menu {{ $inventoryItemActive ? 'mm-show' : '' }}"
+                        aria-expanded="{{ $inventoryItemActive ? 'true' : 'false' }}">
+
+                        @if (hasPermission('initialProject.index'))
+                            <li>
+                                <a href="{{ route('initialProject.index') }}"
+                                    class="{{ Request::routeIs('initialProject.*') ? 'active' : '' }}">
+                                    <i data-feather="crosshair"></i>
+                                    <span data-key="t-project">{{ __('menus.project') }}</span>
+                                </a>
+                            </li>
+                        @endif
+
+
+                        {{-- ---------- Duel Submenu ---------- --}}
+                        @if (hasPermission('initialDuelEntry.index') || hasPermission('initialDuelRelease.index'))
+                            <li class="{{ $duelActive ? 'mm-active' : '' }}">
+                                <a href="javascript: void(0);" class="has-arrow">
+                                    <i data-feather="file-text"></i>
+                                    <span data-key="t-duel">{{ __('menus.duel') }}</span>
+                                </a>
+                                <ul class="sub-menu {{ $duelActive ? 'mm-show' : '' }}"
+                                    aria-expanded="{{ $duelActive ? 'true' : 'false' }}">
+
+                                    @if (hasPermission('initialDuelEntry.index'))
+                                        <li>
+                                            <a href="{{ route('initialDuelEntry.index') }}"
+                                                class="{{ Request::routeIs('initialDuelEntry.*') ? 'active' : '' }}">
+                                                <i data-feather="crosshair"></i>
+                                                <span data-key="t-duel-entry">{{ __('menus.duel.entry') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    @if (hasPermission('initialDuelRelease.index'))
+                                        <li>
+                                            <a href="{{ route('initialDuelRelease.index') }}"
+                                                class="{{ Request::routeIs('initialDuelRelease.*') ? 'active' : '' }}">
+                                                <i data-feather="package"></i>
+                                                <span data-key="t-duel-release">{{ __('menus.duel.release') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
+                            </li>
+                        @endif
+
+                        {{-- ---------- Material Submenu ---------- --}}
+                        @if (hasPermission('initialMaterialEntry.index') || hasPermission('initialMaterialRelease.index'))
+                            <li class="{{ $materialActive ? 'mm-active' : '' }}">
+                                <a href="javascript: void(0);" class="has-arrow">
+                                    <i data-feather="file-text"></i>
+                                    <span data-key="t-material">{{ __('menus.material') }}</span>
+                                </a>
+                                <ul class="sub-menu {{ $materialActive ? 'mm-show' : '' }}"
+                                    aria-expanded="{{ $materialActive ? 'true' : 'false' }}">
+
+                                    @if (hasPermission('initialMaterialEntry.index'))
+                                        <li>
+                                            <a href="{{ route('initialMaterialEntry.index') }}"
+                                                class="{{ Request::routeIs('initialMaterialEntry.*') ? 'active' : '' }}">
+                                                <i data-feather="git-merge"></i>
+                                                <span
+                                                    data-key="t-material-entry">{{ __('menus.material.entry') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+
+                                    @if (hasPermission('initialMaterialRelease.index'))
+                                        <li>
+                                            <a href="{{ route('initialMaterialRelease.index') }}"
+                                                class="{{ Request::routeIs('initialMaterialRelease.*') ? 'active' : '' }}">
+                                                <i data-feather="package"></i>
+                                                <span
+                                                    data-key="t-material-release">{{ __('menus.material.release') }}</span>
+                                            </a>
+                                        </li>
+                                    @endif
+                                </ul>
                             </li>
                         @endif
 

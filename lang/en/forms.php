@@ -57,11 +57,20 @@ return [
     'decrease' => 'ថយ',
     'editorial'  => 'វិចារណកម្ម',
     'initial.budget.year' => 'កម្រងឆ្នាំ',
-    'company.name' => 'ឈ្មោះក្រុមហ៊ុន',
-    'item.name' => 'ឈ្មោះផលិតផល',
-    'stock.number' => 'លេខស្តុក',
-    'stock.name' => 'ឈ្មោះស្តុក',
+
+    // Material
+    'stock.number' => 'លេខបញ្ចូលឃ្លាំង',
+    'stock.name' => 'ឈ្មោះគម្រោង',
+    'company.name' => 'ឈ្មោះក្រុមហ៊ុនផ្គត់ផ្គង់',
+    'reciept.date' => 'បណ្ណបញ្ចេញឃ្លាំង',
     'user.entry' => 'ឈ្មោះអ្នកបញ្ចូល',
+    'receiver' => 'ឈ្មោះអ្នកទទួល',
+    'date' => 'កាលបរិច្ឆេទ',
+    'warehouse.voucher' => 'បណ្ណបញ្ចេញឃ្លាំង',
+    'project' => 'គម្រោង',
+
+
+    'item.name' => 'ឈ្មោះទំនិញ',
     'user.request' => 'ឈ្មោះអ្នកស្នើសុំ',
     'receiver' => 'ឈ្មោះអ្នកទទួល',
     'unit' => 'ឯកតា',
@@ -76,7 +85,7 @@ return [
     'file' => 'ឯកសារ',
     'pro.code' => 'លេខកូដ​ផលិតផល',
     'pro.name' => 'ឈ្មោះ​ផលិតផល',
-    'pro.year' => 'ឆ្នាំ​ផលិតផល',
+    'pro.year' => 'ឆ្នាំ​ផលិត',
     'source' => 'ប្រភព',
     'total.price' => 'តម្លៃ​សរុប​',
 
@@ -104,4 +113,5 @@ return [
     'expense.type' => 'ប្រភេទចំណាយ',
     'type' => 'ប្រភេទ',
     'th.code' => 'លេខកូដសម្គាល់',
+
 ];

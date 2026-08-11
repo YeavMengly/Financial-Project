@@ -133,7 +133,7 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('budgetDirectPayment.expenseRecord.editEarlyBalance');
 
     Route::get('direct/payment/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBook')->name('budgetDirectPayment.expenseRecord.exportExpenseRecordBook');
-     /// Training
+    /// Training
     Route::post('training/expense-record/{params}/store', 'storeExpenseRecordTraing')->name('budgetTraining.expenseRecord.store');
     Route::post('training/expense-record/{params}/update/{id}', 'updateExpenseRecordTraining')->name('budgetTraining.expenseRecord.update');
     Route::get('training/expense-record/{params}/restore/{id}', 'restoreExpenseRecordTraining')->name('budgetTraining.expenseRecord.restore');
@@ -153,7 +153,7 @@ Route::controller(BudgetMandateController::class)->group(function () {
 
     Route::get('training/expense-record/{params}/exportExpenseRecordBook', 'exportExpenseRecordBookTraining')->name('budgetTraining.expenseRecord.exportExpenseRecordBook');
 
-    
+
     Route::post('royalty-mandate/{params}/store', 'storeRoyaltyMandate')->name('royaltyMandate.store');
     Route::post('royalty-mandate/{params}/update/{id}', 'updateRoyaltyMandate')->name('royaltyMandate.update');
     Route::get('royalty-mandate/{params}/restore/{id}', 'restoreRoyaltyMandate')->name('royaltyMandate.restore');
@@ -170,4 +170,6 @@ Route::controller(BudgetMandateController::class)->group(function () {
         ->name('royaltyMandate.getEarlyBalance');
     Route::get('royalty-mandate/{params}/edit-early-balance', 'editEarlyBalance')
         ->name('royaltyMandate.editEarlyBalance');
+
+    Route::get('mandate/get-by-expense/legal-number', 'getByExpenseId')->name('budgetMandate.get.expense_type_id');
 });

@@ -29,20 +29,20 @@ class BudgetVoucher extends Model
         'cluster_id',
         'account_sub_id',
         'no',
+        'fin_law',
         'budget',
         'expense_type_id',
-        'legal_number',
         'legal_id',
-        'legal_name',
-        'temporary_id',
         'payment_voucher_number',
-        'day_of_number',
+        'legal_number',
+        'legal_name',
         'status',
         'is_archived',
         'description',
         'attachments',
         'transaction_date',
-        'request_date'
+        'request_date',
+        'legal_date',
     ];
 
     protected $casts = [
