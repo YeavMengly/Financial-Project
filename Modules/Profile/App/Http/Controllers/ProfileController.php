@@ -26,36 +26,6 @@ class ProfileController extends Controller
             ->with('role', $role);
     }
 
-    // public function passwordChange(Request $request) {
-    //     $request->validate([
-    //         'password' => ['required', 'min:6', 'confirmed']
-    //     ]);
-    //     DB::beginTransaction();
-    //     try {
-    //         $user = User::findOrfail(auth()->user()->id);
-    //         $user->update([
-    //             'password'  => bcrypt($request->password)
-    //         ]);
-    //         DB::commit();
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->success('success_msg', 'successful')
-    //             ->flash();
-
-    //         return redirect()->route('profile.index');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         $bug = $e->getMessage();
-    //         Log::error($bug);
-    //         flash()
-    //             ->translate('kh')
-    //             ->option('timeout', 2000)
-    //             ->error($bug, 'បញ្ហា')
-    //             ->flash();
-    //         return redirect()->route('profile.index');
-    //     }
-    // }
     public function passwordChange(Request $request)
     {
         $request->validate([
