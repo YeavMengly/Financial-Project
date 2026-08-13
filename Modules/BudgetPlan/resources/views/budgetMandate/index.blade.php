@@ -40,90 +40,173 @@
             <div class="card">
                 <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label>
+                        {{-- <div class="col-sm-2">
+                            <label for="cboTodo" class="form-label font-size-13 text-muted">ជ្រើសរើស
+                                កំណត់ចំណាំ</label>
                             <select class="form-control" id="cboTodo" name="cboTodo">
                                 <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
                                 <option value="2">កំពុងធ្វើ</option>
                                 <option value="3" selected>បានបញ្ចប់</option>
                             </select>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label>
+                        {{-- <div class="col-sm-2">
+                            <label for="cboStatus" class="form-label font-size-13 text-muted">ជ្រើសរើស ស្ថានភាព</label>
                             <select class="form-select" id="cboStatus" name="cboStatus">
                                 <option value="1">ជ្រើសរើស ស្ថានភាព</option>
                                 <option value="2" selected>សកម្ម</option>
                                 <option value="3">លុប</option>
                             </select>
+                        </div> --}}
+
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="cboTodo" class="form-label font-size-13 text-muted">ជ្រើសរើស
+                                    កំណត់ចំណាំ</label>
+
+                                {{-- <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label> --}}
+                                <select class="form-select" id="cboTodo" name="cboTodo">
+                                    <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
+                                    <option value="2">កំពុងធ្វើ</option>
+                                    <option value="3" selected>បានបញ្ចប់</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboProgram">{{ __('menus.content.program') }}</label>
-                            <select class="form-control" name="cboProgram" id="cboProgram">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($program as $p)
-                                    <option value="{{ $p->id }}"
-                                        {{ request('cboProgram') == $p->id ? 'selected' : '' }}>
-                                        {{ $p->no }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="col-sm-2">
+
+                            <div class="form-group mb-3">
+                                <label for="cboStatus" class="form-label font-size-13 text-muted">ជ្រើសរើស ស្ថានភាព</label>
+                                {{-- <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label> --}}
+                                <select class="form-select" id="cboStatus" name="cboStatus">
+                                    <option value="1">ជ្រើសរើស ស្ថានភាព</option>
+                                    <option value="2" selected>សកម្ម</option>
+                                    <option value="3">លុប</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="subAccountNumber">{{ __('menus.sub.account') }}</label>
-                            <select class="form-control" name="subAccountNumber" id="subAccountNumber">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($accountSub as $as)
-                                    <option value="{{ $as->no }}"
-                                        {{ request('subAccountNumber') == $as->no ? 'selected' : '' }}>
-                                        {{ $as->no }}
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="cboProgram"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.content.program') }}</label>
+                                <select class="form-control" name="cboProgram" id="cboProgram">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($program as $p)
+                                        <option value="{{ $p->id }}"
+                                            {{ request('cboProgram') == $p->id ? 'selected' : '' }}>
+                                            {{ __('menus.content.program') }} {{ $p->no }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="CboPaymentVoucherNumber">{{ __('menus.voucher') }}</label>
-                            <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber"
-                                class="form-control" placeholder="{{ __('menus.voucher') }}"
-                                value="{{ request('CboPaymentVoucherNumber') }}"
-                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="cboAccountSub"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.content.sub.accounts') }}</label>
+                                <select class="form-control" name="cboAccountSub" id="cboAccountSub">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($accountSub as $as)
+                                        <option value="{{ $as->no }}"
+                                            {{ request('cboAccountSub') == $as->no ? 'selected' : '' }}>
+                                            {{ $as->no }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
-                            <input type="text" id="start_date" name="start_date" class="form-control"
-                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" value="{{ request('start_date') }}"
-                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="cboAgency"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.content.agency') }}</label>
+                                <select class="form-control" name="cboAgency" id="cboAgency">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($agency as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request('cboAgency') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->no }} - {{ $item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
-                            <input type="text" id="end_date" name="end_date" class="form-control"
-                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}" value="{{ request('end_date') }}"
-                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="cboExpenseType"
+                                    class="form-label font-size-13 text-muted">{{ __('forms.expense.type') }}</label>
+                                <select class="form-select" id="cboExpenseType" name="cboExpenseType" required
+                                    tabindex="13" data-pristine-required-message="{{ __('messages.required') }}">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($expenseType as $item)
+                                        <option value="{{ $item->id }}">
+                                            {{ $item->name_kh }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-sm-3 d-flex align-items-center gap-2">
-                            <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
-                            <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
-                            </a>
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="CboPaymentVoucherNumber"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.number.voucher') }}</label>
+                                {{-- <label class="visually-hidden" for="CboPaymentVoucherNumber">{{ __('menus.voucher') }}</label> --}}
+                                <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber"
+                                    class="form-control" placeholder="{{ __('menus.number.voucher') }}"
+                                    value="{{ request('CboPaymentVoucherNumber') }}"
+                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                            </div>
+                        </div>
 
-                            <a id="btnExport"
-                                href="{{ route(
-                                    'budgetMandate.export',
-                                    array_merge(
-                                        ['params' => $params],
-                                        request()->only(['cboProgram', 'cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
-                                    ),
-                                ) }}"
-                                class="btn btn-success d-flex align-items-center px-3">
-                                <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
-                            </a>
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="start_date"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.start_date') }}</label>
+                                {{-- <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label> --}}
+                                <input type="text" id="start_date" name="start_date" class="form-control"
+                                    placeholder="{{ __('forms.select_date') }}" value="{{ request('start_date') }}"
+                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                            </div>
+                        </div>
 
+                        <!-- End Date -->
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="end_date"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.end_date') }}</label>
+                                {{-- <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label> --}}
+                                <input type="text" id="end_date" name="end_date" class="form-control"
+                                    placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
+                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-2">
+                            <label for="button"
+                                class="form-label font-size-13 text-muted">{{ __('buttons.search') }}</label>
+                            <div class="form-group mb-3 d-flex align-items-center gap-2">
+                                <button type="submit" class="btn btn-primary">{{ __('buttons.search') }}</button>
+                                <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
+                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                                </a>
+
+                                <a id="btnExport"
+                                    href="{{ route(
+                                        'budgetMandate.export',
+                                        array_merge(
+                                            ['params' => $params],
+                                            request()->only(['cboProgram', 'cboTodo', 'cboStatus', 'subAccountNumber', 'start_date', 'end_date']),
+                                        ),
+                                    ) }}"
+                                    class="btn btn-success d-flex align-items-center px-3">
+                                    <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
+                                </a>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -240,24 +323,47 @@
                 shouldSort: false
             });
         });
+    </script>
 
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('subAccountNumber');
-            const taskTypeChoices = new Choices(taskTypeSelect, {
+            const cboAccountSub = document.getElementById('cboAccountSub');
+            const cboAccountSubChoices = new Choices(cboAccountSub, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើសអនុគណនី', // Khmer placeholder
-                searchPlaceholderValue: 'ជ្រើសរើស អនុគណនី', // Khmer search placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
         });
-
         document.addEventListener('DOMContentLoaded', function() {
-            const taskTypeSelect = document.getElementById('program');
+            const input = document.getElementById('CboPaymentVoucherNumber');
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Submit the form
+                    this.form.submit();
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('CboMandate');
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    // Submit the form
+                    this.form.submit();
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('cboExpenseType');
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើសកម្មវិធី', // Khmer placeholder
+                placeholderValue: 'ជ្រើសរើសប្រភេទចំណាយ', // Khmer placeholder
                 searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
@@ -268,20 +374,31 @@
             const cboProgramChoices = new Choices(cboProgramSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
-                placeholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer placeholder
-                searchPlaceholderValue: 'ជ្រើសរើស​ កម្មវិធី', // Khmer search placeholder
+                placeholderValue: 'ជ្រើសរើសកម្មវិធី', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboAgencySelect = document.getElementById('cboAgency');
+            const cboAgencyChoices = new Choices(cboAgencySelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសអង្គភាព', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
                 shouldSort: false
             });
         });
     </script>
 
     <script>
-        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date,#CboPaymentVoucherNumber')
-            .on('change keyup', function() {
-                $('#budgetmandate-table').DataTable().ajax.reload();
-            });
+        $('#cboTodo, #cboStatus, #cboProgram, #cboAccountSub, #cboAgency, #cboExpenseType, #CboPaymentVoucherNumber,  #start_date, #end_date')
+            .on('change keyup',
+                function() {
+                    $('#budgetmandate-table').DataTable().ajax.reload();
+                });
     </script>
-
     <script>
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
@@ -289,12 +406,13 @@
             let baseUrl = "{{ route('budgetMandate.export', ['params' => $params]) }}";
 
             let params = new URLSearchParams({
+                cboExpenseType: $('#cboExpenseType').val(),
+                cboAccountSub: $('#cboAccountSub').val(),
+                CboPaymentVoucherNumber: $('#CboPaymentVoucherNumber').val(),
+                cboAgency: $('#cboAgency').val(),
                 cboProgram: $('#cboProgram').val(),
-                subAccountNumber: $('#subAccountNumber').val(),
-                agency: $('#agency').val(),
                 no: $('#no').val(),
                 cboTodo: $('#cboTodo').val(),
-                CboPaymentVoucherNumber: $('#CboPaymentVoucherNumber').val(),
                 cboStatus: $('#cboStatus').val(),
                 start_date: $('#start_date').val(),
                 end_date: $('#end_date').val(),

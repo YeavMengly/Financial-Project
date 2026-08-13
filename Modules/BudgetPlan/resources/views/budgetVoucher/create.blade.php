@@ -43,16 +43,15 @@
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
 
-
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.id') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="number" class="form-control" placeholder="{{ __('forms.legal.id') }}"
-                                            name="legalID" tabindex="1" name="legalID" min="0" max="999"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="number"
+                                            class="form-control" placeholder="{{ __('forms.legal.id') }}" name="legalID"
+                                            tabindex="1" name="legalID" min="0" max="999"
                                             oninput="if(this.value.length > 3) this.value = this.value.slice(0,3)" />
                                     </div>
                                 </div>
@@ -73,10 +72,9 @@
                                         <label>{{ __('forms.payment.voucher') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="text" class="form-control"
-                                            placeholder="{{ __('forms.payment.voucher.number') }}" name="paymentVoucher"
-                                            tabindex="3" min="0" max="9999"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="text"
+                                            class="form-control" placeholder="{{ __('forms.payment.voucher') }}"
+                                            name="paymentVoucher" tabindex="3" min="0" max="9999"
                                             oninput="if(this.value.length > 4) this.value = this.value.slice(0,4)" />
                                     </div>
                                 </div>
@@ -87,7 +85,6 @@
                                             <label for="legalNumber"
                                                 class="form-label mb-0">{{ __('forms.legal.number') }}</label>
 
-                                            <!-- Skip Switch -->
                                             <div class="form-check form-switch mb-0">
                                                 <input class="form-check-input" type="checkbox" role="switch"
                                                     tabindex="4" id="skipLegalNumber" style="cursor: pointer;">
@@ -101,9 +98,8 @@
                                         <input class="form-control" id="legalNumber" name="legalNumber"
                                             data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1"
-                                            type="number" placeholder="{{ __('forms.legal.number') }}" required
-                                            tabindex="5">
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                            placeholder="{{ __('forms.legal.number') }}" required tabindex="5">
                                     </div>
                                 </div>
 
@@ -113,7 +109,6 @@
                                             <label for="legalName"
                                                 class="form-label mb-0">{{ __('forms.legal.name') }}</label>
 
-                                            <!-- Skip Switch -->
                                             <div class="form-check form-switch mb-0">
                                                 <input class="form-check-input" type="checkbox" role="switch"
                                                     id="skipLegalName" style="cursor: pointer;">
@@ -264,7 +259,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
                                         <input type="file" id="fileInput" name="attachments[]" class="form-control"
                                             tabindex="16" accept=".pdf,.doc,.docx" multiple required data-max-size="5"
                                             data-allowed-extensions="pdf,doc,docx"
@@ -303,6 +297,8 @@
 
                     </div>
                 </div>
+
+                {{--Data table viewing --}}
                 <div class="card-body">
                     <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
