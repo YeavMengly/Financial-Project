@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('duel_entries', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('project_id');
             $table->string('item_name');
             $table->string('company_name');
             $table->string('stock_number');
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->text('note')->nullable();
             $table->text('refer')->nullable();
             $table->date('date_entry');
+            $table->string('pro_year');
             $table->string('source')->nullable();
             $table->string('file')->nullable();
             $table->timestamps();

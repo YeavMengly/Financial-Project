@@ -105,6 +105,7 @@ return [
   'th.law_average' => 'ច្បាប់មធ្យម',
   'th.law_correction' => 'កែសម្រួលច្បាប់',
   'th.created_at' => 'បានបង្កើតនៅ',
+  'th.pro_year' => 'ឆ្នាំផលិត',
 
   'th.title_entity' => 'អង្គភាព',
   'th.title_entity.code' => 'លេខអង្គភាព',
