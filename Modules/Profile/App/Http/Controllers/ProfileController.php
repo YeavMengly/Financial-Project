@@ -28,17 +28,31 @@ class ProfileController extends Controller
 
     public function passwordChange(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'min:6', 'confirmed', 'different:current_password'],
-        ]);
+        $user = auth()->user();
+
+        // Check if user is Admin (Adjust this check based on your app's role structure)
+        // Options: $user->role_id === 1 OR $user->hasRole('Admin') OR strtolower($user->role->name) === 'admin'
+        $isAdmin = $user->role_id === 1;
+
+        // Dynamic validation rules
+        $rules = [
+            'password' => ['required', 'min:6', 'confirmed'],
+        ];
+
+        // Require current password ONLY for non-admin users
+        if (!$isAdmin) {
+            $rules['current_password'] = ['required', 'current_password'];
+            $rules['password'][] = 'different:current_password';
+        }
+
+        $request->validate($rules);
 
         DB::beginTransaction();
         try {
-            $user = User::findOrFail(auth()->user()->id);
+            $userModel = User::findOrFail($user->id);
 
-            $user->update([
-                'password'  => bcrypt($request->password)
+            $userModel->update([
+                'password' => bcrypt($request->password)
             ]);
 
             DB::commit();

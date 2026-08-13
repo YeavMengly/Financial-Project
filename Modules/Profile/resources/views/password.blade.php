@@ -19,6 +19,12 @@
             </div>
         </div>
     </div>
+
+    @php
+        // Adjust role check condition as needed (e.g., $role->id === 1 or strtolower($role->name) === 'admin')
+        $isAdmin = auth()->user()->role_id === 1;
+    @endphp
+
     <!-- end page title -->
     <div class="row">
         <div class="col-3"></div>
@@ -45,18 +51,22 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.current.password') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="password" class="form-control @error('current_password') is-invalid @enderror"
-                                        name="current_password" id="current_password" autocomplete="one-time-code"
-                                        autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="1" />
-                                    @error('current_password')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
+                            {{-- Only show Current Password input for Non-Admin users --}}
+                            @if (!$isAdmin)
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label>{{ __('forms.current.password') }}</label>
+                                        <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                            type="password"
+                                            class="form-control @error('current_password') is-invalid @enderror"
+                                            name="current_password" id="current_password" autocomplete="one-time-code"
+                                            autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="1" />
+                                        @error('current_password')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
 
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
