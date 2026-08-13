@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legal_number', 100);
             $table->string('legal_id', 100);
-            $table->string('legal_name');
+            $table->string('legal_name')->nullable();
             $table->string('temporary_id', 100);
             $table->string('payment_voucher_number', 100);
             $table->string('day_of_number', 100);

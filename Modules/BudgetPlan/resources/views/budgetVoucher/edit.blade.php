@@ -61,7 +61,7 @@
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                         data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
                                         value="{{ old('paymentVoucher', $module->payment_voucher_number) }}"
-                                        class="form-control" placeholder="{{ __('forms.payment.voucher.number') }}"
+                                        class="form-control" placeholder="{{ __('forms.payment.voucher') }}"
                                         name="paymentVoucher" tabindex="2" />
                                 </div>
                             </div>
@@ -685,7 +685,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             const form = document.getElementById('pristine-valid-example');
@@ -837,70 +837,101 @@
 
 
         });
-    </script>
-    {{-- <script>
+    </script> --}}
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            /* ================== Choices Instance ================== */
-            let legalChoices = initChoices('#cboPaymentVoucherNumber');
+            const form = document.getElementById('pristine-valid-example');
+            if (!form) return;
 
-            function initChoices(selector) {
-                return new Choices(selector, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក...",
-                    shouldSort: false
-                });
+            const pristine = new Pristine(form, {
+                classTo: 'form-group',
+                errorClass: 'has-danger',
+                successClass: 'has-success',
+                errorTextParent: 'form-group',
+                errorTextTag: 'div',
+                errorTextClass: 'text-danger mt-1'
+            });
+
+            const fields = [{
+                    checkbox: document.getElementById('skipLegalNumber'),
+                    input: document.getElementById('legalNumber')
+                },
+                {
+                    checkbox: document.getElementById('skipLegalName'),
+                    input: document.getElementById('legalName')
+                },
+                {
+                    checkbox: document.getElementById('skipFileInput'),
+                    input: document.getElementById('fileInput')
+                }
+            ];
+
+            function setupSkipField(field) {
+                const checkbox = field.checkbox;
+                const input = field.input;
+
+                if (!checkbox || !input) return;
+
+                function toggle() {
+                    const group = input.closest('.form-group');
+
+                    if (checkbox.checked) {
+                        // SKIP ON
+                        input.disabled = true;
+                        input.removeAttribute('required');
+                        input.value = '';
+
+                        input.classList.add('border-success', 'bg-success-subtle');
+
+                        if (group) {
+                            group.classList.remove('has-danger');
+                            group.classList.add('has-success');
+                        }
+                    } else {
+                        // SKIP OFF
+                        input.disabled = false;
+                        input.setAttribute('required', 'required');
+
+                        input.classList.remove('border-success', 'bg-success-subtle');
+
+                        if (group) {
+                            group.classList.remove('has-success');
+                        }
+                    }
+
+                    // Clear old validation messages
+                    pristine.reset();
+                }
+
+                // Run on page load
+                toggle();
+
+                checkbox.addEventListener('change', toggle);
             }
 
-            function resetSelect(selector) {
-                $(selector).html(`<option value="">ស្វែងរក...</option>`);
-            }
+            fields.forEach(field => {
+                setupSkipField(field);
+            });
 
-            function resetChoices(selector, instance) {
-                instance.destroy();
-                return initChoices(selector);
-            }
+            form.addEventListener('submit', function(e) {
+                // Validate only enabled fields
+                const valid = pristine.validate();
 
-            function loadLegalNumber(expenseTypeId, selectedId = null) {
+                if (!valid) {
+                    e.preventDefault();
+                    return false;
+                }
 
-                resetSelect('#cboPaymentVoucherNumber');
-                legalChoices = resetChoices('#cboPaymentVoucherNumber', legalChoices);
-
-                if (!expenseTypeId) return;
-
-                $.ajax({
-                    url: "{{ route('budgetVoucher.edit.expense_type_id') }}",
-                    type: "GET",
-                    data: {
-                        expense_type_id: expenseTypeId,
-                        selected_id: selectedId
-                    },
-                    success: function(html) {
-
-                        $('#cboPaymentVoucherNumber').html(html);
-
-                        legalChoices = resetChoices('#cboPaymentVoucherNumber', legalChoices);
+                // Enable disabled fields before submission (Safely checking for null)
+                fields.forEach(field => {
+                    if (field.input && field.input.disabled) {
+                        field.input.disabled = false;
+                        field.input.value = '';
                     }
                 });
-            }
-
-            /* ================== PRELOAD EDIT DATA ================== */
-
-            const expenseTypeId = $('#cboExpenseType').val();
-            const oldLegalId = $('#cboPaymentVoucherNumber').data('old');
-
-            if (expenseTypeId) {
-                loadLegalNumber(expenseTypeId, oldLegalId);
-            }
-
-            /* ================== EVENT ================== */
-
-            $('#cboExpenseType').on('change', function() {
-                loadLegalNumber($(this).val());
             });
 
         });
-    </script> --}}
+    </script>
 @endsection

@@ -83,7 +83,7 @@ class BudgetMandateDataTable extends DataTable
                     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
                 }
             })
-            ->rawColumns(['description', 'attachments', 'agency', 'is_archived', 'soft_delete']);
+            ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
 
     /**
@@ -123,16 +123,28 @@ class BudgetMandateDataTable extends DataTable
             $model->where('budget_mandates.expense_type_id', 1);
         }
 
-        if ($request->filled('subAccountNumber')) {
-            $model->where('account_subs.no', $request->subAccountNumber);
+        if ($request->filled('cboProgram')) {
+            $model->where('programs.id', $request->cboProgram);
+        }
+
+        if ($request->cboAccountSub) {
+            $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+        }
+
+        if ($request->cboAgency) {
+            $model->where('budget_vouchers.agency_id', $request->cboAgency);
+        }
+
+        if ($request->filled('cboExpenseType')) {
+            $model->where(
+                'budget_vouchers.expense_type_id',
+                $request->cboExpenseType
+            );
         }
         if ($request->filled('CboPaymentVoucherNumber')) {
             $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
         }
 
-        if ($request->filled('cboProgram')) {
-            $model->where('programs.id', $request->cboProgram);
-        }
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
                 ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
@@ -175,7 +187,7 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.legal_number',
             'budget_mandates.legal_name',
             'budget_mandates.temporary_id',
-            'budget_mandates.payment_voucher_number',
+            'budget_mandates.payment_voucher_number as pvn',
             'budget_mandates.day_of_number',
             'budget_mandates.is_archived',
             'budget_mandates.expense_type_id',
@@ -186,10 +198,17 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.request_date',
             'budget_mandates.created_at',
             'budget_mandates.deleted_at'
-            // 'budget_mandates.budget AS voucher_budget',
         ]);
 
-        $model->orderByDesc('budget_mandates.created_at');
+        // ==========================================
+        // Sorting Logic
+        // ==========================================
+        if (!$request->has('order')) {
+            $model->orderBy('budget_mandates.payment_voucher_number', 'asc')
+                ->orderBy('budget_mandates.day_of_number', 'asc')
+                ->orderBy('budget_mandates.no', 'asc');
+        }
+
 
         return $model;
     }
@@ -207,14 +226,15 @@ class BudgetMandateDataTable extends DataTable
             ])
             ->ajax([
                 'data' => 'function(d) {
-                d.agency     = $("#agency").val();
-                d.cboProgram    = $("#cboProgram").val();
-                d.CboPaymentVoucherNumber    = $("#CboPaymentVoucherNumber").val();
-                d.subAccountNumber  = $("#subAccountNumber").val();
-                d.cboTodo = $("#cboTodo").val();
-                d.cboStatus = $("#cboStatus").val();
-                d.start_date = $("#start_date").val();
-                d.end_date = $("#end_date").val();
+                   d.cboTodo = $("#cboTodo").val();
+                    d.cboStatus = $("#cboStatus").val();
+                    d.cboProgram = $("#cboProgram").val();
+                    d.cboAccountSub = $("#cboAccountSub").val();
+                    d.cboAgency = $("#cboAgency").val();
+                    d.cboExpenseType = $("#cboExpenseType").val();
+                    d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
+                    d.start_date = $("#start_date").val();
+                    d.end_date = $("#end_date").val();
                 }',
             ])
             ->initComplete('function () {
@@ -236,13 +256,15 @@ class BudgetMandateDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
-            Column::make('payment_voucher_number')->title(__('tables.th.pvn'))->width(30)->addClass('align-middle'),
+            Column::make('pvn')->title(__('tables.th.pvn'))->width(30)->addClass('align-middle'),
             Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
+            Column::make('name_kh')->title(__('tables.th.expense.type'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
+            Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
