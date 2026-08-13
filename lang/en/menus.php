@@ -43,6 +43,8 @@ return [
     'budget.control.mandate' => 'អាណត្តិ',
     'voucher' => 'សលាកបត្រ',
     'mandate' => 'អាណត្តិ',
+    'number.voucher' => 'សលាកបត្រ',
+    'number.mandate' => 'អាណត្តិ',
 
     'expenditure.guarantee' => 'ធានាចំណាយ',
     'expenditure.procurement' => 'ធានាចំណាយលទ្ធកម្ម',
@@ -136,5 +138,9 @@ return [
 
     'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 
-    'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ'
+    'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ',
+
+    // Filter
+    'start_date' => 'ថ្ងៃចាប់ផ្ដើម',
+    'end_date' => 'ថ្ងៃបញ្ចប់'
 ];

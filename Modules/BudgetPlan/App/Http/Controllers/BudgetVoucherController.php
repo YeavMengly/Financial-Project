@@ -30,6 +30,20 @@ class BudgetVoucherController extends Controller
         return $dataTable->render('budgetplan::initialVoucher.index');
     }
 
+    public function getLegalDate(Request $request)
+    {
+        $voucherNumber = $request->get('voucher_number');
+
+        $legalDate = BudgetVoucher::where('payment_voucher_number', $voucherNumber)
+            ->value('legal_date');
+
+        return response()->json([
+            'legal_date' => $legalDate
+                ? \Carbon\Carbon::parse($legalDate)->format('Y-m-d')
+                : null
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -38,13 +52,15 @@ class BudgetVoucherController extends Controller
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
         $expenseType = ExpenseType::all();
-        $agency = Agency::all();
+        $agency = Agency::where('ministry_id', $id)->get();
+        $program = Program::where('ministry_id', $id)->get();
         $budgetVoucher = BudgetVoucher::where('ministry_id', $data->id)->get();
 
         return $dataTable->render('budgetplan::budgetVoucher.index', [
             'data' => $data,
             'params' => $params,
             'expenseType' => $expenseType,
+            'program' => $program,
             'agency' => $agency,
             'budgetVoucher' => $budgetVoucher
         ]);
@@ -182,31 +198,6 @@ class BudgetVoucherController extends Controller
 
         return response($html);
     }
-
-    // public function getByExpenseId(Request $request)
-    // {
-    //     if (!$request->filled('expense_type_id')) {
-    //         return response()->json([]);
-    //     }
-
-    //     $data = BudgetMandate::select('id', 'payment_voucher_number', 'legal_name', 'description')
-    //         ->where('expense_type_id', $request->expense_type_id)
-    //         ->where('is_archived', 1)
-    //         ->where('status', 'todo')
-    //         ->get()
-    //         ->map(function ($item) {
-    //             return [
-    //                 'value' => $item->payment_voucher_number,
-    //                 'label' => $item->payment_voucher_number,
-    //                 'customProperties' => [
-    //                     'legal_name' => $item->legal_name,
-    //                     'description' => $item->description,
-    //                 ]
-    //             ];
-    //         });
-
-    //     return response()->json($data);
-    // }
 
     /**
      * Show the form for creating a new resource.
@@ -353,6 +344,7 @@ class BudgetVoucherController extends Controller
             'cboAgency'        => 'required',
             'cboSubAccount'    => 'required',
             'budget'           => 'required|numeric|min:0',
+            'cboExpenseType'       => 'required',
             'txtDescription'   => 'required',
             'attachments'      => 'nullable|array',
             'attachments.*'    => 'file|mimes:pdf,doc,docx|max:2048',
@@ -416,7 +408,7 @@ class BudgetVoucherController extends Controller
                 'no'               => $beginVoucher->no,
                 'fin_law'          => $beginVoucher->fin_law,
                 'budget'           => $applyValue,
-                'expense_type_id'  => 1,
+                'expense_type_id'  => $validated['cboExpenseType'],
                 'legal_id'         => $validated['legalID'],
                 'payment_voucher_number' => $validated['paymentVoucher'],
                 'legal_number'     => $validated['legalNumber'] ?? null,
@@ -486,7 +478,7 @@ class BudgetVoucherController extends Controller
         $ministry = Ministry::where('id', decode_params($params))->first();
 
         $agency   = Agency::where('ministry_id', $ministry->id)->get();
-        $expenseType = ExpenseType::where('id', 1)->get();
+        $expenseType = ExpenseType::all();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         $module = BudgetVoucher::where('id', $id)
@@ -668,6 +660,7 @@ class BudgetVoucherController extends Controller
             'cboCluster'       => 'required',
             'cboAgency'        => 'required',
             'cboSubAccount'    => 'required',
+            'cboExpenseType'    => 'required',
 
             'budget'           => 'required|numeric|min:0',
             'txtDescription'   => 'required',
@@ -730,7 +723,7 @@ class BudgetVoucherController extends Controller
                 'fin_law'                => $beginVoucher->fin_law,
                 'budget'                 => $applyValue,
 
-                'expense_type_id'        => $voucher->expense_type_id,
+                'expense_type_id'        => $validated['cboExpenseType'],
 
                 'legal_id'               => $validated['legalID'],
                 'payment_voucher_number' => $validated['paymentVoucher'],
@@ -1187,6 +1180,7 @@ class BudgetVoucherController extends Controller
                 $loanDecrease = "MAX(COALESCE(budget_voucher_loans.decrease,0)) AS loan_decrease";
                 $loanEditorial = "MAX(COALESCE(budget_voucher_loans.editorial,0)) AS loan_editorial";
             }
+
             if ($request->filled('start_date') && $request->filled('end_date')) {
                 $currentLoan = "
                     MAX(
@@ -1225,6 +1219,7 @@ class BudgetVoucherController extends Controller
 
                 $currentLoan = "MAX(begin_vouchers.current_loan) AS current_loan";
             }
+
             $query->select([
                 'budget_vouchers.no as budget_no',
                 'begin_vouchers.no as begin_no',
@@ -1269,26 +1264,9 @@ class BudgetVoucherController extends Controller
                 'begin_vouchers.law_average',
                 'begin_vouchers.law_correction',
             );
+
             $query->orderBy('budget_vouchers.transaction_date');
 
-            // Sub voucher number
-            if ($request->filled('CboPaymentVoucherNumber')) {
-                $query->where(
-                    'budget_vouchers.payment_voucher_number',
-                    $request->CboPaymentVoucherNumber
-                );
-            }
-            // Sub voucher number
-            if ($request->filled('CboMandate')) {
-                $query->where(
-                    'budget_vouchers.day_of_number',
-                    $request->CboMandate
-                );
-            }
-            // Sub Account filter
-            if ($request->filled('cboAccountSub')) {
-                $query->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
-            }
             //status
             if ($request->has('cboStatus')) {
                 if ($request->cboStatus == '2') {
@@ -1305,22 +1283,39 @@ class BudgetVoucherController extends Controller
                 // Default: non-deleted
                 $query->whereNull('budget_vouchers.deleted_at');
             }
-            //To do
+
+            // Program
+            if ($request->filled('cboProgram')) {
+                $query->where('budget_vouchers.program_id', $request->cboProgram);
+            }
+
+            // Sub Account filter
+            if ($request->filled('cboAccountSub')) {
+                $query->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+            }
+
+            if ($request->filled('cboAgency')) {
+                $query->where('budget_vouchers.agency_id', $request->cboAgency);
+            }
+
+            //ExpenseType
             if ($request->filled('cboExpenseType')) {
-
-                $expenseType = (int) $request->cboExpenseType;
-
-                if ($expenseType > 1) {
-                    $query->where('budget_vouchers.expense_type_id', $expenseType - 1);
-                }
-
-                // expenseType == 1 -> no filter
+                $query->where('budget_vouchers.expense_type_id', $request->cboExpenseType);
             }
-            //Date
+
             // Date filter
-            if ($request->filled('end_date')) {
-                $query->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
+                    ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+            } else {
+                if ($request->filled('start_date')) {
+                    $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
+                }
+                if ($request->filled('end_date')) {
+                    $query->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+                }
             }
+
             $data = $query->get();
 
             Log::info('Exported BeginVoucher Count', [
