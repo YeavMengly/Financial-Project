@@ -37,110 +37,87 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-xl-6 col-md-6">
-                                    <div class="row">
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="company_name">{{ __('forms.company.name') }}</label>
-                                                <input type="text" name="company_name" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('company_name')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="project" class="form-label font-size-13 text-muted">
+                                            {{ __('forms.project') }}
+                                        </label>
+                                        <select class="form-control" data-trigger id="dropProject" name="project" required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($projects as $item)
+                                                <option value="{{ $item->id }}">
+                                                    {{ $item->stock_number}}-{{ $item->stock_name }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                        @error('project')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="source">{{ __('forms.source') }}</label>
+
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="skipSource" style="cursor: pointer;">
+
+                                                <label class="form-check-label font-size-12 text-muted" for="skipSource"
+                                                    style="cursor: pointer;">
+                                                    រំលង
+                                                </label>
                                             </div>
                                         </div>
 
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="stock_number">{{ __('forms.stock.number') }}</label>
-                                                <input type="text" name="stock_number" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('stock_number')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+                                        <input type="text" name="source" id="source" class="form-control"
+                                            placeholder="{{ __('forms.source') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
 
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="user_entry">{{ __('forms.user.entry') }}</label>
-                                                <input type="text" name="user_entry" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('user_entry')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
+                                        @error('source')
+                                            <div class="pristine-error text-help text-danger mt-1">
+                                                {{ $message }}
                                             </div>
-                                        </div>
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="date_entry" class="form-label">កាលបរិច្ឆេទ</label>
-                                                <input type="text" id="datepicker-basic" name="date_entry"
-                                                    class="form-control" placeholder="{{ __('forms.select_date') }}"
-                                                    required
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('date_entry')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="title">{{ __('forms.title') }}</label>
-                                                <input type="text" name="title" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('title')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="source">{{ __('forms.source') }}</label>
-                                                <input type="text" name="source" class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('source')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="file">{{ __('forms.file') }}</label>
-                                                <input type="file" id="fileInput" name="file[]" class="form-control"
-                                                    accept=".pdf,.doc,.docx" multiple />
-                                                <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX</small>
-                                                @error('file')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="vRefer">{{ __('forms.refer') }}</label>
-                                                <textarea name="refer" id="vRefer" rows="5" class="form-control" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                                @error('txtRefer')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-12 col-md-12">
-                                            <div class="form-group mb-3">
-                                                <label for="vNote">{{ __('forms.note') }}</label>
-                                                <textarea name="note" id="vNote" rows="5" class="form-control" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                                @error('txtNote')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+                                        @enderror
 
                                     </div>
                                 </div>
-                                <div class="col-xl-6 col-md-6">
+                                <!-- Project Year -->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="pro_year">{{ __('forms.pro.year') }}</label>
+
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="skipProYear" style="cursor: pointer;">
+
+                                                <label class="form-check-label font-size-12 text-muted" for="skipProYear"
+                                                    style="cursor: pointer;">
+                                                    រំលង
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <input type="text" name="pro_year" id="pro_year" class="form-control"
+                                            placeholder="{{ __('forms.pro.year') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+
+                                        @error('pro_year')
+                                            <div class="pristine-error text-help text-danger mt-1">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-12 col-md-12 mt-3">
                                     <div class="col-xl-12 col-md-12">
                                         <table class="table table-bordered" id="itemTable">
                                             <thead>
@@ -281,7 +258,16 @@
                 shouldSort: false
             });
         });
-
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropProject = document.getElementById('dropProject');
+            const dropProjectChoice = new Choices(dropProject, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
     </script>
 
     <script>
@@ -312,6 +298,171 @@
                     e.target.closest('tr').remove();
                 }
 
+            });
+
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const form = document.getElementById('pristine-valid-example');
+
+            if (!form) {
+                console.error('Form not found');
+                return;
+            }
+
+            const pristine = new Pristine(form);
+            const sourceInput = document.getElementById('source');
+            const skipSourceCheckbox = document.getElementById('skipSource');
+
+            const proYearInput = document.getElementById('pro_year');
+            const skipProYearCheckbox = document.getElementById('skipProYear');
+
+
+            // ==========================================
+            // CLEAR FIELD ERRORS
+            // ==========================================
+            function clearFieldErrors(input) {
+
+                if (!input) return;
+
+                const parentGroup = input.closest('.form-group');
+
+                if (parentGroup) {
+
+                    parentGroup
+                        .querySelectorAll('.pristine-error, .text-help')
+                        .forEach(el => el.remove());
+
+                    parentGroup.classList.remove(
+                        'has-danger',
+                        'has-error'
+                    );
+                }
+
+                input.classList.remove(
+                    'is-invalid',
+                    'border-danger'
+                );
+            }
+
+
+            // ==========================================
+            // SETUP SKIP FIELD
+            // ==========================================
+            function setupSkipField(checkbox, input) {
+                if (!checkbox || !input) return;
+                // ------------------------------------------
+                // Initial state
+                // ------------------------------------------
+                if (checkbox.checked) {
+                    input.value = '';
+                    input.disabled = true;
+                } else {
+                    input.disabled = false;
+                    input.setAttribute('required', 'required');
+                }
+                // ------------------------------------------
+                // Add Pristine validator
+                // ------------------------------------------
+                pristine.addValidator(
+                    input,
+                    function(value) {
+                        // If skipped, always valid
+                        if (checkbox.checked) {
+                            return true;
+                        }
+                        // Otherwise required
+                        return value.trim() !== '';
+                    },
+                    "{{ __('messages.required') }}",
+                    1,
+                    true
+                );
+                // ------------------------------------------
+                // Checkbox change
+                // ------------------------------------------
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        // ==============================
+                        // SKIP
+                        // ==============================
+                        input.value = '';
+                        input.disabled = true;
+                        input.removeAttribute('required');
+                        clearFieldErrors(input);
+                        pristine.reset(input)
+                        input.classList.remove(
+                            'is-invalid',
+                            'border-danger'
+                        );
+                        input.classList.add(
+                            'border-success',
+                            'bg-success-subtle'
+                        );
+                    } else {
+                        // ==============================
+                        // REQUIRED AGAIN
+                        // ==============================
+                        input.disabled = false;
+                        input.setAttribute('required', 'required');
+                        input.classList.remove(
+                            'border-success',
+                            'bg-success-subtle'
+                        );
+
+                        clearFieldErrors(input);
+
+                        pristine.reset(input);
+                    }
+                });
+            }
+            // ==========================================
+            // INITIALIZE
+            // ==========================================
+            setupSkipField(
+                skipSourceCheckbox,
+                sourceInput
+            );
+            setupSkipField(
+                skipProYearCheckbox,
+                proYearInput
+            );
+            // ==========================================
+            // FORM SUBMIT
+            // ==========================================
+            form.addEventListener('submit', function(e) {
+
+                e.preventDefault();
+                // ------------------------------------------
+                // Save which button was clicked
+                // ------------------------------------------
+                const submitter = e.submitter;
+
+                if (submitter && submitter.name === 'action') {
+
+                    let hidden = form.querySelector(
+                        'input[name="action"]'
+                    );
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+
+                        form.appendChild(hidden);
+                    }
+
+                    hidden.value = submitter.value;
+                }
+                const isValid = pristine.validate();
+
+                console.log('Form valid:', isValid);
+                console.log('Errors:', pristine.getErrors());
+                if (!isValid) {
+                    return;
+                }
+                HTMLFormElement.prototype.submit.call(form);
             });
 
         });

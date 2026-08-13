@@ -11,6 +11,7 @@ class DuelEntry extends Model
 
     protected $fillable = [
         'ministry_id',
+        'project_id',
         'item_name',
         'company_name',
         'stock_number',
@@ -24,6 +25,7 @@ class DuelEntry extends Model
         'note',
         'refer',
         'date_entry',
+        'pro_year',
         'file',
         'source'
     ];

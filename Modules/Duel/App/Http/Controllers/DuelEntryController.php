@@ -9,10 +9,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Content\Ministry;
 use App\Models\Duel\DuelEntry;
 use App\Models\DuelType;
+use App\Models\Material\Projects;
 use App\Models\UnitType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 
 class DuelEntryController extends Controller
 {
@@ -55,12 +57,14 @@ class DuelEntryController extends Controller
         $duelType = DuelType::all();
         $unitType = UnitType::where('id', 2)->get();
         $ministry = Ministry::where('id', $id)->first();
+        $project = Projects::all();
 
         return view('duel::duelEntry.create')
             ->with('params', $params)
             ->with('duelType', $duelType)
             ->with('ministry', $ministry)
-            ->with('unitType', $unitType);
+            ->with('unitType', $unitType)
+            ->with('projects', $project);
     }
 
     /**
@@ -69,19 +73,12 @@ class DuelEntryController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'company_name'  => 'required|string|max:255',
-            'stock_number'  => 'required',
-            'user_entry'    => 'required|string|max:255',
-            'title'         => 'required|string|max:255',
-            'item_name.*' => 'required',
+            'project'      => 'required|integer',
+            'item_name.*' => 'required|string',
             'quantity.*'  => 'required|numeric',
             'price.*'     => 'required|numeric',
-            'note'          => 'nullable|string|max:10000',
-            'date_entry'    => 'required|date',
-            'refer'         => 'nullable|string|max:10000',
             'source'        => 'nullable|string|max:255',
-            'file'          => 'nullable|array',
-            'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'pro_year'  => 'nullable|string|max:255',
         ]);
 
         $id = decode_params($params);
@@ -89,8 +86,9 @@ class DuelEntryController extends Controller
 
         try {
             $ministry = Ministry::where('id', $id)->first();
-            $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
-
+            $project = Projects::where('id', $validated['project'])
+                ->where('ministry_id', $id)
+                ->firstOrFail();
             $paths = [];
             if ($request->hasFile('file')) {
                 foreach ($request->file('file') as $file) {
@@ -99,28 +97,26 @@ class DuelEntryController extends Controller
                     }
                 }
             }
-
             foreach ($request->item_name as $index => $item) {
 
                 DuelEntry::create([
                     'ministry_id'   => $ministry->id,
+                    'project_id'   => $project->id,
                     'item_name'     => $request->item_name[$index],
-                    'company_name'  => $validated['company_name'],
-                    'stock_number'  =>  $validated['stock_number'],
-                    'stock_name'    => 'ក្រសួងការងារ និងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
-                    'user_entry'    =>  $validated['user_entry'],
+                    'company_name'  => $project->company_name,
+                    'stock_number'  =>  $project->stock_number,
+                    'stock_name'    => $project->stock_name,
+                    'user_entry'    =>  $project->user_entry,
                     'unit'          => 2,
-                    'title'         => $validated['title'],
-
+                    'title'         => $project->title ?? '',
                     'quantity'      => $request->quantity[$index],
                     'price'         => $request->price[$index],
-
                     'duel_total'    => $request->quantity[$index] * $request->price[$index],
-
-                    'note'          =>  strip_tags($validated['note'] ?? ''),
-                    'refer'         => strip_tags($validated['refer']),
-                    'date_entry'    => $dateEntry,
-                    'source'        => $validated['source'],
+                    'note'          =>  strip_tags($project->note ?? ''),
+                    'refer'         => strip_tags($project->refer),
+                    'date_entry'    => $project->date,
+                    'source'   => $validated['source'] ?? null,
+                    'pro_year' => $validated['pro_year'] ?? '',
                     'file'         => json_encode($paths),
                 ]);
             }
@@ -161,20 +157,24 @@ class DuelEntryController extends Controller
      */
     public function edit($params, $id)
     {
-
         $id = decode_params($id);
-        $ministry = Ministry::where('id', decode_params($params))->first();
+        $ministry = Ministry::where('id', decode_params($params))->firstOrFail();
+
         $unitType = UnitType::where('name', 'លីត្រ')->get();
         $duelType = DuelType::all();
+        $projects = Projects::where('ministry_id', $ministry->id)->get();
+
         $module = DuelEntry::where('id', $id)
-            ->where('ministry_id', $ministry->id)->first();
+            ->where('ministry_id', $ministry->id)
+            ->firstOrFail();
 
         return view('duel::duelEntry.edit')
             ->with('params', $params)
             ->with('duelType', $duelType)
             ->with('ministry', $ministry)
             ->with('unitType', $unitType)
-            ->with('module', $module);
+            ->with('module', $module)
+            ->with('projects', $projects);
     }
 
     /**
@@ -183,72 +183,94 @@ class DuelEntryController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
-            'company_name'  => 'required|string|max:255',
-            'stock_number'  => 'required',
-            // 'stock_name'    => 'required|string|max:255',
-            'user_entry'    => 'required|string|max:255',
-            'item_name'     => 'required',
-            'title'    => 'required|string|max:255',
-            // 'unit'          => 'required',
-            'quantity'      => 'required',
-            'price'         => 'required',
-            'note'          => 'nullable|string|max:10000',
-            'date_entry'    => 'required|date',
-            'refer'         => 'nullable|string|max:10000',
-            'source'        => 'nullable|string|max:255',
-            'file'          => 'nullable|array',
-            'file.*'        => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'project'     => 'required',
+            'item_name'   => 'required|array',
+            'item_name.*' => 'required',
+            'quantity'    => 'required|array',
+            'quantity.*'  => 'required|numeric',
+            'price'       => 'required|array',
+            'price.*'     => 'required|numeric',
+            'source'      => 'nullable|string|max:255',
+            'pro_year'    => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
         try {
-            $ministry = Ministry::where('id', decode_params($params))->first();
-            $duelTotal = (int)$validated['quantity'] * (float)$validated['price'];
-            $dateEntry = \Carbon\Carbon::parse($validated['date_entry'])->format('Y-m-d');
+            $ministry = Ministry::where('id', decode_params($params))->firstOrFail();
+            $project  = Projects::where('id', $validated['project'])
+                ->where('ministry_id', $ministry->id)
+                ->firstOrFail();
 
-            $paths = [];
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
-                        $stored[] = $file->store('duelEntry', 'public');
+            $dateEntry = !empty($project->date)
+                ? \Carbon\Carbon::parse($project->date)->format('Y-m-d')
+                : null;
+
+            $items = (array) $request->item_name;
+
+            foreach ($items as $index => $itemName) {
+                $qty   = (float) ($request->quantity[$index] ?? 0);
+                $price = (float) ($request->price[$index] ?? 0);
+                $total = $qty * $price;
+
+                if ($index === 0) {
+                    $duelEntry = DuelEntry::where('id', $id)
+                        ->where('ministry_id', $ministry->id)
+                        ->first();
+
+                    if ($duelEntry) {
+                        $duelEntry->update([
+                            'ministry_id'  => $ministry->id,
+                            'project_id'   => $project->id,
+                            'item_name'    => $itemName,
+                            'company_name' => $project->company_name ?? '',
+                            'stock_number' => $project->stock_number ?? '',
+                            'stock_name'   => $project->stock_name ?? '',
+                            'user_entry'   => $project->user_entry ?? '',
+                            'unit'         => $project->unit ?? '',
+                            'title'        => $project->title ?? '',
+                            'quantity'     => $qty,
+                            'price'        => $price,
+                            'duel_total'   => $total,
+                            'note'         => $project->note ?? '',
+                            'refer'        => $project->refer ?? '',
+                            'date_entry'   => $dateEntry,
+                            'source'       => $validated['source'] ?? '',
+                            'pro_year'     => $validated['pro_year'] ?? '',
+                        ]);
                     }
+                } else {
+                    DuelEntry::create([
+                        'ministry_id'  => $ministry->id,
+                        'project_id'   => $project->id,
+                        'item_name'    => $itemName,
+                        'company_name' => $project->company_name ?? '',
+                        'stock_number' => $project->stock_number ?? '',
+                        'stock_name'   => $project->stock_name ?? '',
+                        'user_entry'   => $project->user_entry ?? '',
+                        'unit'         => $project->unit ?? '',
+                        'title'        => $project->title ?? '',
+                        'quantity'     => $qty,
+                        'price'        => $price,
+                        'duel_total'   => $total,
+                        'note'         => $project->note ?? '',
+                        'refer'        => $project->refer ?? '',
+                        'date_entry'   => $dateEntry,
+                        'source'       => $validated['source'] ?? '',
+                        'pro_year'     => $validated['pro_year'] ?? '',
+                    ]);
                 }
             }
 
-            $duelEntry = DuelEntry::where('id', $id)
-                ->where('ministry_id', $ministry->id)->first();
+            DB::commit();
 
-            if ($duelEntry) {
-                $duelEntry->update([
-                    'ministry_id'  => $ministry->id,
-                    'item_name'    => $validated['item_name'],
-                    'company_name' => $validated['company_name'],
-                    'stock_number' => $validated['stock_number'],
-                    'stock_name'   => 'ក្រសួងការងារ និងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
-                    'user_entry'   => $validated['user_entry'],
-                    'unit'         => 2,
-                    'title'   => $validated['title'],
-                    'quantity'     => $validated['quantity'],
-                    'price'        => $validated['price'],
-                    'duel_total'   => $duelTotal,
-                    'note'         => strip_tags($validated['note'] ?? ''),
-                    'refer'        => strip_tags($validated['refer']),
-                    'date_entry'   => $dateEntry,
-                    'source'   => $validated['source'],
-                    'file'         => json_encode($paths),
-                ]);
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'successful')
+                ->flash();
 
-                DB::commit();
-
-                flash()
-                    ->translate('en')
-                    ->option('timeout', 2000)
-                    ->success('success_msg', 'successful')
-                    ->flash();
-                return redirect()->route('duelEntry.index', $params);
-            }
+            return redirect()->route('duelEntry.index', $params);
         } catch (\Exception $e) {
-
             DB::rollBack();
             Log::error($e->getMessage());
 
