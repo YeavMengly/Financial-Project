@@ -13,20 +13,12 @@ class DuelEntry extends Model
         'ministry_id',
         'project_id',
         'item_name',
-        'company_name',
-        'stock_number',
-        'stock_name',
-        'user_entry',
         'unit',
-        'title',
         'quantity',
         'price',
-        'duel_total',
-        'note',
-        'refer',
+        'total_price',
         'date_entry',
         'pro_year',
-        'file',
         'source'
     ];
 }

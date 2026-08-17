@@ -58,24 +58,24 @@ class DuelEntryDataTable extends DataTable
         $model = $model->newQuery();
         //  $model->withTrashed();
         $model->leftJoin('duel_types', 'duel_entries.item_name', '=', 'duel_types.id');
-
+        $model->leftJoin('projects', 'duel_entries.project_id', '=', 'projects.id');
         $model->select([
             'duel_entries.id',
             'duel_entries.ministry_id',
             'duel_types.name_km',
-            'duel_entries.company_name',
-            'duel_entries.stock_number',
-            'duel_entries.stock_name',
-            'duel_entries.user_entry',
+            'projects.company_name',
+            'projects.stock_number',
+            'projects.stock_name',
+            'projects.user_entry',
             'duel_entries.unit',
             'duel_entries.quantity',
             'duel_entries.price',
-            'duel_entries.duel_total',
-            'duel_entries.note',
-            'duel_entries.refer',
+            'duel_entries.total_price',
+            'projects.note',
+            'projects.refer',
             'duel_entries.date_entry',
-            'duel_entries.title',
-            'duel_entries.file',
+            'projects.title',
+            'projects.file',
             'duel_entries.created_at',
             'duel_entries.updated_at',
         ])
