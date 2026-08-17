@@ -69,19 +69,12 @@ class BudgetMandateDataTable extends DataTable
                 if (!$row->attachments) {
                     return '<span class="text-muted">-</span>';
                 }
-                $files = json_decode($row->attachments, true);
-                if (is_array($files)) {
-                    $html = '<ul class="list-unstyled m-0">';
-                    foreach ($files as $file) {
-                        $url = asset('storage/uploads/' . $file);
-                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                } else {
-                    $url = asset('storage/uploads/' . $row->attachments);
-                    return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
-                }
+                $url = asset('storage/' . $row->attachments);
+                $filename = basename($row->attachments);
+
+                return "<a href='{$url}' target='_blank' class='text-primary'>
+                <i class='fas fa-file-alt me-1'></i>Preview
+            </a>";
             })
             ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
@@ -113,14 +106,11 @@ class BudgetMandateDataTable extends DataTable
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
                 $model->where('budget_mandates.is_archived', 1);
-                $model->where('budget_mandates.expense_type_id', 1);
             } elseif ($request->cboTodo == 3) {
                 $model->where('budget_mandates.is_archived', 2);
-                $model->where('budget_mandates.expense_type_id', 1);
             }
         } else {
             $model->where('budget_mandates.is_archived', 1);
-            $model->where('budget_mandates.expense_type_id', 1);
         }
 
         if ($request->filled('cboProgram')) {
@@ -128,21 +118,25 @@ class BudgetMandateDataTable extends DataTable
         }
 
         if ($request->cboAccountSub) {
-            $model->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+            $model->where('budget_mandates.account_sub_id', $request->cboAccountSub);
         }
 
         if ($request->cboAgency) {
-            $model->where('budget_vouchers.agency_id', $request->cboAgency);
+            $model->where('budget_mandates.agency_id', $request->cboAgency);
         }
 
         if ($request->filled('cboExpenseType')) {
             $model->where(
-                'budget_vouchers.expense_type_id',
+                'budget_mandates.expense_type_id',
                 $request->cboExpenseType
             );
         }
         if ($request->filled('CboPaymentVoucherNumber')) {
             $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
+
+        if ($request->filled('cboDayNumber')) {
+            $model->where('budget_mandates.day_of_number', $request->cboDayNumber);
         }
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -169,11 +163,10 @@ class BudgetMandateDataTable extends DataTable
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_mandates.expense_type_id', '=', 'expense_types.id');
-        // $model->leftJoin('budget_vouchers', 'budget_mandates.payment_voucher_number', '=', 'budget_vouchers.payment_voucher_number');
+        $model->leftJoin('budget_vouchers', 'budget_mandates.payment_voucher_number', '=', 'budget_vouchers.payment_voucher_number');
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
-        // $model->where('budget_mandates.expense_type_id', 1);
 
         // ===== SELECT =====
         $model->select([
@@ -206,9 +199,9 @@ class BudgetMandateDataTable extends DataTable
         if (!$request->has('order')) {
             $model->orderBy('budget_mandates.payment_voucher_number', 'asc')
                 ->orderBy('budget_mandates.day_of_number', 'asc')
+                ->orderBy('account_subs.no', 'asc')
                 ->orderBy('budget_mandates.no', 'asc');
         }
-
 
         return $model;
     }
@@ -233,6 +226,7 @@ class BudgetMandateDataTable extends DataTable
                     d.cboAgency = $("#cboAgency").val();
                     d.cboExpenseType = $("#cboExpenseType").val();
                     d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
+                          d.cboDayNumber = $("#cboDayNumber").val();
                     d.start_date = $("#start_date").val();
                     d.end_date = $("#end_date").val();
                 }',
@@ -256,6 +250,8 @@ class BudgetMandateDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
+            Column::make('name_kh')->title(__('tables.th.expense.type'))->width(30)->addClass('align-middle'),
+
             Column::make('pvn')->title(__('tables.th.pvn'))->width(30)->addClass('align-middle'),
             Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
@@ -272,7 +268,6 @@ class BudgetMandateDataTable extends DataTable
             Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
-
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

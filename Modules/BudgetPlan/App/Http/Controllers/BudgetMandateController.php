@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 class BudgetMandateController extends Controller
 {
@@ -51,7 +52,7 @@ class BudgetMandateController extends Controller
     {
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
-        $expenseType = ExpenseType::where('id', 1)->get();
+        $expenseType = ExpenseType::all();
         $program = Program::where('ministry_id', $data->id)->orderBy('no', 'asc')->get();
         $accountSub = AccountSub::where('ministry_id', $data->id)->orderBy('no', 'asc')->get();
         $agency = Agency::where('ministry_id', $id)->get();
@@ -384,8 +385,7 @@ class BudgetMandateController extends Controller
             'budget'          => 'required|numeric|min:0',
             'cboExpenseType'       => 'required',
             'txtDescription'  => 'required',
-            'attachments'     => 'nullable|array',
-            'attachments.*'   => 'file|mimes:pdf,doc,docx|max:2048',
+            'attachments'      => 'required|file|max:51200',
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
         ]);
@@ -408,7 +408,6 @@ class BudgetMandateController extends Controller
                 ->where('cluster_id', $validated['cboCluster'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
-
 
             if (!$beginVoucher) {
                 flash()
@@ -463,14 +462,13 @@ class BudgetMandateController extends Controller
                 return back();
             }
 
-            $stored = [];
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    if ($file->isValid()) {
-                        $stored[] = $file->store('certificateDatas', 'public');
-                    }
-                }
+            // Store file consistently in 'sources/voucher/pdf' on the public disk
+            $path_store = 'uploads/mandate/' . date('Y-m-d');
+            if (! File::exists($path_store)) {
+                File::makeDirectory($path_store, 0777, true, true);
             }
+            $filePath = $request->file('attachments')->store($path_store, 'public');
+
             BudgetMandate::create([
                 'ministry_id'    => $ministry->id,
                 'agency_id'      => $validated['cboAgency'],
@@ -489,7 +487,7 @@ class BudgetMandateController extends Controller
                 'status' => 'done',
                 'is_archived' => 2,
                 'description' => strip_tags($validated['txtDescription']),
-                'attachments'    => json_encode($stored),
+                'attachments'            => $filePath,
                 'transaction_date'           => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
             ]);
@@ -647,11 +645,9 @@ class BudgetMandateController extends Controller
             $ministry = Ministry::where('id', decode_params($params))->first();
             $mandate = BudgetMandate::where('id', $id)
                 ->where('ministry_id', $ministry->id)
-                ->where('expense_type_id', $validated['cboExpenseType'])
                 ->where('is_archived', 2)
                 ->where('status', 'done')
                 ->firstOrFail();
-
 
             $beginCredit = BeginMandate::where('account_sub_id', $validated['cboSubAccount'])
                 ->where('program_id', $validated['cboProgram'])
@@ -680,8 +676,8 @@ class BudgetMandateController extends Controller
                 'budget'                 => $applyValue,
                 'expense_type_id'        => $validated['cboExpenseType'],
                 'payment_voucher_number' => $validated['cboPaymentVoucherNumber'],
-                'day_of_number' => $validated['cbodayOfNumber'],
-
+                'temporary_id'           => $validated['cboTemporaryId'],
+                'day_of_number'          => $validated['cbodayOfNumber'],
                 'legal_name'             => $validated['legalName'],
                 'description'            => strip_tags($validated['txtDescription']),
                 'transaction_date'       => $validated['transactionDate'],
@@ -737,14 +733,21 @@ class BudgetMandateController extends Controller
 
         // ✅ Delete attached files
         if ($mandate->attachments) {
-            $attachments = json_decode($mandate->attachments, true);
+            $filePath = $mandate->attachments;
 
-            foreach ($attachments as $filePath) {
-                if (Storage::disk('public')->exists($filePath)) {
-                    Storage::disk('public')->delete($filePath);
-                } else {
-                    Log::warning("Attachment not found for deletion: " . $filePath);
+            if (Storage::disk('public')->exists($filePath)) {
+                $trashPath = 'trash/' . $filePath;
+
+                // Ensure trash directory exists before moving
+                $trashDir = dirname($trashPath);
+                if (!Storage::disk('public')->exists($trashDir)) {
+                    Storage::disk('public')->makeDirectory($trashDir);
                 }
+
+                Storage::disk('public')->move($filePath, $trashPath);
+
+                $mandate->attachments = $trashPath;
+                $mandate->save();
             }
         }
 
@@ -785,32 +788,24 @@ class BudgetMandateController extends Controller
             ->first();
 
         if ($mandate->attachments) {
+            $filePath = $mandate->attachments;
 
-            $attachments = json_decode($mandate->attachments, true);
-            $restoredFiles = [];
+            if (Storage::disk('public')->exists($filePath)) {
+                $originalPath = preg_replace('/^trash\//', '', $filePath);
 
-            foreach ($attachments as $filePath) {
+                Storage::disk('public')->move($filePath, $originalPath);
 
-                if (Storage::disk('public')->exists($filePath)) {
-
-                    $originalPath = str_replace('trash/', '', $filePath);
-
-                    Storage::disk('public')->move($filePath, $originalPath);
-
-                    $restoredFiles[] = $originalPath;
-                }
+                $mandate->attachments = $originalPath;
+                $mandate->save();
             }
-
-            $mandate->attachments = json_encode($restoredFiles);
         }
+        $mandate->restore();
 
         $voucher->update([
-
             'status' => 'done',
             'is_archived' => 2,
         ]);
 
-        $mandate->restore();
         $beginCredit = BeginMandate::where('account_sub_id', $voucher->account_sub_id)
             ->where('no', $voucher->no)
             ->where('ministry_id', $voucher->ministry_id)
@@ -819,7 +814,6 @@ class BudgetMandateController extends Controller
         if ($beginCredit) {
             $this->recalculateAndSaveReport($beginCredit);
         }
-
 
         flash()
             ->translate('en')

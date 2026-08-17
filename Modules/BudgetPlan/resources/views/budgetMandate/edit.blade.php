@@ -97,10 +97,8 @@
                                         <span class="input-group-text bg-light text-muted">#</span>
                                         <!-- Removed static 'required' from input attributes -->
                                         <input data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
-                                            value="{{ old('cbotemporaryId', $module->temporary_id) }}" min="1"
-                                            type="number" class="form-control" id="cboTemporaryId"
+                                            value="{{ old('cboTemporaryId', $module->temporary_id) }}" type="text"
+                                            class="form-control" id="cboTemporaryId"
                                             placeholder="{{ __('forms.temporary.id') }}" name="cboTemporaryId"
                                             {{ empty($module->temporary_id) ? 'disabled' : 'required' }} tabindex="2" />
                                     </div>

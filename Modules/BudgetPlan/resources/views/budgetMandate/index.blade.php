@@ -164,6 +164,17 @@
 
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
+                                <label for="cboDayNumber"
+                                    class="form-label font-size-13 text-muted">{{ __('menus.number.mandate') }}</label>
+                                {{-- <label class="visually-hidden" for="cboDayNumber">{{ __('menus.voucher') }}</label> --}}
+                                <input type="text" id="cboDayNumber" name="cboDayNumber" class="form-control"
+                                    placeholder="{{ __('menus.number.mandate') }}" value="{{ request('cboDayNumber') }}"
+                                    data-pristine-required-message="{{ __('messages.required') }}" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
                                 <label for="start_date"
                                     class="form-label font-size-13 text-muted">{{ __('menus.start_date') }}</label>
                                 {{-- <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label> --}}
@@ -393,7 +404,7 @@
     </script>
 
     <script>
-        $('#cboTodo, #cboStatus, #cboProgram, #cboAccountSub, #cboAgency, #cboExpenseType, #CboPaymentVoucherNumber,  #start_date, #end_date')
+        $('#cboTodo, #cboStatus, #cboProgram, #cboAccountSub, #cboAgency, #cboExpenseType, #CboPaymentVoucherNumber,#cboDayNumber,  #start_date, #end_date')
             .on('change keyup',
                 function() {
                     $('#budgetmandate-table').DataTable().ajax.reload();
