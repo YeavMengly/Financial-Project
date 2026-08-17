@@ -28,7 +28,7 @@ class EditFileProject extends Component
 
     public function render()
     {
-        return view('livewire.project.projectFile');
+        return view('livewire.project.edit-file-project');
     }
 
     public function save()
