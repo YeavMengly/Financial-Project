@@ -281,7 +281,7 @@
 
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <label class="form-label mb-0">
-                                {{ __('forms.project') }}
+                                {{ __('forms.sub.project') }}
                             </label>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" role="switch" id="skipItemTable"
