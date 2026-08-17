@@ -14,7 +14,7 @@ class MaterialReleaseController extends Controller
 {
 
     public function getIndex(InitialMaterialReleaseDataTable $dataTable)
-    {
+    { return view('maintenance.maintenance');
         return $dataTable->render('material::materialRelease.initialMaterialRelease.index');
     }
 

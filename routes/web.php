@@ -1,8 +1,9 @@
 <?php
 
 use App\Livewire\BudgetPlan\AdvancePayment;
+use App\Livewire\BudgetPlan\EditFileMandate;
+use App\Livewire\BudgetPlan\EditFileVoucher;
 use App\Livewire\BudgetPlan\ExpenseRecordFile;
-use App\Livewire\BudgetPlan\Payment;
 use App\Livewire\BudgetPlan\PaymentDeadline;
 use App\Livewire\Document\EditFileDocument;
 use App\Livewire\BudgetPlan\GaranteeFile;
@@ -36,24 +37,16 @@ Route::get('/', function () {
 Route::prefix('document')->middleware(['auth'])->group(function () {
     Route::get('/edit-doc/{params}', EditFileDocument::class)->name('document.edit.doc');
 });
-Route::prefix('budgetplan/mandates')->middleware(['auth'])->group(function () {
-    Route::get('{params}/gurantee-file/{id}', GaranteeFile::class)->name('garantee.edit.doc');
-    Route::get('{params}/advance-payment-file/{id}', AdvancePayment::class)->name('advancePayment.edit.doc');
-    Route::get('{params}/expense-record-file/{id}', ExpenseRecordFile::class)->name('expenseRecord.edit.doc');
-    Route::get('{params}/procurement-file/{id}', ProcurementFile::class)->name('procurement.edit.doc');
-    Route::get('{params}/expense-record-training-file/{id}', ExpenseRecordTrainingFile::class)->name('expenseRecordTraining.edit.doc');
-});
-Route::prefix('budgetplan/voucher')->middleware(['auth'])->group(function () {
-    Route::get('{params}/payment-file/{id}', Payment::class)->name('payment.edit.doc');
-    Route::get('{params}/payment-deadline-file/{id}', PaymentDeadline::class)->name('paymentDeadline.edit.doc');
-    Route::get('{params}/payment-deadline-training-file/{id}', PaymentDeadlineTraining::class)->name('paymentDeadlineTraining.edit.doc');
-});
-Route::prefix('duel')->middleware(['auth'])->group(function () {
-    Route::get('{params}/duel-release-file/{id}', Release::class)->name('duelRelease.edit.doc');
-     
+
+Route::prefix('budgetplan')->middleware(['auth'])->group(function () {
+    Route::get('voucher/{params}/budget-voucher-file/{id}', EditFileVoucher::class)->name('budgetVoucher.edit.doc');
+    Route::get('mandate/{params}/budget-mandate-file/{id}', EditFileMandate::class)->name('budgetMandate.edit.doc');
 });
 Route::prefix('project')->middleware(['auth'])->group(function () {
     Route::get('{params}/project-file/{id}', Project::class)->name('project.edit.doc');
      
 });
 
+Route::prefix('duel')->middleware(['auth'])->group(function () {
+    Route::get('{params}/duel-release-file/{id}', Release::class)->name('duelRelease.edit.doc');
+});

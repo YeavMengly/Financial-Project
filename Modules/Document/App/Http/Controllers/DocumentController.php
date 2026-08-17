@@ -27,7 +27,7 @@ class DocumentController extends Controller
     }
 
     public function getByCategoryId(Request $request)
-{
+    {
         echo '<option value="">ជ្រើសរើស អនុប្រភេទ</option>';
 
         if ($request->cate_id != '') {

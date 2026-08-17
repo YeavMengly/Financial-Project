@@ -84,14 +84,16 @@
                         <!-- Sub Account Number -->
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
-                                <label for="cboAccountSub"
-                                    class="form-label font-size-13 text-muted">{{ __('menus.content.sub.accounts') }}</label>
+                                <label for="cboAccountSub" class="form-label font-size-13 text-muted">
+                                    {{ __('menus.content.sub.accounts') }}
+                                </label>
+
                                 <select class="form-control" name="cboAccountSub" id="cboAccountSub">
                                     <option value="">{{ __('forms.search...') }}</option>
-                                    @foreach ($budgetVoucher as $ts)
-                                        <option value="{{ $ts->account_sub_id }}"
-                                            {{ request('cboAccountSub') == $ts->account_sub_id ? 'selected' : '' }}>
-                                            {{ $ts->account_sub_id }}
+
+                                    @foreach ($accountSub as $as)
+                                        <option value="{{ $as->no }}" @selected(old('cboAccountSub', $budgetVoucher) == $as->account_sub_id)>
+                                            {{ $as->no }}
                                         </option>
                                     @endforeach
                                 </select>

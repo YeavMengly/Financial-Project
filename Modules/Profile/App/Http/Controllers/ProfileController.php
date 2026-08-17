@@ -26,49 +26,33 @@ class ProfileController extends Controller
             ->with('role', $role);
     }
 
-    // public function passwordChange(Request $request) {
-    //     $request->validate([
-    //         'password' => ['required', 'min:6', 'confirmed']
-    //     ]);
-    //     DB::beginTransaction();
-    //     try {
-    //         $user = User::findOrfail(auth()->user()->id);
-    //         $user->update([
-    //             'password'  => bcrypt($request->password)
-    //         ]);
-    //         DB::commit();
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->success('success_msg', 'successful')
-    //             ->flash();
-
-    //         return redirect()->route('profile.index');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         $bug = $e->getMessage();
-    //         Log::error($bug);
-    //         flash()
-    //             ->translate('kh')
-    //             ->option('timeout', 2000)
-    //             ->error($bug, 'បញ្ហា')
-    //             ->flash();
-    //         return redirect()->route('profile.index');
-    //     }
-    // }
     public function passwordChange(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password'         => ['required', 'min:6', 'confirmed', 'different:current_password'],
-        ]);
+        $user = auth()->user();
+
+        // Check if user is Admin (Adjust this check based on your app's role structure)
+        // Options: $user->role_id === 1 OR $user->hasRole('Admin') OR strtolower($user->role->name) === 'admin'
+        $isAdmin = $user->role_id === 1;
+
+        // Dynamic validation rules
+        $rules = [
+            'password' => ['required', 'min:6', 'confirmed'],
+        ];
+
+        // Require current password ONLY for non-admin users
+        if (!$isAdmin) {
+            $rules['current_password'] = ['required', 'current_password'];
+            $rules['password'][] = 'different:current_password';
+        }
+
+        $request->validate($rules);
 
         DB::beginTransaction();
         try {
-            $user = User::findOrFail(auth()->user()->id);
+            $userModel = User::findOrFail($user->id);
 
-            $user->update([
-                'password'  => bcrypt($request->password)
+            $userModel->update([
+                'password' => bcrypt($request->password)
             ]);
 
             DB::commit();

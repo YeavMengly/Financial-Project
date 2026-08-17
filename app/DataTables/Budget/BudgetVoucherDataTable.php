@@ -67,19 +67,12 @@ class BudgetVoucherDataTable extends DataTable
                 if (!$row->attachments) {
                     return '<span class="text-muted">-</span>';
                 }
-                $files = json_decode($row->attachments, true);
-                if (is_array($files)) {
-                    $html = '<ul class="list-unstyled m-0">';
-                    foreach ($files as $file) {
-                        $url = asset('storage/uploads/' . $file);
-                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                } else {
-                    $url = asset('storage/uploads/' . $row->attachments);
-                    return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
-                }
+                $url = asset('storage/' . $row->attachments);
+                $filename = basename($row->attachments);
+
+                return "<a href='{$url}' target='_blank' class='text-primary'>
+                <i class='fas fa-file-alt me-1'></i>Preview
+            </a>";
             })
             ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
@@ -87,7 +80,6 @@ class BudgetVoucherDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
-
     public function query(BudgetVoucher $model, Request $request): QueryBuilder
     {
         $params = $request->params;
@@ -219,6 +211,7 @@ class BudgetVoucherDataTable extends DataTable
         // ==========================================
         if (!$request->has('order')) {
             $model->orderBy('budget_vouchers.payment_voucher_number', 'asc')
+                ->orderBy('account_subs.no', 'asc')
                 ->orderBy('budget_vouchers.no', 'asc');
         }
 
@@ -268,6 +261,7 @@ class BudgetVoucherDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
+            Column::make('name_kh')->title(__('tables.th.expense.type'))->width(30)->addClass('align-middle'),
             Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),

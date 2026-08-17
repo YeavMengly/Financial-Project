@@ -6,14 +6,24 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+            @if (hasPermission('budgetMandate.index'))
+                    <a download href="{{ asset($module->attachments) }}" class="dropdown-item"><i
+                            class="bx bx-download"></i>
+                        {{ __('buttons.download') }}</a>
+                @endif
+                @if (hasPermission('budgetMandate.edit') or
+                        hasPermission('budgetMandate.edit.doc') or
+                        hasPermission('budgetMandate.destroy'))
+                    <hr />
+                @endif
                 @if (hasPermission('budgetMandate.edit'))
                     <a href="{{ route('budgetMandate.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit') }}
                     </a>
                 @endif
-                @if (hasPermission('garantee.edit.doc'))
-                    <a href="{{ route('garantee.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                @if (hasPermission('budgetMandate.edit.doc'))
+                    <a href="{{ route('budgetMandate.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}
                     </a>

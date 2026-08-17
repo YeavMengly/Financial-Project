@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('stock_number')->nullable();
             $table->string('agency')->nullable();
             $table->string('user_request')->nullable();
+            $table->string('receiver')->nullable();
             $table->string('unit')->nullable();
             $table->string('title')->nullable();
             $table->integer('quantity_total');

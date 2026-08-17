@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 class BudgetVoucherController extends Controller
 {
@@ -61,6 +62,7 @@ class BudgetVoucherController extends Controller
         $expenseType = ExpenseType::all();
 
         // Fetch associated 
+        $accountSub = AccountSub::where('ministry_id', $id)->get();
         $agency = Agency::where('ministry_id', $id)->get();
         $program = Program::where('ministry_id', $id)->orderBy('no', 'asc')->get();
         $budgetVoucher = BudgetVoucher::where('ministry_id', $data->id)->get();
@@ -72,6 +74,7 @@ class BudgetVoucherController extends Controller
             'program'       => $program,
             'agency'        => $agency,
             'budgetVoucher' => $budgetVoucher,
+            'accountSub'    => $accountSub
         ]);
     }
 
@@ -372,6 +375,7 @@ class BudgetVoucherController extends Controller
             'exists'            => true,
         ]);
     }
+
     private function calculateCreditMovement($loans): float
     {
         if (!$loans) {
@@ -398,7 +402,7 @@ class BudgetVoucherController extends Controller
         $validated = $request->validate([
             'legalID'          => 'required',
             'paymentVoucher'   => 'required',
-            'legalNumber'      => 'nullable|integer|min:1',
+            'legalNumber'      => 'nullable|string',
             'legalName'        => 'nullable|string',
             'cboProgram'       => 'required',
             'cboProgramSub'    => 'required',
@@ -408,8 +412,7 @@ class BudgetVoucherController extends Controller
             'budget'           => 'required|numeric|min:0',
             'cboExpenseType'   => 'required',
             'txtDescription'   => 'required',
-            'attachments'      => 'nullable|array',
-            'attachments.*'    => 'file|mimes:pdf,doc,docx|max:2048',
+            'attachments'      => 'required|file|max:51200',
             'transactionDate'  => 'required|date',
             'requestDate'      => 'required|date',
             'legalDate'        => 'required|date',
@@ -455,15 +458,12 @@ class BudgetVoucherController extends Controller
                 return back();
             }
 
-            // Process uploaded file attachments
-            $stored = [];
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    if ($file->isValid()) {
-                        $stored[] = $file->store('certificateDatas', 'public');
-                    }
-                }
+            // Store file consistently in 'sources/voucher/pdf' on the public disk
+            $path_store = 'uploads/voucher/' . date('Y-m-d');
+            if (! File::exists($path_store)) {
+                File::makeDirectory($path_store, 0777, true, true);
             }
+            $filePath = $request->file('attachments')->store($path_store, 'public');
 
             // Create new budget voucher entry
             BudgetVoucher::create([
@@ -484,7 +484,7 @@ class BudgetVoucherController extends Controller
                 'status'                 => 'todo',
                 'is_archived'            => 1,
                 'description'            => strip_tags($validated['txtDescription']),
-                'attachments'            => json_encode($stored),
+                'attachments'            => $filePath,
                 'transaction_date'       => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
                 'legal_date'             => $validated['legalDate'],
@@ -611,7 +611,7 @@ class BudgetVoucherController extends Controller
         $validated = $request->validate([
             'legalID'          => 'required',
             'paymentVoucher'   => 'required',
-            'legalNumber'      => 'nullable|integer|min:1',
+            'legalNumber'      => 'nullable|string',
             'legalName'        => 'nullable|string|max:255',
             'cboProgram'       => 'required',
             'cboProgramSub'    => 'required',
@@ -619,7 +619,7 @@ class BudgetVoucherController extends Controller
             'cboAgency'        => 'required',
             'cboSubAccount'    => 'required',
             'cboExpenseType'   => 'required',
-            'budget'           => 'required|numeric|min:0',
+            'budget'           => 'required',
             'txtDescription'   => 'required',
             'transactionDate'  => 'required|date',
             'requestDate'      => 'required|date',
@@ -628,15 +628,19 @@ class BudgetVoucherController extends Controller
 
         DB::beginTransaction();
         try {
-            $id = decode_params($params);
-            $voucher = BudgetVoucher::where('ministry_id', $id)->findOrFail($id);
+            $ministry = Ministry::where('id', decode_params($params))->first();
+
+            $voucher = BudgetVoucher::where([
+                'id' => $id,
+                'ministry_id'    => $ministry->id,
+            ])->first();
 
             $beginVoucher = BeginVoucher::where([
                 'account_sub_id' => $validated['cboSubAccount'],
                 'program_id'     => $validated['cboProgram'],
                 'program_sub_id' => $validated['cboProgramSub'],
                 'cluster_id'     => $validated['cboCluster'],
-                'ministry_id'    => $id,
+                'ministry_id'    => $ministry->id
             ])->first();
 
             if (!$beginVoucher) {
@@ -646,31 +650,16 @@ class BudgetVoucherController extends Controller
             }
 
             // 1. Calculate credit limit (re-add current voucher budget before validating new amount)
-            $applyValue = (float) $validated['budget'];
-            $availableCredit = $beginVoucher->credit + $voucher->budget;
+            $applyValue = $validated['budget'];
+            // $availableCredit = $beginVoucher->credit + $voucher->budget;
 
-            if (($availableCredit - $applyValue) < 0) {
-                flash()->translate('en')->option('timeout', 2000)
-                    ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')->flash();
-                return back()->withInput();
-            }
-
-            // 2. Handle file attachments
-            $attachments = is_array($voucher->attachments)
-                ? $voucher->attachments
-                : (json_decode($voucher->attachments ?? '[]', true) ?? []);
-
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    if ($file->isValid()) {
-                        $attachments[] = $file->store('certificateDatas', 'public');
-                    }
-                }
-            }
-
-            // 3. Update Voucher
+            // if (($availableCredit - $applyValue) < 0) {
+            //     flash()->translate('en')->option('timeout', 2000)
+            //         ->error('ឥណទានមិនអាចតិចជាងសូន្យ។', 'បញ្ហា')->flash();
+            //     return back()->withInput();
+            // }
+            // 2. Update Voucher
             $voucher->update([
-                'ministry_id'            => $id,
                 'agency_id'              => $validated['cboAgency'],
                 'program_id'             => $validated['cboProgram'],
                 'program_sub_id'         => $validated['cboProgramSub'],
@@ -687,13 +676,12 @@ class BudgetVoucherController extends Controller
                 'status'                 => 'todo',
                 'is_archived'            => 1,
                 'description'            => strip_tags($validated['txtDescription']),
-                'attachments'            => is_array($voucher->attachments) ? $attachments : json_encode($attachments),
                 'transaction_date'       => $validated['transactionDate'],
                 'request_date'           => $validated['requestDate'],
                 'legal_date'             => $validated['legalDate'],
             ]);
 
-            // 4. Recalculate and update BeginVoucher balances
+            // 3. Recalculate and update BeginVoucher balances
             $this->recalculateAndSaveReport($beginVoucher);
 
             DB::commit();
@@ -726,17 +714,26 @@ class BudgetVoucherController extends Controller
             ->first();
 
         // 2. ✅ Delete attached files
-        if ($voucher->attachments) {
-            $attachments = json_decode($voucher->attachments, true);
 
-            foreach ($attachments as $filePath) {
-                if (Storage::disk('public')->exists($filePath)) {
-                    Storage::disk('public')->delete($filePath);
-                } else {
-                    Log::warning("Attachment not found for deletion: " . $filePath);
+        if ($voucher->attachments) {
+            $filePath = $voucher->attachments;
+
+            if (Storage::disk('public')->exists($filePath)) {
+                $trashPath = 'trash/' . $filePath;
+
+                // Ensure trash directory exists before moving
+                $trashDir = dirname($trashPath);
+                if (!Storage::disk('public')->exists($trashDir)) {
+                    Storage::disk('public')->makeDirectory($trashDir);
                 }
+
+                Storage::disk('public')->move($filePath, $trashPath);
+
+                $voucher->attachments = $trashPath;
+                $voucher->save();
             }
         }
+
 
         // 3. Delete the voucher record
         $voucher->delete();
@@ -768,24 +765,20 @@ class BudgetVoucherController extends Controller
         $voucher = BudgetVoucher::withTrashed()->whereKey($pid)->first();
 
         if ($voucher->attachments) {
-            $attachments = json_decode($voucher->attachments, true);
-            $restoredFiles = [];
-            foreach ($attachments as $filePath) {
+            $filePath = $voucher->attachments;
 
-                if (Storage::disk('public')->exists($filePath)) {
+            if (Storage::disk('public')->exists($filePath)) {
+                $originalPath = preg_replace('/^trash\//', '', $filePath);
 
-                    $originalPath = str_replace('trash/', '', $filePath);
+                Storage::disk('public')->move($filePath, $originalPath);
 
-                    Storage::disk('public')->move($filePath, $originalPath);
-
-                    $restoredFiles[] = $originalPath;
-                }
+                $voucher->attachments = $originalPath;
+                $voucher->save();
             }
-            $voucher->attachments = json_encode($restoredFiles);
         }
-
         // Restore the soft-deleted database record
         $voucher->restore();
+
 
         // Recalculate report data if a matching initial credit voucher exists
         $beginCredit = BeginVoucher::where('account_sub_id', $voucher->account_sub_id)

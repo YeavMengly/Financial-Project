@@ -42,7 +42,7 @@
                     <form id="pristine-valid-example" action="{{ route('budgetMandate.store', $params) }}" method="POST"
                         enctype="multipart/form-data" novalidate>
                         @csrf
-                        
+
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
@@ -77,9 +77,8 @@
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label>{{ __('forms.legal.name') }}</label>
-                                    <input data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" id="legalName" name="legalName"
-                                        tabindex="2" />
+                                    <input data-pristine-required-message="{{ __('messages.required') }}" type="text"
+                                        class="form-control" id="legalName" name="legalName" tabindex="2" />
                                 </div>
                             </div>
 
@@ -99,11 +98,8 @@
                                         </div>
                                     </div>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light text-muted">#</span>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="" min="1"
-                                            type="number" class="form-control" id="cboTemporaryId"
+                                            type="text" class="form-control" id="cboTemporaryId"
                                             placeholder="{{ __('forms.temporary.id') }}" name="cboTemporaryId"
                                             tabindex="2" />
                                     </div>
@@ -127,8 +123,8 @@
                                     </div>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="" min="1"
-                                        type="number" class="form-control" id="cbodayOfNumber"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="number"
+                                        class="form-control" id="cbodayOfNumber"
                                         placeholder="{{ __('forms.day.number') }}" name="cbodayOfNumber"
                                         tabindex="2" />
                                 </div>
@@ -268,8 +264,8 @@
                                     </div>
 
                                     <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
-                                    <input type="file" id="fileInput" name="attachments[]" class="form-control"
-                                        accept=".pdf,.doc,.docx" multiple required data-max-size="5"
+                                    <input type="file" id="fileInput" name="attachments" class="form-control"
+                                        accept=".pdf,.doc,.docx" required
                                         data-allowed-extensions="pdf,doc,docx"
                                         data-pristine-required-message="{{ __('messages.required') }}" />
                                     <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
@@ -461,8 +457,8 @@
             };
 
             // Register all skippable fields here:
-            setupSkipToggle('skipTemporaryId', 'cboTemporaryId', '0');
-            setupSkipToggle('skipDayNumber', 'cbodayOfNumber', '0');
+            setupSkipToggle('skipTemporaryId', 'cboTemporaryId', 'មិនមាន');
+            setupSkipToggle('skipDayNumber', 'cbodayOfNumber', 'មិនមាន');
             setupSkipToggle('skipFileInput', 'fileInput', '', true);
 
             // =========================================================================

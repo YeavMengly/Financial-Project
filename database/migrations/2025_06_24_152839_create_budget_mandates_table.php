@@ -25,13 +25,13 @@ return new class extends Migration
             $table->string('legal_number', 100);
             $table->string('legal_id', 100);
             $table->string('legal_name')->nullable();
-            $table->string('temporary_id', 100);
+            $table->string('temporary_id', 100)->nullable();
             $table->string('payment_voucher_number', 100);
             $table->string('day_of_number', 100);
             $table->enum('status', ['todo', 'done'])->default('todo');
             $table->integer('is_archived')->default(1);
             $table->text('description');
-            $table->json('attachments')->nullable();
+            $table->string('attachments')->nullable();
             $table->date('transaction_date');
             $table->date('request_date');
             $table->timestamps();
