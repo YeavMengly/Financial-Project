@@ -68,6 +68,7 @@ return [
     'date' => 'កាលបរិច្ឆេទ',
     'warehouse.voucher' => 'បណ្ណបញ្ចេញឃ្លាំង',
     'project' => 'គម្រោង',
+    'sub.project' => 'អនុគម្រោង',
 
 
     'item.name' => 'ឈ្មោះទំនិញ',
