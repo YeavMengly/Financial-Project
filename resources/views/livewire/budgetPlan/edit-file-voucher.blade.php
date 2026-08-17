@@ -12,7 +12,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-3"></div>
         <div class="col-6">
@@ -20,9 +20,9 @@
                 <div class="card-body">
                     <form wire:submit="save">
                         <div class="row">
-                            
+
                             <!-- Document Title Field -->
-                            <div class="col-md-12">
+                            {{-- <div class="col-md-12">
                                 <div class="mb-3">
                                     <label class="form-label" for="validationCategory">{{ __('forms.document.title') }}</label>
                                     <input type="text" class="form-control" wire:model="documentTitle" disabled />
@@ -30,10 +30,10 @@
                                         <div class="pristine-error text-help text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <!-- Download Existing File Button -->
-                            @if ($budgetVoucherOldFile)
+                            {{-- @if ($budgetVoucherOldFile)
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <a download href="{{ asset('storage/' . $budgetVoucherOldFile) }}"
@@ -43,14 +43,15 @@
                                         </a>
                                     </div>
                                 </div>
-                            @endif
+                            @endif --}}
 
                             <!-- Upload New File Input -->
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label class="form-label" for="validationCategory">{{ __('forms.document.file') }}</label>
+                                    <label class="form-label"
+                                        for="validationCategory">{{ __('forms.document.file') }}</label>
                                     <input type="file" class="form-control" wire:model.live="attachments" />
-                                    
+
                                     <div wire:loading wire:target="attachments" class="text-primary font-size-13 mt-1">
                                         <i class="fas fa-spinner fa-spin me-1"></i> Uploading file...
                                     </div>
