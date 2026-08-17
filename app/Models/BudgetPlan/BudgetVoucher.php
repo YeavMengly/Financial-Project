@@ -46,7 +46,6 @@ class BudgetVoucher extends Model
     ];
 
     protected $casts = [
-        'attachments' => 'array',
         'date'        => 'date',
     ];
 

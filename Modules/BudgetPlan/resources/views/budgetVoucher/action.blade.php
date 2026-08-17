@@ -6,12 +6,22 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+                @if (hasPermission('budgetVoucher.index'))
+                    <a download href="{{ asset($module->attachments) }}" class="dropdown-item"><i
+                            class="bx bx-download"></i>
+                        {{ __('buttons.download') }}</a>
+                @endif
+                @if (hasPermission('budgetVoucher.edit') or
+                        hasPermission('budgetVoucher.edit.doc') or
+                        hasPermission('budgetVoucher.destroy'))
+                    <hr />
+                @endif
                 @if (hasPermission('budgetVoucher.edit'))
                     <a href="{{ route('budgetVoucher.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                 @if (hasPermission('payment.edit.doc'))
-                    <a href="{{ route('payment.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                @if (hasPermission('budgetVoucher.edit.doc'))
+                    <a href="{{ route('budgetVoucher.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}</a>
                 @endif
                 @if (hasPermission('budgetVoucher.destroy'))

@@ -84,9 +84,7 @@
                                     </div>
 
                                     <input class="form-control" id="legalNumber" name="legalNumber"
-                                        data-pristine-required-message="{{ __('messages.required') }}"
-                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                        data-pristine-required-message="{{ __('messages.required') }}" type="text"
                                         value="{{ old('legalNumber', $module->legal_number) }}"
                                         placeholder="{{ __('forms.legal.number') }}"
                                         {{ empty($module->legal_number) ? 'disabled' : 'required' }} tabindex="5">
@@ -109,9 +107,7 @@
                                     </div>
 
                                     <input class="form-control" id="legalName" name="legalName"
-                                        data-pristine-required-message="{{ __('messages.required') }}"
-                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="text"
+                                        data-pristine-required-message="{{ __('messages.required') }}" type="text"
                                         value="{{ old('legalName', $module->legal_name) }}"
                                         placeholder="{{ __('forms.legal.name') }}"
                                         {{ empty($module->legal_name) ? 'disabled' : 'required' }} tabindex="6">
@@ -685,159 +681,6 @@
         });
     </script>
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const form = document.getElementById('pristine-valid-example');
-
-            const pristine = new Pristine(form, {
-                classTo: 'form-group',
-                errorClass: 'has-danger',
-                successClass: 'has-success',
-                errorTextParent: 'form-group',
-                errorTextTag: 'div',
-                errorTextClass: 'text-danger mt-1'
-            });
-
-
-            const fields = [{
-                    checkbox: document.getElementById('skipLegalNumber'),
-                    input: document.getElementById('legalNumber')
-                },
-                {
-                    checkbox: document.getElementById('skipLegalName'),
-                    input: document.getElementById('legalName')
-                },
-                {
-                    checkbox: document.getElementById('skipFileInput'),
-                    input: document.getElementById('fileInput')
-                }
-            ];
-
-
-            function setupSkipField(field) {
-
-                const checkbox = field.checkbox;
-                const input = field.input;
-
-                if (!checkbox || !input) return;
-
-
-                function toggle() {
-
-                    const group = input.closest('.form-group');
-
-
-                    if (checkbox.checked) {
-
-                        // =========================
-                        // SKIP ON
-                        // =========================
-
-                        input.disabled = true;
-
-                        input.removeAttribute('required');
-
-                        input.value = '';
-
-
-                        input.classList.add(
-                            'border-success',
-                            'bg-success-subtle'
-                        );
-
-
-                        if (group) {
-                            group.classList.remove('has-danger');
-                            group.classList.add('has-success');
-                        }
-
-
-                    } else {
-
-
-                        // =========================
-                        // SKIP OFF
-                        // =========================
-
-                        input.disabled = false;
-
-                        input.setAttribute(
-                            'required',
-                            'required'
-                        );
-
-
-                        input.classList.remove(
-                            'border-success',
-                            'bg-success-subtle'
-                        );
-
-
-                        if (group) {
-                            group.classList.remove('has-success');
-                        }
-
-                    }
-
-
-                    // clear old validation message
-                    pristine.reset();
-
-                }
-
-
-                // run on page load
-                toggle();
-
-
-                checkbox.addEventListener(
-                    'change',
-                    toggle
-                );
-
-            }
-
-
-            fields.forEach(field => {
-                setupSkipField(field);
-            });
-
-
-
-            form.addEventListener('submit', function(e) {
-
-
-                const valid = pristine.validate();
-
-
-                if (!valid) {
-
-                    e.preventDefault();
-
-                    return false;
-
-                }
-
-
-                // enable disabled fields before submit
-                fields.forEach(field => {
-
-                    if (field.input.disabled) {
-
-                        field.input.disabled = false;
-                        field.input.value = '';
-
-                    }
-
-                });
-
-
-            });
-
-
-        });
-    </script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

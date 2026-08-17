@@ -30,7 +30,7 @@ return new class extends Migration
             $table->enum('status', ['todo', 'done'])->default('todo');
             $table->integer('is_archived')->default(1);
             $table->text('description');
-            $table->json('attachments')->nullable();
+            $table->string('attachments')->nullable();
             $table->date('transaction_date');
             $table->date('request_date');
             $table->date('legal_date');

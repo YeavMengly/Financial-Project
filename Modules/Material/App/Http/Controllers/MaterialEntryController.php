@@ -19,7 +19,7 @@ class MaterialEntryController extends Controller
 {
 
     public function getIndex(InitialMaterialEntryDataTable $dataTable)
-    {
+    { return view('maintenance.maintenance');
         return $dataTable->render('material::materialEntry.initialMaterialEntry.index');
     }
 

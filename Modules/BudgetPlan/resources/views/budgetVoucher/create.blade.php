@@ -72,7 +72,7 @@
                                         <label>{{ __('forms.payment.voucher') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="text"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="number"
                                             class="form-control" placeholder="{{ __('forms.payment.voucher') }}"
                                             name="paymentVoucher" tabindex="3" min="0" max="9999"
                                             oninput="if(this.value.length > 4) this.value = this.value.slice(0,4)" />
@@ -96,9 +96,7 @@
                                         </div>
 
                                         <input class="form-control" id="legalNumber" name="legalNumber"
-                                            data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                            data-pristine-required-message="{{ __('messages.required') }}" type="text"
                                             placeholder="{{ __('forms.legal.number') }}" required tabindex="5">
                                     </div>
                                 </div>
@@ -259,8 +257,8 @@
                                             </div>
                                         </div>
 
-                                        <input type="file" id="fileInput" name="attachments[]" class="form-control"
-                                            tabindex="16" accept=".pdf,.doc,.docx" multiple required data-max-size="5"
+                                        <input type="file" id="fileInput" name="attachments" class="form-control"
+                                            tabindex="16" accept=".pdf,.doc,.docx" required 
                                             data-allowed-extensions="pdf,doc,docx"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
@@ -298,7 +296,7 @@
                     </div>
                 </div>
 
-                {{--Data table viewing --}}
+                {{-- Data table viewing --}}
                 <div class="card-body">
                     <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
@@ -351,7 +349,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
             if (!form) return;
@@ -640,14 +638,9 @@
                 defaultValue: '0',
                 restoreValidation: () => {
                     legalInput.setAttribute('required', true);
-                    legalInput.setAttribute('min', '1');
                     legalInput.setAttribute(
                         'data-pristine-required-message',
                         "{{ __('messages.required') }}"
-                    );
-                    legalInput.setAttribute(
-                        'data-pristine-min-message',
-                        'លំដាប់ ត្រូវតែធំជាងសូន្យ'
                     );
                 }
             });
@@ -731,6 +724,390 @@
                 HTMLFormElement.prototype.submit.call(form);
             });
 
+        });
+    </script> --}}
+
+    <!-- 1. Pass Laravel routes and translations to JavaScript -->
+    <script>
+        window.BudgetFormConfig = {
+            urls: {
+                programSub: "{{ route('budgetVoucher.by.program_sub') }}",
+                agency: "{{ route('budgetVoucher.by.agency') }}",
+                cluster: "{{ route('budgetVoucher.by.cluster') }}",
+                earlyBalance: "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}"
+            },
+            translations: {
+                search: "{{ __('forms.search...') }}",
+                required: "{{ __('messages.required') }}"
+            }
+        };
+    </script>
+
+    <!-- 2. Include the relative external JavaScript file -->
+    <script src="{{ asset('js/budget-form.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+            if (!form) return;
+
+            // ==========================================
+            // 1. PRISTINE INITIALIZATION
+            // ==========================================
+            const createPristineInstance = () => {
+                return new Pristine(form, {
+                    classTo: 'form-group',
+                    errorClass: 'has-danger',
+                    successClass: 'has-success',
+                    errorTextParent: 'form-group',
+                    errorTextTag: 'div',
+                    errorTextClass: 'pristine-error text-help text-danger font-size-14 mt-1'
+                });
+            };
+
+            let pristine = createPristineInstance();
+            const refreshPristine = () => {
+                pristine.destroy();
+                pristine = createPristineInstance();
+            };
+
+            // ==========================================
+            // 2. FLATPICKR SYNC
+            // ==========================================
+            const initFlatpickr = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                flatpickr(el, {
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    defaultDate: el.value || null,
+                    onChange: () => pristine.validate(el),
+                    onClose: () => pristine.validate(el)
+                });
+            };
+            initFlatpickr('transactionDate');
+            initFlatpickr('requestDate');
+            initFlatpickr('legalDate');
+
+            // ==========================================
+            // 3. SUMMERNOTE SYNC
+            // ==========================================
+            if (window.jQuery && $('#vDescription').length) {
+                $('#vDescription').summernote({
+                    height: 150,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['color', ['color']]
+                    ],
+                    callbacks: {
+                        onChange: function(contents) {
+                            const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                            document.getElementById('vDescription').value = clean === '' ? '' :
+                                contents;
+                            pristine.validate(document.getElementById('vDescription'));
+                        }
+                    }
+                });
+            }
+
+            // ==========================================
+            // 4. CHOICES.JS INITIALIZATION
+            // ==========================================
+            const defaultChoicesOpts = {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...', // Can also be moved to translations if needed
+                shouldSort: false
+            };
+
+            let programChoices = new Choices('#cboProgram', defaultChoicesOpts);
+            let programSubChoices = new Choices('#cboProgramSub', defaultChoicesOpts);
+            let clusterChoices = new Choices('#cboCluster', defaultChoicesOpts);
+            let agencyChoices = new Choices('#cboAgency', defaultChoicesOpts);
+            let subAccountChoices = new Choices('#cboSubAccount', defaultChoicesOpts);
+
+            const resetSelect = (selector) => {
+                $(selector).html(`<option value="">${window.BudgetFormConfig.translations.search}</option>`);
+            };
+
+            const resetChoices = (selector, instance) => {
+                instance.destroy();
+                return new Choices(selector, defaultChoicesOpts);
+            };
+
+            const loadOptions = ({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) => {
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: () => resetSelect(targetSelect)
+                });
+            };
+
+            // Sync validation on dropdown change
+            form.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', () => pristine.validate(select));
+            });
+
+            // ==========================================
+            // 5. CASCADING AJAX DROPDOWNS
+            // ==========================================
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: window.BudgetFormConfig.urls.programSub,
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub',
+                        programSubChoices)
+                });
+
+                loadOptions({
+                    url: window.BudgetFormConfig.urls.agency,
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency',
+                        agencyChoices)
+                });
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: window.BudgetFormConfig.urls.cluster,
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster',
+                        clusterChoices)
+                });
+            });
+
+            // ==========================================
+            // 6. EARLY BALANCE & CREDIT CALCULATIONS
+            // ==========================================
+            const n = v => (isNaN(+v) ? 0 : +v);
+            const fmt = v => n(v).toLocaleString('en-US', {
+                maximumFractionDigits: 2
+            });
+
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = fmt(val);
+            };
+
+            const resetNumbers = () => {
+                ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
+                    'deadline_balance', 'applying', 'remaining_credit'
+                ].forEach(id => setText(id, 0));
+            };
+
+            const budgetInput = document.getElementById('budget');
+            const recomputeRemaining = () => {
+                const apply = n(budgetInput?.value);
+                const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
+                setText('applying', apply);
+                setText('remaining_credit', Math.max(credit - apply, 0));
+                if (credit - apply < 0 && budgetInput) budgetInput.value = '';
+            };
+
+            const fetchEarlyBalance = async () => {
+                const programId = document.getElementById('cboProgram')?.value;
+                const programSubId = document.getElementById('cboProgramSub')?.value;
+                const clusterId = document.getElementById('cboCluster')?.value;
+                const accountSubId = document.getElementById('cboSubAccount')?.value;
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
+                    resetNumbers();
+                    return;
+                }
+
+                // Initialize URL properly using absolute or relative paths seamlessly
+                const url = new URL(window.BudgetFormConfig.urls.earlyBalance, window.location.origin);
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
+                url.searchParams.set('account_sub_id', accountSubId);
+
+                try {
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await res.json();
+                    setText('fin_law', data.fin_law);
+                    setText('credit_movement', data.credit_movement);
+                    setText('new_credit_status', data.new_credit_status);
+                    setText('credit', data.credit);
+                    setText('deadline_balance', data.deadline_balance);
+                    recomputeRemaining();
+                } catch (err) {
+                    console.error("Failed to fetch balance:", err);
+                    resetNumbers();
+                }
+            };
+
+            ['cboProgram', 'cboProgramSub', 'cboCluster', 'cboSubAccount'].forEach(id => {
+                document.getElementById(id)?.addEventListener('change', fetchEarlyBalance);
+            });
+            budgetInput?.addEventListener('input', recomputeRemaining);
+
+            // ==========================================
+            // 7. SKIP LEGAL NUMBER LOGIC 
+            // ==========================================
+            const legalInput = document.getElementById('legalNumber');
+            const skipLegalCheckbox = document.getElementById('skipLegalNumber');
+
+            const legalNameInput = document.getElementById('legalName');
+            const skipLegalNameCheckbox = document.getElementById('skipLegalName');
+
+            const fileInput = document.getElementById('fileInput');
+            const skipFileCheckbox = document.getElementById('skipFileInput');
+
+            const setupSkipField = ({
+                checkbox,
+                input,
+                defaultValue = '',
+                restoreValidation = () => {}
+            }) => {
+                if (!checkbox || !input) return;
+
+                checkbox.addEventListener('change', function() {
+                    const parentGroup = input.closest('.form-group');
+
+                    if (this.checked) {
+                        input.value = '';
+                        input.disabled = true;
+
+                        input.classList.add('border-success', 'bg-success-subtle');
+                        parentGroup?.classList.add('has-success');
+
+                        input.removeAttribute('required');
+                        input.removeAttribute('min');
+                        input.removeAttribute('data-pristine-required-message');
+
+                        pristine.reset(input);
+                    } else {
+                        input.value = defaultValue;
+                        input.disabled = false;
+
+                        input.classList.remove('border-success', 'bg-success-subtle');
+                        parentGroup?.classList.remove('has-success');
+
+                        restoreValidation();
+                    }
+
+                    refreshPristine();
+                });
+            };
+
+            setupSkipField({
+                checkbox: skipLegalCheckbox,
+                input: legalInput,
+                defaultValue: '0',
+                restoreValidation: () => {
+                    legalInput.setAttribute('required', true);
+                    legalInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
+                        .translations.required);
+                }
+            });
+
+            setupSkipField({
+                checkbox: skipLegalNameCheckbox,
+                input: legalNameInput,
+                defaultValue: '',
+                restoreValidation: () => {
+                    legalNameInput.setAttribute('required', true);
+                    legalNameInput.setAttribute('data-pristine-required-message', window
+                        .BudgetFormConfig.translations.required);
+                }
+            });
+
+            setupSkipField({
+                checkbox: skipFileCheckbox,
+                input: fileInput,
+                restoreValidation: () => {
+                    fileInput.setAttribute('required', true);
+                    fileInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
+                        .translations.required);
+                }
+            });
+
+            // ==========================================
+            // 8. MASTER FORM SUBMIT GATEKEEPER
+            // ==========================================
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const submitter = e.submitter;
+                if (submitter && submitter.name === 'action') {
+                    let hidden = form.querySelector('input[name="action"]');
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+                        form.appendChild(hidden);
+                    }
+                    hidden.value = submitter.value;
+                }
+
+                [
+                    [skipLegalCheckbox, legalInput],
+                    [skipLegalNameCheckbox, legalNameInput],
+                    [skipFileCheckbox, fileInput]
+                ].forEach(([checkbox, input]) => {
+                    if (checkbox?.checked && input) {
+                        input.disabled = true;
+                        input.removeAttribute('required');
+                        pristine.reset(input);
+                    }
+                });
+
+                const isValid = pristine.validate();
+
+                if (!isValid) return;
+
+                // Re-enable before submitting so Laravel receives empty/null values instead of missing keys
+                [legalInput, legalNameInput, fileInput].forEach(input => {
+                    if (input) input.disabled = false;
+                });
+
+                HTMLFormElement.prototype.submit.call(form);
+            });
         });
     </script>
 @endsection
