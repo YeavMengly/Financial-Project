@@ -10,6 +10,10 @@
                     <a href="{{ route('project.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
+                 @if (hasPermission('project.edit.doc'))
+                    <a href="{{ route('project.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
+                        class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}</a>
+                @endif
                 @if (hasPermission('project.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('project.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"

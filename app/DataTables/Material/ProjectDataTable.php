@@ -268,7 +268,7 @@ class ProjectDataTable extends DataTable
         |--------------------------------------------------------------------------
         */
         return $model->newQuery()
-            ->withTrashed()
+
             ->select([
                 'projects.id',
                 'projects.ministry_id',
@@ -323,7 +323,7 @@ class ProjectDataTable extends DataTable
             Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
             Column::make('user_receiver')->title(__('tables.th.receiver'))->width(60)->addClass('align-middle'),
             Column::make('warehouse_owner')->title(__('tables.th.warehouse.owner'))->width(90)->addClass('align-middle'),
-
+            Column::computed('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date.entry'))->width(200)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
             Column::make('note')->title(__('tables.th.note'))->addClass('align-middle'),
