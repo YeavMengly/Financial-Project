@@ -21,8 +21,8 @@ class BudgetAllocation extends Model
         'budget_begin_voucher_id',
         'budget_expense_type_id',
         'amount',
+        'rounds'
     ];
-
     protected $casts = [
         'amount' => 'decimal:2',
     ];

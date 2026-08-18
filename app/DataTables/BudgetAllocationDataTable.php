@@ -147,6 +147,8 @@ class BudgetAllocationDataTable extends DataTable
             Column::make('account_sub_id')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(30)->addClass('align-middle'),
             Column::make('amount')->title(__('tables.th.budget'))->width(120)->addClass('align-middle'),
+            Column::make('rounds')->title(__('ជុំទី'))->width(120)->addClass('align-middle'),
+
             Column::make('expense_type_name')
                 ->title(__('tables.th.expense.type')),
             Column::make('agency')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
