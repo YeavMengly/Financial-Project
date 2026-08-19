@@ -7,8 +7,8 @@
 
     <style>
         /* =========================================================
-                 * TABLE FIXES FOR DROPDOWNS
-                 * ========================================================= */
+                     * TABLE FIXES FOR DROPDOWNS
+                     * ========================================================= */
         #itemTable {
             table-layout: fixed !important;
             width: 100% !important;
@@ -31,8 +31,8 @@
         }
 
         /* =========================================================
-                 * CHOICES.JS STYLING
-                 * ========================================================= */
+                     * CHOICES.JS STYLING
+                     * ========================================================= */
         .choices {
             margin-bottom: 0 !important;
             width: 100% !important;
@@ -93,8 +93,8 @@
         }
 
         /* =========================================================
-                 * DISABLED / SKIPPED STATE
-                 * ========================================================= */
+                     * DISABLED / SKIPPED STATE
+                     * ========================================================= */
         #itemTableWrapper.table-skipped {
             opacity: 0.6;
         }
@@ -780,8 +780,12 @@
             /* =========================================================
              * 8. FORM SUBMIT EVENT
              * ========================================================= */
+            /* =========================================================
+             * 8. FORM SUBMIT EVENT (PREVENT DOUBLE SUBMISSION)
+             * ========================================================= */
             if (form) {
                 form.addEventListener('submit', function(e) {
+                    // Sync Summernote content to textareas
                     if ($('#vNote').length) {
                         $('#vNote').val($('#vNote').summernote('code'));
                     }
@@ -789,6 +793,7 @@
                         $('#vRefer').val($('#vRefer').summernote('code'));
                     }
 
+                    // Validate form with Pristine.js
                     const valid = pristine.validate();
 
                     if (!valid) {
@@ -796,6 +801,17 @@
                         return false;
                     }
 
+                    // Disable save button instantly & show spinner
+                    const submitBtn = document.getElementById('insertToTableBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = `
+                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                កំពុងរក្សាទុក...
+            `;
+                    }
+
+                    // Allow form submission to continue
                     return true;
                 });
             }

@@ -121,7 +121,7 @@ class MaterialReleaseDataTable extends DataTable
             // Column::make('stock_name')->title(__('tables.th.stock.name'))->width(30)->addClass('align-middle'),
             // Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
             Column::make('p_code')->title(__('tables.th.pro.code'))->width(60)->addClass('align-middle'),
-            Column::make('p_name')->title(__('tables.th.pro.name'))->width(80)->addClass('align-middle'),
+            Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
             Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),

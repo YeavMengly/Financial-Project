@@ -11,6 +11,7 @@ class MaterialRelease extends Model
 
     protected $fillable = [
         'ministry_id',
+        'project_id',
         'p_code',
         'p_name',
         'p_year',

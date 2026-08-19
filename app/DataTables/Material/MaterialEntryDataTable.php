@@ -49,11 +49,18 @@ class MaterialEntryDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
+        // Initialize query builder
+        $query = $model->newQuery();
+
+        // Base condition & Joins
+        $query->where('material_entries.ministry_id', $id)
+            ->leftJoin('projects', 'material_entries.project_sub_id', '=', 'projects.id')
             ->select([
                 'material_entries.id',
                 'material_entries.ministry_id',
                 'material_entries.project_id',
+                'material_entries.project_sub_id',
+                'projects.sub_project',
                 'material_entries.p_name',
                 'material_entries.p_year',
                 'material_entries.unit',
@@ -64,7 +71,22 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.created_at',
                 'material_entries.updated_at',
             ])
-            ->where('material_entries.ministry_id', $id);
+            ->orderBy('material_entries.id', 'DESC');
+
+        // Project Filter (Exact Match)
+        if ($request->filled('project')) {
+            $query->where('material_entries.project_id', $request->input('project'));
+        }
+
+        // Source Filter (Exact or Partial Match)
+        if ($request->filled('source')) {
+            $query->where('material_entries.source', 'LIKE', '%' . $request->input('source') . '%');
+        }
+
+        // Product Name Filter (Partial Search)
+        if ($request->filled('Pname')) {
+            $query->where('material_entries.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
+        }
 
         return $query;
     }
@@ -82,6 +104,15 @@ class MaterialEntryDataTable extends DataTable
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
+            ->ajax([
+                'data' => 'function(d) {
+                    d.project = $("#project").val();
+                    d.source = $("#source").val();
+                    d.Pname = $("#Pname").val();
+                    d.stockNum = $("#stockNum").val();
+                    d.companyName = $("#companyName").val();
+                }',
+            ])
             ->orderBy(2, 'ASC');
     }
 
@@ -94,6 +125,7 @@ class MaterialEntryDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
+            Column::make('sub_project')->title(__('tables.th.sub.pro'))->width(80)->addClass('align-middle'),
             Column::make('p_year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
             Column::make('qty')->title(__('tables.th.quantity'))->width(80)->addClass('align-middle'),
