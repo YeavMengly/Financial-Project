@@ -45,6 +45,7 @@ return [
     'year' => 'ឆ្នាំ',
     'cover' => 'កម្រង',
     'agency' => 'អង្គភាព',
+    'agency.executive.unit' => 'អង្គភាពប្រតិបត្តិ',
     'program.code' => 'កូដកម្មវិធី',
     'fin.law' => 'ច្បាប់ហិរញ្ញវត្ថុ',
     'current.loan' => 'ឥណទានបច្ចុប្បន្ន',

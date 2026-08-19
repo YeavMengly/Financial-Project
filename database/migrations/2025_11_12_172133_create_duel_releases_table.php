@@ -14,17 +14,19 @@ return new class extends Migration
         Schema::create('duel_releases', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('duel_entries_id');
             $table->string('item_name')->nullable();
             $table->string('receipt_number')->nullable();
-            $table->string('stock_number')->nullable();
             $table->string('agency')->nullable();
+            $table->string('executive_unit_id')->nullable();
             $table->string('user_request')->nullable();
             $table->string('receiver')->nullable();
             $table->string('unit')->nullable();
             $table->string('title')->nullable();
             $table->integer('quantity_total');
             $table->integer('quantity_request');
-            $table->decimal('duel_total', 15, 0);
+            $table->integer('quantity_remain');
             $table->text('note')->nullable();
             $table->text('refer')->nullable();
             $table->date('date_release');
