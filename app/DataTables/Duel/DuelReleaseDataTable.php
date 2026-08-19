@@ -3,6 +3,7 @@
 namespace App\DataTables\Duel;
 
 use App\Models\Duel\DuelRelease;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
@@ -34,6 +35,11 @@ class DuelReleaseDataTable extends DataTable
             ->editColumn('duel_total', function ($row) {
                 $remain = ($row->running_total ?? 0) - ($row->quantity_request ?? 0);
                 return number_format(max(0, $remain)) . ' L';
+            })
+               ->editColumn('date_release', function ($row) {
+                $active =  Carbon::parse($row->date_release)->format('Y-m-d');
+
+                return $active;
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 return is_null($soft_delete->deleted_at)

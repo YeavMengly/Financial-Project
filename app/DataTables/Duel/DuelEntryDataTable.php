@@ -3,6 +3,7 @@
 namespace App\DataTables\Duel;
 
 use App\Models\Duel\DuelEntry;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
@@ -30,7 +31,11 @@ class DuelEntryDataTable extends DataTable
             ->editColumn('price', function ($row) {
                 return number_format($row->price ?? 0) . ' ៛';
             })
+            ->editColumn('date_entry', function ($row) {
+                $active =  Carbon::parse($row->date_entry)->format('Y-m-d');
 
+                return $active;
+            })
             ->editColumn('file', function ($row) {
                 return '<strong>' . $row->title  . '</strong><br/><hr/>' . $row->file;
             })
@@ -44,7 +49,7 @@ class DuelEntryDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('duel::duelEntry.action', ['module' => $module]);
             })
-            ->rawColumns(['id']);
+            ->rawColumns(['id', 'note', 'refer',]);
     }
 
     /**
@@ -70,11 +75,11 @@ class DuelEntryDataTable extends DataTable
             'duel_entries.unit',
             'duel_entries.quantity',
             'duel_entries.price',
-            'duel_entries.duel_total',
+            'duel_entries.total_price',
             'duel_entries.source',
             'duel_entries.pro_year',
-            'duel_entries.note',
-            'duel_entries.refer',
+            'projects.note',
+            'projects.refer',
             'duel_entries.date_entry',
             'projects.title',
             'projects.file',
@@ -122,10 +127,10 @@ class DuelEntryDataTable extends DataTable
             Column::make('company_name')->title(__('tables.th.company.name'))->width(30)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(30)->addClass('align-middle'),
             Column::make('pro_year')->title(__('tables.th.pro_year'))->width(60)->addClass('align-middle'),
-            Column::computed('stock_name')->title(__('tables.th.stock.name'))->width(60)->addClass('align-middle'),
-            Column::computed('note')->title(__('tables.th.note'))->addClass('align-middle'),
-            Column::computed('refer')->title(__('tables.th.refer'))->width(200)->addClass('align-middle'),
-            Column::computed('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
+            // Column::computed('stock_name')->title(__('tables.th.stock.name'))->width(60)->addClass('align-middle'),
+            // Column::computed('note')->title(__('tables.th.note'))->addClass('align-middle'),
+            // Column::computed('refer')->title(__('tables.th.refer'))->width(200)->addClass('align-middle'),
+            // Column::computed('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
