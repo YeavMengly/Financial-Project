@@ -45,6 +45,7 @@ return [
   'th.currentCredit' => 'ឥណទានបច្ចុប្បន្ន',
   'th.name.kh' => 'ឈ្មោះ (ខ្មែរ)',
   'th.name.en' => 'ឈ្មោះ (អង់គ្លេស)',
+  'th.sub.pro' => 'អនុគម្រោង',
 
   'th.budget' => 'ថវិកា',
   'th.voucher.budgeted' => 'ថវិកាបញ្ជាក់(បានទូទាត់)',

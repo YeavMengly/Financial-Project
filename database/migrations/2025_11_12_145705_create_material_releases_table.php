@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('material_releases', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('project_id');
             $table->string('p_code');
             $table->string('p_name');
             $table->string('p_year');

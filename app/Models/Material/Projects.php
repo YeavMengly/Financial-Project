@@ -9,7 +9,8 @@ use Jenssegers\Agent\Agent;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
-
+use App\Models\Content\Program;
+use App\Models\Content\ProgramSub;
 class Projects extends Model
 {
     use HasFactory;
@@ -42,7 +43,16 @@ class Projects extends Model
     protected $casts = [
         'date' => 'date',
     ];
+    
+    public function program()
+    {
+        return $this->belongsTo(Program::class, 'program_id');
+    }
 
+    public function programSub()
+    {
+        return $this->belongsTo(ProgramSub::class, 'program_sub_id');
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
@@ -53,7 +63,7 @@ class Projects extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(
-                fn (string $eventName) => $eventName
+                fn(string $eventName) => $eventName
             );
     }
 

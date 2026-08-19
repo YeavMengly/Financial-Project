@@ -39,7 +39,20 @@
             <div class="card">
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
-
+                        <div class="col-sm-3">
+                            <label for="project" class="form-label font-size-13 text-muted">
+                                {{ __('forms.project') }}
+                            </label>
+                            <select class="form-control" name="project" id="project">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($project as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ request('project') == $item->id ? 'selected' : '' }}>
+                                        {{ $item->stock_number }}-{{ $item->stock_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="col-sm-3">
                             <label for="companyName" class="form-label font-size-13 text-muted">
                                 {{ __('forms.company.name') }}
@@ -77,8 +90,8 @@
                             <select class="form-control" name="source" id="source">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('source') == $item->id ? 'selected' : '' }}>
+                                    <option value="{{ $item->source }}"
+                                        {{ request('source') == $item->source ? 'selected' : '' }}>
                                         {{ $item->source }}
                                     </option>
                                 @endforeach
@@ -92,8 +105,8 @@
                             <select class="form-control" name="p_name" id="Pname">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('p_name') == $item->id ? 'selected' : '' }}>
+                                    <option value="{{ $item->p_name }}"
+                                        {{ request('p_name') == $item->p_name ? 'selected' : '' }}>
                                         {{ $item->p_name }}
                                     </option>
                                 @endforeach
@@ -119,7 +132,7 @@
                             <label for="stock_number" class="form-label font-size-13 text-muted">
                                 {{ __('forms.stock.number') }}
                             </label>
-                            <input type="text" class="form-control" name="stock_number"
+                            <input type="text" class="form-control" name="stock_number" id="stockNum"
                                 value="{{ request('stock_number') }}" />
                         </div>
 
@@ -215,6 +228,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const project = document.getElementById('project');
+            const projectChoices = new Choices(project, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false,    
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
             const companyName = document.getElementById('companyName');
             const companyNameChoices = new Choices(companyName, {
                 searchEnabled: true,
@@ -289,6 +312,13 @@
                 }
             });
         });
+    </script>
+    <script>
+        $('#project, #companyName, #userEntry, #source, #Pname,#stockNum')
+            .on('change keyup',
+                function() {
+                    $('#materialentry-table').DataTable().ajax.reload();
+                });
     </script>
 
     {!! $dataTable->scripts() !!}

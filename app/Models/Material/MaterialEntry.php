@@ -12,6 +12,11 @@ class MaterialEntry extends Model
     protected $fillable = [
         'ministry_id',
         'project_id',
+        'project_sub_id',
+        'program_id',
+        'program_sub_id',
+        'cluster_id',
+        'account_sub_id',
         'p_name',
         'p_year',
         'unit',
