@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
 
             $table->unsignedBigInteger('ministry_id');
-            
+
             $table->foreignId('budget_begin_voucher_id')
                 ->constrained('begin_vouchers')
                 ->cascadeOnDelete();
@@ -25,12 +25,14 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->decimal('amount', 18, 2)->default(0);
+            $table->integer('rounds')->nullable();
 
             $table->timestamps();
 
             $table->unique([
                 'budget_begin_voucher_id',
-                'budget_expense_type_id'
+                'budget_expense_type_id',
+                'rounds'
             ]);
 
             $table->softDeletes();

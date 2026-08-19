@@ -43,16 +43,15 @@
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
 
-
                             <div class="row">
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label>{{ __('forms.legal.id') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="number" class="form-control" placeholder="{{ __('forms.legal.id') }}"
-                                            name="legalID" tabindex="1" name="legalID" min="0" max="999"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="number"
+                                            class="form-control" placeholder="{{ __('forms.legal.id') }}" name="legalID"
+                                            tabindex="1" name="legalID" min="0" max="999"
                                             oninput="if(this.value.length > 3) this.value = this.value.slice(0,3)" />
                                     </div>
                                 </div>
@@ -73,10 +72,9 @@
                                         <label>{{ __('forms.payment.voucher') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" value="0" min="1"
-                                            type="text" class="form-control"
-                                            placeholder="{{ __('forms.payment.voucher.number') }}" name="paymentVoucher"
-                                            tabindex="3" min="0" max="9999"
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="number"
+                                            class="form-control" placeholder="{{ __('forms.payment.voucher') }}"
+                                            name="paymentVoucher" tabindex="3" min="0" max="9999"
                                             oninput="if(this.value.length > 4) this.value = this.value.slice(0,4)" />
                                     </div>
                                 </div>
@@ -87,7 +85,6 @@
                                             <label for="legalNumber"
                                                 class="form-label mb-0">{{ __('forms.legal.number') }}</label>
 
-                                            <!-- Skip Switch -->
                                             <div class="form-check form-switch mb-0">
                                                 <input class="form-check-input" type="checkbox" role="switch"
                                                     tabindex="4" id="skipLegalNumber" style="cursor: pointer;">
@@ -99,11 +96,8 @@
                                         </div>
 
                                         <input class="form-control" id="legalNumber" name="legalNumber"
-                                            data-pristine-required-message="{{ __('messages.required') }}"
-                                            data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1"
-                                            type="number" placeholder="{{ __('forms.legal.number') }}" required
-                                            tabindex="5">
+                                            data-pristine-required-message="{{ __('messages.required') }}" type="text"
+                                            placeholder="{{ __('forms.legal.number') }}" required tabindex="5">
                                     </div>
                                 </div>
 
@@ -113,7 +107,6 @@
                                             <label for="legalName"
                                                 class="form-label mb-0">{{ __('forms.legal.name') }}</label>
 
-                                            <!-- Skip Switch -->
                                             <div class="form-check form-switch mb-0">
                                                 <input class="form-check-input" type="checkbox" role="switch"
                                                     id="skipLegalName" style="cursor: pointer;">
@@ -212,9 +205,26 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
+                                        <label for="cboExpenseType"
+                                            class="form-label font-size-13 text-muted">{{ __('forms.expense.type') }}</label>
+                                        <select class="form-select" id="cboExpenseType" name="cboExpenseType" required
+                                            tabindex="13"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($expenseType as $item)
+                                                <option value="{{ $item->id }}">
+                                                    {{ $item->name_kh }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
                                         <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}( PO
                                             FMIS )</label>
-                                        <input type="text" id="transactionDate" name="transactionDate" tabindex="13"
+                                        <input type="text" id="transactionDate" name="transactionDate" tabindex="14"
                                             class="form-control" placeholder="{{ __('forms.select_transaction_date') }}"
                                             required data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
@@ -226,7 +236,7 @@
                                             FMIS
                                             )</label>
                                         <input type="text" id="requestDate" name="requestDate" class="form-control"
-                                            tabindex="14" placeholder="{{ __('forms.select_request_date') }}" required
+                                            tabindex="15" placeholder="{{ __('forms.select_request_date') }}" required
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
                                 </div>
@@ -247,9 +257,8 @@
                                             </div>
                                         </div>
 
-                                        <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
-                                        <input type="file" id="fileInput" name="attachments[]" class="form-control"
-                                            tabindex="15" accept=".pdf,.doc,.docx" multiple required data-max-size="5"
+                                        <input type="file" id="fileInput" name="attachments" class="form-control"
+                                            tabindex="16" accept=".pdf,.doc,.docx" required 
                                             data-allowed-extensions="pdf,doc,docx"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
@@ -265,7 +274,7 @@
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="vDescription">{{ __('forms.document.description') }}</label>
-                                    <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required tabindex="16"
+                                    <textarea name="txtDescription" id="vDescription" rows="5" class="form-control" required tabindex="17"
                                         data-pristine-required-message="{{ __('messages.required') }}"></textarea>
                                 </div>
                             </div>
@@ -286,6 +295,8 @@
 
                     </div>
                 </div>
+
+                {{-- Data table viewing --}}
                 <div class="card-body">
                     <table class="table table-bordered text-center align-middle">
                         <thead class="table-light">
@@ -325,720 +336,20 @@
     <script src="{{ asset('assets/libs/pristinejs/pristine.min.js') }}"></script>
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('pristine-valid-example');
-            if (!form) return;
-
-            // =========================================================================
-            // 1. MASTER PRISTINE VALIDATION ENGINE
-            // =========================================================================
-            const createPristine = () => {
-                return new Pristine(form, {
-                    classTo: 'form-group',
-                    errorClass: 'has-danger',
-                    successClass: 'has-success',
-                    errorTextParent: 'form-group',
-                    errorTextTag: 'div',
-                    errorTextClass: 'pristine-error text-help text-danger font-size-14 mt-1'
-                });
-            };
-
-            let pristine = createPristine();
-
-            const refreshPristine = () => {
-                pristine.destroy();
-                pristine = createPristine();
-                applyCustomFileValidators();
-            };
-
-            // =========================================================================
-            // 2. UNIVERSAL SKIP TOGGLE ENGINE (WITH GREEN HIGHLIGHT)
-            // =========================================================================
-            const setupSkipToggle = (checkboxId, inputId, skippedValue = '0', isFile = false) => {
-                const checkbox = document.getElementById(checkboxId);
-                const input = document.getElementById(inputId);
-                if (!checkbox || !input) return;
-
-                // Cache original validation attributes
-                const origRequiredMsg = input.getAttribute('data-pristine-required-message') ||
-                    "{{ __('messages.required') }}";
-                const origMinMsg = input.getAttribute('data-pristine-min-message');
-                const origIntMsg = input.getAttribute('data-pristine-integer-message');
-                const origMin = input.getAttribute('min');
-
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        // SKIP STATE: Apply green highlight, set skipped value, lock input
-                        input.value = skippedValue;
-                        input.disabled = true;
-                        input.readOnly = true;
-
-                        // Apply soft green styling (#d1e7dd background, dark green text/border)
-                        input.classList.add('bg-success-subtle', 'text-success-emphasis',
-                            'border-success');
-                        input.style.setProperty('background-color', '#d1e7dd', 'important');
-                        input.style.setProperty('border-color', '#198754', 'important');
-                        input.style.setProperty('color', '#0f5132', 'important');
-
-                        // Strip validation rules so Pristine ignores it
-                        input.removeAttribute('required');
-                        input.removeAttribute('data-pristine-required-message');
-                        if (origMinMsg) input.removeAttribute('data-pristine-min-message');
-                        if (origIntMsg) input.removeAttribute('data-pristine-integer-message');
-                        if (origMin) input.removeAttribute('min');
-
-                        pristine.reset(input); // Wipe any active red error text instantly
-                    } else {
-                        // ACTIVE STATE: Remove green styling, restore default empty state and rules
-                        input.value = '';
-                        input.disabled = false;
-                        input.readOnly = false;
-
-                        input.classList.remove('bg-success-subtle', 'text-success-emphasis',
-                            'border-success');
-                        input.style.removeProperty('background-color');
-                        input.style.removeProperty('border-color');
-                        input.style.removeProperty('color');
-
-                        input.setAttribute('required', 'true');
-                        input.setAttribute('data-pristine-required-message', origRequiredMsg);
-                        if (origMinMsg) input.setAttribute('data-pristine-min-message', origMinMsg);
-                        if (origIntMsg) input.setAttribute('data-pristine-integer-message', origIntMsg);
-                        if (origMin) input.setAttribute('min', origMin);
-                    }
-                    refreshPristine();
-                });
-
-                if (isFile) {
-                    input.addEventListener('change', () => pristine.validate(input));
-                }
-            };
-
-            // Register all skippable fields here:
-            setupSkipToggle('skipTemporaryId', 'temporaryId', '0');
-            setupSkipToggle('skipDayNumber', 'cbodayOfNumber', '0');
-            setupSkipToggle('skipFileInput', 'fileInput', '', true);
-
-            // =========================================================================
-            // 3. CUSTOM FILE VALIDATORS (SIZE & EXTENSION)
-            // =========================================================================
-            const fileInput = document.getElementById('fileInput');
-            const skipFileCheckbox = document.getElementById('skipFileInput');
-
-            const applyCustomFileValidators = () => {
-                if (!fileInput) return;
-                const maxMB = parseFloat(fileInput.getAttribute('data-max-size')) || 5;
-                const maxBytes = maxMB * 1024 * 1024;
-                const allowedExts = (fileInput.getAttribute('data-allowed-extensions') || '').toLowerCase()
-                    .split(',').map(ext => ext.trim());
-
-                pristine.addValidator(fileInput, function(value) {
-                    if ((skipFileCheckbox && skipFileCheckbox.checked) || fileInput.disabled ||
-                        fileInput.files.length === 0) return true;
-                    for (let i = 0; i < fileInput.files.length; i++) {
-                        if (fileInput.files[i].size > maxBytes) return false;
-                    }
-                    return true;
-                }, `ទំហំឯកសារនីមួយៗមិនត្រូវលើសពី ${maxMB}MB ឡើយ`, 2, false);
-
-                pristine.addValidator(fileInput, function(value) {
-                        if ((skipFileCheckbox && skipFileCheckbox.checked) || fileInput.disabled ||
-                            fileInput.files.length === 0) return true;
-                        for (let i = 0; i < fileInput.files.length; i++) {
-                            const fileExt = fileInput.files[i].name.split('.').pop().toLowerCase();
-                            if (!allowedExts.includes(fileExt)) return false;
-                        }
-                        return true;
-                    }, `ប្រភេទឯកសារមិនត្រឹមត្រូវ! អនុញ្ញាតតែ (${allowedExts.join(', '.toUpperCase())})`, 2,
-                    false);
-            };
-
-            applyCustomFileValidators();
-
-            // =========================================================================
-            // 4. CHOICES.JS DROPDOWNS & AJAX DEPENDENCY ROUTING
-            // =========================================================================
-            // const initChoices = (selector, opts = {}) => {
-            //     const el = document.querySelector(selector);
-            //     if (!el) return null;
-            //     return new Choices(el, Object.assign({
-            //         searchEnabled: true,
-            //         itemSelectText: '',
-            //         placeholder: true,
-            //         placeholderValue: 'ស្វែងរក...',
-            //         shouldSort: false
-            //     }, opts));
-            // };
-
-            // let voucherChoices = initChoices('#cboPaymentVoucherNumber');
-            // let programSubChoices = initChoices('#cboProgramSub');
-            // let clusterChoices = initChoices('#cboCluster');
-            // let agencyChoices = initChoices('#cboAgency');
-            // initChoices('#cboExpenseType');
-            // initChoices('#cboProgram');
-            // initChoices('#cboSubAccount');
-
-            // const resetSelectChoices = (selector, instanceRef) => {
-            //     if (instanceRef) instanceRef.destroy();
-            //     const el = document.querySelector(selector);
-            //     if (el) el.innerHTML = `<option value="">{{ __('forms.search...') }}</option>`;
-            //     return initChoices(selector);
-            // };
-
-            // const loadDependentOptions = (url, data, targetSelector, instanceRef, onSuccessCallback) => {
-            //     $.ajax({
-            //         url: url,
-            //         type: 'GET',
-            //         data: data,
-            //         success: function(response) {
-            //             const el = document.querySelector(targetSelector);
-            //             if (el) el.innerHTML = response;
-            //             const newInstance = resetSelectChoices(targetSelector, instanceRef);
-            //             if (onSuccessCallback) onSuccessCallback(newInstance);
-            //         },
-            //         error: () => resetSelectChoices(targetSelector, instanceRef)
-            //     });
-            // };
-
-            // $('#cboExpenseType').on('change', function() {
-            //     const expenseTypeId = $(this).val();
-            //     voucherChoices.clearStore();
-            //     voucherChoices.clearChoices();
-            //     $('#legalName').val('').prop('readonly', false);
-            //     if ($('#vDescription').length) {
-            //         $('#vDescription').summernote('code', '');
-            //         $('#vDescription').summernote('enable');
-            //     }
-            //     if (!expenseTypeId) return;
-
-            //     voucherChoices.setChoices([{
-            //         value: '',
-            //         label: 'កំពុងផ្ទុក...',
-            //         disabled: true,
-            //         selected: true
-            //     }], 'value', 'label', true);
-
-            //     $.ajax({
-            //         url: "{{ route('budgetVoucher.get.expense_type_id') }}",
-            //         type: 'GET',
-            //         dataType: 'json',
-            //         data: {
-            //             expense_type_id: expenseTypeId
-            //         },
-            //         success: (data) => {
-            //             voucherChoices.clearChoices();
-            //             voucherChoices.setChoices(data, 'value', 'label', true);
-            //         },
-            //         error: () => voucherChoices.clearChoices()
-            //     });
-            // });
-
-            // const voucherEl = document.getElementById('cboPaymentVoucherNumber');
-            // if (voucherEl && voucherChoices) {
-            //     voucherEl.addEventListener('change', function() {
-            //         const selected = voucherChoices.getValue();
-            //         const legalNameInput = document.getElementById('legalName');
-            //         if (selected && selected.customProperties && selected.value !== '') {
-            //             if (legalNameInput) {
-            //                 legalNameInput.value = selected.customProperties.legal_name || '';
-            //                 legalNameInput.readOnly = true;
-            //             }
-            //             if ($('#vDescription').length) {
-            //                 $('#vDescription').summernote('code', selected.customProperties.description ||
-            //                     '');
-            //                 $('#vDescription').summernote('disable');
-            //             }
-            //         } else {
-            //             if (legalNameInput) {
-            //                 legalNameInput.value = '';
-            //                 legalNameInput.readOnly = false;
-            //             }
-            //             if ($('#vDescription').length) {
-            //                 $('#vDescription').summernote('code', '');
-            //                 $('#vDescription').summernote('enable');
-            //             }
-            //         }
-            //         pristine.validate(legalNameInput);
-            //     });
-            // }
-
-            // $('#cboProgram').on('change', function() {
-            //     const programId = $(this).val();
-            //     programSubChoices = resetSelectChoices('#cboProgramSub', programSubChoices);
-            //     agencyChoices = resetSelectChoices('#cboAgency', agencyChoices);
-            //     clusterChoices = resetSelectChoices('#cboCluster', clusterChoices);
-            //     if (!programId) return;
-
-            //     loadDependentOptions("{{ route('budgetVoucher.by.program_sub') }}", {
-            //         program_id: programId
-            //     }, '#cboProgramSub', programSubChoices, (inst) => programSubChoices = inst);
-            //     loadDependentOptions("{{ route('budgetVoucher.by.agency') }}", {
-            //         program_id: programId
-            //     }, '#cboAgency', agencyChoices, (inst) => agencyChoices = inst);
-            // });
-
-            // $('#cboProgramSub').on('change', function() {
-            //     const programSubId = $(this).val();
-            //     clusterChoices = resetSelectChoices('#cboCluster', clusterChoices);
-            //     if (!programSubId) return;
-            //     loadDependentOptions("{{ route('budgetVoucher.by.cluster') }}", {
-            //         program_sub_id: programSubId
-            //     }, '#cboCluster', clusterChoices, (inst) => clusterChoices = inst);
-            // });
-
-            // form.querySelectorAll('select').forEach(select => {
-            //     select.addEventListener('change', () => pristine.validate(select));
-            // });
-
-            // =========================================================================
-            // 5. FLATPICKR DATEPICKERS & SUMMERNOTE EDITOR
-            // =========================================================================
-            const initFlatpickr = (id) => {
-                const el = document.getElementById(id);
-                if (!el) return;
-                flatpickr(el, {
-                    dateFormat: 'Y-m-d',
-                    altInput: true,
-                    altFormat: 'd/m/Y',
-                    allowInput: true,
-                    defaultDate: el.value || null,
-                    onChange: (dates, str, inst) => pristine.validate(inst.element),
-                    onClose: (dates, str, inst) => pristine.validate(inst.element)
-                });
-            };
-
-            initFlatpickr('transactionDate');
-            initFlatpickr('requestDate');
-
-            if ($('#vDescription').length) {
-                $('#vDescription').summernote({
-                    height: 150,
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['color', ['color']]
-                    ],
-                    callbacks: {
-                        onChange: function(contents) {
-                            const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
-                            document.getElementById('vDescription').value = clean === '' ? '' :
-                                contents;
-                            pristine.validate(document.getElementById('vDescription'));
-                        }
-                    }
-                });
-            }
-
-            // =========================================================================
-            // 6. LIVE BUDGET BALANCE CALCULATOR
-            // =========================================================================
-            // const n = v => (isNaN(+v) ? 0 : +v);
-            // const fmt = v => n(v).toLocaleString('en-US', {
-            //     maximumFractionDigits: 2
-            // });
-            // const setText = (id, val) => {
-            //     const el = document.getElementById(id);
-            //     if (el) el.textContent = fmt(val);
-            // };
-            // const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
-            //     'deadline_balance', 'applying', 'remaining_credit'
-            // ].forEach(id => setText(id, 0));
-
-            // const recomputeRemaining = () => {
-            //     const budgetInput = document.getElementById('budget');
-            //     const apply = n(budgetInput?.value);
-            //     const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
-            //     setText('applying', apply);
-            //     setText('remaining_credit', Math.max(credit - apply, 0));
-            //     if (credit - apply < 0 && budgetInput) budgetInput.value = '';
-            // };
-
-            // const fetchEarlyBalance = async () => {
-            //     const programId = document.getElementById('cboProgram')?.value;
-            //     const programSubId = document.getElementById('cboProgramSub')?.value;
-            //     const clusterId = document.getElementById('cboCluster')?.value;
-            //     const accountSubId = document.getElementById('cboSubAccount')?.value;
-
-            //     if (!programId || !programSubId || !clusterId || !accountSubId) {
-            //         resetNumbers();
-            //         return;
-            //     }
-
-            //     const url = new URL("{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}",
-            //         window.location.origin);
-            //     url.searchParams.set('program_id', programId);
-            //     url.searchParams.set('program_sub_id', programSubId);
-            //     url.searchParams.set('cluster_id', clusterId);
-            //     url.searchParams.set('account_sub_id', accountSubId);
-
-            //     try {
-            //         const res = await fetch(url.toString(), {
-            //             headers: {
-            //                 'Accept': 'application/json'
-            //             }
-            //         });
-            //         const data = await res.json();
-            //         setText('fin_law', data.fin_law);
-            //         setText('credit_movement', data.credit_movement);
-            //         setText('new_credit_status', data.new_credit_status);
-            //         setText('credit', data.credit);
-            //         setText('deadline_balance', data.deadline_balance);
-            //         recomputeRemaining();
-            //     } catch (err) {
-            //         console.error("Balance fetch failed:", err);
-            //         resetNumbers();
-            //     }
-            // };
-
-            // ['cboProgram', 'cboProgramSub', 'cboCluster', 'cboSubAccount'].forEach(id => {
-            //     document.getElementById(id)?.addEventListener('change', fetchEarlyBalance);
-            // });
-            // document.getElementById('budget')?.addEventListener('input', recomputeRemaining);
-
-            // =========================================================================
-            // 6. LIVE BUDGET BALANCE CALCULATOR (ROBUST AJAX & EVENT DELEGATION)
-            // =========================================================================
-            // const n = v => (isNaN(+v) ? 0 : +v);
-            // const fmt = v => n(v).toLocaleString('en-US', {
-            //     maximumFractionDigits: 2
-            // });
-            // const setText = (id, val) => {
-            //     const el = document.getElementById(id);
-            //     if (el) el.textContent = fmt(val);
-            // };
-            // const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
-            //     'deadline_balance', 'applying', 'remaining_credit'
-            // ].forEach(id => setText(id, 0));
-
-            // const recomputeRemaining = () => {
-            //     const budgetInput = document.getElementById('budget');
-            //     const apply = n(budgetInput?.value);
-            //     const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
-            //     setText('applying', apply);
-            //     setText('remaining_credit', Math.max(credit - apply, 0));
-            //     if (credit - apply < 0 && budgetInput) budgetInput.value = '';
-            // };
-
-            // function fetchEarlyBalance() {
-            //     // Read clean values directly using jQuery
-            //     const programId = $('#cboProgram').val();
-            //     const programSubId = $('#cboProgramSub').val();
-            //     const clusterId = $('#cboCluster').val();
-            //     const accountSubId = $('#cboSubAccount').val();
-
-            //     // Abort if any of the 4 required accounting classification dropdowns are empty
-            //     if (!programId || !programSubId || !clusterId || !accountSubId) {
-            //         resetNumbers();
-            //         return;
-            //     }
-
-            //     $.ajax({
-            //         url: "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}",
-            //         type: "GET",
-            //         dataType: "json",
-            //         data: {
-            //             program_id: programId,
-            //             program_sub_id: programSubId,
-            //             cluster_id: clusterId,
-            //             account_sub_id: accountSubId
-            //         },
-            //         success: function(data) {
-            //             if (data && data.exists !== false) {
-            //                 setText('fin_law', data.fin_law);
-            //                 setText('credit_movement', data.credit_movement);
-            //                 setText('new_credit_status', data.new_credit_status);
-            //                 setText('credit', data.credit);
-            //                 setText('deadline_balance', data.deadline_balance);
-            //                 recomputeRemaining();
-            //             } else {
-            //                 resetNumbers();
-            //             }
-            //         },
-            //         error: function(err) {
-            //             console.error("Balance fetch failed:", err);
-            //             resetNumbers();
-            //         }
-            //     });
-            // }
-
-            // // THE FIX: Use jQuery event delegation on 'document'. 
-            // // This guarantees that even when Choices.js destroys and recreates #cboProgramSub or #cboCluster via AJAX, the change listener is never lost.
-            // $(document).on('change', '#cboProgram, #cboProgramSub, #cboCluster, #cboSubAccount', function() {
-            //     fetchEarlyBalance();
-            // });
-
-            // document.getElementById('budget')?.addEventListener('input', recomputeRemaining);
-            // =========================================================================
-            // 7. MASTER FORM SUBMIT GATEKEEPER
-            // =========================================================================
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                if ($('#vDescription').length) {
-                    const summernoteContent = $('#vDescription').summernote('isEmpty') ? '' : $(
-                        '#vDescription').summernote('code');
-                    document.getElementById('vDescription').value = summernoteContent;
-                }
-
-                const isValid = pristine.validate();
-
-                if (isValid) {
-                    // THE CRITICAL FIX: Re-enable disabled fields right before submit
-                    // Browsers ignore disabled inputs during POST requests. Enabling them ensures Laravel receives clean '0' or null values instead of throwing missing parameter errors.
-                    form.querySelectorAll(':disabled').forEach(el => {
-                        el.disabled = false;
-                    });
-                    if ($('#vDescription').length && $('#vDescription').summernote('isDisabled')) {
-                        $('#vDescription').summernote('enable');
-                    }
-
-                    HTMLFormElement.prototype.submit.call(form);
-                } else {
-                    const firstError = form.querySelector('.has-danger');
-                    if (firstError) {
-                        firstError.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                }
-            });
-
-            // =========================================================================
-            // 4. CHOICES.JS DROPDOWNS & AJAX DEPENDENCY ROUTING
-            // =========================================================================
-            const initChoices = (selector, opts = {}) => {
-                const el = document.querySelector(selector);
-                if (!el) return null;
-                return new Choices(el, Object.assign({
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: 'ស្វែងរក...',
-                    shouldSort: false
-                }, opts));
-            };
-
-            let voucherChoices = initChoices('#cboPaymentVoucherNumber');
-            let programSubChoices = initChoices('#cboProgramSub');
-            let clusterChoices = initChoices('#cboCluster');
-            let agencyChoices = initChoices('#cboAgency');
-            initChoices('#cboExpenseType');
-            initChoices('#cboProgram');
-            initChoices('#cboSubAccount');
-
-            // HELPER 1: Wipes out a dropdown and sets it back to default "Search..."
-            const clearDropdown = (selector, instanceRef) => {
-                if (instanceRef) instanceRef.destroy();
-                const el = document.querySelector(selector);
-                if (el) el.innerHTML = `<option value="">{{ __('forms.search...') }}</option>`;
-                return initChoices(selector);
-            };
-
-            // HELPER 2: Safely destroys Choices, injects server HTML, and re-initializes WITHOUT erasing data
-            const setDropdownHtml = (selector, instanceRef, htmlContent) => {
-                if (instanceRef) instanceRef.destroy();
-                const el = document.querySelector(selector);
-                if (el) el.innerHTML = htmlContent;
-                return initChoices(selector);
-            };
-
-            // AJAX Dependency Loader
-            const loadDependentOptions = (url, data, targetSelector, instanceRef, onSuccessCallback) => {
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    data: data,
-                    success: function(response) {
-                        const newInstance = setDropdownHtml(targetSelector, instanceRef, response);
-                        if (onSuccessCallback) onSuccessCallback(newInstance);
-                    },
-                    error: () => clearDropdown(targetSelector, instanceRef)
-                });
-            };
-
-            // Expense Type -> Payment Voucher Number
-            $('#cboExpenseType').on('change', function() {
-                const expenseTypeId = $(this).val();
-                voucherChoices.clearStore();
-                voucherChoices.clearChoices();
-                $('#legalName').val('').prop('readonly', false);
-                if ($('#vDescription').length) {
-                    $('#vDescription').summernote('code', '');
-                    $('#vDescription').summernote('enable');
-                }
-                if (!expenseTypeId) return;
-
-                voucherChoices.setChoices([{
-                    value: '',
-                    label: 'កំពុងផ្ទុក...',
-                    disabled: true,
-                    selected: true
-                }], 'value', 'label', true);
-
-                $.ajax({
-                    url: "{{ route('budgetVoucher.get.expense_type_id') }}",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        expense_type_id: expenseTypeId
-                    },
-                    success: (data) => {
-                        voucherChoices.clearChoices();
-                        voucherChoices.setChoices(data, 'value', 'label', true);
-                    },
-                    error: () => voucherChoices.clearChoices()
-                });
-            });
-
-            // Auto-fill Legal Name & Description
-            const voucherEl = document.getElementById('cboPaymentVoucherNumber');
-            if (voucherEl && voucherChoices) {
-                voucherEl.addEventListener('change', function() {
-                    const selected = voucherChoices.getValue();
-                    const legalNameInput = document.getElementById('legalName');
-                    if (selected && selected.customProperties && selected.value !== '') {
-                        if (legalNameInput) {
-                            legalNameInput.value = selected.customProperties.legal_name || '';
-                            legalNameInput.readOnly = true;
-                        }
-                        if ($('#vDescription').length) {
-                            $('#vDescription').summernote('code', selected.customProperties.description ||
-                                '');
-                            $('#vDescription').summernote('disable');
-                        }
-                    } else {
-                        if (legalNameInput) {
-                            legalNameInput.value = '';
-                            legalNameInput.readOnly = false;
-                        }
-                        if ($('#vDescription').length) {
-                            $('#vDescription').summernote('code', '');
-                            $('#vDescription').summernote('enable');
-                        }
-                    }
-                    pristine.validate(legalNameInput);
-                });
-            }
-
-            // Program -> ProgramSub & Agency
-            $('#cboProgram').on('change', function() {
-                const programId = $(this).val();
-                programSubChoices = clearDropdown('#cboProgramSub', programSubChoices);
-                agencyChoices = clearDropdown('#cboAgency', agencyChoices);
-                clusterChoices = clearDropdown('#cboCluster', clusterChoices);
-                if (!programId) return;
-
-                loadDependentOptions("{{ route('budgetVoucher.by.program_sub') }}", {
-                    program_id: programId
-                }, '#cboProgramSub', programSubChoices, (inst) => programSubChoices = inst);
-                loadDependentOptions("{{ route('budgetVoucher.by.agency') }}", {
-                    program_id: programId
-                }, '#cboAgency', agencyChoices, (inst) => agencyChoices = inst);
-            });
-
-            // ProgramSub -> Cluster
-            $('#cboProgramSub').on('change', function() {
-                const programSubId = $(this).val();
-                clusterChoices = clearDropdown('#cboCluster', clusterChoices);
-                if (!programSubId) return;
-                loadDependentOptions("{{ route('budgetVoucher.by.cluster') }}", {
-                    program_sub_id: programSubId
-                }, '#cboCluster', clusterChoices, (inst) => clusterChoices = inst);
-            });
-
-            form.querySelectorAll('select').forEach(select => {
-                select.addEventListener('change', () => pristine.validate(select));
-            });
-
-            // =========================================================================
-            // 6. LIVE BUDGET BALANCE CALCULATOR (WITH CONSOLE LOGGING)
-            // =========================================================================
-            const n = v => (isNaN(+v) ? 0 : +v);
-            const fmt = v => n(v).toLocaleString('en-US', {
-                maximumFractionDigits: 2
-            });
-            const setText = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = fmt(val);
-            };
-            const resetNumbers = () => ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
-                'deadline_balance', 'applying', 'remaining_credit'
-            ].forEach(id => setText(id, 0));
-
-            const recomputeRemaining = () => {
-                const budgetInput = document.getElementById('budget');
-                const apply = n(budgetInput?.value);
-                const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
-                setText('applying', apply);
-                setText('remaining_credit', Math.max(credit - apply, 0));
-                if (credit - apply < 0 && budgetInput) budgetInput.value = '';
-            };
-
-            function fetchEarlyBalance() {
-                const programId = $('#cboProgram').val();
-                const programSubId = $('#cboProgramSub').val();
-                const clusterId = $('#cboCluster').val();
-                const accountSubId = $('#cboSubAccount').val();
-
-                // Debug print to your browser console (Press F12 to view)
-                console.log("Checking Balance IDs:", {
-                    programId,
-                    programSubId,
-                    clusterId,
-                    accountSubId
-                });
-
-                if (!programId || !programSubId || !clusterId || !accountSubId) {
-                    console.warn("Balance check aborted: One or more required accounting fields are still empty.");
-                    resetNumbers();
-                    return;
-                }
-
-                console.info("Sending AJAX balance request to Laravel...");
-
-                $.ajax({
-                    url: "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}",
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        program_id: programId,
-                        program_sub_id: programSubId,
-                        cluster_id: clusterId,
-                        account_sub_id: accountSubId
-                    },
-                    success: function(data) {
-                        console.log("Laravel Balance Response:", data);
-                        if (data && data.exists !== false) {
-                            setText('fin_law', data.fin_law);
-                            setText('credit_movement', data.credit_movement);
-                            setText('new_credit_status', data.new_credit_status);
-                            setText('credit', data.credit);
-                            setText('deadline_balance', data.deadline_balance);
-                            recomputeRemaining();
-                        } else {
-                            console.warn("No matching voucher row found in database for these 4 IDs.");
-                            resetNumbers();
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("AJAX Error details:", status, error, xhr.responseText);
-                        resetNumbers();
-                    }
-                });
-            }
-
-            // Event delegation guarantees this fires even after Choices.js reloads DOM elements
-            $(document).on('change', '#cboProgram, #cboProgramSub, #cboCluster, #cboSubAccount', function() {
-                fetchEarlyBalance();
-            });
-
-            document.getElementById('budget')?.addEventListener('input', recomputeRemaining);
-        });
-    </script> --}}
-
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('cboExpenseType');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
+    </script>
+
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
             if (!form) return;
@@ -1327,14 +638,9 @@
                 defaultValue: '0',
                 restoreValidation: () => {
                     legalInput.setAttribute('required', true);
-                    legalInput.setAttribute('min', '1');
                     legalInput.setAttribute(
                         'data-pristine-required-message',
                         "{{ __('messages.required') }}"
-                    );
-                    legalInput.setAttribute(
-                        'data-pristine-min-message',
-                        'លំដាប់ ត្រូវតែធំជាងសូន្យ'
                     );
                 }
             });
@@ -1418,6 +724,390 @@
                 HTMLFormElement.prototype.submit.call(form);
             });
 
+        });
+    </script> --}}
+
+    <!-- 1. Pass Laravel routes and translations to JavaScript -->
+    <script>
+        window.BudgetFormConfig = {
+            urls: {
+                programSub: "{{ route('budgetVoucher.by.program_sub') }}",
+                agency: "{{ route('budgetVoucher.by.agency') }}",
+                cluster: "{{ route('budgetVoucher.by.cluster') }}",
+                earlyBalance: "{{ route('budgetVoucher.getEarlyBalance', ['params' => $params]) }}"
+            },
+            translations: {
+                search: "{{ __('forms.search...') }}",
+                required: "{{ __('messages.required') }}"
+            }
+        };
+    </script>
+
+    <!-- 2. Include the relative external JavaScript file -->
+    <script src="{{ asset('js/budget-form.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+            if (!form) return;
+
+            // ==========================================
+            // 1. PRISTINE INITIALIZATION
+            // ==========================================
+            const createPristineInstance = () => {
+                return new Pristine(form, {
+                    classTo: 'form-group',
+                    errorClass: 'has-danger',
+                    successClass: 'has-success',
+                    errorTextParent: 'form-group',
+                    errorTextTag: 'div',
+                    errorTextClass: 'pristine-error text-help text-danger font-size-14 mt-1'
+                });
+            };
+
+            let pristine = createPristineInstance();
+            const refreshPristine = () => {
+                pristine.destroy();
+                pristine = createPristineInstance();
+            };
+
+            // ==========================================
+            // 2. FLATPICKR SYNC
+            // ==========================================
+            const initFlatpickr = (id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                flatpickr(el, {
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    defaultDate: el.value || null,
+                    onChange: () => pristine.validate(el),
+                    onClose: () => pristine.validate(el)
+                });
+            };
+            initFlatpickr('transactionDate');
+            initFlatpickr('requestDate');
+            initFlatpickr('legalDate');
+
+            // ==========================================
+            // 3. SUMMERNOTE SYNC
+            // ==========================================
+            if (window.jQuery && $('#vDescription').length) {
+                $('#vDescription').summernote({
+                    height: 150,
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['color', ['color']]
+                    ],
+                    callbacks: {
+                        onChange: function(contents) {
+                            const clean = contents.replace(/<\/?[^>]+(>|$)/g, "").trim();
+                            document.getElementById('vDescription').value = clean === '' ? '' :
+                                contents;
+                            pristine.validate(document.getElementById('vDescription'));
+                        }
+                    }
+                });
+            }
+
+            // ==========================================
+            // 4. CHOICES.JS INITIALIZATION
+            // ==========================================
+            const defaultChoicesOpts = {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...', // Can also be moved to translations if needed
+                shouldSort: false
+            };
+
+            let programChoices = new Choices('#cboProgram', defaultChoicesOpts);
+            let programSubChoices = new Choices('#cboProgramSub', defaultChoicesOpts);
+            let clusterChoices = new Choices('#cboCluster', defaultChoicesOpts);
+            let agencyChoices = new Choices('#cboAgency', defaultChoicesOpts);
+            let subAccountChoices = new Choices('#cboSubAccount', defaultChoicesOpts);
+
+            const resetSelect = (selector) => {
+                $(selector).html(`<option value="">${window.BudgetFormConfig.translations.search}</option>`);
+            };
+
+            const resetChoices = (selector, instance) => {
+                instance.destroy();
+                return new Choices(selector, defaultChoicesOpts);
+            };
+
+            const loadOptions = ({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) => {
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: () => resetSelect(targetSelect)
+                });
+            };
+
+            // Sync validation on dropdown change
+            form.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', () => pristine.validate(select));
+            });
+
+            // ==========================================
+            // 5. CASCADING AJAX DROPDOWNS
+            // ==========================================
+            $('#cboProgram').on('change', function() {
+                const programId = $(this).val();
+
+                resetSelect('#cboProgramSub');
+                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
+                resetSelect('#cboAgency');
+                agencyChoices = resetChoices('#cboAgency', agencyChoices);
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programId) return;
+
+                loadOptions({
+                    url: window.BudgetFormConfig.urls.programSub,
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboProgramSub',
+                    instanceRefSetter: () => programSubChoices = resetChoices('#cboProgramSub',
+                        programSubChoices)
+                });
+
+                loadOptions({
+                    url: window.BudgetFormConfig.urls.agency,
+                    data: {
+                        program_id: programId
+                    },
+                    targetSelect: '#cboAgency',
+                    instanceRefSetter: () => agencyChoices = resetChoices('#cboAgency',
+                        agencyChoices)
+                });
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                const programSubId = $(this).val();
+
+                resetSelect('#cboCluster');
+                clusterChoices = resetChoices('#cboCluster', clusterChoices);
+
+                if (!programSubId) return;
+
+                loadOptions({
+                    url: window.BudgetFormConfig.urls.cluster,
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    targetSelect: '#cboCluster',
+                    instanceRefSetter: () => clusterChoices = resetChoices('#cboCluster',
+                        clusterChoices)
+                });
+            });
+
+            // ==========================================
+            // 6. EARLY BALANCE & CREDIT CALCULATIONS
+            // ==========================================
+            const n = v => (isNaN(+v) ? 0 : +v);
+            const fmt = v => n(v).toLocaleString('en-US', {
+                maximumFractionDigits: 2
+            });
+
+            const setText = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = fmt(val);
+            };
+
+            const resetNumbers = () => {
+                ['fin_law', 'credit_movement', 'new_credit_status', 'credit',
+                    'deadline_balance', 'applying', 'remaining_credit'
+                ].forEach(id => setText(id, 0));
+            };
+
+            const budgetInput = document.getElementById('budget');
+            const recomputeRemaining = () => {
+                const apply = n(budgetInput?.value);
+                const credit = n((document.getElementById('credit')?.textContent || '0').replace(/,/g, ''));
+                setText('applying', apply);
+                setText('remaining_credit', Math.max(credit - apply, 0));
+                if (credit - apply < 0 && budgetInput) budgetInput.value = '';
+            };
+
+            const fetchEarlyBalance = async () => {
+                const programId = document.getElementById('cboProgram')?.value;
+                const programSubId = document.getElementById('cboProgramSub')?.value;
+                const clusterId = document.getElementById('cboCluster')?.value;
+                const accountSubId = document.getElementById('cboSubAccount')?.value;
+
+                if (!programId || !programSubId || !clusterId || !accountSubId) {
+                    resetNumbers();
+                    return;
+                }
+
+                // Initialize URL properly using absolute or relative paths seamlessly
+                const url = new URL(window.BudgetFormConfig.urls.earlyBalance, window.location.origin);
+                url.searchParams.set('program_id', programId);
+                url.searchParams.set('program_sub_id', programSubId);
+                url.searchParams.set('cluster_id', clusterId);
+                url.searchParams.set('account_sub_id', accountSubId);
+
+                try {
+                    const res = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await res.json();
+                    setText('fin_law', data.fin_law);
+                    setText('credit_movement', data.credit_movement);
+                    setText('new_credit_status', data.new_credit_status);
+                    setText('credit', data.credit);
+                    setText('deadline_balance', data.deadline_balance);
+                    recomputeRemaining();
+                } catch (err) {
+                    console.error("Failed to fetch balance:", err);
+                    resetNumbers();
+                }
+            };
+
+            ['cboProgram', 'cboProgramSub', 'cboCluster', 'cboSubAccount'].forEach(id => {
+                document.getElementById(id)?.addEventListener('change', fetchEarlyBalance);
+            });
+            budgetInput?.addEventListener('input', recomputeRemaining);
+
+            // ==========================================
+            // 7. SKIP LEGAL NUMBER LOGIC 
+            // ==========================================
+            const legalInput = document.getElementById('legalNumber');
+            const skipLegalCheckbox = document.getElementById('skipLegalNumber');
+
+            const legalNameInput = document.getElementById('legalName');
+            const skipLegalNameCheckbox = document.getElementById('skipLegalName');
+
+            const fileInput = document.getElementById('fileInput');
+            const skipFileCheckbox = document.getElementById('skipFileInput');
+
+            const setupSkipField = ({
+                checkbox,
+                input,
+                defaultValue = '',
+                restoreValidation = () => {}
+            }) => {
+                if (!checkbox || !input) return;
+
+                checkbox.addEventListener('change', function() {
+                    const parentGroup = input.closest('.form-group');
+
+                    if (this.checked) {
+                        input.value = '';
+                        input.disabled = true;
+
+                        input.classList.add('border-success', 'bg-success-subtle');
+                        parentGroup?.classList.add('has-success');
+
+                        input.removeAttribute('required');
+                        input.removeAttribute('min');
+                        input.removeAttribute('data-pristine-required-message');
+
+                        pristine.reset(input);
+                    } else {
+                        input.value = defaultValue;
+                        input.disabled = false;
+
+                        input.classList.remove('border-success', 'bg-success-subtle');
+                        parentGroup?.classList.remove('has-success');
+
+                        restoreValidation();
+                    }
+
+                    refreshPristine();
+                });
+            };
+
+            setupSkipField({
+                checkbox: skipLegalCheckbox,
+                input: legalInput,
+                defaultValue: '0',
+                restoreValidation: () => {
+                    legalInput.setAttribute('required', true);
+                    legalInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
+                        .translations.required);
+                }
+            });
+
+            setupSkipField({
+                checkbox: skipLegalNameCheckbox,
+                input: legalNameInput,
+                defaultValue: '',
+                restoreValidation: () => {
+                    legalNameInput.setAttribute('required', true);
+                    legalNameInput.setAttribute('data-pristine-required-message', window
+                        .BudgetFormConfig.translations.required);
+                }
+            });
+
+            setupSkipField({
+                checkbox: skipFileCheckbox,
+                input: fileInput,
+                restoreValidation: () => {
+                    fileInput.setAttribute('required', true);
+                    fileInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
+                        .translations.required);
+                }
+            });
+
+            // ==========================================
+            // 8. MASTER FORM SUBMIT GATEKEEPER
+            // ==========================================
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const submitter = e.submitter;
+                if (submitter && submitter.name === 'action') {
+                    let hidden = form.querySelector('input[name="action"]');
+                    if (!hidden) {
+                        hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+                        form.appendChild(hidden);
+                    }
+                    hidden.value = submitter.value;
+                }
+
+                [
+                    [skipLegalCheckbox, legalInput],
+                    [skipLegalNameCheckbox, legalNameInput],
+                    [skipFileCheckbox, fileInput]
+                ].forEach(([checkbox, input]) => {
+                    if (checkbox?.checked && input) {
+                        input.disabled = true;
+                        input.removeAttribute('required');
+                        pristine.reset(input);
+                    }
+                });
+
+                const isValid = pristine.validate();
+
+                if (!isValid) return;
+
+                // Re-enable before submitting so Laravel receives empty/null values instead of missing keys
+                [legalInput, legalNameInput, fileInput].forEach(input => {
+                    if (input) input.disabled = false;
+                });
+
+                HTMLFormElement.prototype.submit.call(form);
+            });
         });
     </script>
 @endsection

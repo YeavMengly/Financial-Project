@@ -2,6 +2,8 @@
 
 namespace App\Models\Duel;
 
+use App\Models\Ministry;
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,20 +15,38 @@ class DuelEntry extends Model
         'ministry_id',
         'project_id',
         'item_name',
-        'company_name',
-        'stock_number',
-        'stock_name',
-        'user_entry',
         'unit',
-        'title',
         'quantity',
         'price',
-        'duel_total',
-        'note',
-        'refer',
+        'total_price',
         'date_entry',
         'pro_year',
-        'file',
         'source'
     ];
+
+    protected $casts = [
+        'date_entry'  => 'date',
+        'quantity'    => 'integer',
+        'price'       => 'decimal:2',
+        'total_price' => 'decimal:2',
+    ];
+
+    // ==========================================
+    // Relationships
+    // ==========================================
+
+    public function ministry()
+    {
+        return $this->belongsTo(Ministry::class);
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function duelReleases()
+    {
+        return $this->hasMany(DuelRelease::class, 'duel_entries_id');
+    }
 }

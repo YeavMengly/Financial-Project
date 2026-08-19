@@ -120,7 +120,7 @@
                         </li> --}}
 
                         {{-- Pre-Financing Submenu --}}
-                         
+                   
 
                         {{-- Mandate Payment --}}
                         @if (hasPermission('initialMandate.index'))

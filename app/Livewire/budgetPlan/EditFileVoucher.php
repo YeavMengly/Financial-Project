@@ -5,24 +5,30 @@ namespace App\Livewire\BudgetPlan;
 use App\Models\BudgetPlan\BudgetVoucher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class Payment extends Component
+class EditFileVoucher extends Component
 {
     use WithFileUploads;
 
     public $att_id = 0;
-    public $params = 0;
-    public $attachments = " ";
-    public $budgetVoucherOldFile = " ";
+    
+    public $params;
+    public $documentTitle;
+    public $attachments;
+    public $budgetVoucherOldFile;
 
-    public function mount($id)
+    public function mount($params, $id)
     {
-        $id = decode_params($id);
-        $budgetMandate = BudgetVoucher::where("id", $id)->first();
-        //    dd( $id, $params, decode_params($params));
+        $this->params = $params;
+        $decodedId = decode_params($id);
+
+        $budgetMandate = BudgetVoucher::where("ministry_id", decode_params($params))
+            ->where("id", $decodedId)
+            ->firstOrFail();
 
         $this->att_id = $budgetMandate->id;
         $this->budgetVoucherOldFile = $budgetMandate->attachments;
@@ -30,38 +36,38 @@ class Payment extends Component
 
     public function render()
     {
-        return view('livewire.budgetPlan.payment');
+        return view('livewire.budgetPlan.edit-file-voucher');
     }
 
     public function save()
     {
-
-        $validated = $this->validate([
-            'attachments'   => 'required|file|max:51200',
+        $this->validate([
+            'attachments' => 'required|file|max:51200', // 50MB max
         ], [
-            "attachments" => [
-                "required" => "ជ្រើសរើស File ឯកសារ",
-                "max" => "File ឯកសារត្រូវតែតូចជាងទំហំ 10MB"
-            ]
+            "attachments.required" => "ជ្រើសរើស File ឯកសារ",
+            "attachments.max" => "File ឯកសារត្រូវតែតូចជាងទំហំ 50MB"
         ], [
             "attachments" => __("forms.document.file")
         ]);
-        $path_store = "uploads/budgetPlan/payment/" . date("Y-m-d");
-        // delete old file
+
+        $path_store = "uploads/voucher/" . date("Y-m-d");
         if (!File::exists($path_store)) {
             File::makeDirectory($path_store, 0777, true, true);
         }
-        $last_file = $this->attachments->store($path_store);
-        if (!empty($this->budgetVoucherOldFile) && File::exists($this->budgetVoucherOldFile)) {
-            File::delete($this->budgetVoucherOldFile);
+        $last_file = $this->attachments->store($path_store, 'public');
+        if (!empty($this->budgetVoucherOldFile) && Storage::disk('public')->exists($this->budgetVoucherOldFile)) {
+            Storage::disk('public')->delete($this->budgetVoucherOldFile);
         }
+
         DB::beginTransaction();
 
         try {
+
             $updateDoc = BudgetVoucher::findOrFail($this->att_id);
             $updateDoc->update([
                 "attachments" => $last_file
             ]);
+
             DB::commit();
 
             flash()

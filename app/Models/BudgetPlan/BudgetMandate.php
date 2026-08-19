@@ -47,11 +47,9 @@ class BudgetMandate extends Model
     ];
 
     protected $casts = [
-        'attachments' => 'array',
         'transaction_date' => 'date',
         'request_date' => 'date',
         'legal_date' => 'date',
-        'expense_type_id' => 'array',
     ];
     /* -----------------------------------------------------------------
      |  Relationships
