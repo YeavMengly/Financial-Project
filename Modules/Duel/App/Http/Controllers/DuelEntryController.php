@@ -89,35 +89,20 @@ class DuelEntryController extends Controller
             $project = Projects::where('id', $validated['project'])
                 ->where('ministry_id', $id)
                 ->firstOrFail();
-            $paths = [];
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
-                        $stored[] = $file->store('duelEntry', 'public');
-                    }
-                }
-            }
+
             foreach ($request->item_name as $index => $item) {
 
                 DuelEntry::create([
                     'ministry_id'   => $ministry->id,
                     'project_id'   => $project->id,
                     'item_name'     => $request->item_name[$index],
-                    'company_name'  => $project->company_name,
-                    'stock_number'  =>  $project->stock_number,
-                    'stock_name'    => $project->stock_name,
-                    'user_entry'    =>  $project->user_entry,
                     'unit'          => 2,
-                    'title'         => $project->title ?? '',
                     'quantity'      => $request->quantity[$index],
                     'price'         => $request->price[$index],
                     'duel_total'    => $request->quantity[$index] * $request->price[$index],
-                    'note'          =>  strip_tags($project->note ?? ''),
-                    'refer'         => strip_tags($project->refer),
                     'date_entry'    => $project->date,
                     'source'   => $validated['source'] ?? null,
                     'pro_year' => $validated['pro_year'] ?? '',
-                    'file'         => json_encode($paths),
                 ]);
             }
 
@@ -222,17 +207,10 @@ class DuelEntryController extends Controller
                             'ministry_id'  => $ministry->id,
                             'project_id'   => $project->id,
                             'item_name'    => $itemName,
-                            'company_name' => $project->company_name ?? '',
-                            'stock_number' => $project->stock_number ?? '',
-                            'stock_name'   => $project->stock_name ?? '',
-                            'user_entry'   => $project->user_entry ?? '',
                             'unit'         => $project->unit ?? '',
-                            'title'        => $project->title ?? '',
                             'quantity'     => $qty,
                             'price'        => $price,
-                            'duel_total'   => $total,
-                            'note'         => $project->note ?? '',
-                            'refer'        => $project->refer ?? '',
+                            'total_price'   => $total,
                             'date_entry'   => $dateEntry,
                             'source'       => $validated['source'] ?? '',
                             'pro_year'     => $validated['pro_year'] ?? '',
@@ -243,17 +221,10 @@ class DuelEntryController extends Controller
                         'ministry_id'  => $ministry->id,
                         'project_id'   => $project->id,
                         'item_name'    => $itemName,
-                        'company_name' => $project->company_name ?? '',
-                        'stock_number' => $project->stock_number ?? '',
-                        'stock_name'   => $project->stock_name ?? '',
-                        'user_entry'   => $project->user_entry ?? '',
                         'unit'         => $project->unit ?? '',
-                        'title'        => $project->title ?? '',
                         'quantity'     => $qty,
                         'price'        => $price,
-                        'duel_total'   => $total,
-                        'note'         => $project->note ?? '',
-                        'refer'        => $project->refer ?? '',
+                        'total_price'   => $total,
                         'date_entry'   => $dateEntry,
                         'source'       => $validated['source'] ?? '',
                         'pro_year'     => $validated['pro_year'] ?? '',

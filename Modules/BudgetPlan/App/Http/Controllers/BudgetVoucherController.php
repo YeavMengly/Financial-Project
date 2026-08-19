@@ -836,6 +836,334 @@ class BudgetVoucherController extends Controller
         $beginVoucher->save();
     }
 
+    // public function export(Request $request, $params)
+    // {
+    //     try {
+    //         $id = decode_params($params);
+
+    //         $query = BudgetVoucher::query();
+
+    //         $query->leftJoin('begin_vouchers', function ($join) use ($id) {
+    //             $join->on('budget_vouchers.account_sub_id', '=', 'begin_vouchers.account_sub_id')
+    //                 ->on('budget_vouchers.no', '=', 'begin_vouchers.no')
+    //                 ->on('budget_vouchers.program_id', '=', 'begin_vouchers.program_id')
+    //                 ->where('begin_vouchers.ministry_id', $id);
+    //         });
+    //         $query->leftJoin('budget_voucher_loans', function ($join) {
+    //             $join->on('budget_voucher_loans.account_sub_id', '=', 'begin_vouchers.account_sub_id')
+    //                 ->on('budget_voucher_loans.no', '=', 'begin_vouchers.no')
+    //                 ->on('budget_voucher_loans.program_id', '=', 'begin_vouchers.program_id');
+    //         });
+
+    //         /**
+    //          * Current Budget
+    //          */
+    //         if ($request->filled('start_date') && $request->filled('end_date')) {
+
+    //             $budgetSum = "
+    //                     SUM(
+    //                         CASE
+    //                             WHEN budget_vouchers.transaction_date
+    //                                 BETWEEN '{$request->start_date}'
+    //                                 AND '{$request->end_date}'
+    //                             AND budget_vouchers.is_archived = 2
+    //                             THEN budget_vouchers.budget
+    //                             ELSE 0
+    //                         END
+    //                     ) AS budget
+    //                 ";
+    //             $endDate = Carbon::parse($request->end_date);
+    //         } else {
+
+    //             $month = now()->month;
+    //             $year  = now()->year;
+
+    //             $budgetSum = "
+    //                         SUM(
+    //                             CASE
+    //                                 WHEN MONTH(budget_vouchers.transaction_date) = {$month}
+    //                                 AND YEAR(budget_vouchers.transaction_date) = {$year}
+    //                                 THEN budget_vouchers.budget
+    //                                 ELSE 0
+    //                             END
+    //                         ) AS budget
+    //                     ";
+
+    //             $endDate = now();
+    //         }
+    //         $start = Carbon::parse($request->start_date);
+    //         $end   = Carbon::parse($request->end_date);
+
+    //         $lastMonthStart = $end->copy()->startOfMonth()->toDateString();
+
+    //         /**
+    //          * Early Budget (Normal)
+    //          */
+    //         $earlyBudget = "
+    //                 SUM(
+    //                     CASE
+    //                         WHEN budget_vouchers.transaction_date >= '{$start->toDateString()}'
+    //                         AND budget_vouchers.transaction_date < '{$lastMonthStart}'
+    //                         AND budget_vouchers.is_archived = 2
+    //                         THEN budget_vouchers.budget
+    //                         ELSE 0
+    //                     END
+    //                 ) AS early_budget
+    //             ";
+
+    //         $lastMonthBudget = "
+    //             SUM(
+    //                 CASE
+    //                     WHEN YEAR(budget_vouchers.transaction_date) = {$end->year}
+    //                     AND MONTH(budget_vouchers.transaction_date) = {$end->month}
+    //                     AND budget_vouchers.is_archived = 2
+    //                     THEN budget_vouchers.budget
+    //                     ELSE 0
+    //                 END
+    //             ) AS last_month_budget
+    //             ";
+
+    //         // G -> N caculate by date
+    //         if ($request->filled('start_date') && $request->filled('end_date')) {
+
+    //             $loanInternal = "
+    //                     MAX(
+    //                         CASE
+    //                             WHEN DATE(budget_voucher_loans.updated_at)
+    //                                 BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+    //                             THEN budget_voucher_loans.internal_increase
+    //                             ELSE 0
+    //                         END
+    //                     ) AS loan_internal_increase
+    //                 ";
+
+    //             $loanUnexpected = "
+    //                     MAX(
+    //                         CASE
+    //                             WHEN DATE(budget_voucher_loans.updated_at)
+    //                                 BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+    //                             THEN budget_voucher_loans.unexpected_increase
+    //                             ELSE 0
+    //                         END
+    //                     ) AS loan_unexpected_increase
+    //                 ";
+
+    //             $loanAdditional = "
+    //                     MAX(
+    //                         CASE
+    //                             WHEN DATE(budget_voucher_loans.updated_at)
+    //                                 BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+    //                             THEN budget_voucher_loans.additional_increase
+    //                             ELSE 0
+    //                         END
+    //                     ) AS loan_additional_increase
+    //                 ";
+
+    //             $loanTotal = "
+    //                     MAX(
+    //                         CASE
+    //                             WHEN DATE(budget_voucher_loans.updated_at)
+    //                                 BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+    //                             THEN budget_voucher_loans.total_increase
+    //                             ELSE 0
+    //                         END
+    //                     ) AS loan_total_increase
+    //                 ";
+
+    //             $loanDecrease = "
+    //                     MAX(
+    //                         CASE
+    //                             WHEN DATE(budget_voucher_loans.updated_at)
+    //                                 BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+    //                             THEN budget_voucher_loans.decrease
+    //                             ELSE 0
+    //                         END
+    //                     ) AS loan_decrease
+    //                 ";
+
+    //             $loanEditorial = "
+    //                     MAX(
+    //                         CASE
+    //                             WHEN DATE(budget_voucher_loans.updated_at)
+    //                                 BETWEEN '{$request->start_date}' AND '{$request->end_date}'
+    //                             THEN budget_voucher_loans.editorial
+    //                             ELSE 0
+    //                         END
+    //                     ) AS loan_editorial
+    //                 ";
+    //         } else {
+    //             $loanInternal = "MAX(COALESCE(budget_voucher_loans.internal_increase,0)) AS loan_internal_increase";
+    //             $loanUnexpected = "MAX(COALESCE(budget_voucher_loans.unexpected_increase,0)) AS loan_unexpected_increase";
+    //             $loanAdditional = "MAX(COALESCE(budget_voucher_loans.additional_increase,0)) AS loan_additional_increase";
+    //             $loanTotal = "MAX(COALESCE(budget_voucher_loans.total_increase,0)) AS loan_total_increase";
+    //             $loanDecrease = "MAX(COALESCE(budget_voucher_loans.decrease,0)) AS loan_decrease";
+    //             $loanEditorial = "MAX(COALESCE(budget_voucher_loans.editorial,0)) AS loan_editorial";
+    //         }
+
+    //         if ($request->filled('start_date') && $request->filled('end_date')) {
+    //             $currentLoan = "
+    //                 MAX(
+    //                     begin_vouchers.current_loan
+
+    //                     + COALESCE((
+    //                         SELECT SUM(COALESCE(bml.total_increase,0))
+    //                         FROM budget_voucher_loans bml
+    //                         WHERE bml.no = begin_vouchers.no
+    //                         AND bml.program_id = begin_vouchers.program_id
+    //                         AND bml.account_sub_id = begin_vouchers.account_sub_id
+    //                         AND DATE(bml.updated_at) < '{$request->start_date}'
+    //                     ),0)
+
+    //                     - COALESCE((
+    //                         SELECT SUM(COALESCE(bml.decrease,0))
+    //                         FROM budget_voucher_loans bml
+    //                         WHERE bml.no = begin_vouchers.no
+    //                         AND bml.program_id = begin_vouchers.program_id
+    //                         AND bml.account_sub_id = begin_vouchers.account_sub_id
+    //                         AND DATE(bml.updated_at) < '{$request->start_date}'
+    //                     ),0)
+
+    //                     + COALESCE((
+    //                         SELECT SUM(COALESCE(bml.editorial,0))
+    //                         FROM budget_voucher_loans bml
+    //                         WHERE bml.no = begin_vouchers.no
+    //                         AND bml.program_id = begin_vouchers.program_id
+    //                         AND bml.account_sub_id = begin_vouchers.account_sub_id
+    //                         AND DATE(bml.updated_at) < '{$request->start_date}'
+    //                     ),0)
+
+    //                 ) AS current_loan
+    //                 ";
+    //         } else {
+
+    //             $currentLoan = "MAX(begin_vouchers.current_loan) AS current_loan";
+    //         }
+
+    //         $query->select([
+    //             'budget_vouchers.no as budget_no',
+    //             'begin_vouchers.no as begin_no',
+    //             'begin_vouchers.chapter_id',
+    //             'budget_vouchers.program_id',
+    //             'budget_vouchers.account_sub_id',
+    //             'begin_vouchers.account_id',
+    //             'begin_vouchers.txtDescription',
+    //             'begin_vouchers.fin_law',
+    //             'begin_vouchers.new_credit_status',
+    //             'begin_vouchers.deadline_balance',
+    //             'begin_vouchers.early_balance',
+    //             'begin_vouchers.credit',
+    //             'begin_vouchers.law_average',
+    //             'begin_vouchers.law_correction',
+    //             DB::raw($currentLoan),
+    //             DB::raw($loanInternal),
+    //             DB::raw($loanUnexpected),
+    //             DB::raw($loanAdditional),
+    //             DB::raw($loanTotal),
+    //             DB::raw($loanDecrease),
+    //             DB::raw($loanEditorial),
+    //             DB::raw('MAX(begin_vouchers.apply) AS apply'),
+    //             DB::raw($budgetSum),
+    //             DB::raw('MAX(budget_vouchers.transaction_date) AS transaction_date'),
+    //             DB::raw($earlyBudget),
+    //             DB::raw($lastMonthBudget),
+    //         ]);
+    //         $query->groupBy(
+    //             'budget_vouchers.no',
+    //             'begin_vouchers.no',
+    //             'begin_vouchers.chapter_id',
+    //             'budget_vouchers.program_id',
+    //             'budget_vouchers.account_sub_id',
+    //             'begin_vouchers.account_id',
+    //             'begin_vouchers.txtDescription',
+    //             'begin_vouchers.fin_law',
+    //             'begin_vouchers.new_credit_status',
+    //             'begin_vouchers.deadline_balance',
+    //             'begin_vouchers.early_balance',
+    //             'begin_vouchers.credit',
+    //             'begin_vouchers.law_average',
+    //             'begin_vouchers.law_correction',
+    //         );
+
+    //         $query->orderBy('budget_vouchers.transaction_date');
+
+    //         //status
+    //         if ($request->has('cboStatus')) {
+    //             if ($request->cboStatus == '2') {
+    //                 // Only non-deleted
+    //                 $query->whereNull('budget_vouchers.deleted_at');
+    //             } elseif ($request->cboStatus == '3') {
+    //                 // Only deleted
+    //                 $query->onlyTrashed();
+    //             } else {
+    //                 // All records
+    //                 $query->withTrashed();
+    //             }
+    //         } else {
+    //             // Default: non-deleted
+    //             $query->whereNull('budget_vouchers.deleted_at');
+    //         }
+
+    //         // Program
+    //         if ($request->filled('cboProgram')) {
+    //             $query->where('budget_vouchers.program_id', $request->cboProgram);
+    //         }
+
+    //         // Sub Account filter
+    //         if ($request->filled('cboAccountSub')) {
+    //             $query->where('budget_vouchers.account_sub_id', $request->cboAccountSub);
+    //         }
+
+    //         if ($request->filled('cboAgency')) {
+    //             $query->where('budget_vouchers.agency_id', $request->cboAgency);
+    //         }
+
+    //         //ExpenseType
+    //         if ($request->filled('cboExpenseType')) {
+    //             $query->where('budget_vouchers.expense_type_id', $request->cboExpenseType);
+    //         }
+
+    //         // Date filter
+    //         if ($request->filled('start_date') && $request->filled('end_date')) {
+    //             $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date)
+    //                 ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+    //         } else {
+    //             if ($request->filled('start_date')) {
+    //                 $query->whereDate('budget_vouchers.legal_date', '>=', $request->start_date);
+    //             }
+    //             if ($request->filled('end_date')) {
+    //                 $query->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+    //             }
+    //         }
+
+    //         $data = $query->get();
+
+    //         Log::info('Exported BeginVoucher Count', [
+    //             'ministry_id' => $id,
+    //             'count'       => $data->count(),
+    //         ]);
+
+    //         $export = new BeginExport(
+    //             $data,
+    //             $id,
+    //             $request->start_date,
+    //             $request->end_date
+    //         );
+
+    //         return $export->export($request);
+    //     } catch (\Throwable $e) {
+    //         Log::error('Export Error: ' . $e->getMessage(), [
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 2000)
+    //             ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+    //             ->flash();
+
+    //         return redirect()->route('budgetVoucher.index', $params);
+    //     }
+    // }
     public function export(Request $request, $params)
     {
         try {
@@ -859,22 +1187,23 @@ class BudgetVoucherController extends Controller
              * Current Budget
              */
             if ($request->filled('start_date') && $request->filled('end_date')) {
-
                 $budgetSum = "
-                        SUM(
-                            CASE
-                                WHEN budget_vouchers.transaction_date
-                                    BETWEEN '{$request->start_date}'
-                                    AND '{$request->end_date}'
-                                AND budget_vouchers.is_archived = 2
-                                THEN budget_vouchers.budget
-                                ELSE 0
-                            END
-                        ) AS budget
-                    ";
+                    SUM(
+                        CASE
+                            WHEN budget_vouchers.transaction_date
+                                BETWEEN '{$request->start_date}'
+                                AND '{$request->end_date}'
+                            AND budget_vouchers.is_archived = 2
+                            THEN budget_vouchers.budget
+                            ELSE 0
+                        END
+                    ) AS budget
+                ";
                 $endDate = Carbon::parse($request->end_date);
+                $start = Carbon::parse($request->start_date);
+                $end   = Carbon::parse($request->end_date);
+                $lastMonthStart = $end->copy()->startOfMonth()->toDateString();
             } else {
-
                 $month = now()->month;
                 $year  = now()->year;
 
@@ -890,26 +1219,25 @@ class BudgetVoucherController extends Controller
                         ";
 
                 $endDate = now();
+                $start = now()->startOfMonth();
+                $end = now();
+                $lastMonthStart = $end->copy()->startOfMonth()->toDateString();
             }
-            $start = Carbon::parse($request->start_date);
-            $end   = Carbon::parse($request->end_date);
-
-            $lastMonthStart = $end->copy()->startOfMonth()->toDateString();
 
             /**
              * Early Budget (Normal)
              */
             $earlyBudget = "
-                    SUM(
-                        CASE
-                            WHEN budget_vouchers.transaction_date >= '{$start->toDateString()}'
-                            AND budget_vouchers.transaction_date < '{$lastMonthStart}'
-                            AND budget_vouchers.is_archived = 2
-                            THEN budget_vouchers.budget
-                            ELSE 0
-                        END
-                    ) AS early_budget
-                ";
+                SUM(
+                    CASE
+                        WHEN budget_vouchers.transaction_date >= '{$start->toDateString()}'
+                        AND budget_vouchers.transaction_date < '{$lastMonthStart}'
+                        AND budget_vouchers.is_archived = 2
+                        THEN budget_vouchers.budget
+                        ELSE 0
+                    END
+                ) AS early_budget
+            ";
 
             $lastMonthBudget = "
                 SUM(
@@ -923,9 +1251,8 @@ class BudgetVoucherController extends Controller
                 ) AS last_month_budget
                 ";
 
-            // G -> N caculate by date
+            // G -> N calculate by date
             if ($request->filled('start_date') && $request->filled('end_date')) {
-
                 $loanInternal = "
                         MAX(
                             CASE
@@ -1035,7 +1362,6 @@ class BudgetVoucherController extends Controller
                     ) AS current_loan
                     ";
             } else {
-
                 $currentLoan = "MAX(begin_vouchers.current_loan) AS current_loan";
             }
 
@@ -1089,17 +1415,13 @@ class BudgetVoucherController extends Controller
             //status
             if ($request->has('cboStatus')) {
                 if ($request->cboStatus == '2') {
-                    // Only non-deleted
                     $query->whereNull('budget_vouchers.deleted_at');
                 } elseif ($request->cboStatus == '3') {
-                    // Only deleted
                     $query->onlyTrashed();
                 } else {
-                    // All records
                     $query->withTrashed();
                 }
             } else {
-                // Default: non-deleted
                 $query->whereNull('budget_vouchers.deleted_at');
             }
 
@@ -1117,7 +1439,7 @@ class BudgetVoucherController extends Controller
                 $query->where('budget_vouchers.agency_id', $request->cboAgency);
             }
 
-            //ExpenseType
+            // ExpenseType
             if ($request->filled('cboExpenseType')) {
                 $query->where('budget_vouchers.expense_type_id', $request->cboExpenseType);
             }

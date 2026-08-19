@@ -39,221 +39,238 @@
                             @csrf
 
                             <div class="row">
-                                <div class="col-xl-6 col-md-6">
-                                    <div class="row">
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="stock_number" class="form-label font-size-13 text-muted">
-                                                    {{ __('forms.stock.number') }}
-                                                </label>
-                                                <select class="form-control" data-trigger id="dropStockNumber"
-                                                    name="stock_number" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}">
-                                                    <option value="">{{ __('forms.search...') }}</option>
-                                                    @foreach ($duelEntry as $stock)
-                                                        <option value="{{ $stock }}">{{ $stock }}</option>
-                                                    @endforeach
-                                                </select>
-                                                </select>
-                                                @error('stock_number')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
 
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="item_name" class="form-label font-size-13 text-muted">
-                                                    {{ __('forms.item.name') }}
-                                                </label>
-                                                <select id="cboDuel" class="form-select" name="item_name" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}">
-                                                    <option value="">{{ __('forms.search...') }}</option>
-                                                </select>
-                                                @error('item_name')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="stock_number" class="form-label font-size-13 text-muted">
+                                                {{ __('forms.stock.number') }}
+                                            </label>
+                                            <select class="form-control" data-trigger id="dropStockNumber"
+                                                name="stock_number" required tabindex="1"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+                                                <option value="">{{ __('forms.search...') }}</option>
+                                                @foreach ($duelEntry as $stock)
+                                                    <option value="{{ $stock }}">{{ $stock }}</option>
+                                                @endforeach
+                                            </select>
 
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="quantity_request">{{ __('forms.quantity.request') }} /
-                                                    លីត្រ</label>
-                                                <input type="text" name="quantity_request" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('quantity_request')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+                                            @error('stock_number')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
                                         </div>
+                                    </div>
 
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="agency" class="form-label font-size-13 text-muted">
-                                                    {{ __('forms.agency') }}
-                                                </label>
-                                                <select class="form-control" data-trigger id="dropAgency" name="agency"
-                                                    required
-                                                    data-pristine-required-message="{{ __('messages.required') }}">
-                                                    <option value="">{{ __('forms.search...') }}</option>
-                                                    @foreach ($agency as $item)
-                                                        <option value="{{ $item->id }}">
-                                                            {{ $item->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                @error('agency')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                                {{ __('forms.item.name') }}
+                                            </label>
+                                            <select id="cboDuel" class="form-select" name="item_name" required
+                                                tabindex="2"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+                                                <option value="">{{ __('forms.search...') }}</option>
+                                            </select>
+                                            @error('item_name')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
                                         </div>
+                                    </div>
 
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
-                                                <input type="text" id="receipt_number" name="receipt_number"
-                                                    value="{{ old('receipt_number') }}" required maxlength="4"
-                                                    inputmode="numeric" class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}"
-                                                    data-pristine-pattern="/^\d{4}$/"
-                                                    data-pristine-pattern-message="សូមបញ្ចូលលេខ ៤ ខ្ទង់"
-                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" />
-                                                @error('receipt_number')
-                                                    <div class="pristine-error text-help text-danger mt-1">{{ $message }}
-                                                    </div>
-                                                @enderror
-                                            </div>
+                                    <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="quantity_request">{{ __('forms.quantity.request') }} /
+                                                លីត្រ</label>
+                                            <input type="text" name="quantity_request" required tabindex="3"
+                                                class="form-control"
+                                                data-pristine-required-message="{{ __('messages.required') }}" />
+                                            @error('quantity_request')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="user_request">{{ __('forms.user.request') }}</label>
-                                                <input type="text" name="user_request" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('user_request')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="receiver">{{ __('forms.receiver') }}</label>
-                                                <input type="text" name="receiver" required class="form-control"
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('receiver')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="form-group mb-3">
-                                                <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
-                                                <input type="text" id="datepicker-basic" name="date_release"
-                                                    class="form-control" placeholder="{{ __('forms.select_date') }}"
-                                                    required
-                                                    data-pristine-required-message="{{ __('messages.required') }}" />
-                                                @error('date_release')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-xl-4 col-md-6">
-                                            <div class="form-group mb-3">
+                                    </div>
 
-                                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                                    <label for="title">{{ __('forms.title') }}</label>
 
-                                                    <div class="form-check form-switch mb-0">
-                                                        <input class="form-check-input" type="checkbox" role="switch"
-                                                            id="skipTitle" style="cursor: pointer;">
 
-                                                        <label class="form-check-label font-size-12 text-muted"
-                                                            for="skipTitle" style="cursor: pointer;">
-                                                            រំលង
-                                                        </label>
-                                                    </div>
+                                    <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="receipt_number">{{ __('forms.receipt.number') }}</label>
+                                            <input type="text" id="receipt_number" name="receipt_number"
+                                                value="{{ old('receipt_number') }}" required tabindex="4" maxlength="4"
+                                                inputmode="numeric" class="form-control"
+                                                data-pristine-required-message="{{ __('messages.required') }}"
+                                                data-pristine-pattern="/^\d{4}$/"
+                                                data-pristine-pattern-message="សូមបញ្ចូលលេខ ៤ ខ្ទង់"
+                                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);" />
+                                            @error('receipt_number')
+                                                <div class="pristine-error text-help text-danger mt-1">{{ $message }}
                                                 </div>
-                                                <input class="form-control" id="title" name="title" type="text"
-                                                    placeholder="{{ __('forms.title') }}"
-                                                    data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                @error('title')
-                                                    <div class="pristine-error text-help text-danger mt-1">
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
-                                            </div>
+                                            @enderror
                                         </div>
-                                        <div class="col-lg-4 col-md-6">
-                                            <div class="form-group mb-3">
+                                    </div>
+                                    <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="user_request">{{ __('forms.user.request') }}</label>
+                                            <input type="text" name="user_request" required class="form-control"
+                                                data-pristine-required-message="{{ __('messages.required') }}" />
+                                            @error('user_request')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="receiver">{{ __('forms.receiver') }}</label>
+                                            <input type="text" name="receiver" required tabindex="5"
+                                                class="form-control"
+                                                data-pristine-required-message="{{ __('messages.required') }}" />
+                                            @error('receiver')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
 
-                                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                                    <label for="fileInput" class="form-label mb-0">
-                                                        {{ __('forms.file.type') }}
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="agency" class="form-label font-size-13 text-muted">
+                                                {{ __('forms.agency') }}
+                                            </label>
+                                            <select class="form-control" data-trigger id="cboAgency" name="agency"
+                                                required tabindex="6"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+                                                <option value="">{{ __('forms.search...') }}</option>
+                                                @foreach ($agency as $item)
+                                                    <option value="{{ $item->id }}">
+                                                        {{ $item->no }}-{{ $item->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('agency')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="cboExecutive"
+                                                class="form-label font-size-13 text-muted">{{ __('forms.agency.executive.unit') }}</label>
+                                            <select id="cboExecutive" class="form-select" name="cboExecutive" required
+                                                data-trigger tabindex="7"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+                                                <option value="">{{ __('forms.search...') }}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
+                                            <input type="text" id="datepicker-basic" name="date_release"
+                                                class="form-control" placeholder="{{ __('forms.select_date') }}" required
+                                                tabindex="8"
+                                                data-pristine-required-message="{{ __('messages.required') }}" />
+                                            @error('date_release')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label for="title">{{ __('forms.title') }}</label>
+
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="skipTitle" style="cursor: pointer;">
+
+                                                    <label class="form-check-label font-size-12 text-muted"
+                                                        for="skipTitle" style="cursor: pointer;">
+                                                        រំលង
                                                     </label>
-
-                                                    <div class="form-check form-switch mb-0">
-                                                        <input class="form-check-input" type="checkbox" role="switch"
-                                                            id="skipFileInput" style="cursor: pointer;">
-
-                                                        <label class="form-check-label font-size-12 text-muted"
-                                                            for="skipFileInput" style="cursor: pointer;">
-                                                            រំលង
-                                                        </label>
-                                                    </div>
                                                 </div>
-
-                                                <input type="file" id="fileInput" name="file[]" class="form-control"
-                                                    tabindex="15" accept=".pdf,.doc,.docx" multiple data-max-size="5"
-                                                    data-allowed-extensions="pdf,doc,docx"
-                                                    data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                <small class="form-text text-muted">
-                                                    Allowed types: PDF, DOC, DOCX (Max: 5MB per file)
-                                                </small>
-
-                                                @error('file')
-                                                    <div class="pristine-error text-help text-danger mt-1">
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
-
-                                                @error('file.*')
-                                                    <div class="pristine-error text-help text-danger mt-1">
-                                                        {{ $message }}
-                                                    </div>
-                                                @enderror
-
                                             </div>
-                                        </div>
+                                            <input class="form-control" id="title" name="title" type="text"
+                                                tabindex="9" placeholder="{{ __('forms.title') }}"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
 
-                                    </div>
-                                </div>
-                                <div class="col-xl-6 col-md-6">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-3">
-                                                <label for="vRefer">{{ __('forms.refer') }}</label>
-                                                <textarea name="refer" id="vRefer" rows="5" class="form-control" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                                @error('txtRefer')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-3">
-                                                <label for="vNote">{{ __('forms.note') }}</label>
-                                                <textarea name="note" id="vNote" rows="5" class="form-control" required
-                                                    data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                                @error('txtNote')
-                                                    <div class="pristine-error text-help">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+                                            @error('title')
+                                                <div class="pristine-error text-help text-danger mt-1">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
                                         </div>
                                     </div>
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label for="fileInput" class="form-label mb-0">
+                                                    {{ __('forms.file.type') }}
+                                                </label>
+
+                                                <div class="form-check form-switch mb-0">
+                                                    <input class="form-check-input" type="checkbox" role="switch"
+                                                        id="skipFileInput" style="cursor: pointer;">
+
+                                                    <label class="form-check-label font-size-12 text-muted"
+                                                        for="skipFileInput" style="cursor: pointer;">
+                                                        រំលង
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <input type="file" id="fileInput" name="file" tabindex="10"
+                                                class="form-control" tabindex="15" accept=".pdf,.doc,.docx"
+                                                data-allowed-extensions="pdf,doc,docx"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+
+                                            <small class="form-text text-muted">
+                                                Allowed types: PDF, DOC, DOCX (Max: 5MB per file)
+                                            </small>
+
+                                            @error('file')
+                                                <div class="pristine-error text-help text-danger mt-1">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+
+                                            @error('file.*')
+                                                <div class="pristine-error text-help text-danger mt-1">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+
+                                        </div>
+                                    </div>
+
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="vRefer">{{ __('forms.refer') }}</label>
+                                            <textarea name="refer" id="vRefer" rows="5" class="form-control" required tabindex="11"
+                                                data-pristine-required-message="{{ __('messages.required') }}"></textarea>
+                                            @error('txtRefer')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="vNote">{{ __('forms.note') }}</label>
+                                            <textarea name="note" id="vNote" rows="5" class="form-control" required tabindex="12"
+                                                data-pristine-required-message="{{ __('messages.required') }}"></textarea>
+                                            @error('txtNote')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-primary"
@@ -330,8 +347,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            const dropAgency = document.getElementById('dropAgency');
-            const dropAgencyChoice = new Choices(dropAgency, {
+            const cboAgency = document.getElementById('cboAgency');
+            const cboAgencyChoice = new Choices(cboAgency, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
                 placeholderValue: 'ជ្រើសរើស', // Khmer placeholder
@@ -551,6 +568,182 @@
                 HTMLFormElement.prototype.submit.call(form);
             });
 
+        });
+    </script>
+
+    {{-- <script>
+        let cboAgencyChoice = new Choices('#cboAgency', {
+            searchEnabled: true,
+            itemSelectText: '',
+            placeholder: true,
+            placeholderValue: "ស្វែងរក..."
+        });
+
+        let cboExecutiveChoice = null;
+
+        $('#cboAgency').on('change', function() {
+            const agencyId = $(this).val();
+
+            resetSelect('#cboExecutive');
+            cboExecutiveChoice = resetChoices('#cboExecutive', cboExecutiveChoice);
+
+            if (!agencyId) return;
+
+            loadOptions({
+                url: "{{ route('duelRelease.by.executive') }}",
+                data: {
+                    agency_id: agencyId
+                },
+                targetSelect: '#cboExecutive',
+                instanceRefSetter: () => {
+                    cboExecutiveChoice = resetChoices('#cboExecutive', cboExecutiveChoice);
+                }
+            });
+        });
+    </script> --}}
+    <script>
+        // document.addEventListener('DOMContentLoaded', function() {
+
+        //     // ========= Choices Instances =========
+        //     let executiveChoices = new Choices('#cboExecutive', {
+        //         searchEnabled: true,
+        //         itemSelectText: '',
+        //         placeholder: true,
+        //         placeholderValue: "ស្វែងរក..."
+        //     });
+
+        //     // ========= Helpers =========
+        //     function resetSelect(selector) {
+        //         $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+        //     }
+
+        //     function resetChoices(selector, instance) {
+        //         instance.destroy();
+        //         return new Choices(selector, {
+        //             searchEnabled: true,
+        //             itemSelectText: '',
+        //             placeholder: true,
+        //             placeholderValue: "ស្វែងរក..."
+        //         });
+        //     }
+
+        //     function loadOptions({
+        //         url,
+        //         data,
+        //         targetSelect,
+        //         instanceRefSetter
+        //     }) {
+        //         $.ajax({
+        //             url,
+        //             type: "GET",
+        //             data,
+        //             success: function(html) {
+        //                 $(targetSelect).html(html);
+        //                 instanceRefSetter();
+        //             },
+        //             error: function() {
+        //                 // optional: keep empty if error
+        //                 resetSelect(targetSelect);
+        //             }
+        //         });
+        //     }
+
+        //     // ========= Script 1: Program -> ProgramSub =========
+        //     function handleProgramChangeForProgramSub(agencyId) {
+        //         resetSelect('#cboExecutive');
+        //         executiveChoices = resetChoices('#cboExecutive', executiveChoices);
+
+        //         if (!agencyId) return;
+
+        //         loadOptions({
+        //             url: "{{ route('beginVoucher.by.program_sub') }}",
+        //             data: {
+        //                 agency_id: agencyId
+        //             },
+        //             targetSelect: '#cboExecutive',
+        //             instanceRefSetter: () => {
+        //                 executiveChoices = resetChoices('#cboExecutive', executiveChoices);
+        //             }
+        //         });
+        //     }
+
+        //     // ========= Events =========
+        //     $('#cboAgency').on('change', function() {
+        //         const agencyId = $(this).val();
+
+        //         // when program changes -> always clear cluster too
+        //         handleProgramChangeForProgramSub(agencyId);
+        //     });
+        // });
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========= Choices Instances =========
+            let executiveChoices = new Choices('#cboExecutive', {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: "ស្វែងរក..."
+            });
+
+            // ========= Helpers =========
+            function resetSelect(selector) {
+                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
+            }
+
+            function resetChoices(selector, instance) {
+                instance.destroy();
+                return new Choices(selector, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: "ស្វែងរក..."
+                });
+            }
+
+            function loadOptions({
+                url,
+                data,
+                targetSelect,
+                instanceRefSetter
+            }) {
+                $.ajax({
+                    url,
+                    type: "GET",
+                    data,
+                    success: function(html) {
+                        $(targetSelect).html(html);
+                        instanceRefSetter();
+                    },
+                    error: function() {
+                        resetSelect(targetSelect);
+                    }
+                });
+            }
+
+            // ========= Script: Agency -> Executive Unit =========
+            function handleAgencyChange(agencyId) {
+                resetSelect('#cboExecutive');
+                executiveChoices = resetChoices('#cboExecutive', executiveChoices);
+
+                if (!agencyId) return;
+
+                loadOptions({
+                    url: "{{ route('duelRelease.by.executive') }}", // Fixed route name
+                    data: {
+                        agency_id: agencyId
+                    },
+                    targetSelect: '#cboExecutive',
+                    instanceRefSetter: () => {
+                        executiveChoices = resetChoices('#cboExecutive', executiveChoices);
+                    }
+                });
+            }
+
+            // ========= Events =========
+            $('#cboAgency').on('change', function() {
+                const agencyId = $(this).val();
+                handleAgencyChange(agencyId);
+            });
         });
     </script>
 @endsection

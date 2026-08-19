@@ -218,6 +218,21 @@ class BeginVoucherController extends Controller
      */
     public function store(Request $request, $params)
     {
+        // 1. Create Cache Lock Signature to prevent duplicate concurrent requests
+        $userId = auth()->check() ? auth()->id() : request()->ip();
+        $requestSignature = 'begin_voucher_store_' . $userId . '_' . md5(json_encode($request->except('_token')));
+
+        // 2. Lock for 10 seconds
+        if (!\Illuminate\Support\Facades\Cache::add($requestSignature, true, 10)) {
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('Please wait, your request is already being processed.', 'Warning')
+                ->flash();
+
+            return back()->withInput();
+        }
+
         $validatedData = $request->validate([
             'cboProgram'     => 'required',
             'cboProgramSub'  => 'required',
@@ -810,51 +825,163 @@ class BeginVoucherController extends Controller
             ->with('budgetAllocationId', $budgetAllocationId);
     }
 
+    // public function storeBudgetAllocation(Request $request, $params, $budgetAllocationId)
+    // {
+
+    //     // 1. Create Cache Lock Signature to prevent duplicate concurrent requests
+    //     $userId = auth()->check() ? auth()->id() : request()->ip();
+    //     $requestSignature = 'budget_allocation_store_' . $userId . '_' . md5(json_encode($request->except('_token')));
+
+    //     // 2. Lock for 10 seconds
+    //     if (!\Illuminate\Support\Facades\Cache::add($requestSignature, true, 10)) {
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 2000)
+    //             ->error('Please wait, your request is already being processed.', 'Warning')
+    //             ->flash();
+
+    //         return back()->withInput();
+    //     }
+
+    //     $validatedData = $request->validate([
+    //         'amount'         => 'required|numeric|min:0.01',
+    //         'cboExpenseType' => 'required|exists:expense_types,id',
+    //         'rounds'         => 'nullable|integer|min:1|max:4', // Validate as single integer
+    //     ]);
+
+    //     DB::beginTransaction();
+    //     try {
+    //         // 1. Fetch Ministry & Voucher
+    //         $ministry = Ministry::where('id', decode_params($params))->first();
+    //         $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
+    //             ->where('ministry_id', $ministry->id)
+    //             ->first();
+
+    //         if (!$beginVoucher) {
+    //             throw new \Exception('រកមិនឃើញឥណទានដើមគ្រាឡើយ');
+    //         }
+
+    //         // 2. Check remaining budget limit
+    //         $currentAllocated = BudgetAllocation::where('ministry_id', $ministry->id)
+    //             ->where('budget_begin_voucher_id', $beginVoucher->id)
+    //             ->sum('amount');
+
+    //         $remainingBudget = (float) $beginVoucher->fin_law - $currentAllocated;
+
+    //         if ($validatedData['amount'] > $remainingBudget) {
+    //             throw new \Exception('ទឹកប្រាក់បែងចែកលើសពីច្បាប់ហិរញ្ញវត្ថុដែលនៅសល់ (' . number_format($remainingBudget) . ')');
+    //         }
+
+    //         // 3. Save new allocation
+    //         BudgetAllocation::create([
+    //             'ministry_id'             => $ministry->id,
+    //             'budget_begin_voucher_id' => $beginVoucher->id,
+    //             'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+    //             'amount'                  => $validatedData['amount'],
+    //             'rounds'                  => $validatedData['rounds'], // Saves as 1, 2, 3, 4, or null
+    //         ]);
+
+    //         DB::commit();
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 1000)
+    //             ->success('success_msg', 'successful')
+    //             ->flash();
+
+    //         return redirect()->route('budgetAllocation.index', [
+    //             'params'             => $params,
+    //             'budgetAllocationId' => $budgetAllocationId,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('BudgetAllocation Store Error: ' . $e->getMessage());
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 3000)
+    //             ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
+    //             ->flash();
+
+    //         return redirect()->back()->withInput();
+    //     }
+    // }
     public function storeBudgetAllocation(Request $request, $params, $budgetAllocationId)
     {
+        // 1. VALIDATE FIRST! (Do not lock the cache if validation fails)
         $validatedData = $request->validate([
             'amount'         => 'required|numeric|min:0.01',
             'cboExpenseType' => 'required|exists:expense_types,id',
+            'rounds'         => 'nullable|array',
+            'rounds.*'       => 'integer|min:1|max:4',
         ]);
+
+        // 2. Create Cache Lock Signature (Only locks if form is perfectly valid)
+        $userId = auth()->check() ? auth()->id() : request()->ip();
+        $requestSignature = 'budget_allocation_store_' . $userId . '_' . md5(json_encode($request->except('_token')));
+
+        if (!\Illuminate\Support\Facades\Cache::add($requestSignature, true, 10)) {
+            flash()->translate('en')->option('timeout', 2000)->error('Please wait, your request is already being processed.', 'Warning')->flash();
+            return back()->withInput();
+        }
 
         DB::beginTransaction();
         try {
-            // 1. Fetch Ministry & Voucher
             $ministry = Ministry::where('id', decode_params($params))->first();
             $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
-            if (!$beginVoucher) {
-                throw new \Exception('រកមិនឃើញឥណទានដើមគ្រាឡើយ');
-            }
+            if (!$beginVoucher) throw new \Exception('រកមិនឃើញឥណទានដើមគ្រាឡើយ');
 
-            // 2. Check remaining budget limit
+            // 3. SAFELY HANDLE ROUNDS (Fixes the Undefined Array Key Crash)
+            $roundsInput = $request->input('rounds');
+            $roundsToSave = empty($roundsInput) ? [null] : $roundsInput;
+
+            // 4. Prevent Duplicate Database Entry for ANY of the selected rounds
+            $existingAllocation = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
+                ->where('budget_expense_type_id', $validatedData['cboExpenseType'])
+                ->where(function ($query) use ($roundsToSave) {
+                    if (in_array(null, $roundsToSave, true)) {
+                        $query->whereNull('rounds');
+                    } else {
+                        $query->whereIn('rounds', $roundsToSave);
+                    }
+                })->exists();
+
+            if ($existingAllocation) throw new \Exception('ប្រភេទចំណាយក្នុងជុំនេះត្រូវបានបែងចែករួចហើយ!');
+
+            // 5. Check remaining budget limit
             $currentAllocated = BudgetAllocation::where('ministry_id', $ministry->id)
                 ->where('budget_begin_voucher_id', $beginVoucher->id)
                 ->sum('amount');
 
             $remainingBudget = (float) $beginVoucher->fin_law - $currentAllocated;
 
-            if ($validatedData['amount'] > $remainingBudget) {
-                throw new \Exception('ទឹកប្រាក់បែងចែកលើសពីច្បាប់ហិរញ្ញវត្ថុដែលនៅសល់ (' . number_format($remainingBudget) . ')');
+            // Multiply the amount by the number of rows we are creating
+            $totalAmountToDeduct = $validatedData['amount'] * count($roundsToSave);
+
+            if ($totalAmountToDeduct > $remainingBudget) {
+                throw new \Exception('ទឹកប្រាក់បែងចែកសរុប (' . number_format($totalAmountToDeduct) . ') លើសពីច្បាប់ហិរញ្ញវត្ថុដែលនៅសល់ (' . number_format($remainingBudget) . ')');
             }
 
-            // 3. Save new allocation
-            BudgetAllocation::create([
-                'ministry_id'             => $ministry->id,
-                'budget_begin_voucher_id' => $beginVoucher->id,
-                'budget_expense_type_id'  => $validatedData['cboExpenseType'],
-                'amount'                  => $validatedData['amount'],
-            ]);
+            // 6. Save multiple rows (one for each round)
+            foreach ($roundsToSave as $round) {
+                BudgetAllocation::create([
+                    'ministry_id'             => $ministry->id,
+                    'budget_begin_voucher_id' => $beginVoucher->id,
+                    'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+                    'amount'                  => $validatedData['amount'],
+                    'rounds'                  => $round, // Inserts 1, 2, 3, 4, or null
+                ]);
+            }
 
             DB::commit();
 
-            flash()
-                ->translate('en')
-                ->option('timeout', 1000)
-                ->success('success_msg', 'successful')
-                ->flash();
+            // Release the lock upon success so the user can immediately add another entry
+            \Illuminate\Support\Facades\Cache::forget($requestSignature);
+
+            flash()->translate('en')->option('timeout', 1000)->success('success_msg', 'successful')->flash();
 
             return redirect()->route('budgetAllocation.index', [
                 'params'             => $params,
@@ -862,18 +989,14 @@ class BeginVoucherController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('BudgetAllocation Store Error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Cache::forget($requestSignature); // Release lock on error
 
-            flash()
-                ->translate('en')
-                ->option('timeout', 3000)
-                ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
-                ->flash();
+            Log::error('BudgetAllocation Store Error: ' . $e->getMessage());
+            flash()->translate('en')->option('timeout', 3000)->error($e->getMessage(), 'បញ្ហា')->flash();
 
             return redirect()->back()->withInput();
         }
     }
-
     public function editBudgetAllocation($params, $budgetAllocationId, $id)
     {
 
@@ -912,58 +1035,73 @@ class BeginVoucherController extends Controller
 
     public function updateBudgetAllocation(Request $request, $params, $budgetAllocationId, $id)
     {
+        // 1. Lock to prevent double-submit
+        $userId = auth()->check() ? auth()->id() : request()->ip();
+        $requestSignature = 'budget_allocation_update_' . $userId . '_' . md5(json_encode($request->except('_token')));
+
+        if (!\Illuminate\Support\Facades\Cache::add($requestSignature, true, 10)) {
+            flash()->translate('en')->option('timeout', 2000)->error('Please wait, processing.', 'Warning')->flash();
+            return back()->withInput();
+        }
 
         $validatedData = $request->validate([
-            'amount'          => 'required|numeric|min:0',
+            'amount'         => 'required|numeric|min:0.01',
             'cboExpenseType' => 'required|exists:expense_types,id',
+            // 'rounds'         => 'nullable|integer|max:4',
         ]);
 
         DB::beginTransaction();
         try {
-            // Fetch the ministry safely
-            $ministry = Ministry::where('id', decode_params($params))->first();
-
-            // Fetch the begin voucher
+            $ministry = Ministry::where('id', decode_params($params))->firstOrFail();
             $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
-                ->where('ministry_id', $ministry->id)
-                ->first();
+                ->where('ministry_id', $ministry->id)->firstOrFail();
 
-            // Fetch the specific Budget Allocation entry
-            $module = BudgetAllocation::where('id', $id)
+            // Find the exact allocation we are editing
+            $allocation = BudgetAllocation::findOrFail($id);
+
+            // 2. Prevent Duplicate Database Entry (IGNORE CURRENT RECORD)
+            $existingAllocation = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
+                ->where('budget_expense_type_id', $validatedData['cboExpenseType'])
+                ->where('id', '!=', $allocation->id) // <--- CRITICAL: Ignore itself
+                ->exists();
+
+            if ($existingAllocation) throw new \Exception('ប្រភេទចំណាយនេះត្រូវបានបែងចែករួចហើយ!');
+
+            // 3. Check remaining budget limit (IGNORE CURRENT RECORD AMOUNT)
+            // Calculate how much is allocated to OTHER expenses
+            $otherAllocated = BudgetAllocation::where('ministry_id', $ministry->id)
                 ->where('budget_begin_voucher_id', $beginVoucher->id)
-                ->first();
+                ->where('id', '!=', $allocation->id) // <--- CRITICAL: Ignore itself
+                ->sum('amount');
 
-            if (!$module) {
-                throw new \Exception('ការស្វែងរកមិនបានជោគជ័យ។');
+            $remainingBudget = (float) $beginVoucher->fin_law - $otherAllocated;
+
+            if ($validatedData['amount'] > $remainingBudget) {
+                throw new \Exception('ទឹកប្រាក់បែងចែកលើសពីច្បាប់ហិរញ្ញវត្ថុដែលនៅសល់ (' . number_format($remainingBudget) . ')');
             }
 
-            // Update the Budget Allocation entry
-            $module->update([
+            // 4. Update the allocation
+            $allocation->update([
                 'budget_expense_type_id'  => $validatedData['cboExpenseType'],
-                'amount'           => $validatedData['amount'],
+                'amount'                  => $validatedData['amount'],
+                // Add ?? null so it empties the field if user checked the skip button
+                // 'rounds'                  => $validatedData['rounds'] ?? null,
             ]);
 
             DB::commit();
 
-            flash()
-                ->translate('en')
-                ->option('timeout', 1000)
-                ->success('success_msg', 'successful')
-                ->flash();
+            flash()->translate('en')->option('timeout', 1000)->success('success_msg', 'successful')->flash();
 
             return redirect()->route('budgetAllocation.index', [
-                'params' => $params,
-                'budgetAllocationId' => $budgetAllocationId
+                'params'             => $params,
+                'budgetAllocationId' => $budgetAllocationId,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error($e->getMessage());
+            \Illuminate\Support\Facades\Cache::forget($requestSignature);
 
-            flash()
-                ->translate('en')
-                ->option('timeout', 2000)
-                ->error('បញ្ហាក្នុងការធ្វើបច្ចុប្បន្នភាព: ' . $e->getMessage(), 'បញ្ហា')
-                ->flash();
+            Log::error('BudgetAllocation Update Error: ' . $e->getMessage());
+            flash()->translate('en')->option('timeout', 3000)->error($e->getMessage(), 'បញ្ហា')->flash();
 
             return redirect()->back()->withInput();
         }

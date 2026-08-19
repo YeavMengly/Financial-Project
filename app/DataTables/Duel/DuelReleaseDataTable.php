@@ -13,6 +13,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 use Illuminate\Support\Facades\DB;
+
 class DuelReleaseDataTable extends DataTable
 {
     /**
@@ -35,8 +36,8 @@ class DuelReleaseDataTable extends DataTable
                 return number_format(max(0, $remain)) . ' L';
             })
             ->editColumn('soft_delete', function ($soft_delete) {
-                return is_null($soft_delete->deleted_at) 
-                    ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' 
+                return is_null($soft_delete->deleted_at)
+                    ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->editColumn('item_name', function ($row) {
@@ -68,19 +69,118 @@ class DuelReleaseDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      */
+    // public function query(DuelRelease $model, Request $request): QueryBuilder
+    // {
+    //     $params = $request->params;
+    //     $ministryId = decode_params($params);
+
+    //     $query = $model->newQuery()
+
+    //         ->leftJoin('duel_entries', 'duel_entries.item_name', '=', 'duel_types.id')
+
+    //         ->leftJoin('duel_entries', 'duel_entries.project_id', '=', 'projects.id')
+
+    //         ->leftJoin('agencies', 'duel_releases.agency', '=', 'agencies.id')
+    //         ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
+    //         // ->leftJoin('duel_entries', function ($join) use ($ministryId) {
+    //         //     $join->on('duel_entries.stock_number', '=', 'duel_releases.stock_number')
+    //         //         ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
+    //         //         ->where('duel_entries.ministry_id', '=', $ministryId);
+    //         // })
+
+    //         ->where('duel_releases.ministry_id', $ministryId);
+
+    //     // Filters
+    //     if ($request->filled('start_date') && $request->filled('end_date')) {
+    //         $query->whereBetween('duel_releases.date_release', [$request->start_date, $request->end_date]);
+    //     } elseif ($request->filled('start_date')) {
+    //         $query->whereDate('duel_releases.date_release', '>=', $request->start_date);
+    //     } elseif ($request->filled('end_date')) {
+    //         $query->whereDate('duel_releases.date_release', '<=', $request->end_date);
+    //     }
+
+    //     if ($request->filled('cboNumber')) {
+    //         $query->where('duel_releases.receipt_number', $request->cboNumber);
+    //     }
+    //     if ($request->filled('cboUserRequest')) {
+    //         $query->where('duel_releases.user_request', $request->cboUserRequest);
+    //     }
+    //     if ($request->filled('cboDuelType')) {
+    //         $query->where('duel_releases.item_name', $request->cboDuelType);
+    //     }
+    //     if ($request->filled('cboExecutiveUnit')) {
+    //         $query->where('duel_releases.executive_unit', $request->cboExecutiveUnit);
+    //     }
+
+    //     // Subquery matching release sequence strictly by (date_release, receipt_number, id)
+    //     $previousReleasesSubQuery = DB::table('duel_releases as dr_prev')
+    //         ->selectRaw('COALESCE(SUM(dr_prev.quantity_request), 0)')
+    //         ->whereColumn('dr_prev.ministry_id', 'duel_releases.ministry_id')
+    //         ->whereColumn('dr_prev.stock_number', 'duel_releases.stock_number')
+    //         ->whereColumn('dr_prev.item_name', 'duel_releases.item_name')
+    //         ->where(function ($q) {
+    //             $q->whereColumn('dr_prev.date_release', '<', 'duel_releases.date_release')
+    //                 ->orWhere(function ($q2) {
+    //                     $q2->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
+    //                         ->whereColumn('dr_prev.receipt_number', '<', 'duel_releases.receipt_number');
+    //                 })
+    //                 ->orWhere(function ($q3) {
+    //                     $q3->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
+    //                         ->whereColumn('dr_prev.receipt_number', '=', 'duel_releases.receipt_number')
+    //                         ->whereColumn('dr_prev.id', '<', 'duel_releases.id');
+    //                 });
+    //         });
+
+    //     $query->select([
+    //         'duel_releases.id',
+    //         'duel_releases.ministry_id',
+    //         'duel_types.name_km as item_name',
+    //         'duel_releases.receipt_number',
+    //         'projects.stock_number',
+    //         'agencies.name as agency',
+    //         'duel_releases.user_request',
+    //         'duel_releases.receiver',
+    //         'duel_releases.quantity_request',
+    //         'duel_releases.note',
+    //         'duel_releases.refer',
+    //         'duel_releases.title',
+    //         'duel_releases.date_release',
+    //         'duel_releases.file',
+    //         'duel_releases.created_at',
+    //         'duel_releases.updated_at',
+    //         DB::raw("GREATEST(0, COALESCE(duel_entries.quantity, 0) - ({$previousReleasesSubQuery->toSql()})) as running_total")
+    //     ])
+    //         ->mergeBindings($previousReleasesSubQuery);
+
+    //     // Make sure table sort order matches subquery sequence logic
+    //     return $query->orderBy('duel_releases.date_release', 'ASC')
+    //         ->orderBy('duel_releases.receipt_number', 'ASC')
+    //         ->orderBy('duel_releases.id', 'ASC');
+    // }
     public function query(DuelRelease $model, Request $request): QueryBuilder
     {
         $params = $request->params;
         $ministryId = decode_params($params);
 
         $query = $model->newQuery()
+            // 1. Join Related Lookups Properly
             ->leftJoin('agencies', 'duel_releases.agency', '=', 'agencies.id')
+            ->leftJoin('executive_units', 'duel_releases.executive_unit_id', '=', 'executive_units.id')
             ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
+
+            // 2. Join Projects table using project_id from duel_releases migration
+            ->leftJoin('projects', function ($join) use ($ministryId) {
+                $join->on('projects.id', '=', 'duel_releases.project_id')
+                    ->where('projects.ministry_id', '=', $ministryId);
+            })
+
+            // 3. Join Duel Entries table cleanly via project_id and item_name
             ->leftJoin('duel_entries', function ($join) use ($ministryId) {
-                $join->on('duel_entries.stock_number', '=', 'duel_releases.stock_number')
+                $join->on('duel_entries.project_id', '=', 'duel_releases.project_id')
                     ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
                     ->where('duel_entries.ministry_id', '=', $ministryId);
             })
+
             ->where('duel_releases.ministry_id', $ministryId);
 
         // Filters
@@ -106,22 +206,22 @@ class DuelReleaseDataTable extends DataTable
         }
 
         // Subquery matching release sequence strictly by (date_release, receipt_number, id)
-        $previousReleasesSubQuery =DB::table('duel_releases as dr_prev')
+        $previousReleasesSubQuery = DB::table('duel_releases as dr_prev')
             ->selectRaw('COALESCE(SUM(dr_prev.quantity_request), 0)')
             ->whereColumn('dr_prev.ministry_id', 'duel_releases.ministry_id')
-            ->whereColumn('dr_prev.stock_number', 'duel_releases.stock_number')
+            ->whereColumn('dr_prev.project_id', 'duel_releases.project_id')
             ->whereColumn('dr_prev.item_name', 'duel_releases.item_name')
             ->where(function ($q) {
                 $q->whereColumn('dr_prev.date_release', '<', 'duel_releases.date_release')
-                  ->orWhere(function ($q2) {
-                      $q2->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
-                         ->whereColumn('dr_prev.receipt_number', '<', 'duel_releases.receipt_number');
-                  })
-                  ->orWhere(function ($q3) {
-                      $q3->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
-                         ->whereColumn('dr_prev.receipt_number', '=', 'duel_releases.receipt_number')
-                         ->whereColumn('dr_prev.id', '<', 'duel_releases.id');
-                  });
+                    ->orWhere(function ($q2) {
+                        $q2->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
+                            ->whereColumn('dr_prev.receipt_number', '<', 'duel_releases.receipt_number');
+                    })
+                    ->orWhere(function ($q3) {
+                        $q3->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
+                            ->whereColumn('dr_prev.receipt_number', '=', 'duel_releases.receipt_number')
+                            ->whereColumn('dr_prev.id', '<', 'duel_releases.id');
+                    });
             });
 
         $query->select([
@@ -129,8 +229,9 @@ class DuelReleaseDataTable extends DataTable
             'duel_releases.ministry_id',
             'duel_types.name_km as item_name',
             'duel_releases.receipt_number',
-            'duel_releases.stock_number',
+            'projects.stock_number',
             'agencies.name as agency',
+            'executive_units.title as title_executive_units',
             'duel_releases.user_request',
             'duel_releases.receiver',
             'duel_releases.quantity_request',
@@ -143,7 +244,7 @@ class DuelReleaseDataTable extends DataTable
             'duel_releases.updated_at',
             DB::raw("GREATEST(0, COALESCE(duel_entries.quantity, 0) - ({$previousReleasesSubQuery->toSql()})) as running_total")
         ])
-        ->mergeBindings($previousReleasesSubQuery);
+            ->mergeBindings($previousReleasesSubQuery);
 
         // Make sure table sort order matches subquery sequence logic
         return $query->orderBy('duel_releases.date_release', 'ASC')
@@ -162,6 +263,7 @@ class DuelReleaseDataTable extends DataTable
             Column::make('date_release')->title(__('tables.th.date.release'))->width(200)->addClass('align-middle'),
             Column::make('receipt_number')->title(__('tables.th.receipt.number'))->width(30)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
+            Column::make('title_executive_units')->title(__('tables.th.agency.executive.unit'))->width(30)->addClass('align-middle'),
             Column::make('user_request')->title(__('tables.th.user.req'))->width(30)->addClass('align-middle'),
             Column::make('receiver')->title(__('tables.th.user.rec'))->width(30)->addClass('align-middle'),
             Column::make('item_name')->title(__('tables.th.item.name'))->width(90)->addClass('align-middle'),

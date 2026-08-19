@@ -353,6 +353,26 @@ class BeginExport
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
             'Cache-Control' => 'max-age=0',
         ]);
+        // 1. Define temporary file path on disk
+        // $fileName = 'budget_report_' . time() . '.xlsx';
+        // $directory = 'app/exports';
+        // $fullDirectoryPath = storage_path($directory);
+
+        // if (!file_exists($fullDirectoryPath)) {
+        //     mkdir($fullDirectoryPath, 0755, true);
+        // }
+
+        // $filePath = $fullDirectoryPath . '/' . $fileName;
+
+        // // 2. Save the spreadsheet to the temporary file path
+        // $writer = new Xlsx($spreadsheet);
+        // $writer->save($filePath);
+
+        // // 3. Return download response and automatically delete the file from disk after sending
+        // return response()->download($filePath, $fileName, [
+        //     'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Cache-Control' => 'max-age=0',
+        // ])->deleteFileAfterSend(true);
     }
 
     private function initTotals(): array
