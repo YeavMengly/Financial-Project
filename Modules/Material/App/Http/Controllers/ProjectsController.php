@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 class ProjectsController extends Controller
 {
@@ -156,138 +157,70 @@ class ProjectsController extends Controller
     {
         $ministryId = decode_params($params);
         $ministry = Ministry::where('id', $ministryId)->firstOrFail();
+
         // | Validation Rules
         $rules = [
-            'stock_number' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'stock_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'company_name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'warehouse_voucher' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'user_entry' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'user_receiver' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-            'date' => [
-                'required',
-                'date',
-            ],
-            // | Optional Title
-            'title' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-            // | Optional Files
-            'file' => [
-                'nullable',
-                'array',
-            ],
-            'file.*' => [
-                'nullable',
-                'file',
-                'mimes:pdf,doc,docx',
-                'max:5120',
-            ],
-            //   | Note / Refer
-            'note' => [
-                'required',
-                'string',
-                'max:10000',
-            ],
-            'refer' => [
-                'required',
-                'string',
-                'max:10000',
-            ],
+            'stock_number' => ['required', 'string', 'max:255'],
+            'stock_name' => ['required', 'string', 'max:255'],
+            'company_name' => ['required', 'string', 'max:255'],
+            'warehouse_voucher' => ['required', 'string', 'max:255'],
+            'user_entry' => ['required', 'string', 'max:255'],
+            'user_receiver' => ['required', 'string', 'max:255'],
+            'date' => ['required', 'date'],
+            'title' => ['nullable', 'string', 'max:255'],
+            // Support both single file and array of files
+            'file' => ['nullable'],
+            'file.*' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+            'note' => ['required', 'string', 'max:10000'],
+            'refer' => ['required', 'string', 'max:10000'],
         ];
-        // | Dynamic Table Validation, Only validate table when Skip is NOT checked.
+
+        // | Dynamic Table Validation
         $skipItemTable = $request->boolean('skipItemTable');
         if (!$skipItemTable) {
-            $rules['sub_pro'] = [
-                'required',
-                'array',
-                'min:1',
-            ];
-            $rules['sub_pro.*'] = [
-                'required',
-                'string',
-                'max:255',
-            ];
-            $rules['accountSub'] = [
-                'nullable',
-                'array',
-            ];
-            $rules['accountSub.*'] = [
-                'nullable',
-                'integer',
-            ];
-            $rules['program'] = [
-                'nullable',
-                'array',
-            ];
-            $rules['program.*'] = [
-                'nullable',
-                'integer',
-            ];
-            $rules['cboProgramSub'] = [
-                'nullable',
-                'array',
-            ];
-            $rules['cboProgramSub.*'] = [
-                'nullable',
-                'integer',
-            ];
-            $rules['cboCluster'] = [
-                'nullable',
-                'array',
-            ];
-            $rules['cboCluster.*'] = [
-                'nullable',
-                'integer',
-            ];
+            $rules['sub_pro'] = ['required', 'array', 'min:1'];
+            $rules['sub_pro.*'] = ['required', 'string', 'max:255'];
+            $rules['accountSub'] = ['nullable', 'array'];
+            $rules['accountSub.*'] = ['nullable', 'integer'];
+            $rules['program'] = ['nullable', 'array'];
+            $rules['program.*'] = ['nullable', 'integer'];
+            $rules['cboProgramSub'] = ['nullable', 'array'];
+            $rules['cboProgramSub.*'] = ['nullable', 'integer'];
+            $rules['cboCluster'] = ['nullable', 'array'];
+            $rules['cboCluster.*'] = ['nullable', 'integer'];
         }
-        // | Validate
+
         $validated = $request->validate($rules);
-        // | Start Transaction
+
         DB::beginTransaction();
         try {
-            // | Format Date
-            $formattedDate = Carbon::parse(
-                $validated['date']
-            )->format('Y-m-d');
-            // | Upload Files
-            $paths = [];
+            $formattedDate = Carbon::parse($validated['date'])->format('Y-m-d');
+
+            // | Secure File Upload Handling
+            $filePaths = [];
             if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
+                $path_store = 'uploads/project/' . date('Y-m-d');
+                $files = $request->file('file');
+
+                // Force into array so foreach works for both single and multiple uploads
+                if (!is_array($files)) {
+                    $files = [$files];
+                }
+
+                foreach ($files as $file) {
                     if ($file->isValid()) {
-                        $paths[] = $file->store(
-                            'materials/documents',
-                            'public'
-                        );
+                        $filePaths[] = $file->store($path_store, 'public');
                     }
                 }
             }
+
+            // Store string path or JSON array depending on count
+            $filePath = match (count($filePaths)) {
+                0 => null,
+                1 => $filePaths[0],
+                default => json_encode($filePaths),
+            };
+
             // | Get Dynamic Table Data
             if (!$skipItemTable) {
                 $subProjects = $validated['sub_pro'];
@@ -296,44 +229,26 @@ class ProjectsController extends Controller
                 $programSubs = $validated['cboProgramSub'] ?? [];
                 $clusters = $validated['cboCluster'] ?? [];
             } else {
-                // | Skip Table,  Create one main Project record with NULL dynamic fields.
                 $subProjects = [null];
                 $accountSubs = [];
                 $programs = [];
                 $programSubs = [];
                 $clusters = [];
             }
+
             // | Create Project Records
             foreach ($subProjects as $index => $subProject) {
-                // | When table is NOT skipped, Don't create empty rows.
-                if (
-                    !$skipItemTable &&
-                    (
-                        is_null($subProject) ||
-                        trim($subProject) === ''
-                    )
-                ) {
+                if (!$skipItemTable && (is_null($subProject) || trim($subProject) === '')) {
                     continue;
                 }
+
                 Projects::create([
                     'ministry_id' => $ministry->id,
-                    // | Dynamic Table Fields
-                    'sub_project' => !$skipItemTable
-                        ? trim($subProject)
-                        : null,
-                    'account_sub_id' => !$skipItemTable
-                        ? ($accountSubs[$index] ?? null)
-                        : null,
-                    'program_id' => !$skipItemTable
-                        ? ($programs[$index] ?? null)
-                        : null,
-                    'program_sub_id' => !$skipItemTable
-                        ? ($programSubs[$index] ?? null)
-                        : null,
-                    'cluster_id' => !$skipItemTable
-                        ? ($clusters[$index] ?? null)
-                        : null,
-                    // | Main Project Information
+                    'sub_project' => !$skipItemTable ? trim($subProject) : null,
+                    'account_sub_id' => !$skipItemTable ? ($accountSubs[$index] ?? null) : null,
+                    'program_id' => !$skipItemTable ? ($programs[$index] ?? null) : null,
+                    'program_sub_id' => !$skipItemTable ? ($programSubs[$index] ?? null) : null,
+                    'cluster_id' => !$skipItemTable ? ($clusters[$index] ?? null) : null,
                     'stock_number' => $validated['stock_number'],
                     'stock_name' => $validated['stock_name'],
                     'company_name' => $validated['company_name'],
@@ -342,37 +257,32 @@ class ProjectsController extends Controller
                     'user_entry' => $validated['user_entry'],
                     'user_receiver' => $validated['user_receiver'],
                     'date' => $formattedDate,
-                    // | Optional Fields
                     'title' => !empty($validated['title']) ? $validated['title'] : null,
                     'note' => strip_tags($validated['note']),
                     'refer' => strip_tags($validated['refer']),
-                    'file' => !empty($paths) ? json_encode($paths) : null,
+                    'file' => $filePath,
                 ]);
             }
+
             DB::commit();
+
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
-                ->success(
-                    'success_msg',
-                    'successful'
-                )
+                ->success('success_msg', 'successful')
                 ->flash();
-            return redirect()->route(
-                'project.index',
-                $params
-            );
+
+            return redirect()->route('project.index', $params);
         } catch (\Throwable $e) {
-            // | Rollback
             DB::rollBack();
-            // | Log Error
+
             Log::error('Project Store Error', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'request' => $request->except(['file']),
             ]);
-            // | Return Error
+
             return redirect()
                 ->back()
                 ->withInput()
@@ -434,7 +344,7 @@ class ProjectsController extends Controller
             'stock_name'        => 'required|string',
             'company_name'      => 'required|string',
             'warehouse_voucher' => 'required|string',
-            'warehouse_owner'   => 'nullable|string',  
+            'warehouse_owner'   => 'nullable|string',
             'user_entry'        => 'required|string',
             'user_receiver'     => 'required|string',
             'date'              => 'required|date',

@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ministry_id');
             $table->string('sub_project')->nullable();
-            $table->unsignedBigInteger('program_id');
-            $table->unsignedBigInteger('program_sub_id');
-            $table->unsignedBigInteger('cluster_id');
-            $table->unsignedBigInteger('account_sub_id');
+            $table->string('program_id')->nullable();
+            $table->string('program_sub_id')->nullable();
+            $table->string('cluster_id')->nullable();
+            $table->string('account_sub_id')->nullable();
             $table->string('stock_number');
             $table->string('stock_name');
             $table->string('company_name');
