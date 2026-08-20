@@ -7,8 +7,8 @@
 
     <style>
         /* =========================================================
-                     * TABLE FIXES FOR DROPDOWNS
-                     * ========================================================= */
+                         * TABLE FIXES FOR DROPDOWNS
+                         * ========================================================= */
         #itemTable {
             table-layout: fixed !important;
             width: 100% !important;
@@ -31,8 +31,8 @@
         }
 
         /* =========================================================
-                     * CHOICES.JS STYLING
-                     * ========================================================= */
+                         * CHOICES.JS STYLING
+                         * ========================================================= */
         .choices {
             margin-bottom: 0 !important;
             width: 100% !important;
@@ -93,8 +93,8 @@
         }
 
         /* =========================================================
-                     * DISABLED / SKIPPED STATE
-                     * ========================================================= */
+                         * DISABLED / SKIPPED STATE
+                         * ========================================================= */
         #itemTableWrapper.table-skipped {
             opacity: 0.6;
         }
@@ -365,10 +365,10 @@
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="vNote" class="form-label">{{ __('forms.note') }}</label>
-                                    <textarea name="note" id="vNote" rows="5" class="form-control" required tabindex="10"
+                                    <label for="vRefer" class="form-label">{{ __('forms.refer') }}</label>
+                                    <textarea name="refer" id="vRefer" rows="5" class="form-control" required tabindex="9"
                                         data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                    @error('note')
+                                    @error('refer')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -376,10 +376,10 @@
 
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="vRefer" class="form-label">{{ __('forms.refer') }}</label>
-                                    <textarea name="refer" id="vRefer" rows="5" class="form-control" required tabindex="9"
+                                    <label for="vNote" class="form-label">{{ __('forms.note') }}</label>
+                                    <textarea name="note" id="vNote" rows="5" class="form-control" required tabindex="10"
                                         data-pristine-required-message="{{ __('messages.required') }}"></textarea>
-                                    @error('refer')
+                                    @error('note')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
