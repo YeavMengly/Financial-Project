@@ -33,8 +33,6 @@ class DuelEntryController extends Controller
         $duelType = DuelType::all();
         $unitType = UnitType::where('id', 2)->get();
 
-        // dd($unitType);
-
         $duelEntry = DuelEntry::where('id', $id)
             ->where('ministry_id', $ministry->id)->get();
 
@@ -57,8 +55,9 @@ class DuelEntryController extends Controller
         $duelType = DuelType::all();
         $unitType = UnitType::where('id', 2)->get();
         $ministry = Ministry::where('id', $id)->first();
-        $project = Projects::all();
-
+        $project = Projects::where('ministry_id', $id)
+            ->get()
+            ->unique('stock_number');
         return view('duel::duelEntry.create')
             ->with('params', $params)
             ->with('duelType', $duelType)
@@ -95,11 +94,13 @@ class DuelEntryController extends Controller
                 DuelEntry::create([
                     'ministry_id'   => $ministry->id,
                     'project_id'   => $project->id,
+                    'stock_number'   => $project->stock_number,
+                    'stock_name'   => $project->stock_name,
                     'item_name'     => $request->item_name[$index],
                     'unit'          => 2,
                     'quantity'      => $request->quantity[$index],
                     'price'         => $request->price[$index],
-                    'duel_total'    => $request->quantity[$index] * $request->price[$index],
+                    'total_price'    => $request->quantity[$index] * $request->price[$index],
                     'date_entry'    => $project->date,
                     'source'   => $validated['source'] ?? null,
                     'pro_year' => $validated['pro_year'] ?? '',
@@ -147,7 +148,9 @@ class DuelEntryController extends Controller
 
         $unitType = UnitType::where('name', 'លីត្រ')->get();
         $duelType = DuelType::all();
-        $projects = Projects::where('ministry_id', $ministry->id)->get();
+        $projects = Projects::where('ministry_id', $ministry->id)
+            ->get()
+            ->unique('stock_number');
 
         $module = DuelEntry::where('id', $id)
             ->where('ministry_id', $ministry->id)
@@ -206,6 +209,9 @@ class DuelEntryController extends Controller
                         $duelEntry->update([
                             'ministry_id'  => $ministry->id,
                             'project_id'   => $project->id,
+                            'stock_number'   => $project->stock_number,
+                            'stock_name'   => $project->stock_name,
+
                             'item_name'    => $itemName,
                             'unit'         => $project->unit ?? '',
                             'quantity'     => $qty,
@@ -220,6 +226,8 @@ class DuelEntryController extends Controller
                     DuelEntry::create([
                         'ministry_id'  => $ministry->id,
                         'project_id'   => $project->id,
+                        'stock_number'   => $project->stock_number,
+                        'stock_name'   => $project->stock_name,
                         'item_name'    => $itemName,
                         'unit'         => $project->unit ?? '',
                         'quantity'     => $qty,

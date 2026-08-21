@@ -43,6 +43,17 @@ class ProjectDataTable extends DataTable
 
             /*
         |--------------------------------------------------------------------------
+        | Date
+        |--------------------------------------------------------------------------
+        */
+            ->editColumn('date', function ($row) {
+                $active =  Carbon::parse($row->date)->format('Y-m-d');
+
+                return $active;
+            })
+
+            /*
+        |--------------------------------------------------------------------------
         | Title
         |--------------------------------------------------------------------------
         */
@@ -252,23 +263,48 @@ class ProjectDataTable extends DataTable
      */
     public function query(Projects $model, Request $request): QueryBuilder
     {
-
         /*
-        |--------------------------------------------------------------------------
-        | Decode ministry ID
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Decode ministry ID
+    |--------------------------------------------------------------------------
+    */
         $params = $request->params;
         $id = decode_params($params);
 
+        $model->withTrashed();
+
+        if ($request->has('cboStatus')) {
+            if ($request->cboStatus == '2') {
+                // Only non-deleted
+                $model->whereNull('projects.deleted_at');
+            } elseif ($request->cboStatus == '3') {
+                // Only deleted
+                $model->onlyTrashed();
+            } else {
+                // All records
+                $model->withTrashed();
+            }
+        } else {
+            // Default: non-deleted
+            $model->whereNull('projects.deleted_at');
+        }
+
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('projects.is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('projects.is_archived', 2);
+            }
+        } else {
+            $model->where('projects.is_archived', 2);
+        }
 
         /*
-        |--------------------------------------------------------------------------
-        | Query
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Get one project per stock_number
+    |--------------------------------------------------------------------------
+    */
         return $model->newQuery()
-
             ->select([
                 'projects.id',
                 'projects.ministry_id',
@@ -288,6 +324,12 @@ class ProjectDataTable extends DataTable
                 'projects.deleted_at',
             ])
             ->where('projects.ministry_id', $id)
+            ->whereIn('projects.id', function ($query) use ($id) {
+                $query->selectRaw('MIN(id)')
+                    ->from('projects')
+                    ->where('ministry_id', $id)
+                    ->groupBy('stock_number');
+            })
             ->orderBy('projects.stock_number', 'ASC');
     }
 
@@ -304,6 +346,18 @@ class ProjectDataTable extends DataTable
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
+            ->ajax([
+                'data' => 'function(d) {
+                    d.cboTodo = $("#cboTodo").val();
+                    d.cboStatus = $("#cboStatus").val();
+                }',
+            ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();s
+                    $("#project-table").DataTable().ajax.reload();
+                });
+            }')
             ->orderBy(2, 'ASC');
     }
 

@@ -2,8 +2,8 @@
 
 namespace App\Models\Duel;
 
-use App\Models\Ministry;
-use App\Models\Project;
+use App\Models\Content\Ministry;
+use App\Models\Material\Projects;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +14,8 @@ class DuelEntry extends Model
     protected $fillable = [
         'ministry_id',
         'project_id',
+        'stock_number',
+        'stock_name',
         'item_name',
         'unit',
         'quantity',
@@ -42,7 +44,7 @@ class DuelEntry extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class, 'project_id');
+        return $this->belongsTo(Projects::class, 'project_id');
     }
 
     public function duelReleases()

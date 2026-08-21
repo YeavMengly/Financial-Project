@@ -33,7 +33,7 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example"
+                        {{-- <form id="pristine-valid-example"
                             action="{{ route('duelEntry.update', ['params' => $params, 'id' => $module->id]) }}"
                             method="POST" enctype="multipart/form-data" novalidate>
                             @csrf
@@ -192,6 +192,402 @@
                                     href="{{ route('duelEntry.index', $params) }}">{{ __('buttons.back') }}</a>
 
                             </div>
+                        </form> --}}
+                        <form id="pristine-valid-example"
+                            action="{{ route('duelEntry.update', ['params' => $params, 'id' => $module->id]) }}"
+                            method="POST" enctype="multipart/form-data" novalidate>
+
+                            @csrf
+
+                            <div class="row g-3">
+
+                                {{-- =====================================================
+                                    LEFT COLUMN : PROJECT INFORMATION
+                                ====================================================== --}}
+                                <div class="col-xl-4 col-lg-5">
+                                    <div class="card shadow-sm h-100">
+                                        <div class="card-header bg-transparent">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    <span class="avatar-sm">
+                                                        <span
+                                                            class="avatar-title rounded-circle bg-primary-subtle text-primary">
+                                                            <i class="bi bi-folder2-open"></i>
+                                                        </span>
+                                                    </span>
+                                                </div>
+
+                                                <div>
+                                                    <h5 class="card-title mb-0">
+                                                        {{ __('forms.project') }}
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="card-body">
+                                            {{-- ================= PROJECT ================= --}}
+                                            <div class="form-group mb-4">
+
+                                                <label for="dropProject" class="form-label font-size-13 text-muted">
+
+                                                    {{ __('forms.project') }}
+                                                    <span class="text-danger">*</span>
+
+                                                </label>
+
+                                                <select class="form-control" data-trigger id="dropProject" name="project"
+                                                    required
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                    <option value="">
+                                                        {{ __('forms.search...') }}
+                                                    </option>
+
+                                                    @foreach ($projects as $item)
+                                                        @php
+                                                            $isSelected =
+                                                                (string) $item->id ===
+                                                                    (string) old('project', $module->project_id) ||
+                                                                ($item->stock_number == $module->stock_number &&
+                                                                    $item->stock_name == $module->stock_name);
+                                                        @endphp
+
+                                                        <option value="{{ $item->id }}"
+                                                            {{ $isSelected ? 'selected' : '' }}>
+
+                                                            {{ $item->stock_number }} -
+                                                            {{ $item->stock_name }}
+
+                                                        </option>
+                                                    @endforeach
+
+                                                </select>
+
+                                                @error('project')
+                                                    <div class="pristine-error text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
+                                            </div>
+
+
+                                            {{-- ================= SOURCE ================= --}}
+                                            <div class="form-group mb-4">
+
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                                    <label for="source" class="form-label mb-0">
+
+                                                        {{ __('forms.source') }}
+
+                                                    </label>
+
+                                                    <div class="form-check form-switch mb-0">
+
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipSource" name="skipSource" value="1"
+                                                            style="cursor:pointer;"
+                                                            {{ old('skipSource', empty($module->source)) ? 'checked' : '' }}>
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipSource" style="cursor:pointer;">
+
+                                                            រំលង
+
+                                                        </label>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <input class="form-control" id="source" name="source" type="text"
+                                                    placeholder="{{ __('forms.source') }}"
+                                                    value="{{ old('source', $module->source) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                @error('source')
+                                                    <div class="pristine-error text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
+                                            </div>
+
+                                            {{-- ================= PROJECT YEAR ================= --}}
+                                            <div class="form-group mb-3">
+
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                                    <label for="pro_year" class="form-label mb-0">
+
+                                                        {{ __('forms.pro.year') }}
+
+                                                    </label>
+
+                                                    <div class="form-check form-switch mb-0">
+
+                                                        <input class="form-check-input" type="checkbox" role="switch"
+                                                            id="skipProYear" name="skipProYear" value="1"
+                                                            style="cursor:pointer;"
+                                                            {{ old('skipProYear', empty($module->pro_year)) ? 'checked' : '' }}>
+
+                                                        <label class="form-check-label font-size-12 text-muted"
+                                                            for="skipProYear" style="cursor:pointer;">
+
+                                                            រំលង
+
+                                                        </label>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <input class="form-control" id="pro_year" name="pro_year" type="text"
+                                                    placeholder="{{ __('forms.pro.year') }}"
+                                                    value="{{ old('pro_year', $module->pro_year) }}"
+                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                @error('pro_year')
+                                                    <div class="pristine-error text-danger mt-1">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- =====================================================
+                                    RIGHT COLUMN : ITEM INFORMATION
+                                ====================================================== --}}
+                                <div class="col-xl-8 col-lg-7">
+
+                                    <div class="card shadow-sm h-100">
+
+                                        <div class="card-header bg-transparent">
+
+                                            <div class="d-flex justify-content-between align-items-center">
+
+                                                <div class="d-flex align-items-center">
+
+                                                    <div class="me-2">
+                                                        <span class="avatar-sm">
+                                                            <span
+                                                                class="avatar-title rounded-circle bg-success-subtle text-success">
+                                                                <i class="bi bi-list-ul"></i>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+
+                                                    <div>
+                                                        <h5 class="card-title mb-0">
+                                                            {{ __('forms.item.name') }}
+                                                        </h5>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="card-body">
+
+                                            <div class="table-responsive">
+
+                                                <table class="table table-bordered table-hover align-middle mb-0"
+                                                    id="itemTable">
+
+                                                    <thead class="table-light">
+
+                                                        <tr>
+
+                                                            <th>
+                                                                {{ __('forms.item.name') }}
+                                                                <span class="text-danger">*</span>
+                                                            </th>
+
+                                                            <th width="200">
+                                                                {{ __('forms.quantity') }}
+                                                                <small class="text-muted">
+                                                                    (លីត្រ)
+                                                                </small>
+                                                                <span class="text-danger">*</span>
+                                                            </th>
+
+                                                            <th width="200">
+                                                                {{ __('forms.price') }}
+                                                                <small class="text-muted">
+                                                                    (លីត្រ)
+                                                                </small>
+                                                                <span class="text-danger">*</span>
+                                                            </th>
+
+                                                            <th width="80" class="text-center">
+
+                                                                Action
+
+                                                            </th>
+
+                                                        </tr>
+
+                                                    </thead>
+
+
+                                                    <tbody>
+
+                                                        <tr>
+
+                                                            {{-- Item --}}
+                                                            <td>
+
+                                                                <select id="cboItem" class="form-control"
+                                                                    name="item_name[]" required
+                                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                                    <option value="">
+                                                                        {{ __('forms.search...') }}
+                                                                    </option>
+
+                                                                    @foreach ($duelType as $type)
+                                                                        <option value="{{ $type->id }}"
+                                                                            {{ $type->id == $module->item_name ? 'selected' : '' }}>
+
+                                                                            {{ $type->name_km }}
+
+                                                                        </option>
+                                                                    @endforeach
+
+                                                                </select>
+
+                                                            </td>
+
+
+                                                            {{-- Quantity --}}
+                                                            <td>
+
+                                                                <input type="number" min="0" step="any"
+                                                                    name="quantity[]"
+                                                                    value="{{ old('quantity.0', $module->quantity) }}"
+                                                                    class="form-control"
+                                                                    placeholder="{{ __('forms.quantity') }}" required
+                                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                            </td>
+
+
+                                                            {{-- Price --}}
+                                                            <td>
+
+                                                                <input type="number" min="0" step="any"
+                                                                    name="price[]"
+                                                                    value="{{ old('price.0', $module->price) }}"
+                                                                    class="form-control"
+                                                                    placeholder="{{ __('forms.price') }}" required
+                                                                    data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                            </td>
+
+
+                                                            {{-- Action --}}
+                                                            <td class="text-center">
+
+                                                                <button type="button"
+                                                                    class="btn btn-danger btn-sm removeRow"
+                                                                    title="Remove">
+
+                                                                    <i class="bi bi-trash"></i>
+
+                                                                </button>
+
+                                                            </td>
+
+                                                        </tr>
+
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+
+                                            {{-- Empty/help message --}}
+                                            <div class="text-muted font-size-12 mt-2">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                អ្នកអាចចុច <strong>+</strong> ដើម្បីបន្ថែមទំនិញ/ប្រេងបន្ថែម។
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                {{-- =====================================================
+                                        ACTION CARD
+                                ====================================================== --}}
+                                <div class="col-12">
+
+                                    <div class="card shadow-sm">
+
+                                        <div class="card-body">
+
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+
+                                                {{-- Right --}}
+                                                <div class="d-flex flex-wrap gap-2">
+
+                                                    {{-- Update --}}
+                                                    <button type="submit" class="btn btn-primary" id="insertToTableBtn">
+
+                                                        <i class="bi bi-check-circle me-1"></i>
+
+                                                        {{ __('buttons.save') }}
+
+                                                    </button>
+
+
+                                                    {{-- Reset --}}
+                                                    <a href="{{ url()->current() }}" class="btn btn-danger">
+
+                                                        <i class="bi bi-arrow-clockwise me-1"></i>
+
+                                                        {{ __('buttons.delete') }}
+
+                                                    </a>
+
+
+                                                    {{-- Back --}}
+                                                    <a class="btn btn-dark"
+                                                        href="{{ route('duelEntry.index', $params) }}">
+
+                                                        <i class="bi bi-arrow-left me-1"></i>
+
+                                                        {{ __('buttons.back') }}
+
+                                                    </a>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
                         </form>
 
                     </div>
@@ -384,7 +780,7 @@
                     // Change the action button on the new row to a Remove button
                     const actionTd = newRow.querySelector('td:last-child');
                     actionTd.innerHTML =
-                    '<button type="button" class="btn btn-danger removeRow">-</button>';
+                        '<button type="button" class="btn btn-danger removeRow">-</button>';
                     // Append the new row to the table body
                     tableBody.appendChild(newRow);
                 }

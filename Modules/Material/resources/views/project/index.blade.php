@@ -149,4 +149,12 @@
             });
         });
     </script>
+
+    <script>
+        $('#cboTodo, #cboStatus')
+            .on('change keyup',
+                function() {
+                    $('#project-table').DataTable().ajax.reload();
+                });
+    </script>
 @endsection
