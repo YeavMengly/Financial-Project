@@ -39,8 +39,8 @@ class DuelEntryDataTable extends DataTable
             ->editColumn('file', function ($row) {
                 return '<strong>' . $row->title  . '</strong><br/><hr/>' . $row->file;
             })
-            ->editColumn('duel_total', function ($row) {
-                return number_format($row->duel_total ?? 0) . ' ៛';
+            ->editColumn('total_price', function ($row) {
+                return number_format($row->total_price ?? 0) . ' ៛';
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
@@ -121,7 +121,7 @@ class DuelEntryDataTable extends DataTable
             Column::make('name_km')->title(__('tables.th.item.name'))->width(90)->addClass('align-middle'),
             Column::make('quantity')->title(__('tables.th.quantity'))->addClass('align-middle'),
             Column::make('price')->title(__('tables.th.price'))->width(200)->addClass('align-middle'),
-            Column::make('duel_total')->title(__('tables.th.duel.total'))->width(80)->addClass('align-middle'),
+            Column::make('total_price')->title(__('tables.th.duel.total'))->width(80)->addClass('align-middle'),
             Column::make('date_entry')->title(__('tables.th.date.entry'))->width(200)->addClass('align-middle'),
 
             Column::make('company_name')->title(__('tables.th.company.name'))->width(30)->addClass('align-middle'),

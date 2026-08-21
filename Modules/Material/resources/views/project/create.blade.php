@@ -7,8 +7,8 @@
 
     <style>
         /* =========================================================
-                         * TABLE FIXES FOR DROPDOWNS
-                         * ========================================================= */
+                                     * TABLE FIXES FOR DROPDOWNS
+                                     * ========================================================= */
         #itemTable {
             table-layout: fixed !important;
             width: 100% !important;
@@ -31,8 +31,8 @@
         }
 
         /* =========================================================
-                         * CHOICES.JS STYLING
-                         * ========================================================= */
+                                     * CHOICES.JS STYLING
+                                     * ========================================================= */
         .choices {
             margin-bottom: 0 !important;
             width: 100% !important;
@@ -93,8 +93,8 @@
         }
 
         /* =========================================================
-                         * DISABLED / SKIPPED STATE
-                         * ========================================================= */
+                                     * DISABLED / SKIPPED STATE
+                                     * ========================================================= */
         #itemTableWrapper.table-skipped {
             opacity: 0.6;
         }
@@ -767,7 +767,7 @@
                 reinitPristine();
             });
 
-            $(document).on('click', '.removeRow', function() {
+            $(document).on('click', '.removeRow', function() {k
                 const row = $(this).closest('tr');
                 row.find('select').each(function() {
                     const choicesInstance = choicesMap.get(this);

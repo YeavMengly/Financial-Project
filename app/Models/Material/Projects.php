@@ -11,6 +11,7 @@ use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
+
 class Projects extends Model
 {
     use HasFactory;
@@ -43,7 +44,7 @@ class Projects extends Model
     protected $casts = [
         'date' => 'date',
     ];
-    
+
     public function program()
     {
         return $this->belongsTo(Program::class, 'program_id');
@@ -72,7 +73,7 @@ class Projects extends Model
         $agent = new Agent();
 
         $activity->default_field = $this->stock_name;
-        $activity->log_name = trans('menus.projects');
+        $activity->log_name = trans('menus.project');
 
         $platform = $agent->platform();
         $browser = $agent->browser();
