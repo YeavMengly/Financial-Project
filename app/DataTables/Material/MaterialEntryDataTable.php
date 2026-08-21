@@ -124,15 +124,14 @@ class MaterialEntryDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
             Column::make('sub_project')->title(__('tables.th.sub.pro'))->width(80)->addClass('align-middle'),
-            Column::make('p_year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
+            Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
             Column::make('qty')->title(__('tables.th.quantity'))->width(80)->addClass('align-middle'),
             Column::make('price')->title(__('tables.th.price'))->width(80)->addClass('align-middle'),
             Column::make('total_price')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
-
+            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];
