@@ -23,7 +23,7 @@ class MaterialEntryController extends Controller
 {
 
     public function getIndex(InitialMaterialEntryDataTable $dataTable)
-    { 
+    {
         // return view('maintenance.maintenance');
         return $dataTable->render('material::materialEntry.initialMaterialEntry.index');
     }
@@ -192,24 +192,29 @@ class MaterialEntryController extends Controller
      */
     public function create($params)
     {
-        $id   = decode_params($params);
-        $ministry = Ministry::where('id', $id)->first();
+        $id       = decode_params($params);
+        $ministry = Ministry::where('id', $id)->firstOrFail();
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
-        $project = Projects::where('ministry_id', $ministry->id)->get();
-        $program = Program::where('ministry_id', $ministry->id)->get();
+
+        // Deduplicate projects by stock_number
+        $project  = Projects::where('ministry_id', $ministry->id)
+            ->get()
+            ->unique('stock_number');
+
+        $program    = Program::where('ministry_id', $ministry->id)->get();
         $programSub = ProgramSub::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-        $cluster = Cluster::where('ministry_id', $ministry->id)->get();
+        $cluster    = Cluster::where('ministry_id', $ministry->id)->get();
 
         return view('material::materialEntry.create', [
-            'params' => $params,
-            'unitType' => $unitType,
-            'ministry' => $ministry,
-            'project' => $project,
-            'program' => $program,
+            'params'     => $params,
+            'unitType'   => $unitType,
+            'ministry'   => $ministry,
+            'project'    => $project,
+            'program'    => $program,
             'programSub' => $programSub,
             'accountSub' => $accountSub,
-            'cluster' => $cluster,
+            'cluster'    => $cluster,
         ]);
     }
 
@@ -316,7 +321,11 @@ class MaterialEntryController extends Controller
         $realId     = is_numeric($id) ? $id : decode_params($id);
 
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
-        $project  = Projects::where('ministry_id', $ministry->id)->get();
+
+        // Fetch projects and keep only unique entries by stock_number
+        $project  = Projects::where('ministry_id', $ministry->id)
+            ->get()
+            ->unique('stock_number');
 
         // 1. Fetch the primary entry user clicked
         $module = MaterialEntry::where('id', $realId)
@@ -345,7 +354,7 @@ class MaterialEntryController extends Controller
             ->with('unitType', $unitType)
             ->with('project', $project)
             ->with('module', $module)
-            ->with('items', $items); // Pass all matching items to Blade
+            ->with('items', $items);
     }
     /**
      * Update the specified resource in storage.
@@ -477,9 +486,49 @@ class MaterialEntryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($params, $id)
     {
-        //
+        $ministryId = decode_params($params);
+        $realId     = is_numeric($id) ? $id : decode_params($id);
+
+        DB::beginTransaction();
+
+        try {
+            $ministry = Ministry::where('id', $ministryId)->firstOrFail();
+
+            $module = MaterialEntry::where('id', $realId)
+                ->where('ministry_id', $ministry->id)
+                ->firstOrFail();
+            // Soft deletes matching rows (populates the deleted_at column)
+            $module->delete();
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('delete_msg', 'delete')
+                ->flash();
+
+            return redirect()->route('materialEntry.index', $params);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('MaterialEntry Destroy Error: ' . $e->getMessage(), [
+                'id'    => $id,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការលុប: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->back();
+        }
     }
 
     public function export(Request $request, $params)

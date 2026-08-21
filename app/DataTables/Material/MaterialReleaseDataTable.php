@@ -24,12 +24,18 @@ class MaterialReleaseDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('total', function ($row) {
+                return number_format($row->total ?? 0) . ' ៛';
+            })
+            ->editColumn('quantity_request', function ($row) {
+                return number_format($row->quantity_request ?? 0) . ' ៛';
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
             ->addColumn('action', function ($module) {
-                return view('material::materialEntry.action', ['module' => $module]);
+                return view('material::materialRelease.action', ['module' => $module]);
             })
             ->editColumn('refer', function ($row) {
                 return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->refer) . '</div>';
@@ -63,15 +69,17 @@ class MaterialReleaseDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
+        $query = $model->newQuery();
+        $query->where('material_releases.ministry_id', $id)
+            ->leftJoin('agencies', 'material_releases.agency_id', '=', 'agencies.id')
+            ->leftJoin('projects as parent_project', 'material_releases.project_id', '=', 'parent_project.id')
+            ->leftJoin('projects as sub_project_rel', 'material_releases.project_sub_id', '=', 'sub_project_rel.id')
             ->select([
                 'material_releases.id',
                 'material_releases.ministry_id',
-                // 'material_releases.company_name',
-                // 'material_releases.stock_number',
-                // 'material_releases.stock_name',
-                // 'material_releases.user_entry',
-                'material_releases.p_code',
+                'agencies.name',
+                'parent_project.stock_name',
+                'sub_project_rel.sub_project as sub_project',
                 'material_releases.p_name',
                 'material_releases.p_year',
                 'material_releases.title',
@@ -87,6 +95,7 @@ class MaterialReleaseDataTable extends DataTable
                 'material_releases.updated_at',
             ])
             ->where('material_releases.ministry_id', $id);
+
 
         return $query;
     }
@@ -115,23 +124,20 @@ class MaterialReleaseDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
-            // Column::make('company_name')->title(__('tables.th.company.name'))->width(90)->addClass('align-middle'),
-            // Column::make('stock_number')->title(__('tables.th.stock.number'))->width(30)->addClass('align-middle'),
-            // Column::make('stock_name')->title(__('tables.th.stock.name'))->width(30)->addClass('align-middle'),
-            // Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
-            Column::make('p_code')->title(__('tables.th.pro.code'))->width(60)->addClass('align-middle'),
             Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
-            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
-            Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
+            Column::make('quantity_total')->title(__('tables.th.quantity.req'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
-            Column::make('quantity_total')->title(__('tables.th.quantity.total'))->width(80)->addClass('align-middle'),
-            Column::make('quantity_request')->title(__('tables.th.quantity.req'))->width(80)->addClass('align-middle'),
+            Column::make('quantity_request')->title(__('tables.th.price.unit'))->width(80)->addClass('align-middle'),
             Column::make('total')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.agency'))->width(80)->addClass('align-middle'),
+            Column::make('stock_name')->title(__('tables.th.project'))->width(80)->addClass('align-middle'),
+            Column::make('sub_project')->title(__('tables.th.project.sub'))->width(80)->addClass('align-middle'),
+            Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
+            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
             Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
             Column::make('date_release')->title(__('tables.th.date.release'))->width(200)->addClass('align-middle'),
-            Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
+            // Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
