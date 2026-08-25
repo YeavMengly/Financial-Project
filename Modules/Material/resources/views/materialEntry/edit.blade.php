@@ -70,7 +70,7 @@
                             {{-- Sub Project with Skip Toggle --}}
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
                                         <label for="cboSubProject" class="form-label font-size-13 text-muted mb-0">
                                             {{ __('forms.sub.project') }}
                                         </label>

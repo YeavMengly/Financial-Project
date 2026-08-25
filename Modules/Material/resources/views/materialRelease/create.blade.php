@@ -3,580 +3,566 @@
     <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
+    <style>
+        /* Skipped field styling */
+        .skip-active {
+            background-color: #e7f1ff !important;
+            border-color: #0d6efd !important;
+            color: #0d6efd !important;
+        }
+
+        .choices-skip-active .choices__inner {
+            background-color: #e7f1ff !important;
+            border-color: #0d6efd !important;
+        }
+    </style>
 @endsection
+
 @section('content')
-    <!-- start page title -->
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.material.release') }}</h4>
-
                 <div class="page-title-right">
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a
-                                    href="javascript: void(0);">{{ __('menus.material.release') }}</a></li>
-                            <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
-                        </ol>
-                    </div>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.material.release') }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
+                    </ol>
                 </div>
-
             </div>
         </div>
     </div>
-    <!-- end page title -->
+
     <div class="row">
-        <div class="col-12"></div>
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form class="needs-validation" novalidate method="POST"
-                        action="{{ route('materialRelease.store', $params) }}" autocomplete="off">
+                    <form class="needs-validation" method="POST" action="{{ route('materialRelease.store', $params) }}"
+                        autocomplete="off" id="materialReleaseForm">
                         @csrf
                         <div class="row">
-                            {{-- <div class="col-md-12"> --}}
+                            {{-- Main Project --}}
                             <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
+                                <div class="form-group mb-3">
                                     <label for="cboProject" class="form-label font-size-13 text-muted">
                                         {{ __('forms.project') }}
                                     </label>
-                                    <select class="form-control" data-trigger id="cboProject" name="cboProject" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                    <select class="form-control" id="cboProject" name="cboProject" tabindex="1" required>
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($project as $item)
-                                            <option value="{{ $item->id }}"
-                                                data-location_number="{{ $item->project_id }}">
+                                            <option value="{{ $item->project_id ?? $item->id }}">
                                                 {{ $item->stock_number }} - {{ $item->stock_name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('project')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @error('cboProject')
+                                        <div class="text-danger font-size-12 mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                             <div class="col-xl-4 col-md-6">
+
+                            {{-- Sub Project --}}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3" id="subProjectGroup">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboSubProject" class="form-label font-size-13 text-muted mb-0">
+                                            {{ __('forms.sub.project') }}
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0 " type="checkbox" role="switch"
+                                                id="skipSubProject" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted mb-0"
+                                                for="skipSubProject" style="cursor: pointer;">
+                                                រំលង/ មិនភ្ជាប់
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboSubProject" class="form-select" name="cboSubProject" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboSubProject')
+                                        <div class="text-danger font-size-12 mt-1">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Hidden inputs for project dependencies -->
+                            <input type="hidden" id="program_id" name="program_id">
+                            <input type="hidden" id="program_sub_id" name="program_sub_id">
+                            <input type="hidden" id="cluster_id" name="cluster_id">
+                            <input type="hidden" id="account_sub_id" name="account_sub_id">
+
+                            {{-- Agency --}}
+                            <div class="col-xl-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="agency">{{ __('forms.agency') }}</label>
-                                    <select class="form-control" data-trigger id="agency" name="agency" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                    <label for="agency"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.agency') }}</label>
+                                    <select class="form-control" id="agency" name="agency" required>
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($Agency as $item)
-                                            <option value="{{ $item->id }}"
-                                                data-location_number="{{ $item->id }}">
-                                                {{ $item->name }} 
-                                            </option>
+                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
                                         @endforeach
                                     </select>
                                     @error('agency')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                        <div class="text-danger font-size-12 mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label for="p_name" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.item.name') }}
-                                    </label>
-                                    <select class="form-control" data-trigger id="p_name" name="p_name" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($MaterialEntry as $item)
-                                            <option value="{{ $item->id }}"
-                                                data-location_number="{{ $item->id }}">
-                                                {{ $item->p_name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('p_name')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+
+                            {{-- Date Release --}}
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="unit" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.unit') }}
-                                    </label>
-                                    <select class="form-control" data-trigger id="dropUnit" name="unit" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($unitType as $item)
-                                            <option value="{{ $item->id }}">
-                                                {{ $item->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('unit')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-xl-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="quantity_request">{{ __('forms.quantity.request') }}</label>
-                                    <input type="number" min="0" name="quantity_request" required
-                                        class="form-control"
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('quantity_request')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-xl-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="quantity_total">{{ __('forms.price') }}ឯកតា</label>
-                                    <input type="number" min="0" name="quantity_total" required class="form-control"
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('quantity_total')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-xl-4 col-md-6">
-                                <div class="form-group mb-3">
-
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label for="source">{{ __('forms.source') }}</label>
-
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="skipSource"
-                                                style="cursor: pointer;">
-
-                                            <label class="form-check-label font-size-12 text-muted" for="skipSource"
-                                                style="cursor: pointer;">
-                                                រំលង
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <input type="text" name="source" id="source" class="form-control"
-                                        placeholder="{{ __('forms.source') }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-
-                                    @error('source')
-                                        <div class="pristine-error text-help text-danger mt-1">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-
-                                </div>
-                            </div>
-                            <!-- Project Year -->
-                            <div class="col-xl-4 col-md-6">
-                                <div class="form-group mb-3">
-
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label for="p_year">{{ __('forms.pro.year') }}</label>
-
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch"
-                                                id="skipProYear" style="cursor: pointer;">
-
-                                            <label class="form-check-label font-size-12 text-muted" for="skipProYear"
-                                                style="cursor: pointer;">
-                                                រំលង
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <input type="text" name="p_year" id="p_year" class="form-control"
-                                        placeholder="{{ __('forms.pro.year') }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-
-                                    @error('p_year')
-                                        <div class="pristine-error text-help text-danger mt-1">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="date_release" class="form-label">កាលបរិច្ឆេទ</label>
+                                    <label for="datepicker-basic"
+                                        class="form-label font-size-13 text-muted">កាលបរិច្ឆេទ</label>
                                     <input type="text" id="datepicker-basic" name="date_release" class="form-control"
-                                        placeholder="{{ __('forms.select_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
+                                        placeholder="{{ __('forms.select_date') }}" required />
                                     @error('date_release')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                        <div class="text-danger font-size-12 mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="location_number_use">
-                                        {{ __('forms.location.number') }}
-                                    </label>
-                                    <input type="text" class="form-control" id="location_number_use"
-                                        name="location_number_use" list="location_number_list" required />
-                                    <datalist id="location_number_list">
-                                        @foreach ($waterEntity as $item)
-                                            <option value="{{ $item->location_number }}">
-                                                {{ $item->location_number }} - {{ $item->title_entity }}
-                                            </option>
-                                        @endforeach
-                                    </datalist>
 
-                                    <div class="invalid-feedback">
-                                        {{ __('messages.required') }}
-                                    </div>
-                                </div>
-                            </div> --}}
+                            {{-- Dynamic Item Table --}}
+                            <div class="col-xl-12 col-md-12 mt-3">
+                                <table class="table table-bordered align-middle" id="itemTable">
+                                    <thead>
+                                        <tr>
+                                            <th width="300">{{ __('forms.item.name') }}</th>
+                                            <th width="150">{{ __('forms.unit') }}</th>
+                                            <th width="150">{{ __('forms.quantity') }}</th>
+                                            <th width="150">{{ __('forms.price') }}ឯកតា</th>
+                                            <th width="200">{{ __('forms.source') }}</th>
+                                            <th width="200">{{ __('forms.pro.year') }}</th>
+                                            <th width="60" class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="form-group">
+                                                <select class="form-control item-select" name="p_name[]" required>
+                                                    <option value="">ជ្រើសរើស</option>
+                                                </select>
+                                            </td>
+                                            <td class="form-group">
+                                                <select class="form-control unit-select" name="unit[]" required>
+                                                    <option value="">ជ្រើសរើស</option>
+                                                    @foreach ($unitType as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td class="form-group">
+                                                <input type="number" min="0" name="quantity[]"
+                                                    class="form-control" required>
+                                            </td>
+                                            <td class="form-group">
+                                                <input type="number" min="0" step="any" name="price[]"
+                                                    class="form-control" required>
+                                            </td>
+                                            <td class="form-group">
+                                                <input type="text" name="source[]" class="form-control source-input"
+                                                    placeholder="{{ __('forms.source') }}">
+                                            </td>
+                                            <td class="form-group">
+                                                <input type="text" name="p_year[]" class="form-control pro-year-input"
+                                                    placeholder="{{ __('forms.pro.year') }}">
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-success addRow">+</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="invoice">{{ __('forms.invoice') }}</label>
-                                    <input type="text" class="form-control" name="invoice" required />
-                                    <div class="invalid-feedback">
-                                        {{ __('messages.required') }}
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label for="date" class="form-label">{{ __('forms.date') }}</label>
-                                    <input type="text" id="date" name="date" class="form-control"
-                                        placeholder="{{ __('forms.select_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('date')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div> --}}
-
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label for="use_start" class="form-label">{{ __('forms.use.start') }}</label>
-                                    <input type="text" id="use_start" name="use_start" class="form-control"
-                                        placeholder="{{ __('forms.select_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('use_start')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div> --}}
-
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label for="use_end" class="form-label">{{ __('forms.use.end') }}</label>
-                                    <input type="text" id="use_end" name="use_end" class="form-control"
-                                        placeholder="{{ __('forms.select_date') }}" required
-                                        data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('use_end')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div> --}}
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="kilo">{{ __('forms.kilo') }}</label>
-                                    <input type="text" class="form-control" name="kilo" required />
-                                    <div class="invalid-feedback">
-                                        {{ __('messages.required') }}
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                            {{-- <div class="col-xl-4 col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label" for="cost_total">{{ __('forms.cost.total') }}</label>
-                                    <input type="text" class="form-control" name="cost_total" required />
-                                    <div class="invalid-feedback">
-                                        {{ __('messages.required') }}
-                                    </div>
-                                </div>
-                            </div> --}}
-
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-primary" type="submit" name="submit"
-                                    value="save">{{ __('buttons.save') }}</button>
-                                {{-- <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button> --}}
-
-                                {{-- <button type="submit" class="btn btn-primary"
-                                    id="insertToTableBtn">{{ __('buttons.save') }}</button> --}}
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <button class="btn btn-primary" type="submit" name="submit" value="save"
+                                    id="insertToTableBtn">
+                                    {{ __('buttons.save') }}
+                                </button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                     <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
-                                <a class="btn btn-dark"
-                                    href="{{ route('materialRelease.index', $params) }}">{{ __('buttons.back') }}</a>
+                                <a class="btn btn-dark" href="{{ route('materialRelease.index', $params) }}">
+                                    {{ __('buttons.back') }}
+                                </a>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-12"></div>
     </div>
 @endsection
+
 @section('script')
-    <script src="{{ asset('assets/js/pages/form-validation.init.js') }}"></script>
     <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <script>
-        const dateInput = document.getElementById('datepicker-basic');
-        if (dateInput) {
-            flatpickr(dateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: dateInput.value || null
-            });
-        }
+        window.materialReleaseConfig = {
+            getProjectRoute: "{{ route('materialRelease.get.project') }}",
+            getItemRoute: "{{ route('materialRelease.get.projectItem') }}",
+            searchPlaceholder: "{{ __('forms.search...') }}"
+        };
 
-        const useDateInput = document.getElementById('use_start');
-        if (useDateInput) {
-            flatpickr(useDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: useDateInput.value || null
-            });
-        }
+        let subProjectChoices = null;
+        let agencyChoices = null;
 
-        const endDateInput = document.getElementById('use_end');
-        if (endDateInput) {
-            flatpickr(endDateInput, {
-                dateFormat: 'Y-m-d', // value submitted to backend
-                altInput: true,
-                altFormat: 'd/m/Y', // pretty display for users
-                allowInput: true,
-                defaultDate: endDateInput.value || null
-            });
-        }
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const selectEntity = document.getElementById('dropEntity');
-            const locationInput = document.getElementById('location_number_use');
+            const form = document.getElementById('materialReleaseForm');
+            const submitBtn = document.getElementById('insertToTableBtn');
 
-            // បើអ្នកប្រើ Choices.js
-            const entityChoices = new Choices(selectEntity, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: '{{ __('forms.search...') }}',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-
-            // ពេលមានការជ្រើស entity
-            selectEntity.addEventListener('change', function() {
-                const option = this.options[this.selectedIndex];
-
-                if (option && option.dataset.location_number) {
-                    locationInput.value = option.dataset.location_number;
-                } else {
-                    locationInput.value = '';
-                }
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboProject');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('p_name');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('dropUnit');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('agency');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-         
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const form = document.getElementById('pristine-valid-example');
-
-            if (!form) {
-                console.error('Form not found');
-                return;
-            }
-
-            const pristine = new Pristine(form);
-            const sourceInput = document.getElementById('source');
-            const skipSourceCheckbox = document.getElementById('skipSource');
-
-            const proYearInput = document.getElementById('p_year');
-            const skipProYearCheckbox = document.getElementById('skipProYear');
-
-
-            // ==========================================
-            // CLEAR FIELD ERRORS
-            // ==========================================
-            function clearFieldErrors(input) {
-
-                if (!input) return;
-
-                const parentGroup = input.closest('.form-group');
-
-                if (parentGroup) {
-
-                    parentGroup
-                        .querySelectorAll('.pristine-error, .text-help')
-                        .forEach(el => el.remove());
-
-                    parentGroup.classList.remove(
-                        'has-danger',
-                        'has-error'
-                    );
-                }
-
-                input.classList.remove(
-                    'is-invalid',
-                    'border-danger'
-                );
-            }
-
-
-            // ==========================================
-            // SETUP SKIP FIELD
-            // ==========================================
-            function setupSkipField(checkbox, input) {
-                if (!checkbox || !input) return;
-                // ------------------------------------------
-                // Initial state
-                // ------------------------------------------
-                if (checkbox.checked) {
-                    input.value = '';
-                    input.disabled = true;
-                } else {
-                    input.disabled = false;
-                    input.setAttribute('required', 'required');
-                }
-                // ------------------------------------------
-                // Add Pristine validator
-                // ------------------------------------------
-                pristine.addValidator(
-                    input,
-                    function(value) {
-                        // If skipped, always valid
-                        if (checkbox.checked) {
-                            return true;
-                        }
-                        // Otherwise required
-                        return value.trim() !== '';
-                    },
-                    "{{ __('messages.required') }}",
-                    1,
-                    true
-                );
-                // ------------------------------------------
-                // Checkbox change
-                // ------------------------------------------
-                checkbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        // ==============================
-                        // SKIP
-                        // ==============================
-                        input.value = '';
-                        input.disabled = true;
-                        input.removeAttribute('required');
-                        clearFieldErrors(input);
-                        pristine.reset(input)
-                        input.classList.remove(
-                            'is-invalid',
-                            'border-danger'
-                        );
-                        input.classList.add(
-                            'border-success',
-                            'bg-success-subtle'
-                        );
-                    } else {
-                        // ==============================
-                        // REQUIRED AGAIN
-                        // ==============================
-                        input.disabled = false;
-                        input.setAttribute('required', 'required');
-                        input.classList.remove(
-                            'border-success',
-                            'bg-success-subtle'
-                        );
-
-                        clearFieldErrors(input);
-
-                        pristine.reset(input);
+            if (form && submitBtn) {
+                form.addEventListener('submit', function() {
+                    if (form.checkValidity()) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML =
+                            `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> ${submitBtn.innerText}...`;
                     }
                 });
             }
-            // ==========================================
-            // INITIALIZE
-            // ==========================================
-            setupSkipField(
-                skipSourceCheckbox,
-                sourceInput
-            );
-            setupSkipField(
-                skipProYearCheckbox,
-                proYearInput
-            );
-            // ==========================================
-            // FORM SUBMIT
-            // ==========================================
-            form.addEventListener('submit', function(e) {
 
-                e.preventDefault();
-                // ------------------------------------------
-                // Save which button was clicked
-                // ------------------------------------------
-                const submitter = e.submitter;
+            // Initialize Flatpickr
+            const dateInput = document.getElementById('datepicker-basic');
+            if (dateInput) {
+                flatpickr(dateInput, {
+                    dateFormat: 'Y-m-d',
+                    altInput: true,
+                    altFormat: 'd/m/Y',
+                    allowInput: true,
+                    defaultDate: dateInput.value || null
+                });
+            }
 
-                if (submitter && submitter.name === 'action') {
+            // Project Choice Init
+            const cboProject = document.getElementById('cboProject');
+            if (cboProject) {
+                new Choices(cboProject, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
 
-                    let hidden = form.querySelector(
-                        'input[name="action"]'
-                    );
-                    if (!hidden) {
-                        hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.name = 'action';
+            // Sub-Project Choice Init
+            const subProjectSelect = document.getElementById('cboSubProject');
+            if (subProjectSelect) {
+                subProjectChoices = new Choices(subProjectSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
 
-                        form.appendChild(hidden);
+            // Agency Choice Init
+            const agencySelect = document.getElementById('agency');
+            if (agencySelect) {
+                agencyChoices = new Choices(agencySelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
+
+            // Initialize row choices on first table row
+            const tableBody = document.querySelector('#itemTable tbody');
+            if (tableBody && tableBody.rows[0]) {
+                initRowChoices(tableBody.rows[0]);
+            }
+
+            /* Item Fetch & Populate Logic (Accepts optional target element) */
+            function fetchAndPopulateItems(params, targetSelect = null) {
+                $.ajax({
+                    url: window.materialReleaseConfig.getItemRoute,
+                    type: "GET",
+                    data: params,
+                    dataType: "json",
+                    success: function(data) {
+                        const $targets = targetSelect ? $(targetSelect) : $('.item-select');
+
+                        $targets.each(function() {
+                            const select = this;
+                            if (!select.choicesInstance) return;
+
+                            // Save currently selected value before updating choices
+                            const currentValue = select.choicesInstance.getValue(true);
+
+                            select.choicesInstance.clearStore();
+
+                            if (!Array.isArray(data) || data.length === 0) {
+                                select.choicesInstance.setChoices([{
+                                    value: '',
+                                    label: 'មិនមានទិន្នន័យ',
+                                    selected: true,
+                                    disabled: true
+                                }], 'value', 'label', true);
+                                return;
+                            }
+
+                            const formattedChoices = data.map(function(item) {
+                                const itemVal = String(item.id);
+                                return {
+                                    value: itemVal,
+                                    label: item.p_name || 'Item #' + item.id,
+                                    selected: itemVal === String(currentValue),
+                                    disabled: false,
+                                    customProperties: {
+                                        unit: item.unit || '',
+                                        price: item.price || ''
+                                    }
+                                };
+                            });
+
+                            formattedChoices.unshift({
+                                value: '',
+                                label: 'ជ្រើសរើស',
+                                selected: !currentValue,
+                                disabled: true
+                            });
+
+                            select.choicesInstance.setChoices(formattedChoices, 'value',
+                                'label', true);
+
+                            // Restore existing selection if valid
+                            if (currentValue) {
+                                select.choicesInstance.setChoiceByValue(String(currentValue));
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Fetch Error:", error);
+                    }
+                });
+            }
+
+            /* Main Project Event Listener */
+            if (cboProject) {
+                cboProject.addEventListener('change', function() {
+                    const projectId = this.value;
+
+                    $('#program_id, #program_sub_id, #cluster_id, #account_sub_id').val('');
+
+                    if (subProjectChoices) {
+                        subProjectChoices.clearStore();
+                        subProjectChoices.setChoices([{
+                            value: '',
+                            label: 'ជ្រើសរើស',
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
                     }
 
-                    hidden.value = submitter.value;
-                }
-                const isValid = pristine.validate();
+                    if (!projectId) {
+                        fetchAndPopulateItems({});
+                        return;
+                    }
 
-                console.log('Form valid:', isValid);
-                console.log('Errors:', pristine.getErrors());
-                if (!isValid) {
-                    return;
-                }
-                HTMLFormElement.prototype.submit.call(form);
-            });
+                    $.ajax({
+                        url: window.materialReleaseConfig.getProjectRoute,
+                        type: "GET",
+                        data: {
+                            project_id: projectId
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            if (!subProjectChoices) return;
+                            subProjectChoices.clearStore();
 
+                            if (!Array.isArray(data) || data.length === 0) {
+                                subProjectChoices.setChoices([{
+                                    value: '',
+                                    label: 'មិនមានទិន្នន័យ',
+                                    selected: true,
+                                    disabled: true
+                                }], 'value', 'label', true);
+                            } else {
+                                const choices = data.map(function(item) {
+                                    return {
+                                        value: String(item.value),
+                                        label: item.label,
+                                        customProperties: {
+                                            program_id: item.program_id || '',
+                                            program_sub_id: item.program_sub_id || '',
+                                            cluster_id: item.cluster_id || '',
+                                            account_sub_id: item.account_sub_id || ''
+                                        }
+                                    };
+                                });
+                                choices.unshift({
+                                    value: '',
+                                    label: 'ជ្រើសរើស',
+                                    selected: true,
+                                    disabled: true
+                                });
+                                subProjectChoices.setChoices(choices, 'value', 'label', true);
+                            }
+                        }
+                    });
+
+                    fetchAndPopulateItems({
+                        project_id: projectId,
+                        sub_project_id: ''
+                    });
+                });
+            }
+
+            /* Sub-Project Event Listener */
+            if (subProjectSelect) {
+                subProjectSelect.addEventListener('change', function() {
+                    const selected = subProjectChoices ? subProjectChoices.getValue() : null;
+                    if (selected && selected.customProperties) {
+                        const props = selected.customProperties;
+                        $('#program_id').val(props.program_id || '');
+                        $('#program_sub_id').val(props.program_sub_id || '');
+                        $('#cluster_id').val(props.cluster_id || '');
+                        $('#account_sub_id').val(props.account_sub_id || '');
+                    }
+
+                    const subProjectId = this.value;
+                    const projectId = cboProject ? cboProject.value : null;
+
+                    fetchAndPopulateItems({
+                        project_id: projectId,
+                        sub_project_id: subProjectId
+                    });
+                });
+            }
+
+            /* Skip Sub-Project Switch Listener */
+            const skipSubProjectCheckbox = document.getElementById('skipSubProject');
+            if (skipSubProjectCheckbox) {
+                skipSubProjectCheckbox.addEventListener('change', function() {
+                    const projectId = cboProject ? cboProject.value : null;
+                    const subProjectContainer = subProjectSelect.closest('.choices');
+
+                    if (this.checked) {
+                        subProjectSelect.value = '';
+                        if (subProjectChoices) {
+                            subProjectChoices.removeActiveItems();
+                            subProjectChoices.disable();
+                        }
+                        subProjectSelect.removeAttribute('required');
+
+                        subProjectSelect.classList.add('skip-active');
+                        if (subProjectContainer) {
+                            subProjectContainer.classList.add('choices-skip-active');
+                        }
+
+                        fetchAndPopulateItems({
+                            project_id: projectId,
+                            sub_project_id: ''
+                        });
+                    } else {
+                        if (subProjectChoices) subProjectChoices.enable();
+                        subProjectSelect.setAttribute('required', 'required');
+
+                        subProjectSelect.classList.remove('skip-active');
+                        if (subProjectContainer) {
+                            subProjectContainer.classList.remove('choices-skip-active');
+                        }
+                    }
+                });
+            }
+
+            /* Table Row Operations */
+            if (tableBody) {
+                tableBody.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('addRow')) {
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td class="form-group">
+                                <select class="form-control item-select" name="p_name[]" required>
+                                    <option value="">ជ្រើសរើស</option>
+                                </select>
+                            </td>
+                            <td class="form-group">
+                                <select class="form-control unit-select" name="unit[]" required>
+                                    <option value="">ជ្រើសរើស</option>
+                                    @foreach ($unitType as $item)
+                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="form-group">
+                                <input type="number" min="0" name="quantity[]" class="form-control" required>
+                            </td>
+                            <td class="form-group">
+                                <input type="number" min="0" step="any" name="price[]" class="form-control" required>
+                            </td>
+                            <td class="form-group">
+                                <input type="text" name="source[]" class="form-control source-input" placeholder="{{ __('forms.source') }}">
+                            </td>
+                            <td class="form-group">
+                                <input type="text" name="p_year[]" class="form-control pro-year-input" placeholder="{{ __('forms.pro.year') }}">
+                            </td>
+                            <td class="text-center">
+                                <button type="button" class="btn btn-danger removeRow">-</button>
+                            </td>
+                        `;
+
+                        tableBody.appendChild(newRow);
+                        initRowChoices(newRow);
+
+                        const projectId = cboProject ? cboProject.value : null;
+                        const subProjectId = subProjectSelect ? subProjectSelect.value : null;
+
+                        // Target ONLY the newly added row's item-select element
+                        const newSelect = newRow.querySelector('.item-select');
+                        fetchAndPopulateItems({
+                            project_id: projectId,
+                            sub_project_id: subProjectId
+                        }, newSelect);
+                    }
+
+                    if (e.target.classList.contains('removeRow')) {
+                        const row = e.target.closest('tr');
+                        row.querySelectorAll('select').forEach(select => {
+                            if (select.choicesInstance) {
+                                select.choicesInstance.destroy();
+                            }
+                        });
+                        row.remove();
+                    }
+                });
+            }
+
+            function initRowChoices(row) {
+                const itemSelect = row.querySelector('.item-select');
+                const unitSelect = row.querySelector('.unit-select');
+
+                if (itemSelect && !itemSelect.choicesInstance) {
+                    itemSelect.choicesInstance = new Choices(itemSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: 'ស្វែងរក...',
+                        shouldSort: false
+                    });
+                }
+
+                if (unitSelect && !unitSelect.choicesInstance) {
+                    unitSelect.choicesInstance = new Choices(unitSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: 'ស្វែងរក...',
+                        shouldSort: false
+                    });
+                }
+            }
         });
     </script>
 @endsection
