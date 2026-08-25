@@ -21,6 +21,7 @@ class DuelEntryController extends Controller
 
     public function getIndex(InitialDuelEntryDataTable $dataTable)
     {
+        // return view('maintenance.maintenance');
         return $dataTable->render('duel::duelEntry.initialDuelEntry.index');
     }
     /**
@@ -28,6 +29,7 @@ class DuelEntryController extends Controller
      */
     public function index(DuelEntryDataTable $dataTable, $params)
     {
+
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
         $duelType = DuelType::all();
@@ -94,8 +96,8 @@ class DuelEntryController extends Controller
                 DuelEntry::create([
                     'ministry_id'   => $ministry->id,
                     'project_id'   => $project->id,
-                    'stock_number'   => $project->stock_number,
-                    'stock_name'   => $project->stock_name,
+                    // 'stock_number'   => $project->stock_number,
+                    // 'stock_name'   => $project->stock_name,
                     'item_name'     => $request->item_name[$index],
                     'unit'          => 2,
                     'quantity'      => $request->quantity[$index],
@@ -209,8 +211,8 @@ class DuelEntryController extends Controller
                         $duelEntry->update([
                             'ministry_id'  => $ministry->id,
                             'project_id'   => $project->id,
-                            'stock_number'   => $project->stock_number,
-                            'stock_name'   => $project->stock_name,
+                            // 'stock_number'   => $project->stock_number,
+                            // 'stock_name'   => $project->stock_name,
 
                             'item_name'    => $itemName,
                             'unit'         => $project->unit ?? '',
@@ -226,8 +228,8 @@ class DuelEntryController extends Controller
                     DuelEntry::create([
                         'ministry_id'  => $ministry->id,
                         'project_id'   => $project->id,
-                        'stock_number'   => $project->stock_number,
-                        'stock_name'   => $project->stock_name,
+                        // 'stock_number'   => $project->stock_number,
+                        // 'stock_name'   => $project->stock_name,
                         'item_name'    => $itemName,
                         'unit'         => $project->unit ?? '',
                         'quantity'     => $qty,
