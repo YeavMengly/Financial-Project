@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('project_id');
-            $table->unsignedBigInteger('project_sub_id');
+            $table->string('project_sub_id');
             $table->unsignedBigInteger('agency_id');
             $table->string('p_name');
             $table->string('p_year');
