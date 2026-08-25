@@ -407,7 +407,7 @@
                     $('#budgetvoucher-table').DataTable().ajax.reload();
                 });
     </script>
-    <script>
+    {{-- <script>
         window.startPicker = null;
         window.endPicker = null;
 
@@ -481,6 +481,36 @@
             $('#CboPaymentVoucherNumber').on('change keyup', function() {
                 checkAndLockStartDate();
             });
+        });
+    </script> --}}
+
+    <script>
+        const startDatePicker = flatpickr('#start_date', {
+            dateFormat: 'Y-m-d',
+
+            onChange: function(selectedDates) {
+
+                if (selectedDates.length > 0) {
+
+                    endDatePicker.set('minDate', selectedDates[0]);
+
+                    // If current end date is before start date, clear it
+                    if (
+                        endDatePicker.selectedDates.length > 0 &&
+                        endDatePicker.selectedDates[0] < selectedDates[0]
+                    ) {
+                        endDatePicker.clear();
+                    }
+                } else {
+
+                    endDatePicker.set('minDate', null);
+                }
+            }
+        });
+
+
+        const endDatePicker = flatpickr('#end_date', {
+            dateFormat: 'Y-m-d'
         });
     </script>
 @endsection
