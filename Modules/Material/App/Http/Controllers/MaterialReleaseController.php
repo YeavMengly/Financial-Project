@@ -254,54 +254,18 @@ class MaterialReleaseController extends Controller
             $project  = Projects::where('id', $validated['cboProject'])->firstOrFail();
             $dateRelease = Carbon::parse($validated['date_release'])->format('Y-m-d');
 
-            // Fetch Unit Names
-            $unitIds = array_filter($validated['unit']);
-            $units   = UnitType::whereIn('id', $unitIds)->pluck('name', 'id');
-
-            // 2. Loop Through Each Item Row
-            foreach ($validated['p_name'] as $index => $materialEntryId) {
-                $quantityTotal   = (float) ($validated['quantity'][$index] ?? 0);
-                $quantityRequest = (float) ($validated['price'][$index] ?? 0);
-                $totalAmount     = $quantityTotal * $quantityRequest;
-                $unitId          = $validated['unit'][$index] ?? null;
-
-                // 1. Find the corresponding MaterialEntry record
-                $materialEntry = MaterialEntry::find($materialEntryId);
-
-                if ($materialEntry) {
-                    // Check stock before decrementing
-                    if ($materialEntry->qty >= $quantityTotal) {
-                        $materialEntry->decrement('qty', $quantityTotal);
-                        $materialEntry->update([
-                            'total_price' => $materialEntry->qty * $materialEntry->price
-                        ]);
-                    } else {
-                        throw new \Exception("បរិមាណនៅក្នុងស្តុកមិនគ្រប់គ្រាន់ (Stock insufficient for {$materialEntry->p_name})");
-                    }
-
-                    $pNameValue = $materialEntry->p_name;
-                } else {
-                    $pNameValue = $materialEntryId;
-                }
-
-                // 2. Create the MaterialRelease record
-                MaterialRelease::create([
-                    'ministry_id'      => $ministry->id,
-                    'project_id'       => $project->id,
-                    'project_sub_id'   => !empty($validated['cboSubProject']) ? $validated['cboSubProject'] : 0,
-                    'agency_id'        => $validated['agency'], // <-- ADDED THIS FIELD
-                    'p_name'           => $pNameValue,
-                    'p_year'           => $validated['p_year'][$index] ?? '',
-                    'title'            => $request->input('title', ''),
-                    'unit'             => $units[$unitId] ?? '',
-                    'quantity_total'   => $quantityTotal,
-                    'quantity_request' => $quantityRequest,
-                    'total'            => $totalAmount,
-                    'source'           => $validated['source'][$index] ?? null,
-                    'refer'           => $project->refer ?? null,
-                    'date_release'     => $dateRelease,
-                ]);
-            }
+            MaterialEntry::create([
+                'ministry_id'  => $ministry->id,
+                'project_id' => $project->id,
+                'p_name'   => $validated['p_name'],
+                'p_year'   => $validated['p_year'] ?? '',
+                'unit'         => $unitType->name,
+                'quantity_request'     => $validated['quantity_request'],
+                'quantity_total'        => $validated['quantity_total'],
+                'total_price'   => $materialTotal,
+                'source'        => $validated['source'] ?? null,
+                'date_release'        => $validated['date_release'],
+            ]);
 
             DB::commit();
 
