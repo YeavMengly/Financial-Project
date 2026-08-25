@@ -36,7 +36,8 @@ class DuelEntryController extends Controller
         $unitType = UnitType::where('id', 2)->get();
 
         $duelEntry = DuelEntry::where('id', $id)
-            ->where('ministry_id', $ministry->id)->get();
+            ->where('ministry_id', $ministry->id)
+            ->whereNull('deleted_at')->get();
 
         return $dataTable->render('duel::duelEntry.index', [
             'params' => $params,
@@ -151,6 +152,7 @@ class DuelEntryController extends Controller
         $unitType = UnitType::where('name', 'លីត្រ')->get();
         $duelType = DuelType::all();
         $projects = Projects::where('ministry_id', $ministry->id)
+            ->whereNull('deleted_at')
             ->get()
             ->unique('stock_number');
 
@@ -281,6 +283,21 @@ class DuelEntryController extends Controller
             ->translate('en')
             ->option('timeout', 2000)
             ->error('delete_msg', 'delete')
+            ->flash();
+
+        return redirect()->route('duelEntry.index', $params);
+    }
+
+    public function restore($params, $id)
+    {
+        $pid = decode_params($id);
+
+        DuelEntry::withTrashed()->whereKey($pid)->restore();
+
+        flash()
+            ->translate('en')
+            ->option('timeout', 2000)
+            ->success('restore_msg', 'restore')
             ->flash();
 
         return redirect()->route('duelEntry.index', $params);

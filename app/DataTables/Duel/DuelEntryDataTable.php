@@ -36,9 +36,6 @@ class DuelEntryDataTable extends DataTable
 
                 return $active;
             })
-            ->editColumn('file', function ($row) {
-                return '<strong>' . $row->title  . '</strong><br/><hr/>' . $row->file;
-            })
             ->editColumn('total_price', function ($row) {
                 return number_format($row->total_price ?? 0) . ' ៛';
             })
@@ -46,10 +43,15 @@ class DuelEntryDataTable extends DataTable
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
+
+            ->addColumn("dateTime", function ($module) {
+                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
+            })
+
             ->addColumn('action', function ($module) {
                 return view('duel::duelEntry.action', ['module' => $module]);
             })
-            ->rawColumns(['id', 'note', 'refer',]);
+            ->rawColumns(['id', 'status','soft_delete']);
     }
 
     /**
@@ -61,7 +63,7 @@ class DuelEntryDataTable extends DataTable
         $id = decode_params($params);
 
         $model = $model->newQuery();
-        //  $model->withTrashed();
+        $model->withTrashed();
         $model->leftJoin('duel_types', 'duel_entries.item_name', '=', 'duel_types.id');
         $model->leftJoin('projects', 'duel_entries.project_id', '=', 'projects.id');
         $model->select([
@@ -85,6 +87,7 @@ class DuelEntryDataTable extends DataTable
             'projects.file',
             'duel_entries.created_at',
             'duel_entries.updated_at',
+            'duel_entries.deleted_at',
         ])
             ->where('duel_entries.ministry_id', $id);
 
@@ -131,6 +134,8 @@ class DuelEntryDataTable extends DataTable
             // Column::computed('note')->title(__('tables.th.note'))->addClass('align-middle'),
             // Column::computed('refer')->title(__('tables.th.refer'))->width(200)->addClass('align-middle'),
             // Column::computed('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
+            Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
+            Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
 
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
