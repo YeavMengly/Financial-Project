@@ -136,9 +136,11 @@ class DuelReleaseController extends Controller
             'projects.stock_name',
             'projects.title as project_title'
         )
-            ->where('duel_entries.ministry_id', $ministry->id)
             ->leftJoin('projects', 'duel_entries.project_id', '=', 'projects.id')
+            ->where('duel_entries.ministry_id', $ministry->id)
             ->whereNull('projects.deleted_at')
+            ->whereNull('duel_entries.deleted_at') // Fix: Added table prefix to prevent ambiguous column error
+            // ->orderBy('duel_entries.created_at', 'desc') // Optional: Ensure you get the latest entry per project
             ->get()
             ->unique('project_id')
             ->values();

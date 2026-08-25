@@ -35,7 +35,7 @@
     </div>
     <!-- end page title -->
     <div class="row">
-        <div class="col-12">
+        {{-- <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <form class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" id="filter" method="GET">
@@ -59,7 +59,7 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
     <div class="row">
         <div class="col-12">

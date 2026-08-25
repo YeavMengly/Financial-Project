@@ -271,58 +271,32 @@ class ProjectDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
+        $model = $model->newQuery();
         $model->withTrashed();
-
-        if ($request->has('cboStatus')) {
-            if ($request->cboStatus == '2') {
-                // Only non-deleted
-                $model->whereNull('projects.deleted_at');
-            } elseif ($request->cboStatus == '3') {
-                // Only deleted
-                $model->onlyTrashed();
-            } else {
-                // All records
-                $model->withTrashed();
-            }
-        } else {
-            // Default: non-deleted
-            $model->whereNull('projects.deleted_at');
-        }
-
-        if ($request->cboTodo) {
-            if ($request->cboTodo == 2) {
-                $model->where('projects.is_archived', 1);
-            } elseif ($request->cboTodo == 3) {
-                $model->where('projects.is_archived', 2);
-            }
-        } else {
-            $model->where('projects.is_archived', 2);
-        }
 
         /*
     |--------------------------------------------------------------------------
     | Get one project per stock_number
     |--------------------------------------------------------------------------
     */
-        return $model->newQuery()
-            ->select([
-                'projects.id',
-                'projects.ministry_id',
-                'projects.stock_number',
-                'projects.stock_name',
-                'projects.company_name',
-                'projects.warehouse_voucher',
-                'projects.warehouse_owner',
-                'projects.user_entry',
-                'projects.user_receiver',
-                'projects.date',
-                'projects.title',
-                'projects.file',
-                'projects.note',
-                'projects.refer',
-                'projects.created_at',
-                'projects.deleted_at',
-            ])
+        $model->select([
+            'projects.id',
+            'projects.ministry_id',
+            'projects.stock_number',
+            'projects.stock_name',
+            'projects.company_name',
+            'projects.warehouse_voucher',
+            'projects.warehouse_owner',
+            'projects.user_entry',
+            'projects.user_receiver',
+            'projects.date',
+            'projects.title',
+            'projects.file',
+            'projects.note',
+            'projects.refer',
+            'projects.created_at',
+            'projects.deleted_at',
+        ])
             ->where('projects.ministry_id', $id)
             ->whereIn('projects.id', function ($query) use ($id) {
                 $query->selectRaw('MIN(id)')
@@ -331,6 +305,7 @@ class ProjectDataTable extends DataTable
                     ->groupBy('stock_number');
             })
             ->orderBy('projects.stock_number', 'ASC');
+        return $model;
     }
 
     /**
@@ -346,18 +321,6 @@ class ProjectDataTable extends DataTable
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
-            ->ajax([
-                'data' => 'function(d) {
-                    d.cboTodo = $("#cboTodo").val();
-                    d.cboStatus = $("#cboStatus").val();
-                }',
-            ])
-            ->initComplete('function () {
-                $("#filter").submit(function(event) {
-                    event.preventDefault();s
-                    $("#project-table").DataTable().ajax.reload();
-                });
-            }')
             ->orderBy(2, 'ASC');
     }
 
