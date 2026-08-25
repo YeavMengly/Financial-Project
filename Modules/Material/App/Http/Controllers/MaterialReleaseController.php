@@ -19,7 +19,8 @@ class MaterialReleaseController extends Controller
 {
 
     public function getIndex(InitialMaterialReleaseDataTable $dataTable)
-    { return view('maintenance.maintenance');
+    {
+        // return view('maintenance.maintenance');
         return $dataTable->render('material::materialRelease.initialMaterialRelease.index');
     }
 
@@ -101,7 +102,7 @@ class MaterialReleaseController extends Controller
                 'quantity_total'        => $validated['quantity_total'],
                 'total_price'   => $materialTotal,
                 'source'        => $validated['source'] ?? null,
-                'date_release'        => $validated['date_release'] ,
+                'date_release'        => $validated['date_release'],
             ]);
 
             DB::commit();
