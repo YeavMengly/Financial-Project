@@ -224,7 +224,8 @@
             getItemRoute: "{{ route('materialRelease.get.projectItem') }}",
             searchPlaceholder: "{{ __('forms.search...') }}",
             initialSubProjectId: "{{ $release->project_sub_id ?? '' }}",
-            initialAgencyId: "{{ $release->agency_id ?? '' }}"
+            initialAgencyId: "{{ $release->agency_id ?? '' }}",
+            releaseId: "{{ $release->id ?? '' }}" // <-- Added release ID
         };
 
         let subProjectChoices = null;
@@ -294,13 +295,16 @@
                     }, 100);
                 }
             }
-            // Initialize row choices on first table row
+
             const tableBody = document.querySelector('#itemTable tbody');
             if (tableBody) {
                 Array.from(tableBody.rows).forEach(row => initRowChoices(row));
             }
 
             function fetchAndPopulateItems(params) {
+                // Always pass release_id to retain currently selected edit items
+                params.release_id = window.materialReleaseConfig.releaseId;
+
                 $.ajax({
                     url: window.materialReleaseConfig.getItemRoute,
                     type: "GET",
@@ -386,6 +390,7 @@
                     sub_project_id: initialSubProjectId
                 });
             }
+
             /* Skip Sub-Project Switch Listener */
             const skipSubProjectCheckbox = document.getElementById('skipSubProject');
             if (skipSubProjectCheckbox) {
@@ -422,41 +427,42 @@
                     }
                 });
             }
+
             /* Table Row Operations */
             if (tableBody) {
                 tableBody.addEventListener('click', function(e) {
                     if (e.target.classList.contains('addRow')) {
                         const newRow = document.createElement('tr');
                         newRow.innerHTML = `
-                            <td class="form-group">
-                                <select class="form-control item-select" name="p_name[]" required>
-                                    <option value="">ជ្រើសរើស</option>
-                                </select>
-                            </td>
-                            <td class="form-group">
-                                <select class="form-control unit-select" name="unit[]" required>
-                                    <option value="">ជ្រើសរើស</option>
-                                    @foreach ($unitType as $item)
-                                        <option value="{{ $item->name }}">{{ $item->name }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td class="form-group">
-                                <input type="number" min="0" name="quantity[]" class="form-control" required>
-                            </td>
-                            <td class="form-group">
-                                <input type="number" min="0" step="any" name="price[]" class="form-control" required>
-                            </td>
-                            <td class="form-group">
-                                <input type="text" name="source[]" class="form-control source-input" placeholder="{{ __('forms.source') }}">
-                            </td>
-                            <td class="form-group">
-                                <input type="text" name="p_year[]" class="form-control pro-year-input" placeholder="{{ __('forms.pro.year') }}">
-                            </td>
-                            <td class="text-center">
-                                <button type="button" class="btn btn-danger removeRow">-</button>
-                            </td>
-                        `;
+                        <td class="form-group">
+                            <select class="form-control item-select" name="p_name[]" required>
+                                <option value="">ជ្រើសរើស</option>
+                            </select>
+                        </td>
+                        <td class="form-group">
+                            <select class="form-control unit-select" name="unit[]" required>
+                                <option value="">ជ្រើសរើស</option>
+                                @foreach ($unitType as $item)
+                                    <option value="{{ $item->name }}">{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td class="form-group">
+                            <input type="number" min="0" name="quantity[]" class="form-control" required>
+                        </td>
+                        <td class="form-group">
+                            <input type="number" min="0" step="any" name="price[]" class="form-control" required>
+                        </td>
+                        <td class="form-group">
+                            <input type="text" name="source[]" class="form-control source-input" placeholder="{{ __('forms.source') }}">
+                        </td>
+                        <td class="form-group">
+                            <input type="text" name="p_year[]" class="form-control pro-year-input" placeholder="{{ __('forms.pro.year') }}">
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-danger removeRow">-</button>
+                        </td>
+                    `;
                         tableBody.appendChild(newRow);
                         initRowChoices(newRow);
 
