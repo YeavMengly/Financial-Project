@@ -25,7 +25,6 @@ class MaterialReleaseController extends Controller
 
     public function getIndex(InitialMaterialReleaseDataTable $dataTable)
     {
-        // return view('maintenance.maintenance');
         return $dataTable->render('material::materialRelease.initialMaterialRelease.index');
     }
 
@@ -47,8 +46,8 @@ class MaterialReleaseController extends Controller
             'materialRelease' => $materialRelease,
             'project' => $project
         ]);
-        // return view('maintenance.maintenance');
     }
+
     public function getByProjectSubId(Request $request)
     {
         try {
@@ -56,30 +55,21 @@ class MaterialReleaseController extends Controller
             if (empty($projectId)) {
                 return response()->json([]);
             }
-            // Get selected project
+
             $selectedProject = Projects::find($projectId);
 
             if (!$selectedProject) {
                 return response()->json([]);
             }
-            // Get projects with same stock number
-            // Only return projects that have all required fields
+
             $subProjects = Projects::query()
                 ->when(
                     !empty($selectedProject->stock_number),
                     function ($query) use ($selectedProject) {
-
-                        $query->where(
-                            'stock_number',
-                            $selectedProject->stock_number
-                        );
+                        $query->where('stock_number', $selectedProject->stock_number);
                     },
                     function ($query) use ($selectedProject) {
-
-                        $query->where(
-                            'id',
-                            $selectedProject->id
-                        );
+                        $query->where('id', $selectedProject->id);
                     }
                 )
                 ->whereNotNull('program_id')
@@ -87,12 +77,13 @@ class MaterialReleaseController extends Controller
                 ->whereNotNull('cluster_id')
                 ->whereNotNull('account_sub_id')
                 ->get();
+
             $data = $subProjects->map(function ($item) {
                 $subProjectName = !empty($item->sub_project)
                     ? $item->sub_project
                     : 'Sub-project #' . $item->id;
                 $accountSubId = $item->account_sub_id ?? '';
-                // Get program number
+
                 $programNo = '';
                 if (!empty($item->program_id)) {
                     $program = Program::find($item->program_id);
@@ -100,7 +91,7 @@ class MaterialReleaseController extends Controller
                         $programNo = $program->no ?? '';
                     }
                 }
-                // Get program sub number
+
                 $programSubNo = '';
                 if (!empty($item->program_sub_id)) {
                     $programSub = ProgramSub::find($item->program_sub_id);
@@ -108,15 +99,15 @@ class MaterialReleaseController extends Controller
                         $programSubNo = $programSub->no ?? '';
                     }
                 }
+
                 $clusterNo = '';
                 if (!empty($item->cluster_id)) {
-
                     $cluster = Cluster::find($item->cluster_id);
-                    if ($programSub) {
+                    if ($cluster) {
                         $clusterNo = $cluster->no ?? '';
                     }
                 }
-                // Build dropdown label
+
                 $label = trim(
                     implode(' ', array_filter([
                         $subProjectName . ' - ',
@@ -126,24 +117,19 @@ class MaterialReleaseController extends Controller
                         'ចង្កោមសកម្មភាព' . $clusterNo,
                     ]))
                 );
+
                 return [
                     'value' => (string) $item->id,
-                    'label' => preg_replace(
-                        '/\s+/',
-                        ' ',
-                        $label
-                    ),
+                    'label' => preg_replace('/\s+/', ' ', $label),
                     'program_id' => (string) $item->program_id,
                     'program_sub_id' => (string) $item->program_sub_id,
                     'cluster_id' => (string) $item->cluster_id,
                     'account_sub_id' => (string) $item->account_sub_id,
                 ];
             });
-            return response()->json(
-                $data->values()
-            );
-        } catch (\Throwable $e) {
 
+            return response()->json($data->values());
+        } catch (\Throwable $e) {
             Log::error('getByProjectId Error', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
@@ -158,13 +144,14 @@ class MaterialReleaseController extends Controller
             ], 500);
         }
     }
+
     public function getByItemId(Request $request)
     {
         try {
             $projectId = $request->input('project_id');
             $subProjectId = $request->input('sub_project_id');
+            $releaseId = $request->input('release_id'); // Pass release_id if editing
 
-            // Sanitize string values
             $projectId = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
             $subProjectId = ($subProjectId && $subProjectId !== 'null' && $subProjectId !== 'undefined') ? $subProjectId : null;
 
@@ -175,14 +162,31 @@ class MaterialReleaseController extends Controller
             $query = MaterialEntry::query();
 
             if ($subProjectId) {
-                // Filter by sub project if selected
                 $query->where('project_sub_id', $subProjectId);
             } elseif ($projectId) {
-                // Filter strictly by main project when sub-project is empty
                 $query->where('project_id', $projectId);
             }
 
-            $materials = $query->get(['id', 'p_name', 'unit', 'price']);
+            // Include items that either have stock (> 0) OR are part of the current edit batch
+            $query->where(function ($q) use ($releaseId) {
+                $q->where('qty', '>', 0);
+
+                if ($releaseId) {
+                    $release = MaterialRelease::find($releaseId);
+                    if ($release) {
+                        $existingNames = MaterialRelease::where('ministry_id', $release->ministry_id)
+                            ->where('project_id', $release->project_id)
+                            ->where('project_sub_id', $release->project_sub_id)
+                            ->where('date_release', $release->date_release)
+                            ->pluck('p_name')
+                            ->toArray();
+
+                        $q->orWhereIn('p_name', $existingNames);
+                    }
+                }
+            });
+
+            $materials = $query->get(['id', 'p_name', 'unit', 'price', 'qty']);
 
             return response()->json($materials);
         } catch (\Throwable $e) {
@@ -190,6 +194,7 @@ class MaterialReleaseController extends Controller
             return response()->json([], 500);
         }
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -199,7 +204,6 @@ class MaterialReleaseController extends Controller
         $ministry = Ministry::where('id', $id)->first();
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
 
-        // Fetch projects and group by stock_number to remove duplicates
         $project = Projects::where('ministry_id', $ministry->id)
             ->get()
             ->unique('stock_number');
@@ -223,14 +227,12 @@ class MaterialReleaseController extends Controller
      */
     public function store(Request $request, $params)
     {
-        // 1. Validate Form Inputs
         $validated = $request->validate([
             'cboProject'    => 'required|integer',
             'cboSubProject' => 'nullable',
             'agency'        => 'required|integer',
             'date_release'  => 'required|date',
 
-            // Dynamic Item Table Arrays
             'p_name'        => 'required|array|min:1',
             'p_name.*'      => 'required|string|max:255',
             'unit'          => 'required|array|min:1',
@@ -241,8 +243,8 @@ class MaterialReleaseController extends Controller
             'price.*'       => 'required|numeric|min:0',
             'source'        => 'nullable|array',
             'source.*'      => 'nullable|string|max:255',
-            'refer'        => 'nullable|array',
-            'refer.*'      => 'nullable|string|max:255',
+            'refer'         => 'nullable|array',
+            'refer.*'       => 'nullable|string|max:255',
             'p_year'        => 'nullable|array',
             'p_year.*'      => 'nullable|string|max:255',
         ]);
@@ -255,24 +257,22 @@ class MaterialReleaseController extends Controller
             $project  = Projects::where('id', $validated['cboProject'])->firstOrFail();
             $dateRelease = Carbon::parse($validated['date_release'])->format('Y-m-d');
 
-            // Fetch Unit Names
             $unitIds = array_filter($validated['unit']);
             $units   = UnitType::whereIn('id', $unitIds)->pluck('name', 'id');
 
-            // 2. Loop Through Each Item Row
             foreach ($validated['p_name'] as $index => $materialEntryId) {
                 $quantityTotal   = (float) ($validated['quantity'][$index] ?? 0);
                 $quantityRequest = (float) ($validated['price'][$index] ?? 0);
                 $totalAmount     = $quantityTotal * $quantityRequest;
                 $unitId          = $validated['unit'][$index] ?? null;
 
-                // 1. Find the corresponding MaterialEntry record
                 $materialEntry = MaterialEntry::find($materialEntryId);
 
                 if ($materialEntry) {
-                    // Check stock before decrementing
                     if ($materialEntry->qty >= $quantityTotal) {
                         $materialEntry->decrement('qty', $quantityTotal);
+
+                        // Recalculate total_price for updated stock quantity
                         $materialEntry->update([
                             'total_price' => $materialEntry->qty * $materialEntry->price
                         ]);
@@ -285,12 +285,11 @@ class MaterialReleaseController extends Controller
                     $pNameValue = $materialEntryId;
                 }
 
-                // 2. Create the MaterialRelease record
                 MaterialRelease::create([
                     'ministry_id'      => $ministry->id,
                     'project_id'       => $project->id,
                     'project_sub_id'   => !empty($validated['cboSubProject']) ? $validated['cboSubProject'] : 0,
-                    'agency_id'        => $validated['agency'], // <-- ADDED THIS FIELD
+                    'agency_id'        => $validated['agency'],
                     'p_name'           => $pNameValue,
                     'p_year'           => $validated['p_year'][$index] ?? '',
                     'title'            => $request->input('title', ''),
@@ -299,7 +298,7 @@ class MaterialReleaseController extends Controller
                     'quantity_request' => $quantityRequest,
                     'total'            => $totalAmount,
                     'source'           => $validated['source'][$index] ?? null,
-                    'refer'           => $project->refer ?? null,
+                    'refer'            => $project->refer ?? null,
                     'date_release'     => $dateRelease,
                 ]);
             }
@@ -328,11 +327,6 @@ class MaterialReleaseController extends Controller
     }
 
     /**
-     * Show the specified resource.
-     */
-    public function show() {}
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function editRelease($params, $id)
@@ -353,7 +347,6 @@ class MaterialReleaseController extends Controller
             ->where('ministry_id', $ministry->id)
             ->firstOrFail();
 
-        // Added project_sub_id check to match the batch strictly
         $items = MaterialRelease::where('ministry_id', $ministry->id)
             ->where('project_id', $release->project_id)
             ->where('project_sub_id', $release->project_sub_id)
@@ -399,7 +392,6 @@ class MaterialReleaseController extends Controller
             $ministry = Ministry::where('id', $ministryId)->firstOrFail();
             $project  = Projects::where('id', $validated['cboProject'])->firstOrFail();
 
-            // 1. Retrieve clicked record to establish original batch context
             $release = MaterialRelease::where('id', $realId)
                 ->where('ministry_id', $ministry->id)
                 ->firstOrFail();
@@ -414,14 +406,13 @@ class MaterialReleaseController extends Controller
             $sources    = array_values((array) $request->input('source', []));
             $pYears     = array_values((array) $request->input('p_year', []));
 
-            // 2. Query all existing release items in this batch using matching sub_id
             $existingItems = MaterialRelease::where('ministry_id', $ministry->id)
                 ->where('project_id', $release->project_id)
                 ->where('project_sub_id', $release->project_sub_id)
                 ->where('date_release', $release->date_release)
                 ->get();
 
-            // STEP 1: RESTORE ALL ORIGINAL QUANTITIES FIRST
+            // STEP 1: RESTORE ORIGINAL QUANTITIES BEFORE CHECKING NEW QUANTITIES
             foreach ($existingItems as $oldItem) {
                 $oldEntry = MaterialEntry::where('p_name', (string) $oldItem->p_name)->first();
                 if ($oldEntry) {
@@ -434,7 +425,7 @@ class MaterialReleaseController extends Controller
 
             $unitTypes = UnitType::all()->keyBy('id');
 
-            // STEP 2: LOOP AND VALIDATE/DEDUCT NEW QUANTITIES
+            // STEP 2: LOOP AND DEDUCT NEW QUANTITIES
             foreach ($names as $index => $itemVal) {
                 $itemStr  = (string) $itemVal;
                 $unitVal  = $units[$index] ?? null;
@@ -506,6 +497,7 @@ class MaterialReleaseController extends Controller
                 ->with('error', 'បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage());
         }
     }
+
     /**
      * Remove the specified resource from storage.
      */
@@ -519,12 +511,10 @@ class MaterialReleaseController extends Controller
         try {
             $ministry = Ministry::where('id', $ministryId)->firstOrFail();
 
-            // 1. Find only the specific target release item
             $release = MaterialRelease::where('id', $realId)
                 ->where('ministry_id', $ministry->id)
                 ->firstOrFail();
 
-            // 2. Restore stock in MaterialEntry for this single item
             $materialEntry = MaterialEntry::where('p_name', (string) $release->p_name)->first();
 
             if ($materialEntry) {
@@ -534,7 +524,6 @@ class MaterialReleaseController extends Controller
                 ]);
             }
 
-            // 3. Delete only the selected row
             $release->delete();
 
             DB::commit();
@@ -555,7 +544,7 @@ class MaterialReleaseController extends Controller
 
     public function export(Request $request, $params)
     {
-
         return view('errors.404');
     }
 }
+ 
