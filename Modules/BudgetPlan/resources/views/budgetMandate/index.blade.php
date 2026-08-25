@@ -289,7 +289,7 @@
         }
     </script>
 
-    <script>
+    {{-- <script>
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
         if (startDateInput) {
@@ -310,7 +310,7 @@
                 defaultDate: endDateInput.value || null
             });
         }
-    </script>
+    </script> --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -431,6 +431,35 @@
 
             // ✅ Redirect with correct query string
             window.location.href = baseUrl + '?' + params.toString();
+        });
+    </script>
+    <script>
+        const startDatePicker = flatpickr('#start_date', {
+            dateFormat: 'Y-m-d',
+
+            onChange: function(selectedDates) {
+
+                if (selectedDates.length > 0) {
+
+                    endDatePicker.set('minDate', selectedDates[0]);
+
+                    // If current end date is before start date, clear it
+                    if (
+                        endDatePicker.selectedDates.length > 0 &&
+                        endDatePicker.selectedDates[0] < selectedDates[0]
+                    ) {
+                        endDatePicker.clear();
+                    }
+                } else {
+
+                    endDatePicker.set('minDate', null);
+                }
+            }
+        });
+
+
+        const endDatePicker = flatpickr('#end_date', {
+            dateFormat: 'Y-m-d'
         });
     </script>
 
