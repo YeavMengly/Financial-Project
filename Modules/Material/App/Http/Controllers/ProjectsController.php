@@ -108,7 +108,6 @@ class ProjectsController extends Controller
         return response($html);
     }
 
-
     public function editByProgramSubId(Request $request)
     {
         if (!$request->program_sub_id) {

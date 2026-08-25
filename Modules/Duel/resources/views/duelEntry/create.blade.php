@@ -32,149 +32,6 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        {{-- <form id="pristine-valid-example" action="{{ route('duelEntry.store', $params) }}" method="POST"
-                            enctype="multipart/form-data" novalidate>
-                            @csrf
-
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="project" class="form-label font-size-13 text-muted">
-                                            {{ __('forms.project') }}
-                                        </label>
-                                        <select class="form-control" data-trigger id="dropProject" name="project" required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-                                            <option value="">{{ __('forms.search...') }}</option>
-                                            @foreach ($projects as $item)
-                                                <option value="{{ $item->id }}">
-                                                    {{ $item->stock_number}}-{{ $item->stock_name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-                                        @error('project')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="source">{{ __('forms.source') }}</label>
-
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="skipSource" style="cursor: pointer;">
-
-                                                <label class="form-check-label font-size-12 text-muted" for="skipSource"
-                                                    style="cursor: pointer;">
-                                                    រំលង
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <input type="text" name="source" id="source" class="form-control"
-                                            placeholder="{{ __('forms.source') }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-
-                                        @error('source')
-                                            <div class="pristine-error text-help text-danger mt-1">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-
-                                    </div>
-                                </div>
-                                <!-- Project Year -->
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="form-group mb-3">
-
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label for="pro_year">{{ __('forms.pro.year') }}</label>
-
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch"
-                                                    id="skipProYear" style="cursor: pointer;">
-
-                                                <label class="form-check-label font-size-12 text-muted" for="skipProYear"
-                                                    style="cursor: pointer;">
-                                                    រំលង
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <input type="text" name="pro_year" id="pro_year" class="form-control"
-                                            placeholder="{{ __('forms.pro.year') }}"
-                                            data-pristine-required-message="{{ __('messages.required') }}">
-
-                                        @error('pro_year')
-                                            <div class="pristine-error text-help text-danger mt-1">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-12 col-md-12 mt-3">
-                                    <div class="col-xl-12 col-md-12">
-                                        <table class="table table-bordered" id="itemTable">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{ __('forms.item.name') }}</th>
-                                                    <th width="240">{{ __('forms.quantity') }} (លីត្រ)</th>
-                                                    <th width="240">{{ __('forms.price') }} (លីត្រ)</th>
-                                                    <th width="80">Action</th>
-                                                </tr>
-                                            </thead>
-
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <select id="cboItem" class="form-control" name="item_name[]"
-                                                            required>
-                                                            <option value="">{{ __('forms.search...') }}</option>
-                                                            @foreach ($duelType as $item)
-                                                                <option value="{{ $item->id }}">
-                                                                    {{ $item->name_km }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-
-                                                    <td>
-                                                        <input type="number" min="0" name="quantity[]"
-                                                            class="form-control" required>
-                                                    </td>
-
-                                                    <td>
-                                                        <input type="number" min="0" name="price[]"
-                                                            class="form-control" required>
-                                                    </td>
-
-                                                    <td class="text-center">
-                                                        <button type="button" class="btn btn-success addRow">+</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="d-flex flex-wrap gap-2">
-                                <button type="submit" class="btn btn-primary"
-                                    id="insertToTableBtn">{{ __('buttons.save') }}</button>
-                                <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
-                                </a>
-                                <a class="btn btn-dark"
-                                    href="{{ route('duelEntry.index', $params) }}">{{ __('buttons.back') }}</a>
-
-                            </div>
-                        </form> --}}
 
                         <form id="pristine-valid-example" action="{{ route('duelEntry.store', $params) }}" method="POST"
                             enctype="multipart/form-data" novalidate>
@@ -183,8 +40,8 @@
                             <div class="row g-3">
 
                                 {{-- =========================
-            PROJECT INFORMATION
-        ========================== --}}
+                                    PROJECT INFORMATION
+                                ========================== --}}
                                 <div class="col-xl-4 col-lg-5">
                                     <div class="card shadow-sm h-100">
                                         <div class="card-header bg-transparent">
@@ -300,8 +157,8 @@
 
 
                                 {{-- =========================
-            ITEM DETAILS
-        ========================== --}}
+                                    ITEM DETAILS
+                                ========================== --}}
                                 <div class="col-xl-8 col-lg-7">
 
                                     <div class="card shadow-sm">
@@ -401,7 +258,7 @@
                                                                 <button type="button"
                                                                     class="btn btn-success btn-sm addRow"
                                                                     title="Add Item">
-                                                                    <i class="bi bi-plus-lg"></i>
+                                                                    <i class="bi bi-plus-lg">+</i>
                                                                 </button>
 
                                                             </td>
@@ -419,16 +276,12 @@
                                                 <i class="bi bi-info-circle me-1"></i>
                                                 អ្នកអាចចុច <strong>+</strong> ដើម្បីបន្ថែមទំនិញ/ប្រេងបន្ថែម។
                                             </div>
-
                                         </div>
                                     </div>
-
                                 </div>
-
-
                                 {{-- =========================
-            ACTION BUTTONS
-        ========================== --}}
+                                    ACTION BUTTONS
+                                ========================== --}}
                                 <div class="col-12">
 
                                     <div class="card shadow-sm">

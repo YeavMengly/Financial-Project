@@ -14,8 +14,8 @@ class DuelEntry extends Model
     protected $fillable = [
         'ministry_id',
         'project_id',
-        'stock_number',
-        'stock_name',
+        // 'stock_number',
+        // 'stock_name',
         'item_name',
         'unit',
         'quantity',

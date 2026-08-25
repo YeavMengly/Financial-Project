@@ -16,6 +16,6 @@ Route::controller(DuelReleaseController::class)->group(function () {
     Route::get('duel/release/by-stock_number/{params}', 'getByStockID')->name('duelRelease.by.stock_number');
     Route::get('duel/release/{params}/export', 'export')->name('duelRelease.export');
 
-
-    Route::get('duel/get-by-agency/executive-unit', 'getByAgencyId')->name('duelRelease.by.executive');
+    Route::get('duel/get-by-agency/executive-unit', 'getByAgencyId')->name('duelRelease.by.get.executive');
+    Route::get('duel/edit-by-agency/executive-unit', 'editByAgencyId')->name('duelRelease.by.edit.executive');
 });
