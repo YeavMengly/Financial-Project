@@ -199,6 +199,7 @@ class MaterialEntryController extends Controller
 
         // Deduplicate projects by stock_number
         $project  = Projects::where('ministry_id', $ministry->id)
+            ->whereNull('deleted_at')
             ->get()
             ->unique('stock_number');
 

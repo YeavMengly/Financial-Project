@@ -3,6 +3,7 @@
 namespace App\DataTables\Duel;
 
 use App\Models\Duel\DuelRelease;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
 use Yajra\DataTables\EloquentDataTable;
@@ -34,6 +35,11 @@ class DuelReleaseDataTable extends DataTable
             ->editColumn('duel_total', function ($row) {
                 $remain = ($row->running_total ?? 0) - ($row->quantity_request ?? 0);
                 return number_format(max(0, $remain)) . ' L';
+            })
+            ->editColumn('date_release', function ($row) {
+                $active =  Carbon::parse($row->date_release)->format('Y-m-d');
+
+                return $active;
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 return is_null($soft_delete->deleted_at)
@@ -203,6 +209,29 @@ class DuelReleaseDataTable extends DataTable
         }
         if ($request->filled('cboExecutiveUnit')) {
             $query->where('duel_releases.executive_unit', $request->cboExecutiveUnit);
+        }
+
+
+        if ($request->cboStatus) {
+            if ($request->cboStatus == '2') {
+                $model->where('duel_releases.deleted_at', null);
+            } elseif ($request->cboStatus == '3') {
+                $model->where('duel_releases.deleted_at', '!=', null);
+            } else {
+                $model->withTrashed();
+            }
+        } else {
+            $model->where('duel_releases.deleted_at', null);
+        }
+
+        if ($request->cboTodo) {
+            if ($request->cboTodo == 2) {
+                $model->where('duel_releases.is_archived', 1);
+            } elseif ($request->cboTodo == 3) {
+                $model->where('duel_releases.is_archived', 2);
+            }
+        } else {
+            $model->where('duel_releases.is_archived', 1);
         }
 
         // Subquery matching release sequence strictly by (date_release, receipt_number, id)

@@ -139,15 +139,43 @@ class BudgetMandateDataTable extends DataTable
             $model->where('budget_mandates.day_of_number', $request->cboDayNumber);
         }
 
+        // if ($request->filled('start_date') && $request->filled('end_date')) {
+        //     $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+        //         ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+        // } else {
+        //     if ($request->filled('start_date')) {
+        //         $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+        //     }
+        //     if ($request->filled('end_date')) {
+        //         $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+        //     }
+        // }
+
+        $startDateColumn = 'budget_mandates.request_date';
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
-                ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+
+            $model->whereDate($startDateColumn, '>=', $request->start_date)
+                ->whereDate(
+                    'budget_mandates.transaction_date',
+                    '<=',
+                    $request->end_date
+                );
         } else {
+
             if ($request->filled('start_date')) {
-                $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+                $model->whereDate(
+                    $startDateColumn,
+                    '>=',
+                    $request->start_date
+                );
             }
+
             if ($request->filled('end_date')) {
-                $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+                $model->whereDate(
+                    'budget_mandates.transaction_date',
+                    '<=',
+                    $request->end_date
+                );
             }
         }
         // ===== Left Join Table =====

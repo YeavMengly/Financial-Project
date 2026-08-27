@@ -154,15 +154,41 @@ class BudgetVoucherDataTable extends DataTable
             $startDateColumn = 'budget_vouchers.legal_date';
         }
 
+        // if ($request->filled('start_date') && $request->filled('end_date')) {
+        //     $model->whereDate($startDateColumn, '>=', $request->start_date)
+        //         ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+        // } else {
+        //     if ($request->filled('start_date')) {
+        //         $model->whereDate($startDateColumn, '>=', $request->start_date);
+        //     }
+        //     if ($request->filled('end_date')) {
+        //         $model->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+        //     }
+        // }
         if ($request->filled('start_date') && $request->filled('end_date')) {
+
             $model->whereDate($startDateColumn, '>=', $request->start_date)
-                ->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+                ->whereDate(
+                    'budget_vouchers.transaction_date',
+                    '<=',
+                    $request->end_date
+                );
         } else {
+
             if ($request->filled('start_date')) {
-                $model->whereDate($startDateColumn, '>=', $request->start_date);
+                $model->whereDate(
+                    $startDateColumn,
+                    '>=',
+                    $request->start_date
+                );
             }
+
             if ($request->filled('end_date')) {
-                $model->whereDate('budget_vouchers.transaction_date', '<=', $request->end_date);
+                $model->whereDate(
+                    'budget_vouchers.transaction_date',
+                    '<=',
+                    $request->end_date
+                );
             }
         }
 

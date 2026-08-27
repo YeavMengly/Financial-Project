@@ -43,6 +43,17 @@ class ProjectDataTable extends DataTable
 
             /*
         |--------------------------------------------------------------------------
+        | Date
+        |--------------------------------------------------------------------------
+        */
+            ->editColumn('date', function ($row) {
+                $active =  Carbon::parse($row->date)->format('Y-m-d');
+
+                return $active;
+            })
+
+            /*
+        |--------------------------------------------------------------------------
         | Title
         |--------------------------------------------------------------------------
         */
@@ -252,43 +263,49 @@ class ProjectDataTable extends DataTable
      */
     public function query(Projects $model, Request $request): QueryBuilder
     {
-
         /*
-        |--------------------------------------------------------------------------
-        | Decode ministry ID
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | Decode ministry ID
+    |--------------------------------------------------------------------------
+    */
         $params = $request->params;
         $id = decode_params($params);
 
+        $model = $model->newQuery();
+        $model->withTrashed();
 
         /*
-        |--------------------------------------------------------------------------
-        | Query
-        |--------------------------------------------------------------------------
-        */
-        return $model->newQuery()
-
-            ->select([
-                'projects.id',
-                'projects.ministry_id',
-                'projects.stock_number',
-                'projects.stock_name',
-                'projects.company_name',
-                'projects.warehouse_voucher',
-                'projects.warehouse_owner',
-                'projects.user_entry',
-                'projects.user_receiver',
-                'projects.date',
-                'projects.title',
-                'projects.file',
-                'projects.note',
-                'projects.refer',
-                'projects.created_at',
-                'projects.deleted_at',
-            ])
+    |--------------------------------------------------------------------------
+    | Get one project per stock_number
+    |--------------------------------------------------------------------------
+    */
+        $model->select([
+            'projects.id',
+            'projects.ministry_id',
+            'projects.stock_number',
+            'projects.stock_name',
+            'projects.company_name',
+            'projects.warehouse_voucher',
+            'projects.warehouse_owner',
+            'projects.user_entry',
+            'projects.user_receiver',
+            'projects.date',
+            'projects.title',
+            'projects.file',
+            'projects.note',
+            'projects.refer',
+            'projects.created_at',
+            'projects.deleted_at',
+        ])
             ->where('projects.ministry_id', $id)
+            ->whereIn('projects.id', function ($query) use ($id) {
+                $query->selectRaw('MIN(id)')
+                    ->from('projects')
+                    ->where('ministry_id', $id)
+                    ->groupBy('stock_number');
+            })
             ->orderBy('projects.stock_number', 'ASC');
+        return $model;
     }
 
     /**

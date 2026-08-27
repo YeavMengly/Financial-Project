@@ -39,7 +39,6 @@
                             @csrf
 
                             <div class="row">
-
                                 <div class="row">
                                     <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
@@ -50,8 +49,10 @@
                                                 name="stock_number" required tabindex="1"
                                                 data-pristine-required-message="{{ __('messages.required') }}">
                                                 <option value="">{{ __('forms.search...') }}</option>
-                                                @foreach ($duelEntry as $stock)
-                                                    <option value="{{ $stock }}">{{ $stock }}</option>
+                                                @foreach ($duelEntry as $item)
+                                                    <option value="{{ $item->project_id }}">
+                                                        {{ $item->stock_number }} - {{ $item->stock_name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
 
@@ -369,7 +370,7 @@
         });
     </script>
 
-    <script>
+    {{-- <script>
         let programSubChoices = new Choices('#cboDuel', {
             searchEnabled: true,
             itemSelectText: '',
@@ -569,8 +570,116 @@
             });
 
         });
+    </script> --}}
+
+    <script>
+        let programSubChoices = new Choices('#cboDuel', {
+            searchEnabled: true,
+            itemSelectText: '',
+            placeholder: true,
+            placeholderValue: "ស្វែងរក..."
+        });
+
+        $('#dropStockNumber').change(function() {
+            var id = $(this).val();
+            $.ajax({
+                url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
+                type: 'get',
+                data: {
+                    stock_number: id
+                },
+                success: function(data) {
+                    if (programSubChoices) {
+                        programSubChoices.destroy();
+                    }
+                    $('#cboDuel').html(data);
+                    programSubChoices = new Choices('#cboDuel', {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: "ស្វែងរក..."
+                    });
+                }
+            });
+        });
     </script>
 
+    <script>
+        const titleInput = document.getElementById('title');
+        const skipTitleCheckbox = document.getElementById('skipTitle');
+
+        const fileInput = document.getElementById('fileInput');
+        const skipFileCheckbox = document.getElementById('skipFileInput');
+
+        const setupSkipField = ({
+            checkbox,
+            input,
+            defaultValue = '',
+            restoreValidation = () => {}
+        }) => {
+            if (!checkbox || !input) return;
+
+            checkbox.addEventListener('change', function() {
+                const parentGroup = input.closest('.form-group');
+
+                if (this.checked) {
+                    input.value = '';
+                    input.disabled = true;
+
+                    input.classList.add('border-success', 'bg-success-subtle');
+                    parentGroup?.classList.add('has-success');
+
+                    input.removeAttribute('required');
+                    input.removeAttribute('min');
+                    input.removeAttribute('data-pristine-required-message');
+
+                    pristine.reset(input);
+                } else {
+                    input.value = defaultValue;
+                    input.disabled = false;
+
+                    input.classList.remove('border-success', 'bg-success-subtle');
+                    parentGroup?.classList.remove('has-success');
+
+                    restoreValidation();
+                }
+
+                refreshPristine();
+            });
+        };
+
+        // setupSkipField({
+        //     checkbox: skipLegalCheckbox,
+        //     input: legalInput,
+        //     defaultValue: '0',
+        //     restoreValidation: () => {
+        //         legalInput.setAttribute('required', true);
+        //         legalInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
+        //             .translations.required);
+        //     }
+        // });
+
+        setupSkipField({
+            checkbox: skipTitleCheckbox,
+            input: titleInput,
+            defaultValue: '',
+            restoreValidation: () => {
+                titleInput.setAttribute('required', true);
+                titleInput.setAttribute('data-pristine-required-message', window
+                    .BudgetFormConfig.translations.required);
+            }
+        });
+
+        setupSkipField({
+            checkbox: skipFileCheckbox,
+            input: fileInput,
+            restoreValidation: () => {
+                fileInput.setAttribute('required', true);
+                fileInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
+                    .translations.required);
+            }
+        });
+    </script>
     {{-- <script>
         let cboAgencyChoice = new Choices('#cboAgency', {
             searchEnabled: true,
@@ -728,7 +837,7 @@
                 if (!agencyId) return;
 
                 loadOptions({
-                    url: "{{ route('duelRelease.by.executive') }}", // Fixed route name
+                    url: "{{ route('duelRelease.by.get.executive') }}", // Fixed route name
                     data: {
                         agency_id: agencyId
                     },

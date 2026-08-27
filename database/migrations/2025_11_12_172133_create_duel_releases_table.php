@@ -16,13 +16,14 @@ return new class extends Migration
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('duel_entries_id');
-            $table->string('item_name')->nullable();
-            $table->string('receipt_number')->nullable();
-            $table->string('agency')->nullable();
-            $table->string('executive_unit_id')->nullable();
-            $table->string('user_request')->nullable();
-            $table->string('receiver')->nullable();
-            $table->string('unit')->nullable();
+            // $table->string('stock_number');
+            $table->string('item_name');
+            $table->string('receipt_number');
+            $table->string('agency');
+            $table->string('executive_unit_id');
+            $table->string('user_request');
+            $table->string('receiver');
+            $table->string('unit');
             $table->string('title')->nullable();
             $table->integer('quantity_total');
             $table->integer('quantity_request');
@@ -32,6 +33,7 @@ return new class extends Migration
             $table->date('date_release');
             $table->string('file')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

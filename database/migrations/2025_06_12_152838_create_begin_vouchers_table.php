@@ -33,9 +33,9 @@ return new class extends Migration
             $table->decimal('credit', 15, 0)->default(0);
             $table->decimal('law_average', 15, 2)->default(0);
             $table->decimal('law_correction', 15, 2)->default(0);
-            $table->unsignedBigInteger('expense_type_id');
+            // $table->unsignedBigInteger('expense_type_id');
             $table->timestamps();
-            // $table->softDeletes();
+            $table->softDeletes();
         });
     }
 

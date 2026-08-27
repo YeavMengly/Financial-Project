@@ -209,11 +209,8 @@ class MaterialReleaseController extends Controller
             ->get()
             ->unique('stock_number');
 
-        // Retrieve only entries that have available stock (> 0)
         $MaterialEntry = MaterialEntry::where('ministry_id', $ministry->id)
-            ->where('qty', '>', 0)
-            ->get();
-
+        ->whereNull('deleted_at')->get();
         $Agency = Agency::where('ministry_id', $ministry->id)->get();
 
         return view('material::materialRelease.create', [
