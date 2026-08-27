@@ -57,10 +57,12 @@ class MaterialEntryDataTable extends DataTable
     {
         $params = $request->params;
         $id = decode_params($params);
+
         // Subquery to get total quantity released per material item/entry
         $releasedSubquery = DB::table('material_releases')
             ->select('p_name', 'ministry_id', DB::raw('SUM(quantity_total) as total_released'))
             ->groupBy('p_name', 'ministry_id');
+
         $query = $model->newQuery();
         $query->where('material_entries.ministry_id', $id)
             ->leftJoin('projects', 'material_entries.project_sub_id', '=', 'projects.id')
@@ -86,6 +88,8 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.updated_at',
             ])
             ->orderBy('material_entries.id', 'DESC');
+
+        // Other filters
         if ($request->filled('project')) {
             $query->where('material_entries.project_id', $request->input('project'));
         }
@@ -95,6 +99,15 @@ class MaterialEntryDataTable extends DataTable
         if ($request->filled('Pname')) {
             $query->where('material_entries.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
         }
+
+        // Date Filters (Applied directly to $query)
+        $query->when($request->filled('start_date'), function ($q) use ($request) {
+            $q->whereDate('material_entries.updated_at', '>=', $request->start_date);
+        });
+
+        $query->when($request->filled('end_date'), function ($q) use ($request) {
+            $q->whereDate('material_entries.updated_at', '<=', $request->end_date);
+        });
 
         return $query;
     }
@@ -124,6 +137,8 @@ class MaterialEntryDataTable extends DataTable
                 d.project = $("#project").val();
                 d.source = $("#source").val();
                 d.Pname = $("#Pname").val();
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
             }',
             ]);
     }

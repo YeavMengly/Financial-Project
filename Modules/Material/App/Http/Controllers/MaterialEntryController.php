@@ -37,7 +37,8 @@ class MaterialEntryController extends Controller
         $ministry = Ministry::where('id', $id)->first();
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $materialEntry = MaterialEntry::where('ministry_id', $ministry->id)->get();
-        $project = Projects::where('ministry_id', $ministry->id)->get();
+        $project = Projects::where('ministry_id', $ministry->id)->get()
+            ->unique('stock_number');
         $program = Program::where('ministry_id', $ministry->id)->get();
         $programSub = ProgramSub::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
