@@ -94,8 +94,17 @@ class MaterialReleaseDataTable extends DataTable
                 'material_releases.created_at',
                 'material_releases.updated_at',
             ])
-            ->where('material_releases.ministry_id', $id);
+            ->where('material_releases.ministry_id', $id)
+            ->orderBy('material_releases.id', 'DESC');
 
+        // Date Filters (Applied directly to $query)
+        $query->when($request->filled('start_date'), function ($q) use ($request) {
+            $q->whereDate('material_releases.date_release', '>=', $request->start_date);
+        });
+
+        $query->when($request->filled('end_date'), function ($q) use ($request) {
+            $q->whereDate('material_releases.date_release', '<=', $request->end_date);
+        });
 
         return $query;
     }
@@ -112,6 +121,13 @@ class MaterialReleaseDataTable extends DataTable
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
                 ],
+            ])
+            ->ajax([
+                'data' => 'function(d) {
+               
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
+            }',
             ])
             ->orderBy(2, 'ASC');
     }

@@ -37,7 +37,8 @@ class MaterialReleaseController extends Controller
         $ministry = Ministry::where('id', $id)->first();
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $materialRelease = MaterialRelease::where('ministry_id', $ministry->id)->get();
-        $project = Projects::where('ministry_id', $ministry->id)->get();
+        $project = Projects::where('ministry_id', $ministry->id)->get()
+            ->unique('stock_number');
 
         return $dataTable->render('material::materialRelease.index', [
             'params' => $params,
@@ -550,4 +551,3 @@ class MaterialReleaseController extends Controller
         return view('errors.404');
     }
 }
- 
