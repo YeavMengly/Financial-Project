@@ -149,11 +149,11 @@ class MaterialReleaseController extends Controller
     public function getByItemId(Request $request)
     {
         try {
-            $projectId = $request->input('project_id');
+            $projectId    = $request->input('project_id');
             $subProjectId = $request->input('sub_project_id');
-            $releaseId = $request->input('release_id'); // Pass release_id if editing
+            $releaseId    = $request->input('release_id');
 
-            $projectId = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
+            $projectId    = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
             $subProjectId = ($subProjectId && $subProjectId !== 'null' && $subProjectId !== 'undefined') ? $subProjectId : null;
 
             if (!$projectId && !$subProjectId) {
@@ -168,28 +168,37 @@ class MaterialReleaseController extends Controller
                 $query->where('project_id', $projectId);
             }
 
-            // Include items that either have stock (> 0) OR are part of the current edit batch
-            $query->where(function ($q) use ($releaseId) {
-                $q->where('qty', '>', 0);
+            $materials = $query->whereNull('deleted_at')->get();
 
-                if ($releaseId) {
-                    $release = MaterialRelease::find($releaseId);
-                    if ($release) {
-                        $existingNames = MaterialRelease::where('ministry_id', $release->ministry_id)
-                            ->where('project_id', $release->project_id)
-                            ->where('project_sub_id', $release->project_sub_id)
-                            ->where('date_release', $release->date_release)
-                            ->pluck('p_name')
-                            ->toArray();
-
-                        $q->orWhereIn('p_name', $existingNames);
-                    }
+            // Fetch current release edit IDs if editing
+            $excludedReleaseIds = [];
+            if ($releaseId) {
+                $release = MaterialRelease::find($releaseId);
+                if ($release) {
+                    $excludedReleaseIds = MaterialRelease::where('ministry_id', $release->ministry_id)
+                        ->where('project_id', $release->project_id)
+                        ->where('project_sub_id', $release->project_sub_id)
+                        ->where('date_release', $release->date_release)
+                        ->pluck('id')
+                        ->toArray();
                 }
+            }
+
+            // Filter out out-of-stock items dynamically
+            $filteredMaterials = $materials->filter(function ($entry) use ($excludedReleaseIds) {
+                $otherReleasesTotal = MaterialRelease::where('p_name', $entry->p_name)
+                    ->where('ministry_id', $entry->ministry_id)
+                    ->when(!empty($excludedReleaseIds), function ($q) use ($excludedReleaseIds) {
+                        $q->whereNotIn('id', $excludedReleaseIds);
+                    })
+                    ->sum('quantity_total');
+
+                $remainingStock = $entry->qty - $otherReleasesTotal;
+
+                return $remainingStock > 0;
             });
 
-            $materials = $query->get(['id', 'p_name', 'unit', 'price', 'qty']);
-
-            return response()->json($materials);
+            return response()->json($filteredMaterials->values());
         } catch (\Throwable $e) {
             Log::error('getByItemId Error: ' . $e->getMessage());
             return response()->json([], 500);
@@ -201,25 +210,35 @@ class MaterialReleaseController extends Controller
      */
     public function create($params)
     {
-        $id = decode_params($params);
-        $ministry = Ministry::where('id', $id)->first();
+        $id       = decode_params($params);
+        $ministry = Ministry::where('id', $id)->firstOrFail();
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
 
         $project = Projects::where('ministry_id', $ministry->id)
             ->get()
             ->unique('stock_number');
 
+        // Filter material entries: only keep items with dynamic stock > 0
         $MaterialEntry = MaterialEntry::where('ministry_id', $ministry->id)
-        ->whereNull('deleted_at')->get();
+            ->whereNull('deleted_at')
+            ->get()
+            ->filter(function ($entry) use ($ministry) {
+                $totalReleased = MaterialRelease::where('p_name', $entry->p_name)
+                    ->where('ministry_id', $ministry->id)
+                    ->sum('quantity_total');
+
+                return ($entry->qty - $totalReleased) > 0;
+            });
+
         $Agency = Agency::where('ministry_id', $ministry->id)->get();
 
         return view('material::materialRelease.create', [
-            'params' => $params,
-            'unitType' => $unitType,
-            'ministry' => $ministry,
-            'project' => $project,
+            'params'        => $params,
+            'unitType'      => $unitType,
+            'ministry'      => $ministry,
+            'project'       => $project,
             'MaterialEntry' => $MaterialEntry,
-            'Agency' => $Agency
+            'Agency'        => $Agency
         ]);
     }
 
@@ -233,7 +252,6 @@ class MaterialReleaseController extends Controller
             'cboSubProject' => 'nullable',
             'agency'        => 'required|integer',
             'date_release'  => 'required|date',
-
             'p_name'        => 'required|array|min:1',
             'p_name.*'      => 'required|string|max:255',
             'unit'          => 'required|array|min:1',
@@ -270,15 +288,13 @@ class MaterialReleaseController extends Controller
                 $materialEntry = MaterialEntry::find($materialEntryId);
 
                 if ($materialEntry) {
-                    if ($materialEntry->qty >= $quantityTotal) {
-                        $materialEntry->decrement('qty', $quantityTotal);
+                    $totalReleased = MaterialRelease::where('p_name', $materialEntry->p_name)
+                        ->where('ministry_id', $ministry->id)
+                        ->sum('quantity_total');
 
-                        // Recalculate total_price for updated stock quantity
-                        $materialEntry->update([
-                            'total_price' => $materialEntry->qty * $materialEntry->price
-                        ]);
-                    } else {
-                        throw new \Exception("បរិមាណនៅក្នុងស្តុកមិនគ្រប់គ្រាន់ (Stock insufficient for {$materialEntry->p_name})");
+                    $availableStock = $materialEntry->qty - $totalReleased;
+                    if ($availableStock <= 0 || $quantityTotal > $availableStock) {
+                        throw new \Exception("គ្មានស្តុក ឬស្តុកមិនគ្រប់គ្រាន់ (Insufficient stock. Available: {$availableStock})");
                     }
 
                     $pNameValue = $materialEntry->p_name;
@@ -354,6 +370,27 @@ class MaterialReleaseController extends Controller
             ->where('date_release', $release->date_release)
             ->get();
 
+        $items->transform(function ($item) use ($ministry, $items) {
+            $materialEntry = MaterialEntry::where('p_name', $item->p_name)
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if ($materialEntry) {
+                $otherReleasesTotal = MaterialRelease::where('p_name', $item->p_name)
+                    ->where('ministry_id', $ministry->id)
+                    ->whereNotIn('id', $items->pluck('id'))
+                    ->sum('quantity_total');
+
+                $item->available_stock = max(0, $materialEntry->qty - $otherReleasesTotal);
+                $item->is_out_of_stock = ($item->available_stock <= 0);
+            } else {
+                $item->available_stock = 0;
+                $item->is_out_of_stock = true;
+            }
+
+            return $item;
+        });
+
         return view('material::materialRelease.edit', [
             'params'    => $params,
             'releaseId' => $id,
@@ -413,20 +450,9 @@ class MaterialReleaseController extends Controller
                 ->where('date_release', $release->date_release)
                 ->get();
 
-            // STEP 1: RESTORE ORIGINAL QUANTITIES BEFORE CHECKING NEW QUANTITIES
-            foreach ($existingItems as $oldItem) {
-                $oldEntry = MaterialEntry::where('p_name', (string) $oldItem->p_name)->first();
-                if ($oldEntry) {
-                    $oldEntry->increment('qty', (float) $oldItem->quantity_total);
-                    $oldEntry->update([
-                        'total_price' => (float)$oldEntry->qty * (float)$oldEntry->price
-                    ]);
-                }
-            }
+            $existingIds = $existingItems->pluck('id')->toArray();
+            $unitTypes   = UnitType::all()->keyBy('id');
 
-            $unitTypes = UnitType::all()->keyBy('id');
-
-            // STEP 2: LOOP AND DEDUCT NEW QUANTITIES
             foreach ($names as $index => $itemVal) {
                 $itemStr  = (string) $itemVal;
                 $unitVal  = $units[$index] ?? null;
@@ -436,17 +462,19 @@ class MaterialReleaseController extends Controller
 
                 $materialEntry = is_numeric($itemStr)
                     ? MaterialEntry::find($itemStr)
-                    : MaterialEntry::where('p_name', $itemStr)->first();
+                    : MaterialEntry::where('p_name', $itemStr)->where('ministry_id', $ministry->id)->first();
 
                 if ($materialEntry) {
-                    if ($materialEntry->qty < $q) {
-                        throw new \Exception("បរិមាណនៅក្នុងស្តុកមិនគ្រប់គ្រាន់ (Insufficient stock for {$materialEntry->p_name})");
-                    }
+                    $otherReleasesTotal = MaterialRelease::where('p_name', $materialEntry->p_name)
+                        ->where('ministry_id', $ministry->id)
+                        ->whereNotIn('id', $existingIds)
+                        ->sum('quantity_total');
 
-                    $materialEntry->decrement('qty', $q);
-                    $materialEntry->update([
-                        'total_price' => (float)$materialEntry->qty * (float)$materialEntry->price
-                    ]);
+                    $availableStock = $materialEntry->qty - $otherReleasesTotal;
+
+                    if ($availableStock <= 0 || $q > $availableStock) {
+                        throw new \Exception("បរិមាណនៅក្នុងស្តុកមិនគ្រប់គ្រាន់ (Insufficient stock for {$materialEntry->p_name}. Available: {$availableStock})");
+                    }
 
                     $pNameValue = $materialEntry->p_name;
                 } else {
@@ -475,7 +503,6 @@ class MaterialReleaseController extends Controller
                 }
             }
 
-            // STEP 3: DELETE REMOVED ROWS
             if ($existingItems->count() > count($names)) {
                 for ($i = count($names); $i < $existingItems->count(); $i++) {
                     $existingItems[$i]->delete();
@@ -516,15 +543,7 @@ class MaterialReleaseController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->firstOrFail();
 
-            $materialEntry = MaterialEntry::where('p_name', (string) $release->p_name)->first();
-
-            if ($materialEntry) {
-                $materialEntry->increment('qty', (float) $release->quantity_total);
-                $materialEntry->update([
-                    'total_price' => (float) $materialEntry->qty * (float) $materialEntry->price,
-                ]);
-            }
-
+            // Dynamic calculation handles remaining stock automatically when release row is deleted
             $release->delete();
 
             DB::commit();

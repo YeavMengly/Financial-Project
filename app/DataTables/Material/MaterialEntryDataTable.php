@@ -18,17 +18,18 @@ class MaterialEntryDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        // Calculate total summary values across the dataset
-        $totalQtyBefore = (clone $query)->sum(DB::raw('material_entries.qty + COALESCE(material_releases_sum.total_released, 0)'));
-        $totalQtyAfter  = (clone $query)->sum('material_entries.qty');
+        // Calculate totals dynamically using the computed columns
+        $totalQtyBefore = (clone $query)->sum('material_entries.qty');
+        $totalQtyAfter  = (clone $query)->sum(DB::raw('CAST(material_entries.qty AS SIGNED) - COALESCE(material_releases_sum.total_released, 0)'));
 
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('qty_before_release', function ($row) {
                 return number_format($row->qty_before_release ?? 0);
             })
-            ->editColumn('qty', function ($row) {
-                return number_format($row->qty ?? 0);
+            // Target the correctly calculated column
+            ->editColumn('qty_after_release', function ($row) {
+                return number_format($row->qty_after_release ?? 0);
             })
             ->editColumn('price', function ($row) {
                 return number_format($row->price ?? 0) . ' ៛';
@@ -50,6 +51,7 @@ class MaterialEntryDataTable extends DataTable
                 'total_qty_after'  => number_format($totalQtyAfter),
             ]);
     }
+
     /**
      * Get the query source of dataTable.
      */
@@ -58,16 +60,20 @@ class MaterialEntryDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        // Subquery to get total quantity released per material item/entry
+        // Subquery: Sum releases normalized by material name and ministry ID
         $releasedSubquery = DB::table('material_releases')
-            ->select('p_name', 'ministry_id', DB::raw('SUM(quantity_total) as total_released'))
-            ->groupBy('p_name', 'ministry_id');
+            ->select(
+                DB::raw('LOWER(TRIM(p_name)) as clean_pname'),
+                'ministry_id',
+                DB::raw('SUM(quantity_total) as total_released')
+            )
+            ->groupBy(DB::raw('LOWER(TRIM(p_name))'), 'ministry_id');
 
         $query = $model->newQuery();
         $query->where('material_entries.ministry_id', $id)
             ->leftJoin('projects', 'material_entries.project_sub_id', '=', 'projects.id')
             ->leftJoinSub($releasedSubquery, 'material_releases_sum', function ($join) {
-                $join->on('material_entries.p_name', '=', 'material_releases_sum.p_name')
+                $join->on(DB::raw('LOWER(TRIM(material_entries.p_name))'), '=', 'material_releases_sum.clean_pname')
                     ->on('material_entries.ministry_id', '=', 'material_releases_sum.ministry_id');
             })
             ->select([
@@ -79,8 +85,10 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.p_name',
                 'material_entries.p_year',
                 'material_entries.unit',
-                DB::raw('(material_entries.qty + COALESCE(material_releases_sum.total_released, 0)) AS qty_before_release'),
-                'material_entries.qty', // Remaining qty (after release)
+                // Raw base stock quantity (Original Entry)
+                'material_entries.qty AS qty_before_release',
+                // Dynamic stock calculation (Entry Stock - Released Stock)
+                DB::raw('GREATEST(0, CAST(material_entries.qty AS SIGNED) - COALESCE(material_releases_sum.total_released, 0)) AS qty_after_release'),
                 'material_entries.price',
                 'material_entries.total_price',
                 'material_entries.source',
@@ -89,7 +97,7 @@ class MaterialEntryDataTable extends DataTable
             ])
             ->orderBy('material_entries.id', 'DESC');
 
-        // Other filters
+        // Search & Date Filters
         if ($request->filled('project')) {
             $query->where('material_entries.project_id', $request->input('project'));
         }
@@ -100,7 +108,6 @@ class MaterialEntryDataTable extends DataTable
             $query->where('material_entries.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
         }
 
-        // Date Filters (Applied directly to $query)
         $query->when($request->filled('start_date'), function ($q) use ($request) {
             $q->whereDate('material_entries.updated_at', '>=', $request->start_date);
         });
@@ -111,6 +118,7 @@ class MaterialEntryDataTable extends DataTable
 
         return $query;
     }
+
     public function html(): HtmlBuilder
     {
         return $this->builder()
@@ -142,6 +150,7 @@ class MaterialEntryDataTable extends DataTable
             }',
             ]);
     }
+
     /**
      * Get the dataTable columns definition.
      */
@@ -153,10 +162,10 @@ class MaterialEntryDataTable extends DataTable
             Column::make('sub_project')->title(__('tables.th.sub.pro'))->width(80)->addClass('align-middle'),
             Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
-            // Quantity BEFORE Release
+            // Total Stock Before Release
             Column::make('qty_before_release')->title(__('បរិមាណសរុប'))->width(90)->addClass('text-center align-middle'),
-            // Quantity AFTER Release (Remaining Stock)
-            Column::make('qty')->title(__('បរិមាណនៅសល់'))->width(90)->addClass('text-center align-middle'),
+            // Remaining Stock After Release (Updated to match sql alias)
+            Column::make('qty_after_release')->title(__('បរិមាណនៅសល់'))->width(90)->addClass('text-center align-middle'),
             Column::make('price')->title(__('tables.th.price'))->width(80)->addClass('align-middle'),
             Column::make('total_price')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
