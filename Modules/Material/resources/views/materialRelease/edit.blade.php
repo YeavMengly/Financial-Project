@@ -45,7 +45,7 @@
 
                         <div class="row">
                             {{-- Main Project --}}
-                            <div class="col-xl-4 col-md-6">
+                            <div class="col-xl-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProject" class="form-label font-size-13 text-muted">
                                         {{ __('forms.project') }}
@@ -66,7 +66,7 @@
                             </div>
 
                             {{-- Sub Project --}}
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="form-group mb-3" id="subProjectGroup">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <label for="cboSubProject" class="form-label font-size-13 text-muted mb-0">
@@ -97,7 +97,7 @@
                             <input type="hidden" id="account_sub_id" name="account_sub_id">
 
                             {{-- Agency --}}
-                            <div class="col-xl-4 col-md-6">
+                            <div class="col-xl-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="agency"
                                         class="form-label font-size-13 text-muted">{{ __('forms.agency') }}</label>
@@ -118,7 +118,7 @@
                             </div>
 
                             {{-- Date Release --}}
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="datepicker-basic"
                                         class="form-label font-size-13 text-muted">កាលបរិច្ឆេទ</label>
@@ -167,11 +167,11 @@
                                                 </td>
                                                 <td class="form-group">
                                                     <input type="number" min="0" name="quantity[]"
-                                                        value="{{ $row->quantity_total }}" class="form-control" required>
+                                                        value="{{ $row->quantity_request }}" class="form-control" required>
                                                 </td>
                                                 <td class="form-group">
                                                     <input type="number" min="0" step="any" name="price[]"
-                                                        value="{{ $row->quantity_request }}" class="form-control"
+                                                        value="{{ $row->price }}" class="form-control"
                                                         required>
                                                 </td>
                                                 <td class="form-group">

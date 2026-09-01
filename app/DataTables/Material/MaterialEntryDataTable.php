@@ -61,6 +61,7 @@ class MaterialEntryDataTable extends DataTable
         $releasedSubquery = DB::table('material_releases')
             ->select('p_name', 'ministry_id', DB::raw('SUM(quantity_total) as total_released'))
             ->groupBy('p_name', 'ministry_id');
+
         $query = $model->newQuery();
         $query->where('material_entries.ministry_id', $id)
             ->leftJoin('projects', 'material_entries.project_sub_id', '=', 'projects.id')
@@ -77,17 +78,22 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.p_name',
                 'material_entries.p_year',
                 'material_entries.unit',
-                DB::raw('(material_entries.qty + COALESCE(material_releases_sum.total_released, 0)) AS qty_before_release'),
-                'material_entries.qty', // Remaining qty (after release)
+                'material_entries.qty',
                 'material_entries.price',
                 'material_entries.total_price',
                 'material_entries.source',
                 'material_entries.created_at',
                 'material_entries.updated_at',
             ])
-            ->orderBy('material_entries.id', 'DESC');
+            ->orderBy('material_entries.project_id', 'ASC');
         if ($request->filled('project')) {
             $query->where('material_entries.project_id', $request->input('project'));
+        }
+        if ($request->filled('companyName')) {
+            $query->where('material_entries.company_name', $request->input('companyName'));
+        }
+        if ($request->filled('userEntry')) {
+            $query->where('material_entries.user_entry', $request->input('userEntry'));
         }
         if ($request->filled('source')) {
             $query->where('material_entries.source', 'LIKE', '%' . $request->input('source') . '%');
@@ -122,6 +128,8 @@ class MaterialEntryDataTable extends DataTable
             ->ajax([
                 'data' => 'function(d) {
                 d.project = $("#project").val();
+                d.companyName = $("#companyName").val();
+                d.userEntry = $("#userEntry").val();
                 d.source = $("#source").val();
                 d.Pname = $("#Pname").val();
             }',
@@ -138,10 +146,7 @@ class MaterialEntryDataTable extends DataTable
             Column::make('sub_project')->title(__('tables.th.sub.pro'))->width(80)->addClass('align-middle'),
             Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
-            // Quantity BEFORE Release
-            Column::make('qty_before_release')->title(__('បរិមាណសរុប'))->width(90)->addClass('text-center align-middle'),
-            // Quantity AFTER Release (Remaining Stock)
-            Column::make('qty')->title(__('បរិមាណនៅសល់'))->width(90)->addClass('text-center align-middle'),
+            Column::make('qty')->title(__('tables.th.total'))->width(90)->addClass('text-center align-middle'),
             Column::make('price')->title(__('tables.th.price'))->width(80)->addClass('align-middle'),
             Column::make('total_price')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
