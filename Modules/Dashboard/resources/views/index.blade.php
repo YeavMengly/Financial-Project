@@ -91,6 +91,40 @@
         .cardhover:hover {
             background-color: #fdf9f9;
         }
+
+        .tooltip-btn {
+            position: relative;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        /* Tooltip container element */
+        .tooltip-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+
+            /* Hidden by default */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Show on hover */
+        .tooltip-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 @endsection
 
@@ -583,31 +617,15 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#1fad12"></i>
                                         <span class="me-3">{{ __('menus.advance.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                            data-tooltip="ស្នើរសុំ">
                                             {{ $totalCountAdvance }}
                                         </button>
-                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                        {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountPayment }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </button>
+                                        </button> --}}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -620,28 +638,9 @@
                                         <i class="mdi mdi-circle align-middle font-size-12 me-3"
                                             style="color:#f6ff00"></i>
                                         <span class="me-3">{{ __('menus.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountPayment }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown w-100">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalPayment) }}
-                                                            រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -659,31 +658,15 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#fa2314"></i>
                                             <span class="me-3">{{ __('menus.direct.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            <button type="button"
+                                                class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                                data-tooltip="ស្នើរសុំ">
                                                 {{ $totalCountExpenseR }}
                                             </button>
-                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountPaymentD }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
-                                            </button>
+                                            </button> --}}
                                         </p>
                                         <h6>
                                             <span class="text-muted font-size-14 fw-normal">
@@ -696,27 +679,9 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#00fff2"></i>
                                             <span class="me-3">{{ __('menus.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountPaymentD }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown w-100">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalDirPayment) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
                                             </button>
                                         </p>
                                         <h6>
@@ -742,31 +707,15 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#faad14"></i>
                                         <span class="me-3">{{ __('menus.expenditure.guarantee') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                            data-tooltip="ស្នើរសុំ">
                                             {{ $totalCountArch }}
                                         </button>
-                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                        {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountDir }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </button>
+                                        </button> --}}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -779,27 +728,9 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#2200ff"></i>
                                         <span class="me-3">{{ __('menus.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountDir }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown w-100">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalDir) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -817,31 +748,15 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#fa14fa"></i>
                                             <span class="me-3">{{ __('menus.expenditure.procurement') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            <button type="button"
+                                                class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                                data-tooltip="ស្នើរសុំ">
                                                 {{ $totalCountPro }}
                                             </button>
-                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountExp }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
-                                            </button>
+                                            </button> --}}
                                         </p>
                                         <h6>
                                             <span class="text-muted font-size-14 fw-normal">
@@ -854,27 +769,9 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#65203e"></i>
                                             <span class="me-3">{{ __('menus.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountExp }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown w-100">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalExpenditureProcurement) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
                                             </button>
                                         </p>
                                         <h6>
@@ -910,11 +807,13 @@
                                 <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
                                 </button>
-                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
-                                    {{ $program->total_record_mandate }}
-                                </button>
-                                <button type="button" class="btn btn-soft-danger btn-sm">
+                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn tooltip-btn"
+                                    data-tooltip="ស្នើរសុំ">
                                     {{ $program->total_record_voucher }}
+                                </button>
+                                <button type="button" class="btn btn-soft-danger btn-sm tooltip-btn"
+                                    data-tooltip="ទូទាត់">
+                                    {{ $program->total_record_mandate }}
                                 </button>
                             </div>
                         </div>
@@ -1591,11 +1490,11 @@
                                             <button type="button" class="btn btn-soft-info btn-sm">
                                                 ${sub.total_records ?? 0}
                                             </button>
-                                             <button type="button" class="btn btn-soft-primary btn-sm">
-                                                ${sub.total_record_sub_mandate ?? 0}
-                                            </button>
-                                             <button type="button" class="btn btn-soft-danger btn-sm">
+                                             <button type="button" class="btn btn-soft-primary btn-sm tooltip-btn" data-tooltip="ស្នើរសុំ">
                                                 ${sub.total_record_sub_voucher ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-danger btn-sm tooltip-btn" data-tooltip="ទូទាត់">
+                                                ${sub.total_record_sub_mandate ?? 0}
                                             </button>
                                         </div>
                                     </div>

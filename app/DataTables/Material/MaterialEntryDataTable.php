@@ -18,17 +18,18 @@ class MaterialEntryDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        // Calculate total summary values across the dataset
-        $totalQtyBefore = (clone $query)->sum(DB::raw('material_entries.qty + COALESCE(material_releases_sum.total_released, 0)'));
-        $totalQtyAfter  = (clone $query)->sum('material_entries.qty');
+        // Calculate totals dynamically using the computed columns
+        $totalQtyBefore = (clone $query)->sum('material_entries.qty');
+        $totalQtyAfter  = (clone $query)->sum(DB::raw('CAST(material_entries.qty AS SIGNED) - COALESCE(material_releases_sum.total_released, 0)'));
 
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->editColumn('qty_before_release', function ($row) {
                 return number_format($row->qty_before_release ?? 0);
             })
-            ->editColumn('qty', function ($row) {
-                return number_format($row->qty ?? 0);
+            // Target the correctly calculated column
+            ->editColumn('qty_after_release', function ($row) {
+                return number_format($row->qty_after_release ?? 0);
             })
             ->editColumn('price', function ($row) {
                 return number_format($row->price ?? 0) . ' ៛';
@@ -50,6 +51,7 @@ class MaterialEntryDataTable extends DataTable
                 'total_qty_after'  => number_format($totalQtyAfter),
             ]);
     }
+
     /**
      * Get the query source of dataTable.
      */
@@ -57,7 +59,8 @@ class MaterialEntryDataTable extends DataTable
     {
         $params = $request->params;
         $id = decode_params($params);
-        // Subquery to get total quantity released per material item/entry
+
+        // Subquery: Sum releases normalized by material name and ministry ID
         $releasedSubquery = DB::table('material_releases')
             ->select('p_name', 'ministry_id', DB::raw('SUM(quantity_total) as total_released'))
             ->groupBy('p_name', 'ministry_id');
@@ -66,7 +69,7 @@ class MaterialEntryDataTable extends DataTable
         $query->where('material_entries.ministry_id', $id)
             ->leftJoin('projects', 'material_entries.project_sub_id', '=', 'projects.id')
             ->leftJoinSub($releasedSubquery, 'material_releases_sum', function ($join) {
-                $join->on('material_entries.p_name', '=', 'material_releases_sum.p_name')
+                $join->on(DB::raw('LOWER(TRIM(material_entries.p_name))'), '=', 'material_releases_sum.clean_pname')
                     ->on('material_entries.ministry_id', '=', 'material_releases_sum.ministry_id');
             })
             ->select([
@@ -102,8 +105,17 @@ class MaterialEntryDataTable extends DataTable
             $query->where('material_entries.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
         }
 
+        $query->when($request->filled('start_date'), function ($q) use ($request) {
+            $q->whereDate('material_entries.updated_at', '>=', $request->start_date);
+        });
+
+        $query->when($request->filled('end_date'), function ($q) use ($request) {
+            $q->whereDate('material_entries.updated_at', '<=', $request->end_date);
+        });
+
         return $query;
     }
+
     public function html(): HtmlBuilder
     {
         return $this->builder()
@@ -132,9 +144,12 @@ class MaterialEntryDataTable extends DataTable
                 d.userEntry = $("#userEntry").val();
                 d.source = $("#source").val();
                 d.Pname = $("#Pname").val();
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
             }',
             ]);
     }
+
     /**
      * Get the dataTable columns definition.
      */

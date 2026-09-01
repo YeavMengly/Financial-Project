@@ -192,8 +192,8 @@ class DashboardController extends Controller
             ->get();
         // total count pro
         $totalProgaramVoucher = DB::table('budget_vouchers')
-            ->where('budget_vouchers.is_archived', 2)
-            ->where('budget_vouchers.status', 'done')
+            ->where('budget_vouchers.is_archived', 1)
+            ->where('budget_vouchers.status', 'todo')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_id')
             ->selectRaw('
@@ -204,8 +204,8 @@ class DashboardController extends Controller
             ->keyBy('program_id');
 
         $totalProgaramMandate = DB::table('budget_mandates')
-            ->where('budget_mandates.is_archived', 1)
-            ->where('budget_mandates.status', 'todo')
+            ->where('budget_mandates.is_archived', 2)
+            ->where('budget_mandates.status', 'done')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_id')
             ->selectRaw('
@@ -306,43 +306,47 @@ class DashboardController extends Controller
         //exp_directPayment
         $budgetVouchers = DB::table('budget_vouchers')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('budget_vouchers.is_archived', 1)
+            ->where('budget_vouchers.status', 'todo')
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
         //exp_guarantee
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
+            ->where('budget_mandates.is_archived', 2)
+            ->where('budget_mandates.status', 'done')
             ->select('budget_mandates.*')
             ->where('ministries.year', $year)
             ->where('budget_mandates.deleted_at', null)
             ->get();
-        $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
-        $advance_Payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
-        $expense_Record = $budgetMandate->where('expense_type_id', '3')->pluck('budget');
-        $procurement = $budgetMandate->where('expense_type_id', '4')->pluck('budget');
+        $expenditure_Guarantee = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
+        $advance_Payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
+        $expense_Record = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
+        $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
 
-        $direct_Payment = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
-        $payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
-        $payment_Deadline = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
-        $expenditure_Procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
+        $direct_Payment = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
+        $payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
+        $payment_Deadline = $budgetMandate->where('expense_type_id', '3')->pluck('budget');
+        $expenditure_Procurement = $budgetMandate->where('expense_type_id', '4')->pluck('budget');
 
-        $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
-        $advance_Payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
-        $expense_Record = round($budgetMandate->where('expense_type_id', '3')->sum('budget'), 2);
-        $procurement = round($budgetMandate->where('expense_type_id', '4')->sum('budget'), 2);
-        $direct_Payment = round($budgetVouchers->where('expense_type_id', '1')->sum('budget'), 2);
-        $payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
-        $payment_Deadline = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
-        $expenditure_Procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
+        $expenditure_Guarantee = round($budgetVouchers->where('expense_type_id', '1')->sum('budget'), 2);
+        $advance_Payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
+        $expense_Record = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
+        $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
+        $direct_Payment = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
+        $payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
+        $payment_Deadline = round($budgetMandate->where('expense_type_id', '3')->sum('budget'), 2);
+        $expenditure_Procurement = round($budgetMandate->where('expense_type_id', '4')->sum('budget'), 2);
 
-        $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountDir = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
-        $totalCountAdvance   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
-        $totalCountExpenseR   = $budgetMandate->where('expense_type_id', '3')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPaymentD   = $budgetVouchers->where('expense_type_id', '3')->where('is_archived', ' 2')->where('status', 'done')->count();
-        $totalCountPro   = $budgetMandate->where('expense_type_id', '4')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountExp   = $budgetVouchers->where('expense_type_id', '4')->where('is_archived', ' 2')->where('status', 'done')->count();
+        $totalCountArch = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
+        $totalCountDir = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
+        $totalCountAdvance   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
+        $totalCountPayment   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
+        $totalCountExpenseR   = $budgetVouchers->where('expense_type_id', '3')->where('is_archived', '1')->where('status', 'todo')->count();
+        $totalCountPaymentD   = $budgetMandate->where('expense_type_id', '3')->where('is_archived', ' 2')->where('status', 'done')->count();
+        $totalCountPro   = $budgetVouchers->where('expense_type_id', '4')->where('is_archived', '1')->where('status', 'todo')->count();
+        $totalCountExp   = $budgetMandate->where('expense_type_id', '4')->where('is_archived', ' 2')->where('status', 'done')->count();
 
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
@@ -439,7 +443,7 @@ class DashboardController extends Controller
             'percent_Payment_Deadline' => $percent_Payment_Deadline,
             'percent_procurement' => $percent_procurement,
             'percent_expenditure_Procurement' => $percent_expenditure_Procurement,
-            
+
             'totalCountArch' => $totalCountArch,
             'totalCountDir' => $totalCountDir,
             'totalDir' => $totalDir,
@@ -479,8 +483,8 @@ class DashboardController extends Controller
             ->keyBy('program_sub_id');
         // total count pro
         $totalProSubVoucher = DB::table('budget_vouchers')
-            ->where('budget_vouchers.is_archived', 2)
-            ->where('budget_vouchers.status', 'done')
+            ->where('budget_vouchers.is_archived', 1)
+            ->where('budget_vouchers.status', 'todo')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_sub_id')
             ->selectRaw('
@@ -490,8 +494,8 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('program_sub_id');
         $totalProSubMandate = DB::table('budget_mandates')
-            ->where('budget_mandates.is_archived', 1)
-            ->where('budget_mandates.status', 'todo')
+            ->where('budget_mandates.is_archived', 2)
+            ->where('budget_mandates.status', 'done')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_sub_id')
             ->selectRaw('
@@ -526,19 +530,13 @@ class DashboardController extends Controller
     // Modal Cluster
     public function getClusters($programSubId)
     {
-        $clusters = Cluster::where('program_sub_id', $programSubId)
-            ->select(
-                'id',
-                'no',
-                'decription as description'
-            )
-            ->get();
-        // 2️⃣ Get totals grouped by program_sub_id
-        $clusterTotal = DB::table('begin_vouchers')
-            ->where('program_sub_id', $programSubId) // 🔥 IMPORTANT
+        $clusters = DB::table('begin_vouchers')
+            ->where('program_sub_id', $programSubId)
             ->groupBy('cluster_id')
             ->selectRaw('
-            cluster_id,
+            cluster_id AS id,
+            cluster_id AS no,
+            MAX(txtDescription) AS description,
             SUM(fin_law) AS fin_law,
             SUM(apply) AS apply,
             SUM(deadline_balance) AS remain,
@@ -546,20 +544,13 @@ class DashboardController extends Controller
             COUNT(*) AS total_records
         ')
             ->get()
-            ->keyBy('cluster_id');
-        // 3️⃣ Merge totals into program subs
-        $clusters = $clusters->map(function ($cluster) use ($clusterTotal) {
-            $total = $clusterTotal->get($cluster->id);
-            $cluster->fin_law       = $total->fin_law ?? 0;
-            $cluster->apply         = $total->apply ?? 0;
-            $cluster->remain        = $total->remain ?? 0;
-            $cluster->credit        = $total->credit ?? 0;
-            $cluster->total_records = $total->total_records ?? 0;
-            $cluster->percent       = $cluster->fin_law > 0
-                ? ($cluster->apply / $cluster->fin_law) * 100
-                : 0;
-            return $cluster;
-        });
+            ->map(function ($cluster) {
+                $cluster->percent = $cluster->fin_law > 0
+                    ? round(($cluster->apply / $cluster->fin_law) * 100, 2)
+                    : 0;
+                return $cluster;
+            });
+
         return response()->json($clusters);
     }
     // Modal Account Sub

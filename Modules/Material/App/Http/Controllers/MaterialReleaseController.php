@@ -210,11 +210,11 @@ class MaterialReleaseController extends Controller
     public function getByItemId(Request $request)
     {
         try {
-            $projectId = $request->input('project_id');
+            $projectId    = $request->input('project_id');
             $subProjectId = $request->input('sub_project_id');
             $releaseId = $request->input('release_id');
 
-            $projectId = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
+            $projectId    = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
             $subProjectId = ($subProjectId && $subProjectId !== 'null' && $subProjectId !== 'undefined') ? $subProjectId : null;
 
             if (!$projectId && !$subProjectId) {
@@ -251,11 +251,23 @@ class MaterialReleaseController extends Controller
                 if (!empty($existingEntryIds)) {
                     $q->orWhereIn('id', $existingEntryIds);
                 }
+            }
+
+            // Filter out out-of-stock items dynamically
+            $filteredMaterials = $materials->filter(function ($entry) use ($excludedReleaseIds) {
+                $otherReleasesTotal = MaterialRelease::where('p_name', $entry->p_name)
+                    ->where('ministry_id', $entry->ministry_id)
+                    ->when(!empty($excludedReleaseIds), function ($q) use ($excludedReleaseIds) {
+                        $q->whereNotIn('id', $excludedReleaseIds);
+                    })
+                    ->sum('quantity_total');
+
+                $remainingStock = $entry->qty - $otherReleasesTotal;
+
+                return $remainingStock > 0;
             });
 
-            $materials = $query->get(['id', 'p_name', 'unit', 'price', 'qty']);
-
-            return response()->json($materials);
+            return response()->json($filteredMaterials->values());
         } catch (\Throwable $e) {
             Log::error('getByItemId Error: ' . $e->getMessage());
             return response()->json([], 500);
@@ -267,26 +279,27 @@ class MaterialReleaseController extends Controller
      */
     public function create($params)
     {
-        $id = decode_params($params);
-        $ministry = Ministry::where('id', $id)->first();
+        $id       = decode_params($params);
+        $ministry = Ministry::where('id', $id)->firstOrFail();
         $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
 
         $project = Projects::where('ministry_id', $ministry->id)
             ->get()
             ->unique('stock_number');
 
+        // Filter material entries: only keep items with dynamic stock > 0
         $MaterialEntry = MaterialEntry::where('ministry_id', $ministry->id)
             ->whereNull('deleted_at')->get();
 
         $Agency = Agency::where('ministry_id', $ministry->id)->get();
 
         return view('material::materialRelease.create', [
-            'params' => $params,
-            'unitType' => $unitType,
-            'ministry' => $ministry,
-            'project' => $project,
+            'params'        => $params,
+            'unitType'      => $unitType,
+            'ministry'      => $ministry,
+            'project'       => $project,
             'MaterialEntry' => $MaterialEntry,
-            'Agency' => $Agency
+            'Agency'        => $Agency
         ]);
     }
 
@@ -404,7 +417,6 @@ class MaterialReleaseController extends Controller
             'cboSubProject' => 'nullable',
             'agency'        => 'required|integer',
             'date_release'  => 'required|date',
-
             'p_name'        => 'required|array|min:1',
             'p_name.*'      => 'required|string|max:255',
 
@@ -789,6 +801,27 @@ class MaterialReleaseController extends Controller
             ->where('project_sub_id', $release->project_sub_id)
             ->where('date_release', $release->date_release)
             ->get();
+
+        $items->transform(function ($item) use ($ministry, $items) {
+            $materialEntry = MaterialEntry::where('p_name', $item->p_name)
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if ($materialEntry) {
+                $otherReleasesTotal = MaterialRelease::where('p_name', $item->p_name)
+                    ->where('ministry_id', $ministry->id)
+                    ->whereNotIn('id', $items->pluck('id'))
+                    ->sum('quantity_total');
+
+                $item->available_stock = max(0, $materialEntry->qty - $otherReleasesTotal);
+                $item->is_out_of_stock = ($item->available_stock <= 0);
+            } else {
+                $item->available_stock = 0;
+                $item->is_out_of_stock = true;
+            }
+
+            return $item;
+        });
 
         return view('material::materialRelease.edit', [
             'params'    => $params,
@@ -1302,15 +1335,7 @@ class MaterialReleaseController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->firstOrFail();
 
-            $materialEntry = MaterialEntry::where('p_name', (string) $release->p_name)->first();
-
-            if ($materialEntry) {
-                $materialEntry->increment('qty', (float) $release->quantity_total);
-                $materialEntry->update([
-                    'total_price' => (float) $materialEntry->qty * (float) $materialEntry->price,
-                ]);
-            }
-
+            // Dynamic calculation handles remaining stock automatically when release row is deleted
             $release->delete();
 
             DB::commit();

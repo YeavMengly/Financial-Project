@@ -8,6 +8,7 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -140,6 +141,13 @@
                                 value="{{ request('stock_number') }}" />
                         </div> --}}
 
+                        <div class="col-sm-3">
+                            <label class=" form-label font-size-13 text-muted"
+                                for="end_date">{{ __('menus.end_date') }}</label>
+                            <input type="text" id="end_date" name="end_date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
                         <div class="col-sm-3 d-flex align-items-center gap-2" style="margin-top: 34px;">
 
                             {{-- Search --}}
@@ -195,6 +203,8 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+
 
     <script>
         function confirm(url, condi) {
@@ -315,6 +325,51 @@
                     $('#cboCategorySub').html(data);
                 }
             });
+        });
+    </script>
+    <script>
+        let fpStart = null;
+        let fpEnd = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to extract URL parameters (keeps date values after page refresh)
+            function getUrlParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            const initialStartDate = getUrlParam('start_date') || document.getElementById('start_date')?.value || null;
+            const initialEndDate = getUrlParam('end_date') || document.getElementById('end_date')?.value || null;
+
+            // Common config with auto-reload on selection
+            const dateConfig = {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'd/m/Y',
+                allowInput: true,
+                onChange: function(selectedDates, dateStr) {
+                    // Instantly refresh DataTables when date changes
+                    if ($.fn.DataTable.isDataTable('#materialentry-table')) {
+                        $('#materialentry-table').DataTable().ajax.reload();
+                    }
+                }
+            };
+            const startDateEl = document.getElementById('start_date');
+            const endDateEl = document.getElementById('end_date');
+            // Initialize Start Date Flatpickr
+            if (startDateEl) {
+                fpStart = flatpickr(startDateEl, {
+                    ...dateConfig,
+                    defaultDate: initialStartDate
+                });
+            }
+            // Initialize End Date Flatpickr
+            if (endDateEl) {
+                fpEnd = flatpickr(endDateEl, {
+                    ...dateConfig,
+                    defaultDate: initialEndDate
+                });
+            }
         });
     </script>
     <script>

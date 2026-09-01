@@ -8,6 +8,7 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -185,6 +186,7 @@
     <script src="{{ asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
     <script>
         function confirm(url, condi) {
             if (condi == 1) {
@@ -307,6 +309,52 @@
                     $('#cboCategorySub').html(data);
                 }
             });
+        });
+    </script>
+    <script>
+        let fpStart = null;
+        let fpEnd = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to extract URL parameters (keeps date values after page refresh)
+            function getUrlParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            const initialStartDate = getUrlParam('start_date') || document.getElementById('start_date')?.value ||
+                null;
+            const initialEndDate = getUrlParam('end_date') || document.getElementById('end_date')?.value || null;
+
+            // Common config with auto-reload on selection
+            const dateConfig = {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'd/m/Y',
+                allowInput: true,
+                onChange: function(selectedDates, dateStr) {
+                    // Instantly refresh DataTables when date changes
+                    if ($.fn.DataTable.isDataTable('#materialrelease-table')) {
+                        $('#materialrelease-table').DataTable().ajax.reload();
+                    }
+                }
+            };
+            const startDateEl = document.getElementById('start_date');
+            const endDateEl = document.getElementById('end_date');
+            // Initialize Start Date Flatpickr
+            if (startDateEl) {
+                fpStart = flatpickr(startDateEl, {
+                    ...dateConfig,
+                    defaultDate: initialStartDate
+                });
+            }
+            // Initialize End Date Flatpickr
+            if (endDateEl) {
+                fpEnd = flatpickr(endDateEl, {
+                    ...dateConfig,
+                    defaultDate: initialEndDate
+                });
+            }
         });
     </script>
 @endsection
