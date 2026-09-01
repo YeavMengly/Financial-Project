@@ -27,7 +27,6 @@ class MaterialEntryDataTable extends DataTable
             ->editColumn('qty_before_release', function ($row) {
                 return number_format($row->qty_before_release ?? 0);
             })
-            // Target the correctly calculated column
             ->editColumn('qty_after_release', function ($row) {
                 return number_format($row->qty_after_release ?? 0);
             })
@@ -37,8 +36,8 @@ class MaterialEntryDataTable extends DataTable
             ->editColumn('total_price', function ($row) {
                 return number_format($row->total_price ?? 0) . ' ៛';
             })
-            ->editColumn('soft_delete', function ($soft_delete) {
-                return is_null($soft_delete->deleted_at)
+            ->editColumn('soft_delete', function ($row) { // Fixed parameter name from $soft_delete to $row
+                return is_null($row->deleted_at)
                     ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
                     : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
@@ -60,9 +59,14 @@ class MaterialEntryDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        // Subquery: Sum releases normalized by material name and ministry ID
+        // Fixed: Added clean_pname projection to match the join condition
         $releasedSubquery = DB::table('material_releases')
-            ->select('p_name', 'ministry_id', DB::raw('SUM(quantity_total) as total_released'))
+            ->select(
+                'p_name',
+                'ministry_id',
+                DB::raw('LOWER(TRIM(p_name)) as clean_pname'),
+                DB::raw('SUM(quantity_total) as total_released')
+            )
             ->groupBy('p_name', 'ministry_id');
 
         $query = $model->newQuery();
@@ -85,24 +89,26 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.price',
                 'material_entries.total_price',
                 'material_entries.source',
+                'material_entries.deleted_at', // Fixed: Added deleted_at for badge status check
                 'material_entries.created_at',
                 'material_entries.updated_at',
             ])
             ->orderBy('material_entries.project_id', 'ASC');
+
         if ($request->filled('project')) {
             $query->where('material_entries.project_id', $request->input('project'));
         }
         if ($request->filled('companyName')) {
-            $query->where('material_entries.company_name', $request->input('companyName'));
+            $query->where('projects.company_name', $request->input('companyName'));
         }
         if ($request->filled('userEntry')) {
-            $query->where('material_entries.user_entry', $request->input('userEntry'));
+            $query->where('projects.user_entry', $request->input('userEntry'));
         }
         if ($request->filled('source')) {
-            $query->where('material_entries.source', 'LIKE', '%' . $request->input('source') . '%');
+            $query->where('projects.source', 'LIKE', '%' . $request->input('source') . '%');
         }
         if ($request->filled('Pname')) {
-            $query->where('material_entries.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
+            $query->where('projects.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
         }
 
         $query->when($request->filled('start_date'), function ($q) use ($request) {

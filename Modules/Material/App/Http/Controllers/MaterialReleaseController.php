@@ -251,7 +251,7 @@ class MaterialReleaseController extends Controller
                 if (!empty($existingEntryIds)) {
                     $q->orWhereIn('id', $existingEntryIds);
                 }
-            }
+            });
 
             // Filter out out-of-stock items dynamically
             $filteredMaterials = $materials->filter(function ($entry) use ($excludedReleaseIds) {

@@ -357,4 +357,12 @@
             }
         });
     </script>
+
+    <script>
+        $('#project, #companyName, #userEntry, #source, #Pname,#stockNum')
+            .on('change keyup',
+                function() {
+                    $('#materialrelease-table').DataTable().ajax.reload();
+                });
+    </script>
 @endsection
