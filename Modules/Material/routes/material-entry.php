@@ -19,6 +19,9 @@ Route::controller(MaterialEntryController::class)->group(function () {
     Route::post('material/entry/{params}/store', 'store')->name('materialEntry.store');
     Route::post('material/entry/{params}/update/{id}', 'update')->name('materialEntry.update');
     Route::get('material/entry/{params}/export', 'export')->name('materialEntry.export');
+
+    Route::post('/unit-types/store', [MaterialEntryController::class, 'storeUnitType'])
+    ->name('unit-types.store');
 });
 Route::get('/getByProjectId', [
     MaterialEntryController::class,

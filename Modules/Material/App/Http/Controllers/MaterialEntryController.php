@@ -36,9 +36,20 @@ class MaterialEntryController extends Controller
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
         $agency = Agency::where('ministry_id', $ministry->id)->get();
-        $materialEntry = MaterialEntry::where('ministry_id', $ministry->id)->get();
-        $project = Projects::where('ministry_id', $ministry->id)->get()
-            ->unique('stock_number');
+        $unitType = UnitType::all();
+        $materialEntry = MaterialEntry::where('ministry_id', $ministry->id)
+            ->where('project_id', '!=', null)
+            ->whereNull('deleted_at')
+            ->get();
+        $projectsQuery = Projects::where('ministry_id', $ministry->id)
+            ->whereNull('deleted_at')
+            ->get();
+
+        $project      = $projectsQuery->unique('stock_number'); // Or unique('id')
+        $companies     = $projectsQuery->unique('company_name');
+        $userEntries   = $projectsQuery->unique('user_entry');
+        $sources       = $projectsQuery->unique('source');
+
         $program = Program::where('ministry_id', $ministry->id)->get();
         $programSub = ProgramSub::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
@@ -49,12 +60,17 @@ class MaterialEntryController extends Controller
             'agency' => $agency,
             'materialEntry' => $materialEntry,
             'project' => $project,
+            'companies' => $companies,
+            'userEntries' => $userEntries,
+            'sources' => $sources,
             'program' => $program,
             'programSub' => $programSub,
             'accountSub' => $accountSub,
             'cluster' => $cluster,
+            'unitType' => $unitType,
         ]);
     }
+
     public function getByProjectId(Request $request)
     {
         try {
@@ -228,8 +244,8 @@ class MaterialEntryController extends Controller
         $validated = $request->validate([
             'cboProject'    => 'required',
             'cboSubProject' => 'sometimes|nullable', // Allows null/skipped sub-projects
-            'p_name'        => 'required|array',
-            'p_name.*'      => 'required|string|max:255',
+            'p_name'        => 'required|array|min:1',
+            'p_name.*' => 'required|string|max:255|distinct',
             'unit'          => 'required|array',
             'unit.*'        => 'required',
             'quantity'      => 'required|array',
@@ -251,6 +267,17 @@ class MaterialEntryController extends Controller
             $subProjectId = $request->input('cboSubProject', null);
 
             foreach ($validated['p_name'] as $index => $name) {
+
+                $exists = MaterialEntry::where('ministry_id', $ministry->id)
+                    ->where('project_id', $project->id)
+                    ->where('project_sub_id', $subProjectId)
+                    ->where('p_name', $name)
+                    ->exists();
+
+                if ($exists) {
+                    throw new \Exception("សម្ភារៈ \"$name\" មានរួចហើយក្នុង Project នេះ។");
+                }
+
                 $unitId   = $validated['unit'][$index] ?? null;
                 $unitType = UnitType::find($unitId);
 
@@ -585,5 +612,31 @@ class MaterialEntryController extends Controller
 
             return redirect()->route('materialEntry.index', $params);
         }
+    }
+
+
+    public function storeUnitType(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:unit_types,name',
+            ],
+        ]);
+
+        $unit = UnitType::create([
+            'name' => $validated['name'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Unit added successfully.',
+            'data' => [
+                'id' => $unit->id,
+                'name' => $unit->name,
+            ],
+        ]);
     }
 }

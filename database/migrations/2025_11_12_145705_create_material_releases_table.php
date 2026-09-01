@@ -17,13 +17,15 @@ return new class extends Migration
             $table->unsignedBigInteger('project_id');
             $table->string('project_sub_id');
             $table->unsignedBigInteger('agency_id');
+            $table->unsignedBigInteger('material_entry_id');
             $table->string('p_name');
             $table->string('p_year');
             $table->string('title');
             $table->string('unit');
             $table->integer('quantity_total');
             $table->integer('quantity_request');
-            $table->decimal('total', 15, 0);
+            $table->decimal('price', 15, 0);
+            $table->decimal('total_price', 15, 0);
             $table->string('source')->nullable();
             $table->text('refer')->nullable();
             $table->date('date_release');

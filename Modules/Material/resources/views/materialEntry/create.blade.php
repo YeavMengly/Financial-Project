@@ -112,17 +112,70 @@
                                             <td class="form-group">
                                                 <input type="text" name="p_name[]" class="form-control" required>
                                             </td>
-                                            <td class="form-group">
+                                            {{-- <td class="form-group">
                                                 <select class="form-control unit-select" name="unit[]" required>
                                                     <option value="">ជ្រើសរើស</option>
                                                     @foreach ($unitType as $item)
                                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                 </select>
-                                            </td>
+                                            </td> --}}
+
                                             <td class="form-group">
-                                                <input type="number" min="0" name="quantity[]" class="form-control"
-                                                    required>
+                                                <select class="form-control unit-select" name="unit[]" required>
+                                                    <option value="">ជ្រើសរើស</option>
+
+                                                    @foreach ($unitType as $item)
+                                                        <option value="{{ $item->id }}">
+                                                            {{ $item->name }}
+                                                        </option>
+                                                    @endforeach
+
+                                                    <option value="__add_new__">➕ បន្ថែម​ {{ __('menus.unit') }} ថ្មី
+                                                    </option>
+                                                </select>
+                                            </td>
+                                            {{-- Modal Unit --}}
+                                            <div class="modal fade" id="addUnitModal" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">បន្ថែម {{ __('menus.unit') }} ថ្មី
+                                                            </h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <label class="form-label">{{ __('menus.unit') }}</label>
+
+                                                            <input type="text" id="newUnitName" class="form-control"
+                                                                placeholder="បញ្ចូល {{ __('menus.unit') }} ថ្មី">
+
+                                                            <div id="unitError" class="text-danger mt-2"
+                                                                style="display:none;">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">
+                                                                បោះបង់
+                                                            </button>
+
+                                                            <button type="button" class="btn btn-primary"
+                                                                id="saveNewUnit">
+                                                                រក្សាទុក
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <td class="form-group">
+                                                <input type="number" min="0" name="quantity[]"
+                                                    class="form-control" required>
                                             </td>
                                             <td class="form-group">
                                                 <input type="number" min="0" step="any" name="price[]"
@@ -303,7 +356,8 @@
                     // Disable button instantly upon valid submit
                     if (submitBtn) {
                         submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...';
+                        submitBtn.innerHTML =
+                            '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...';
                     }
                 });
             }
@@ -490,6 +544,108 @@
                     $('#account_sub_id').val(props.account_sub_id || '');
                 });
             }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            let currentSelect = null;
+
+            // When user selects "Add New Unit"
+            $(document).on('change', '.unit-select', function() {
+
+                if ($(this).val() === '__add_new__') {
+
+                    currentSelect = $(this);
+
+                    // Reset input
+                    $('#newUnitName').val('');
+                    $('#unitError').hide().text('');
+
+                    // Open modal
+                    $('#addUnitModal').modal('show');
+
+                    // Reset select
+                    $(this).val('');
+                }
+            });
+
+
+            // Save new unit
+            $('#saveNewUnit').on('click', function() {
+
+                const unitName = $('#newUnitName').val().trim();
+
+                if (!unitName) {
+                    $('#unitError')
+                        .text('សូមបញ្ចូលឈ្មោះ ឯកតា')
+                        .show();
+
+                    return;
+                }
+
+                const button = $(this);
+
+                button.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+
+                $.ajax({
+                    url: "{{ route('unit-types.store') }}",
+                    type: "POST",
+
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        name: unitName
+                    },
+
+                    success: function(response) {
+
+                        if (response.success) {
+
+                            // Add new option to current select
+                            const option = new Option(
+                                response.data.name,
+                                response.data.id,
+                                true,
+                                true
+                            );
+
+                            currentSelect.append(option);
+
+                            // Select new unit
+                            currentSelect.val(response.data.id);
+
+                            // Close modal
+                            $('#addUnitModal').modal('hide');
+
+                            // Reset
+                            $('#newUnitName').val('');
+                            $('#unitError').hide();
+                        }
+                    },
+
+                    error: function(xhr) {
+
+                        let message = 'មិនអាចបន្ថែម ឯកតា បានទេ។';
+
+                        if (xhr.responseJSON?.errors?.name) {
+                            message = xhr.responseJSON.errors.name[0];
+                        }
+
+                        $('#unitError')
+                            .text(message)
+                            .show();
+                    },
+
+                    complete: function() {
+
+                        button.prop('disabled', false)
+                            .html('រក្សាទុក');
+                    }
+                });
+            });
+
         });
     </script>
 @endsection

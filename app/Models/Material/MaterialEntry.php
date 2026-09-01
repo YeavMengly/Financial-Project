@@ -27,4 +27,9 @@ class MaterialEntry extends Model
         'total_price',
         'source',
     ];
+
+    public function materialReleases()
+{
+    return $this->hasMany(MaterialRelease::class, 'material_entry_id', 'id');
+}
 }
