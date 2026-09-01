@@ -415,22 +415,22 @@
                 });
             }
 
-            // function initRowChoices(row) {
-            //     const unitSelect = row.querySelector('.unit-select');
-            //     if (unitSelect && !unitSelect.classList.contains('choices-initialized')) {
-            //         unitSelect.value = '';
-            //         new Choices(unitSelect, {
-            //             searchEnabled: true,
-            //             itemSelectText: '',
-            //             placeholder: true,
-            //             placeholderValue: 'ជ្រើសរើស',
-            //             searchPlaceholderValue: 'ស្វែងរក...',
-            //             shouldSort: false,
-            //             allowHTML: true
-            //         });
-            //         unitSelect.classList.add('choices-initialized');
-            //     }
-            // }
+            function initRowChoices(row) {
+                const unitSelect = row.querySelector('.unit-select');
+                if (unitSelect && !unitSelect.classList.contains('choices-initialized')) {
+                    unitSelect.value = '';
+                    new Choices(unitSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: 'ស្វែងរក...',
+                        shouldSort: false,
+                        allowHTML: true
+                    });
+                    unitSelect.classList.add('choices-initialized');
+                }
+            }
 
             /* ----------------------------------------------------------------------
                3. AJAX SUB-PROJECT HANDLER
