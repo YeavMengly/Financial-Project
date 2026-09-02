@@ -21,15 +21,15 @@ class CostImplementProgramController extends Controller
             ->select('id', 'no', 'year', 'title', 'refer', 'name')
             ->orderBy('year', 'desc')
             ->get();
+
         $defaultYear = $ministries->first()->year ?? date('Y');
         $year = $request->filled('year') ? $request->input('year') : $defaultYear;
 
-        return $dataTable->render('report::report.cost_implement.program.index', [
+        return $dataTable->render('report::report.cost_implement.program.voucher.index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
