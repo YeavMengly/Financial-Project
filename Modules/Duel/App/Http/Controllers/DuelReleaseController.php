@@ -812,7 +812,7 @@ class DuelReleaseController extends Controller
             $query = DuelRelease::query()
                 ->where('duel_releases.ministry_id', $ministryId)
                 ->leftJoin('duel_entries', function ($join) use ($ministryId) {
-                    $join->on('duel_entries.stock_number', '=', 'duel_releases.stock_number')
+                    $join->on('duel_entries.project_id', '=', 'duel_releases.project_id')
                         ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
                         ->where('duel_entries.ministry_id', '=', $ministryId);
                 })

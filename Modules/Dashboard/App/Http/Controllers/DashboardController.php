@@ -11,6 +11,10 @@ use App\Models\Content\ExpenseType;
 use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Material\MaterialEntry;
+use App\Models\Material\MaterialRelease;
+use Carbon\Carbon;
+
 
 class DashboardController extends Controller
 {
@@ -370,7 +374,92 @@ class DashboardController extends Controller
         $totalExpenditureProcurement = $procurement > 0 ? $procurement - $expenditure_Procurement : 0;
         $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record) : 0;
 
+        // =========================
+        // MATERIAL ENTRY
+        // =========================
+        $materialEntry = MaterialEntry::query()
+            ->select(
+                DB::raw('MONTH(updated_at) as month'),
+                DB::raw('COUNT(DISTINCT p_name) as total_product'),
+                DB::raw('SUM(qty) as total_qty'),
+                DB::raw('SUM(total_price) as total_price')
+            )
+            ->whereYear('updated_at', now()->year)
+            ->groupBy(DB::raw('MONTH(updated_at)'))
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+
+        // =========================
+        // MATERIAL RELEASE
+        // =========================
+        $materialRelease = MaterialRelease::query()
+            ->select(
+                DB::raw('MONTH(updated_at) as month'),
+                DB::raw('COUNT(DISTINCT p_name) as total_product'),
+                DB::raw('SUM(quantity_total) as total_qty'),
+                DB::raw('SUM(total) as total_price')
+            )
+            ->whereYear('updated_at', now()->year)
+            ->groupBy(DB::raw('MONTH(updated_at)'))
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+
+        // =========================
+        // MONTHLY DATA
+        // =========================
+        $months = [
+            1  => 'Jan',
+            2  => 'Feb',
+            3  => 'Mar',
+            4  => 'Apr',
+            5  => 'May',
+            6  => 'Jun',
+            7  => 'Jul',
+            8  => 'Aug',
+            9  => 'Sep',
+            10 => 'Oct',
+            11 => 'Nov',
+            12 => 'Dec',
+        ];
+
+        $chartLabels = [];
+        $entryQty = [];
+        $releaseQty = [];
+        $entryPrice = [];
+        $releasePrice = [];
+        $entryTotalQ = [];
+        $releaseTotalQ = [];
+
+        foreach ($months as $monthNumber => $monthName) {
+
+            $chartLabels[] = $monthName;
+
+            $entry = $materialEntry->get($monthNumber);
+            $release = $materialRelease->get($monthNumber);
+
+            $entryQty[] = (float) ($entry->total_product ?? 0);
+            $releaseQty[] = (float) ($release->total_product ?? 0);
+
+            $entryTotalQ[] = (float) ($entry->total_qty ?? 0);
+            $releaseTotalQ[] = (float) ($release->total_qty ?? 0);
+
+            $entryPrice[] = (float) ($entry->total_price ?? 0);
+            $releasePrice[] = (float) ($release->total_price ?? 0);
+        }
+
         return view('dashboard::index', [
+            'chartLabels' => $chartLabels,
+            'entryQty' => $entryQty,
+            'releaseQty' => $releaseQty,
+            'entryPrice' => $entryPrice,
+            'releasePrice' => $releasePrice,
+            'entryTotalQ' => $entryTotalQ,
+            'releaseTotalQ' => $releaseTotalQ,
+
             'ministries' => $ministries,
             'selectedYear' => $year,
             'total_fin_law' => $total_fin_law,

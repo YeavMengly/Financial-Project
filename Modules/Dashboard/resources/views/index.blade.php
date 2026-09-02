@@ -857,8 +857,7 @@
                     <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
                         <option selected="">ជំពូក</option>
                         @foreach ($chapterLabels as $ch)
-                            <option value="{{ $ch }}"
-                                {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
                                 {{ $ch }}
                             </option>
                         @endforeach
@@ -1128,6 +1127,25 @@
             </div><!-- end card -->
         </div>
     </div>
+    <div class="row card">
+        <div class="card-body">
+
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="card-title mb-1">
+                        {{ __('menus.material') }}
+                    </div>
+                    <p class="text-muted mb-0">
+                        Entry vs Release
+                    </p>
+                </div>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="materialMovementChart"></canvas>
+            </div>
+
+        </div>
+    </div>
     {{-- Modal Program Sub --}}
     <div class="modal fade" id="programSubModal" tabindex="-1" aria-labelledby="programSubModalLabel"
         aria-hidden="true">
@@ -1207,6 +1225,238 @@
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const labels = @json($chartLabels);
+
+            const entryQty = @json($entryQty);
+            const releaseQty = @json($releaseQty);
+
+            const entryTotalQ = @json($entryTotalQ);
+            const releaseTotalQ = @json($releaseTotalQ);
+
+            const entryPrice = @json($entryPrice);
+            const releasePrice = @json($releasePrice);
+
+
+            const ctx = document
+                .getElementById('materialMovementChart')
+                .getContext('2d');
+
+
+            new Chart(ctx, {
+
+                type: 'bar',
+
+                data: {
+                    labels: labels,
+
+                    datasets: [
+
+                        // ==========================
+                        // ENTRY
+                        // ==========================
+                        {
+                            label: 'បញ្ចូល',
+
+                            data: entryQty,
+
+                            backgroundColor: '#3b82f6',
+
+                            borderRadius: 1,
+
+                            barPercentage: 0.75,
+
+                            categoryPercentage: 0.65,
+                            totalQ: entryTotalQ,
+
+                            // Save price for tooltip
+                            totalPrice: entryPrice
+                        },
+
+
+                        // ==========================
+                        // RELEASE
+                        // ==========================
+                        {
+                            label: 'បញ្ចេញ',
+
+                            data: releaseQty,
+
+                            backgroundColor: '#ef4444',
+
+                            borderRadius: 1,
+
+                            barPercentage: 0.75,
+
+                            categoryPercentage: 0.65,
+                            totalQ: releaseTotalQ,
+
+                            // Save price for tooltip
+                            totalPrice: releasePrice
+                        }
+
+                    ]
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+
+                    plugins: {
+
+                        legend: {
+                            position: 'top',
+
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                title: function(tooltipItems) {
+
+                                    return tooltipItems[0].label;
+
+                                },
+
+
+                                label: function(context) {
+
+                                    const dataset = context.dataset;
+
+                                    const index = context.dataIndex;
+
+                                    const qty = context.raw;
+                                    const qtytotal = dataset.totalQ[index] ?? 0;
+
+                                    const price = dataset.totalPrice[index] ?? 0;
+
+                                    return [
+                                        `${dataset.label}ផលិតផល: ${Number(qty).toLocaleString()} ប្រភេទ`,
+                                        `${dataset.label}ចំនួនសរុប: ${Number(qtytotal).toLocaleString()}`,
+                                        `ថ្លៃសរុប: ៛​ ${Number(price).toLocaleString()}`
+                                    ];
+
+                                }
+
+                            }
+
+                        },
+
+
+                        // Show quantity above every bar
+                        datalabels: false
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+
+                        },
+
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            title: {
+                                display: true,
+                                text: 'Quantity'
+                            },
+
+                            ticks: {
+
+                                callback: function(value) {
+                                    return Number(value).toLocaleString();
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+
+                plugins: [
+
+                    {
+
+                        id: 'valueLabels',
+
+                        afterDatasetsDraw(chart) {
+
+                            const {
+                                ctx
+                            } = chart;
+
+                            chart.data.datasets.forEach((dataset, datasetIndex) => {
+
+                                const meta = chart.getDatasetMeta(datasetIndex);
+
+                                meta.data.forEach((bar, index) => {
+
+                                    const value = dataset.data[index];
+
+                                    if (value === 0) {
+                                        return;
+                                    }
+
+                                    ctx.save();
+
+                                    ctx.fillStyle = '#1f2937';
+
+                                    ctx.font = 'bold 12px Arial';
+
+                                    ctx.textAlign = 'center';
+
+                                    ctx.textBaseline = 'bottom';
+
+                                    ctx.fillText(
+                                        Number(value).toLocaleString(),
+                                        bar.x,
+                                        bar.y - 5
+                                    );
+
+                                    ctx.restore();
+
+                                });
+
+                            });
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
         });
     </script>
     {{-- mini cahart --}}
