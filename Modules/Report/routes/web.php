@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('reports')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/implement_agency.php';
     require_once __DIR__ . '/implement_program.php';
+    require_once __DIR__ . '/implement_chapter.php';
     require_once __DIR__ . '/implement_importants.php';
     require_once __DIR__ . '/assets_vehicles.php';
 });

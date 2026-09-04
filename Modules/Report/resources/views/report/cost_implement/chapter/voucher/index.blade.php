@@ -13,15 +13,15 @@
             border: 1px solid #e9ecef;
         }
 
-        #costimplementprogram-table {
+        #costimplementchaptervoucher-table {
             width: 100% !important;
             margin: 0 !important;
             table-layout: auto !important;
             border-collapse: collapse !important;
         }
 
-        #costimplementprogram-table th,
-        #costimplementprogram-table td {
+        #costimplementchaptervoucher-table th,
+        #costimplementchaptervoucher-table td {
             white-space: nowrap !important;
             vertical-align: middle !important;
             padding: 8px 12px !important;
@@ -42,7 +42,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.cost.implement.program') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.cost.implement.chapter') }}</h4>
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
                         <div></div>
                         <div class="d-flex align-items-center gap-2">
                             <!-- Filter Year -->
-                            <select id="yearFilter" name="yearFilter" class="form-select">
+                           <select id="yearFilter" name="yearFilter" class="form-select">
                                 @foreach ($ministries->unique('year') as $ministry)
                                     <option value="{{ $ministry->year }}" data-ministry-id="{{ $ministry->id }}"
                                         {{ $ministry->year == $selectedYear ? 'selected' : '' }}>
@@ -63,17 +63,17 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @include('report::report.cost_implement.program.voucher.dropdown')
+                            @include('report::report.cost_implement.chapter.voucher.dropdown')
                         </div>
                     </div>
                 </div>
 
                 <div class="card-body p-3">
                     <div class="table-responsive-wrapper">
-                        <table id="costimplementprogram-table" class="table table-bordered table-hover align-middle">
+                        <table id="costimplementchaptervoucher-table" class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th rowspan="2" class="text-center align-middle">កម្មវិធី</th>
+                                    <th rowspan="2" class="text-center align-middle">ជំពូក</th>
                                     <th rowspan="2" class="text-center align-middle">ច្បាប់ហិរញ្ញវត្ថុ</th>
                                     <th rowspan="2" class="text-center align-middle">ឥណទានថ្មី</th>
                                     <th colspan="7" class="text-center">ធានាចំណាយ</th>
@@ -102,15 +102,15 @@
 
                                 <tr class="total-summary-row">
                                     <th class="text-center" id="total_label">សរុប</th>
-                                    <th class="text-end" id="total_fin_law">0,00</th>
-                                    <th class="text-end" id="total_new_credit">0,00</th>
-                                    <th class="text-end" id="total_early_balance">0,00</th>
-                                    <th class="text-end" id="total_apply">0,00</th>
-                                    <th class="text-end" id="total_apply_percent">0,00%</th>
-                                    <th class="text-end" id="total_credit">0,00</th>
-                                    <th class="text-end" id="total_credit_percent">0,00%</th>
-                                    <th class="text-end" id="total_deadline_balance">0,00</th>
-                                    <th class="text-end" id="total_remaining_percent">0,00%</th>
+                                    <th class="text-end" id="total_fin_law">0.000</th>
+                                    <th class="text-end" id="total_new_credit">0.000</th>
+                                    <th class="text-end" id="total_early_balance">0.000</th>
+                                    <th class="text-end" id="total_apply">0.000</th>
+                                    <th class="text-end" id="total_apply_percent">0.000%</th>
+                                    <th class="text-end" id="total_credit">0.000</th>
+                                    <th class="text-end" id="total_credit_percent">0.000%</th>
+                                    <th class="text-end" id="total_deadline_balance">0.000</th>
+                                    <th class="text-end" id="total_remaining_percent">0.000%</th>
                                 </tr>
                             </thead>
 
@@ -149,7 +149,7 @@
             }
 
             // Update Summary Header on XHR load
-            $('#costimplementprogram-table').on('xhr.dt', function(e, settings, json) {
+            $('#costimplementchaptervoucher-table').on('xhr.dt', function(e, settings, json) {
                 $('#total_label').text('សរុប');
                 if (!json || !json.totals) return;
 
@@ -167,14 +167,14 @@
 
                 // Recalculate columns width after data loads
                 setTimeout(function() {
-                    $('#costimplementprogram-table').DataTable().columns.adjust();
+                    $('#costimplementchaptervoucher-table').DataTable().columns.adjust();
                 }, 50);
             });
 
             // Trigger table reload on year/ministry filter change
             $(document).on('change', '#yearFilter, #ministryFilter, select[name="ministry_id"], #ministry_id',
                 function() {
-                    $('#costimplementprogram-table').DataTable().ajax.reload();
+                    $('#costimplementchaptervoucher-table').DataTable().ajax.reload();
                 });
 
             // Column visibility toggles
@@ -182,16 +182,16 @@
                 e.stopPropagation();
             });
 
-            $(document).on('change', '.toggle-column-program', function() {
-                const table = $('#costimplementprogram-table').DataTable();
+            $(document).on('change', '.toggle-column-chapter', function() {
+                const table = $('#costimplementchaptervoucher-table').DataTable();
                 const columnIndex = $(this).data('column');
                 table.column(columnIndex).visible($(this).is(':checked'));
                 table.columns.adjust();
             });
 
-            $(document).on('click', '#resetProgramColumns', function() {
-                const table = $('#costimplementprogram-table').DataTable();
-                $('.toggle-column-program').prop('checked', true);
+            $(document).on('click', '#resetChapterColumns', function() {
+                const table = $('#costimplementchaptervoucher-table').DataTable();
+                $('.toggle-column-chapter').prop('checked', true);
                 table.columns().visible(true);
                 table.columns.adjust();
             });

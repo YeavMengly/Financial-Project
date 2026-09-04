@@ -2,8 +2,8 @@
 
 namespace Modules\Report\App\Http\Controllers;
 
-use App\DataTables\Report\CostImplementProgramDataTable;
-use App\DataTables\Report\CostlmplementProgramMandateDataTable;
+use App\DataTables\Report\CostImplementChapterVoucherDataTable;
+use App\DataTables\Report\CostImplementChapterMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
@@ -11,12 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
-class CostImplementProgramController extends Controller
+class CostImplementChapterController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(CostImplementProgramDataTable $dataTable, Request $request)
+    public function index(CostImplementChapterVoucherDataTable $dataTable, Request $request)
     {
         $ministries = DB::table('ministries')
             ->select('id', 'no', 'year', 'title', 'refer', 'name')
@@ -29,13 +29,13 @@ class CostImplementProgramController extends Controller
         $year = $request->input('yearFilter', $request->input('year', $defaultYear));
         $ministryId = $request->input('ministry_id');
 
-        return $dataTable->render('report::report.cost_implement.program.voucher.index', [
+        return $dataTable->render('report::report.cost_implement.chapter.voucher.index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
             'selectedMinistry' => $ministryId,
         ]);
     }
-    public function indexMandate(CostlmplementProgramMandateDataTable $dataTable, Request $request)
+    public function indexMandate(CostImplementChapterMandateDataTable $dataTable, Request $request)
     {
         $ministries = DB::table('ministries')
             ->select('id', 'no', 'year', 'title', 'refer', 'name')
@@ -48,7 +48,7 @@ class CostImplementProgramController extends Controller
         $year = $request->input('yearFilter', $request->input('year', $defaultYear));
         $ministryId = $request->input('ministry_id');
 
-        return $dataTable->render('report::report.cost_implement.program.mandate.index', [
+        return $dataTable->render('report::report.cost_implement.chapter.mandate.index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
             'selectedMinistry' => $ministryId,
