@@ -13,15 +13,15 @@
             border: 1px solid #e9ecef;
         }
 
-        #costimplementprogram-table {
+        #costimplementprogramMandate-table {
             width: 100% !important;
             margin: 0 !important;
             table-layout: auto !important;
             border-collapse: collapse !important;
         }
 
-        #costimplementprogram-table th,
-        #costimplementprogram-table td {
+        #costimplementprogramMandate-table th,
+        #costimplementprogramMandate-table td {
             white-space: nowrap !important;
             vertical-align: middle !important;
             padding: 8px 12px !important;
@@ -63,20 +63,21 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @include('report::report.cost_implement.program.voucher.dropdown')
+
+                            @include('report::report.cost_implement.program.mandate.dropdown')
                         </div>
                     </div>
                 </div>
 
                 <div class="card-body p-3">
                     <div class="table-responsive-wrapper">
-                        <table id="costimplementprogram-table" class="table table-bordered table-hover align-middle">
+                        <table id="costimplementprogramMandate-table" class="table table-bordered table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th rowspan="2" class="text-center align-middle">កម្មវិធី</th>
                                     <th rowspan="2" class="text-center align-middle">ច្បាប់ហិរញ្ញវត្ថុ</th>
                                     <th rowspan="2" class="text-center align-middle">ឥណទានថ្មី</th>
-                                    <th colspan="7" class="text-center">ធានាចំណាយ</th>
+                                    <th colspan="7" class="text-center">ទូទាត់ចំណាយ</th>
                                 </tr>
                                 <tr>
                                     <th class="text-center">ដើមគ្រា</th>
@@ -149,7 +150,7 @@
             }
 
             // Update Summary Header on XHR load
-            $('#costimplementprogram-table').on('xhr.dt', function(e, settings, json) {
+            $('#costimplementprogramMandate-table').on('xhr.dt', function(e, settings, json) {
                 $('#total_label').text('សរុប');
                 if (!json || !json.totals) return;
 
@@ -167,14 +168,14 @@
 
                 // Recalculate columns width after data loads
                 setTimeout(function() {
-                    $('#costimplementprogram-table').DataTable().columns.adjust();
+                    $('#costimplementprogramMandate-table').DataTable().columns.adjust();
                 }, 50);
             });
 
             // Trigger table reload on year/ministry filter change
             $(document).on('change', '#yearFilter, #ministryFilter, select[name="ministry_id"], #ministry_id',
                 function() {
-                    $('#costimplementprogram-table').DataTable().ajax.reload();
+                    $('#costimplementprogramMandate-table').DataTable().ajax.reload();
                 });
 
             // Column visibility toggles
@@ -183,14 +184,14 @@
             });
 
             $(document).on('change', '.toggle-column-program', function() {
-                const table = $('#costimplementprogram-table').DataTable();
+                const table = $('#costimplementprogramMandate-table').DataTable();
                 const columnIndex = $(this).data('column');
                 table.column(columnIndex).visible($(this).is(':checked'));
                 table.columns.adjust();
             });
 
             $(document).on('click', '#resetProgramColumns', function() {
-                const table = $('#costimplementprogram-table').DataTable();
+                const table = $('#costimplementprogramMandate-table').DataTable();
                 $('.toggle-column-program').prop('checked', true);
                 table.columns().visible(true);
                 table.columns.adjust();

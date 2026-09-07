@@ -2,8 +2,8 @@
 
 namespace App\DataTables\Report;
 
-use App\Models\Content\Program;
-use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BeginCredit\BeginMandate;
+use App\Models\Content\Chapter;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,9 +11,8 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class CostImplementProgramDataTable extends DataTable
+class CostImplementChapterMandateDataTable extends DataTable
 {
-
     private function getMinistryId()
     {
         $ministryId = request('ministry_id');
@@ -37,8 +36,8 @@ class CostImplementProgramDataTable extends DataTable
     {
         $ministryId = $this->getMinistryId();
 
-        // Calculate Summary Row Totals based on ministry_id
-        $totalQuery = BeginVoucher::query()
+        // 1. Calculate Summary Row Totals
+        $totalQuery = BeginMandate::query()
             ->when($ministryId, function ($q) use ($ministryId) {
                 $q->where('ministry_id', $ministryId);
             });
@@ -60,9 +59,9 @@ class CostImplementProgramDataTable extends DataTable
         $rawBalance = (float) ($total->deadline_balance ?? 0);
 
         $totals = [
-            'fin_law'           => $rawFinLaw ,
-            'new_credit_status' => ((float) ($total->new_credit_status ?? 0)),
-            'early_balance'     => ((float) ($total->early_balance ?? 0)),
+            'fin_law'           => $rawFinLaw,
+            'new_credit_status' => (float) ($total->new_credit_status ?? 0),
+            'early_balance'     => (float) ($total->early_balance ?? 0),
             'apply'             => $rawApply,
             'apply_percent'     => $rawFinLaw > 0 ? ($rawApply / $rawFinLaw) * 100 : 0,
             'credit'            => $rawCredit,
@@ -72,8 +71,8 @@ class CostImplementProgramDataTable extends DataTable
         ];
 
         return (new EloquentDataTable($query))
-            ->addColumn('program', function ($row) {
-                return 'កម្មវិធីទី' . $row->no;
+            ->addColumn('chapter', function ($row) {
+                return 'ជំពូកទី ' . $row->no;
             })
             ->editColumn('fin_law', function ($row) {
                 return number_format($row->fin_law ?? 0) . ' ៛';
@@ -91,7 +90,7 @@ class CostImplementProgramDataTable extends DataTable
                 $finLaw = (float) $row->fin_law;
                 $apply  = (float) $row->apply;
                 $val    = $finLaw > 0 ? ($apply / $finLaw) * 100 : 0;
-                return number_format($val, 2)  . '%';
+                return number_format($val, 2, '.', ',') . '%';
             })
             ->editColumn('credit', function ($row) {
                 return number_format($row->credit ?? 0) . ' ៛';
@@ -100,7 +99,7 @@ class CostImplementProgramDataTable extends DataTable
                 $finLaw = (float) $row->fin_law;
                 $credit = (float) $row->credit;
                 $val    = $finLaw > 0 ? ($credit / $finLaw) * 100 : 0;
-                return number_format($val, 2)  . '%';
+                return number_format($val, 2, '.', ',') . '%';
             })
             ->editColumn('deadline_balance', function ($row) {
                 return number_format($row->deadline_balance ?? 0) . ' ៛';
@@ -109,41 +108,44 @@ class CostImplementProgramDataTable extends DataTable
                 $finLaw  = (float) $row->fin_law;
                 $balance = (float) $row->deadline_balance;
                 $val     = $finLaw > 0 ? ($balance / $finLaw) * 100 : 0;
-                return number_format($val, 2)  . '%';
+                return number_format($val, 2, '.', ',') . '%';
             })
             ->with('totals', $totals)
-            ->rawColumns(['program'])
+            ->rawColumns(['chapter'])
             ->setRowId('no');
     }
 
-    public function query(Program $model): QueryBuilder
+    public function query(Chapter $model): QueryBuilder
     {
         $ministryId = $this->getMinistryId();
 
         return $model->newQuery()
-            ->join('begin_vouchers', 'programs.id', '=', 'begin_vouchers.program_id')
+            ->join('begin_mandates', function ($join) {
+                $join->on('chapters.no', '=', 'begin_mandates.chapter_id')
+                     ->on('chapters.ministry_id', '=', 'begin_mandates.ministry_id');
+            })
             ->when($ministryId, function ($q) use ($ministryId) {
-                $q->where('begin_vouchers.ministry_id', $ministryId);
+                $q->where('chapters.ministry_id', $ministryId);
             })
             ->select([
-                'programs.no as no',
-                DB::raw('COALESCE(SUM(begin_vouchers.fin_law), 0) as fin_law'),
-                DB::raw('COALESCE(SUM(begin_vouchers.new_credit_status), 0) as new_credit_status'),
-                DB::raw('COALESCE(SUM(begin_vouchers.early_balance), 0) as early_balance'),
-                DB::raw('COALESCE(SUM(begin_vouchers.apply), 0) as apply'),
-                DB::raw('COALESCE(SUM(begin_vouchers.credit), 0) as credit'),
-                DB::raw('COALESCE(SUM(begin_vouchers.deadline_balance), 0) as deadline_balance'),
+                'chapters.no as no',
+                DB::raw('COALESCE(SUM(begin_mandates.fin_law), 0) as fin_law'),
+                DB::raw('COALESCE(SUM(begin_mandates.new_credit_status), 0) as new_credit_status'),
+                DB::raw('COALESCE(SUM(begin_mandates.early_balance), 0) as early_balance'),
+                DB::raw('COALESCE(SUM(begin_mandates.apply), 0) as apply'),
+                DB::raw('COALESCE(SUM(begin_mandates.credit), 0) as credit'),
+                DB::raw('COALESCE(SUM(begin_mandates.deadline_balance), 0) as deadline_balance'),
             ])
-            ->groupBy('programs.no')
-            ->orderBy('programs.no', 'ASC');
+            ->groupBy('chapters.no')
+            ->orderBy('chapters.no', 'DESC');
     }
 
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('costimplementprogram-table')
+            ->setTableId('costimplementchaptermandate-table')
             ->ajax([
-                'url'  => route('cost.implement.program.index'),
+                'url'  => route('cost.implement.chapterMandate.index'),
                 'type' => 'GET',
                 'data' => 'function(d) {
                     d.yearFilter = $("#yearFilter").val();
@@ -167,21 +169,21 @@ class CostImplementProgramDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::computed('program')->data('program')->name('program')->title('')->addClass('text-center'),
-            Column::computed('fin_law')->data('fin_law')->name('fin_law')->title('')->addClass('text-end'),
-            Column::computed('new_credit_status')->data('new_credit_status')->name('new_credit_status')->title('')->addClass('text-end'),
-            Column::computed('early_balance')->data('early_balance')->name('early_balance')->title('')->addClass('text-end'),
-            Column::computed('apply')->data('apply')->name('apply')->title('')->addClass('text-end'),
+            Column::computed('chapter')->data('chapter')->name('chapter')->title('')->addClass('text-center'),
+            Column::make('fin_law')->data('fin_law')->name('fin_law')->title('')->addClass('text-end'),
+            Column::make('new_credit_status')->data('new_credit_status')->name('new_credit_status')->title('')->addClass('text-end'),
+            Column::make('early_balance')->data('early_balance')->name('early_balance')->title('')->addClass('text-end'),
+            Column::make('apply')->data('apply')->name('apply')->title('')->addClass('text-end'),
             Column::computed('apply_percent')->data('apply_percent')->name('apply_percent')->title('')->addClass('text-end'),
-            Column::computed('credit')->data('credit')->name('credit')->title('')->addClass('text-end'),
+            Column::make('credit')->data('credit')->name('credit')->title('')->addClass('text-end'),
             Column::computed('credit_percent')->data('credit_percent')->name('credit_percent')->title('')->addClass('text-end'),
-            Column::computed('deadline_balance')->data('deadline_balance')->name('deadline_balance')->title('')->addClass('text-end'),
+            Column::make('deadline_balance')->data('deadline_balance')->name('deadline_balance')->title('')->addClass('text-end'),
             Column::computed('remaining_percent')->data('remaining_percent')->name('remaining_percent')->title('')->addClass('text-end'),
         ];
     }
 
     protected function filename(): string
     {
-        return 'CostImplementProgram_' . date('YmdHis');
+        return 'CostImplementChapterMandate_' . date('YmdHis');
     }
 }

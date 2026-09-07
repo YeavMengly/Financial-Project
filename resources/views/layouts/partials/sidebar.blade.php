@@ -483,13 +483,7 @@
                             </a>
                         </li>
 
-                        {{-- <li>
-                            <a href="{{ route('cost.implement.program.index') }}"
-                                class="{{ Request::routeIs('cost.implement.program.*') ? 'active' : '' }}">
-                                <i data-feather="folder"></i>
-                                {{ __('menus.cost.implement.program') }}
-                            </a>
-                        </li> --}}
+                        {{-- program --}}
                         <li
                             class="{{ Request::routeIs('cost.implement.*') || Request::routeIs('states.assets.vehicles.*') ? 'mm-active' : '' }}">
                             <a href="javascript:void(0);" class="has-arrow">
@@ -509,8 +503,36 @@
                                 </li>
 
                                 <li>
-                                    <a href="{{ route('cost.implement.program.index') }}"
-                                        class="{{ Request::routeIs('cost.implement.program.*') ? 'active' : '' }}">
+                                    <a href="{{ route('cost.implement.programMandate.index') }}"
+                                        class="{{ Request::routeIs('cost.implement.programMandate.*') ? 'active' : '' }}">
+                                        <i data-feather="package"></i>
+                                        {{ __('menus.payment') }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        {{-- chapter --}}
+                        <li
+                            class="{{ Request::routeIs('cost.implement.*') || Request::routeIs('states.assets.vehicles.*') ? 'mm-active' : '' }}">
+                            <a href="javascript:void(0);" class="has-arrow">
+                                <i data-feather="folder"></i>
+                                <span> {{ __('menus.cost.implement.chapter') }}</span>
+                            </a>
+
+                            <ul class="sub-menu"
+                                aria-expanded="{{ Request::routeIs('cost.implement.*') || Request::routeIs('states.assets.vehicles.*') ? 'true' : 'false' }}">
+
+                                <li>
+                                    <a href="{{ route('cost.implement.chapter.index') }}"
+                                        class="{{ Request::routeIs('cost.implement.chapter.*') ? 'active' : '' }}">
+                                        <i data-feather="package"></i>
+                                        {{ __('menus.expenditure.guarantee') }}
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('cost.implement.chapterMandate.index') }}"
+                                        class="{{ Request::routeIs('cost.implement.chapterMandate.*') ? 'active' : '' }}">
                                         <i data-feather="package"></i>
                                         {{ __('menus.payment') }}
                                     </a>

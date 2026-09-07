@@ -3,7 +3,7 @@
 namespace App\DataTables\Report;
 
 use App\Models\Content\Program;
-use App\Models\BeginCredit\BeginVoucher;
+use App\Models\BeginCredit\BeginMandate;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
@@ -11,7 +11,7 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Services\DataTable;
 
-class CostImplementProgramDataTable extends DataTable
+class CostlmplementProgramMandateDataTable extends DataTable
 {
 
     private function getMinistryId()
@@ -38,7 +38,7 @@ class CostImplementProgramDataTable extends DataTable
         $ministryId = $this->getMinistryId();
 
         // Calculate Summary Row Totals based on ministry_id
-        $totalQuery = BeginVoucher::query()
+        $totalQuery = BeginMandate::query()
             ->when($ministryId, function ($q) use ($ministryId) {
                 $q->where('ministry_id', $ministryId);
             });
@@ -121,18 +121,18 @@ class CostImplementProgramDataTable extends DataTable
         $ministryId = $this->getMinistryId();
 
         return $model->newQuery()
-            ->join('begin_vouchers', 'programs.id', '=', 'begin_vouchers.program_id')
+            ->join('begin_mandates', 'programs.id', '=', 'begin_mandates.program_id')
             ->when($ministryId, function ($q) use ($ministryId) {
-                $q->where('begin_vouchers.ministry_id', $ministryId);
+                $q->where('begin_mandates.ministry_id', $ministryId);
             })
             ->select([
                 'programs.no as no',
-                DB::raw('COALESCE(SUM(begin_vouchers.fin_law), 0) as fin_law'),
-                DB::raw('COALESCE(SUM(begin_vouchers.new_credit_status), 0) as new_credit_status'),
-                DB::raw('COALESCE(SUM(begin_vouchers.early_balance), 0) as early_balance'),
-                DB::raw('COALESCE(SUM(begin_vouchers.apply), 0) as apply'),
-                DB::raw('COALESCE(SUM(begin_vouchers.credit), 0) as credit'),
-                DB::raw('COALESCE(SUM(begin_vouchers.deadline_balance), 0) as deadline_balance'),
+                DB::raw('COALESCE(SUM(begin_mandates.fin_law), 0) as fin_law'),
+                DB::raw('COALESCE(SUM(begin_mandates.new_credit_status), 0) as new_credit_status'),
+                DB::raw('COALESCE(SUM(begin_mandates.early_balance), 0) as early_balance'),
+                DB::raw('COALESCE(SUM(begin_mandates.apply), 0) as apply'),
+                DB::raw('COALESCE(SUM(begin_mandates.credit), 0) as credit'),
+                DB::raw('COALESCE(SUM(begin_mandates.deadline_balance), 0) as deadline_balance'),
             ])
             ->groupBy('programs.no')
             ->orderBy('programs.no', 'ASC');
@@ -141,9 +141,9 @@ class CostImplementProgramDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('costimplementprogram-table')
+            ->setTableId('costimplementprogramMandate-table')
             ->ajax([
-                'url'  => route('cost.implement.program.index'),
+                'url'  => route('cost.implement.programMandate.index'),
                 'type' => 'GET',
                 'data' => 'function(d) {
                     d.yearFilter = $("#yearFilter").val();
@@ -182,6 +182,6 @@ class CostImplementProgramDataTable extends DataTable
 
     protected function filename(): string
     {
-        return 'CostImplementProgram_' . date('YmdHis');
+        return 'CostImplementProgramMandate_' . date('YmdHis');
     }
 }
