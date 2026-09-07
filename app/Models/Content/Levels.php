@@ -19,7 +19,6 @@ class Levels extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'ministry_id',
         'name',    
     ];
 

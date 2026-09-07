@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('name_list', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('ministry_id');
-            $table->unsignedBigInteger('id_number');
-            $table->string('account_number')->nullable();
-            $table->string('name_kh')->nullable();
-            $table->string('name_latin')->nullable();
+            $table->string('id_number')->nullable();
+            $table->string('account_number');
+            $table->string('name_kh');
+            $table->string('name_latin');
             $table->timestamps();
             $table->softDeletes();
         });

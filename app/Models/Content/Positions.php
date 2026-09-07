@@ -19,7 +19,6 @@ class Positions extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'ministry_id',
         'level_id',
         'name_position',
     ];
@@ -61,7 +60,7 @@ class Positions extends Model
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();
-        $activity->default_field    = "{$this->name} ";
+        $activity->default_field    = "{$this->name_position} ";
         $activity->log_name         = trans('menus.content.position');
         $platform = $agent->platform();
         $browser = $agent->browser();

@@ -19,7 +19,6 @@ class NameList extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'ministry_id',
         'id_number',
         'account_number',
         'name_kh',
