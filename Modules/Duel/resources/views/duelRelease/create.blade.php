@@ -119,6 +119,7 @@
                                             @enderror
                                         </div>
                                     </div>
+
                                     <div class="col-xl-3 col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="receiver">{{ __('forms.receiver') }}</label>
@@ -137,7 +138,7 @@
                                                 {{ __('forms.agency') }}
                                             </label>
                                             <select class="form-control" data-trigger id="cboAgency" name="agency"
-                                                required tabindex="6"
+                                                tabindex="6"
                                                 data-pristine-required-message="{{ __('messages.required') }}">
                                                 <option value="">{{ __('forms.search...') }}</option>
                                                 @foreach ($agency as $item)
@@ -156,7 +157,7 @@
                                         <div class="form-group mb-3">
                                             <label for="cboExecutive"
                                                 class="form-label font-size-13 text-muted">{{ __('forms.agency.executive.unit') }}</label>
-                                            <select id="cboExecutive" class="form-select" name="cboExecutive" required
+                                            <select id="cboExecutive" class="form-select" name="cboExecutive"
                                                 data-trigger tabindex="7"
                                                 data-pristine-required-message="{{ __('messages.required') }}">
                                                 <option value="">{{ __('forms.search...') }}</option>

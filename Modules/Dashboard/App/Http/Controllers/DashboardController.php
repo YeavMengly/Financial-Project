@@ -161,7 +161,46 @@ class DashboardController extends Controller
         $totalDieselRelease = $duelReleases->where('item_name', 2)->count();
         $totalOilRelease    = $duelReleases->where('item_name', 3)->count();
 
+        /*
+    |--------------------------------------------------------------------------
+    | Remaining
+    |--------------------------------------------------------------------------
+    */
+
+        $qtyFuelRemain = max(
+            $qtyFuel - $qtyFuelRelease,
+            0
+        );
+
+        $qtyDieselRemain = max(
+            $qtyDiesel - $qtyDieselRelease,
+            0
+        );
+
+        $qtyOilRemain = max(
+            $qtyOil - $qtyOilRelease,
+            0
+        );
+
         $totalEntry   = $duelEntries->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Release Lists For Modal
+    |--------------------------------------------------------------------------
+    */
+
+        $fuelReleases = $duelReleases
+            ->where('item_name', 1)
+            ->values();
+
+        $dieselReleases = $duelReleases
+            ->where('item_name', 2)
+            ->values();
+
+        $oilReleases = $duelReleases
+            ->where('item_name', 3)
+            ->values();
         $itemOptions = ['ប្រេងសាំង', 'ប្រេងម៉ាស៊ូត', 'ប្រេងម៉ាស៊ីន'];
         // MATERIAL
         $materialQuery = DB::table('material_entries')
@@ -398,8 +437,8 @@ class DashboardController extends Controller
             ->select(
                 DB::raw('MONTH(updated_at) as month'),
                 DB::raw('COUNT(DISTINCT p_name) as total_product'),
-                DB::raw('SUM(quantity_total) as total_qty'),
-                DB::raw('SUM(total) as total_price')
+                DB::raw('SUM(quantity_request) as total_qty'),
+                DB::raw('SUM(total_price) as total_price')
             )
             ->whereYear('updated_at', now()->year)
             ->groupBy(DB::raw('MONTH(updated_at)'))
@@ -450,7 +489,56 @@ class DashboardController extends Controller
             $entryPrice[] = (float) ($entry->total_price ?? 0);
             $releasePrice[] = (float) ($release->total_price ?? 0);
         }
+        // $months = [
+        //     1  => 'Jan',
+        //     2  => 'Feb',
+        //     3  => 'Mar',
+        //     4  => 'Apr',
+        //     5  => 'May',
+        //     6  => 'Jun',
+        //     7  => 'Jul',
+        //     8  => 'Aug',
+        //     9  => 'Sep',
+        //     10 => 'Oct',
+        //     11 => 'Nov',
+        //     12 => 'Dec',
+        // ];
 
+        $chartLabels = [];
+        $fuelEntryQty = [];
+        $fuelReleaseQty = [];
+        $fuelRemainQty = [];
+
+        foreach ($months as $monthNumber => $monthName) {
+
+            $chartLabels[] = $monthName;
+
+            // Duel Entry for this month
+            $entry = $duelEntries
+                ->filter(function ($row) use ($monthNumber) {
+                    return !empty($row->created_at)
+                        && \Carbon\Carbon::parse($row->created_at)->month == $monthNumber;
+                })
+                ->where('item_name', 1);
+
+            // Duel Release for this month
+            $release = $duelReleases
+                ->filter(function ($row) use ($monthNumber) {
+                    return !empty($row->date_release)
+                        && \Carbon\Carbon::parse($row->date_release)->month == $monthNumber;
+                })
+                ->where('item_name', 1);
+
+            $entryQty[] = (float) $entry->sum('quantity');
+
+            $releaseQty[] = (float) $release->sum('quantity_request');
+
+            // Remaining for that month
+            $fuelRemainQty[] = max(
+                $entry->sum('quantity') - $release->sum('quantity_request'),
+                0
+            );
+        }
         return view('dashboard::index', [
             'chartLabels' => $chartLabels,
             'entryQty' => $entryQty,
@@ -545,7 +633,17 @@ class DashboardController extends Controller
             'totalCountPro' => $totalCountPro,
             'totalCountExp' => $totalCountExp,
             'totalExpenditureProcurement' => $totalExpenditureProcurement,
-            'totalFinLaw' => $totalFinLaw
+            'totalFinLaw' => $totalFinLaw,
+
+
+            'fuelReleases' => $fuelReleases,
+            'dieselReleases' => $dieselReleases,
+            'oilReleases' => $oilReleases,
+
+            // 'chartLabels' => $chartLabels,
+            'fuelEntryQty' => $fuelEntryQty,
+            'fuelReleaseQty' => $fuelReleaseQty,
+            'fuelRemainQty' => $fuelRemainQty
         ]);
     }
     // Modal Program

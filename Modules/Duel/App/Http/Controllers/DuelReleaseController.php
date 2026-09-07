@@ -275,8 +275,8 @@ class DuelReleaseController extends Controller
         $validated = $request->validate([
             'stock_number'     => 'required',
             'item_name'        => 'required',
-            'agency'           => 'nullable|integer',
-            'cboExecutive'     => 'nullable|integer',
+            'agency'           => 'nullable|string',
+            'cboExecutive'     => 'nullable|string',
             'receipt_number'   => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
             'receiver'         => 'nullable|string|max:255',
