@@ -136,26 +136,22 @@
                     </ul>
                 </li>
 
-                {{-- ========== Budget Control ========== --}}
-                {{-- @php
-                    $budgetControlActive =
-                        Request::routeIs('voucherLoan.*') ||
-                        Request::routeIs('mandateLoan.*') ||
-                        Request::routeIs('voucher.*') ||
-                        Request::routeIs('mandate.*');
+                {{-- ========== Missions ========== --}}
+                @php
+                    $missionActive = Request::routeIs('initialMission.*') || Request::routeIs('mission.*');
                 @endphp
 
-                @if (hasPermission('voucherLoan.index'))
+                @if (hasPermission('initialMissions.index'))
                     <li>
-                        <a href="{{ route('voucherLoan.index') }}"
-                            class="{{ Request::routeIs('voucherLoan.*') ? 'active' : '' }}">
+                        <a href="{{ route('initialMissions.index') }}"
+                            class="{{ Request::routeIs('initialMissions.*') ? 'active' : '' }}">
                             <i data-feather="pie-chart"></i>
-                            <span data-key="t-budget.control.voucherLoan">
-                                {{ __('menus.budget.control') }}
+                            <span data-key="t-missions">
+                                {{ __('menus.missions') }}
                             </span>
                         </a>
                     </li>
-                @endif --}}
+                @endif
 
                 {{-- Material --}}
                 <li class="menu-title" data-key="t-inventory">{{ __('menus.material') }}</li>
