@@ -19,8 +19,8 @@ return new class extends Migration
             // $table->string('stock_number');
             $table->string('item_name');
             $table->string('receipt_number');
-            $table->string('agency');
-            $table->string('executive_unit_id');
+            $table->string('agency')->nullable();
+            $table->string('executive_unit_id')->nullable();
             $table->string('user_request');
             $table->string('receiver');
             $table->string('unit');

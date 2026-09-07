@@ -6,11 +6,18 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+                @if (hasPermission('project.index'))
+                    <a download href="{{ asset($module->file) }}" class="dropdown-item"><i class="bx bx-download"></i>
+                        {{ __('buttons.download') }}</a>
+                @endif
+                @if (hasPermission('project.edit') or hasPermission('project.destroy'))
+                    <hr />
+                @endif
                 @if (hasPermission('project.edit'))
                     <a href="{{ route('project.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                @if (hasPermission('project.edit.doc'))
+                @if (hasPermission('project.edit'))
                     <a href="{{ route('project.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}</a>
                 @endif

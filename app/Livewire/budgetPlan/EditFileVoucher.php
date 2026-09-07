@@ -15,7 +15,7 @@ class EditFileVoucher extends Component
     use WithFileUploads;
 
     public $att_id = 0;
-    
+
     public $params;
     public $documentTitle;
     public $attachments;

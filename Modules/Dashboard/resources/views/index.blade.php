@@ -919,7 +919,7 @@
             $qtyFuelRemain = max(($qtyFuel ?? 0) - ($qtyFuelRelease ?? 0), 0);
         @endphp
 
-        <div class="col-xl-3 col-md-6">
+        {{-- <div class="col-xl-3 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
@@ -975,8 +975,299 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
+        <div class="col-xl-3 col-md-6">
 
+            <div class="card card-h-100" style="cursor: pointer;" data-bs-toggle="modal"
+                data-bs-target="#fuelDetailModal">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <span class="text-muted lh-4 d-block text-truncate">
+                            ប្រេងសាំង
+                        </span>
+
+                        <div class="ms-auto d-flex align-items-center gap-1">
+
+                            <button type="button" class="btn btn-soft-primary btn-sm mb-3"
+                                onclick="event.stopPropagation()">
+                                {{ $totalFuel }}
+                            </button>
+
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3"
+                                onclick="event.stopPropagation()">
+                                {{ $totalFuelRelease }}
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row align-items-center">
+
+                        <div class="col-12">
+
+                            <div class="row g-2">
+
+                                <div class="col-6">
+
+                                    <div class="p-2 rounded bg-success-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.entry') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuel ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-6">
+
+                                    <div class="p-2 rounded bg-danger-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.release') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuelRelease ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-12">
+
+                                    <div class="p-2 rounded bg-primary-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.remain') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuelRemain ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-nowrap mt-3">
+
+                        <span class="badge bg-info-subtle text-info">
+                            Entry vs Release
+                        </span>
+
+                        <span class="ms-1 text-muted font-size-13">
+                            {{-- {{ $year }} --}}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="modal fade" id="fuelDetailModal" tabindex="-1" aria-labelledby="fuelDetailModalLabel"
+            aria-hidden="true">
+
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+                <div class="modal-content">
+
+                    {{-- Header --}}
+                    <div class="modal-header bg-light">
+
+                        <div>
+
+                            <h5 class="modal-title fw-semibold" id="fuelDetailModalLabel">
+
+                                <i class="ri-oil-line align-middle me-1 text-primary"></i>
+
+                                របាយការណ៍ការបញ្ចេញប្រេងសាំង
+
+                            </h5>
+
+                            <small class="text-muted">
+                                បញ្ជី Duel Release ប្រចាំឆ្នាំ
+                                {{-- {{ $year }} --}}
+                            </small>
+
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+
+                    {{-- Body --}}
+                    <div class="modal-body">
+
+                        {{-- Summary --}}
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-success-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            ចំនួនឯកសារ Entry
+                                        </div>
+
+                                        <h4 class="mb-0 text-success">
+
+                                            {{ number_format($totalFuel) }}
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-danger-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            សរុបបញ្ចេញ
+                                        </div>
+
+                                        <h4 class="mb-0 text-danger">
+
+                                            {{ number_format($qtyFuelRelease) }}
+
+                                            <span class="fs-6">
+                                                លីត្រ
+                                            </span>
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-primary-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            សល់
+                                        </div>
+
+                                        <h4 class="mb-0 text-primary">
+
+                                            {{ number_format($qtyFuelRemain) }}
+
+                                            <span class="fs-6">
+                                                លីត្រ
+                                            </span>
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Chart --}}
+                        <div class="card border shadow-none">
+
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <h5 class="card-title mb-1">
+                                        <i class="ri-bar-chart-2-line text-primary me-1"></i>
+                                        ក្រាបការបញ្ចេញប្រេងសាំង
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        ប្រៀបធៀប បរិមាណសរុប / បញ្ចេញ / សល់
+                                    </small>
+                                </div>
+
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{-- {{ $year }} --}}
+                                </span>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div id="fuelReleaseChart" style="min-height: 380px;"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Footer --}}
+                    <div class="modal-footer bg-light">
+
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+
+                            <i class="ri-close-line me-1"></i>
+
+                            បិទ
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
         @php
             $qtyDieselRemain = max(($qtyDiesel ?? 0) - ($qtyDieselRelease ?? 0), 0);
         @endphp
@@ -1094,6 +1385,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xl-2 col-md-6">
             <!-- card -->
             <div class="card card-h-100">
@@ -1127,6 +1419,7 @@
             </div><!-- end card -->
         </div>
     </div>
+    {{-- ំMaterial --}}
     <div class="row card">
         <div class="card-body">
 
@@ -2243,3 +2536,536 @@
             });
         });
     </script> --}}
+
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const fuelReleases = @json($fuelReleases);
+            const dieselReleases = @json($dieselReleases);
+            const oilReleases = @json($oilReleases);
+
+
+            const modal = document.getElementById('duelReleaseModal');
+
+            if (!modal) {
+                return;
+            }
+
+
+            modal.addEventListener('show.bs.modal', function(event) {
+
+                const card = event.relatedTarget;
+
+                if (!card) {
+                    return;
+                }
+
+
+                const item = card.dataset.item;
+                const title = card.dataset.title;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Select Data
+                |--------------------------------------------------------------------------
+                */
+
+                let releases = [];
+
+                if (item === '1') {
+
+                    releases = fuelReleases;
+
+                } else if (item === '2') {
+
+                    releases = dieselReleases;
+
+                } else if (item === '3') {
+
+                    releases = oilReleases;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Modal Title
+                |--------------------------------------------------------------------------
+                */
+
+                document.getElementById(
+                    'duelReleaseTitle'
+                ).innerText = title;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Summary
+                |--------------------------------------------------------------------------
+                */
+
+                const totalRelease = releases.reduce(
+                    function(total, row) {
+
+                        return total +
+                            Number(row.quantity_request || 0);
+
+                    },
+                    0
+                );
+
+
+                const lastRow =
+                    releases.length > 0 ?
+                    releases[releases.length - 1] :
+                    null;
+
+
+                const remaining =
+                    lastRow ?
+                    Number(lastRow.quantity_remain || 0) :
+                    0;
+
+
+                document.getElementById(
+                    'modalEntryCount'
+                ).innerText = releases.length.toLocaleString();
+
+
+                document.getElementById(
+                        'modalReleaseQuantity'
+                    ).innerText =
+                    numberFormat(totalRelease) + ' លីត្រ';
+
+
+                document.getElementById(
+                        'modalRemainQuantity'
+                    ).innerText =
+                    numberFormat(remaining) + ' លីត្រ';
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Table
+                |--------------------------------------------------------------------------
+                */
+
+                renderReleaseTable(releases);
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Render Table
+            |--------------------------------------------------------------------------
+            */
+
+            function renderReleaseTable(releases) {
+
+                const tbody =
+                    document.getElementById(
+                        'duelReleaseModalTable'
+                    );
+
+
+                tbody.innerHTML = '';
+
+
+                if (!releases.length) {
+
+                    tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="text-center text-muted py-5">
+
+                        <i class="ri-database-2-line fs-2 d-block mb-2"></i>
+
+                        មិនមានទិន្នន័យ
+
+                    </td>
+                </tr>
+            `;
+
+                    return;
+                }
+
+
+                releases.forEach(function(row, index) {
+
+                    const date = row.date_release ?
+                        formatDate(row.date_release) :
+                        '-';
+
+
+                    tbody.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+                    <td>
+                        <span class="fw-semibold">
+                            ${row.receipt_number ?? '-'}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td class="text-end">
+
+                        ${numberFormat(row.quantity_total)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                    <td class="text-end text-danger fw-semibold">
+
+                        ${numberFormat(row.quantity_request)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                    <td class="text-end text-primary fw-semibold">
+
+                        ${numberFormat(row.quantity_remain)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+                });
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Number Format
+            |--------------------------------------------------------------------------
+            */
+
+            function numberFormat(value) {
+
+                return Number(value || 0).toLocaleString(
+                    'en-US', {
+                        maximumFractionDigits: 2
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Date Format
+            |--------------------------------------------------------------------------
+            */
+
+            function formatDate(value) {
+
+                const date = new Date(value);
+
+                if (isNaN(date.getTime())) {
+                    return value;
+                }
+
+                const day =
+                    String(date.getDate()).padStart(2, '0');
+
+                const month =
+                    String(date.getMonth() + 1).padStart(2, '0');
+
+                const year =
+                    date.getFullYear();
+
+
+                return `${day}/${month}/${year}`;
+
+            }
+
+        });
+    </script> --}}
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const fuelReleases = @json($fuelReleases);
+
+            const dates = fuelReleases.map(function(item) {
+                return item.date_release ?
+                    formatDate(item.date_release) :
+                    '-';
+            });
+
+            const quantityTotal = fuelReleases.map(function(item) {
+                return Number(item.quantity_total ?? 0);
+            });
+
+            const quantityRequest = fuelReleases.map(function(item) {
+                return Number(item.quantity_request ?? 0);
+            });
+
+            const quantityRemain = fuelReleases.map(function(item) {
+                return Number(item.quantity_remain ?? 0);
+            });
+
+
+            // ==========================================
+            // Fuel Release Chart
+            // ==========================================
+
+            const chartElement = document.querySelector('#fuelReleaseChart');
+
+            if (!chartElement) {
+                return;
+            }
+
+            const options = {
+
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: {
+                        show: true
+                    },
+                    zoom: {
+                        enabled: true
+                    }
+                },
+
+                series: [{
+                        name: 'បរិមាណសរុប',
+                        data: quantityTotal
+                    },
+                    {
+                        name: 'បញ្ចេញ',
+                        data: quantityRequest
+                    },
+                    {
+                        name: 'សល់',
+                        data: quantityRemain
+                    }
+                ],
+
+                xaxis: {
+                    categories: dates,
+                    title: {
+                        text: 'កាលបរិច្ឆេទ'
+                    },
+                    labels: {
+                        rotate: -45
+                    }
+                },
+
+                yaxis: {
+                    title: {
+                        text: 'បរិមាណ (លីត្រ)'
+                    },
+
+                    labels: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString();
+                        }
+                    }
+                },
+
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+
+                markers: {
+                    size: 5,
+                    hover: {
+                        size: 7
+                    }
+                },
+
+                dataLabels: {
+                    enabled: false
+                },
+
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+
+                    y: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString() + ' លីត្រ';
+                        }
+                    }
+                },
+
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center'
+                },
+
+                grid: {
+                    strokeDashArray: 4
+                },
+
+                noData: {
+                    text: 'មិនមានទិន្នន័យ'
+                }
+            };
+
+
+            const fuelChart = new ApexCharts(
+                chartElement,
+                options
+            );
+
+            fuelChart.render();
+
+
+            // ==========================================
+            // Format Date
+            // ==========================================
+
+            function formatDate(value) {
+
+                const date = new Date(value);
+
+                if (isNaN(date.getTime())) {
+                    return value;
+                }
+
+                const day = String(date.getDate()).padStart(2, '0');
+
+                const month = String(
+                    date.getMonth() + 1
+                ).padStart(2, '0');
+
+                const year = date.getFullYear();
+
+                return `${day}/${month}/${year}`;
+            }
+
+        });
+    </script> --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const chartLabels = @json($chartLabels);
+
+    const entryQty = @json($fuelEntryQty);
+
+    const releaseQty = @json($fuelReleaseQty);
+
+    const remainQty = @json($fuelRemainQty);
+
+
+    const chartElement = document.querySelector('#fuelReleaseChart');
+
+    if (!chartElement) {
+        return;
+    }
+
+
+    const options = {
+
+        chart: {
+            type: 'line',
+            height: 400,
+            toolbar: {
+                show: true
+            }
+        },
+
+        series: [
+            {
+                name: 'Entry',
+                data: entryQty
+            },
+            {
+                name: 'Release',
+                data: releaseQty
+            },
+            {
+                name: 'Remain',
+                data: remainQty
+            }
+        ],
+
+        xaxis: {
+            categories: chartLabels,
+
+            title: {
+                text: 'Month'
+            }
+        },
+
+        yaxis: {
+            title: {
+                text: 'Quantity (Liter)'
+            },
+
+            labels: {
+                formatter: function (value) {
+                    return Number(value).toLocaleString();
+                }
+            }
+        },
+
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+
+        markers: {
+            size: 5
+        },
+
+        tooltip: {
+            shared: true,
+            intersect: false,
+
+            y: {
+                formatter: function (value) {
+                    return Number(value).toLocaleString() + ' លីត្រ';
+                }
+            }
+        },
+
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center'
+        },
+
+        grid: {
+            strokeDashArray: 4
+        },
+
+        noData: {
+            text: 'មិនមានទិន្នន័យ'
+        }
+    };
+
+
+    const fuelChart = new ApexCharts(
+        chartElement,
+        options
+    );
+
+    fuelChart.render();
+
+});
+</script>

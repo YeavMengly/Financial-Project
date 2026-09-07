@@ -242,6 +242,25 @@ return new class extends Migration
                 'edit'   => 'expenseType.edit',
                 'delete' => 'expenseType.destroy',
             ],
+
+            // Project
+            'project'                  => [
+                'show'   => 'initialProject.index',
+                'view'   => 'project.index',
+                'create' => 'project.create',
+                'edit'   => 'project.edit',
+                'delete' => 'project.destroy',
+
+            ],
+
+            // Missions
+            'missions'                  => [
+                'show'   => 'initialMissions.index',
+                'view'   => 'missions.index',
+                'create' => 'missions.create',
+                'edit'   => 'missions.edit',
+                'delete' => 'missions.destroy',
+            ],
         ];
 
         $admin_permission = [];

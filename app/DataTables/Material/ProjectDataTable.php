@@ -6,6 +6,7 @@ use App\Models\Material\Projects;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -25,53 +26,11 @@ class ProjectDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-
-            /*
-        |--------------------------------------------------------------------------
-        | soft_delete
-        |--------------------------------------------------------------------------
-        */
-
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
-
-            ->addColumn("dateTime", function ($module) {
-                return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
-            })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Date
-        |--------------------------------------------------------------------------
-        */
-            ->editColumn('date', function ($row) {
-                $active =  Carbon::parse($row->date)->format('Y-m-d');
-
-                return $active;
-            })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Title
-        |--------------------------------------------------------------------------
-        */
-            ->editColumn('title', function ($row) {
-                $title = e($row->title ?? '');
-
-                if (empty($title)) {
-                    return '<span class="text-muted">-</span>';
-                }
-
-                return '<strong>' . $title . '</strong>';
-            })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Status
-        |--------------------------------------------------------------------------
-        */
+        
             ->addColumn('status', function ($row) {
 
                 if (is_null($row->deleted_at)) {
@@ -84,12 +43,6 @@ class ProjectDataTable extends DataTable
                     . __('buttons.deleted')
                     . '</span>';
             })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Action
-        |--------------------------------------------------------------------------
-        */
             ->addColumn('action', function ($module) {
                 return view(
                     'material::project.action',
@@ -98,12 +51,6 @@ class ProjectDataTable extends DataTable
                     ]
                 );
             })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Note
-        |--------------------------------------------------------------------------
-        */
             ->editColumn('note', function ($row) {
 
                 if (empty($row->note)) {
@@ -121,12 +68,6 @@ class ProjectDataTable extends DataTable
                     . nl2br(e($row->note))
                     . '</div>';
             })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Reference
-        |--------------------------------------------------------------------------
-        */
             ->editColumn('refer', function ($row) {
 
                 if (empty($row->refer)) {
@@ -145,108 +86,27 @@ class ProjectDataTable extends DataTable
                     . '</div>';
             })
 
-            /*
-        |--------------------------------------------------------------------------
-        | Files
-        |--------------------------------------------------------------------------
-        */
             ->editColumn('file', function ($row) {
-
-                if (empty($row->file)) {
+                if (!$row->file) {
                     return '<span class="text-muted">-</span>';
                 }
+                $url = asset('storage/' . $row->file);
+                $filename = basename($row->file);
 
-                /*
-            |--------------------------------------------------------------------------
-            | Decode JSON
-            |--------------------------------------------------------------------------
-            */
-                $files = json_decode($row->file, true);
-
-                /*
-            |--------------------------------------------------------------------------
-            | Multiple files
-            |--------------------------------------------------------------------------
-            */
-                if (is_array($files) && count($files) > 0) {
-
-                    $html = '<ul class="list-unstyled m-0">';
-
-                    foreach ($files as $file) {
-
-                        if (empty($file)) {
-                            continue;
-                        }
-
-                        $file = (string) $file;
-
-                        /*
-                    |--------------------------------------------------------------------------
-                    | Storage path
-                    |--------------------------------------------------------------------------
-                    |
-                    | Your store() method uses:
-                    |
-                    | $file->store('materials/documents', 'public');
-                    |
-                    */
-                        $url = asset(
-                            'storage/' . ltrim($file, '/')
-                        );
-
-                        $filename = basename($file);
-
-                        $html .= '
-                        <li class="mb-1">
-                            <a
-                                href="' . e($url) . '"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-primary"
-                            >
-                                <i class="fas fa-file-alt me-1"></i>
-                                ' . e($filename) . '
-                            </a>
-                        </li>
-                    ';
-                    }
-
-                    $html .= '</ul>';
-
-                    return $html;
-                }
-
-                /*
-            |--------------------------------------------------------------------------
-            | Single file
-            |--------------------------------------------------------------------------
-            */
-                $file = (string) $row->file;
-
-                $url = asset(
-                    'storage/' . ltrim($file, '/')
-                );
-
-                $filename = basename($file);
-
-                return '
-                <a
-                    href="' . e($url) . '"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-primary"
-                >
-                    <i class="fas fa-file-alt me-1"></i>
-                    ' . e($filename) . '
-                </a>
-            ';
+                return "<a href='{$url}' target='_blank' class='text-primary'>
+                <i class='fas fa-file-alt me-1'></i>Preview
+            </a>";
             })
-
-            /*
-        |--------------------------------------------------------------------------
-        | Raw HTML columns
-        |--------------------------------------------------------------------------
-        */
+            ->editColumn('dateTime', function ($row) {
+                return Carbon::parse($row->created_at)->format('Y-m-d  h:i:s A');
+            })
+            ->editColumn('date', function ($row) {
+                return Carbon::parse($row->date)->format('Y-m-d');
+            })
+            ->editColumn('title', function ($row) {
+                $title = e($row->title ?? '');
+                return $title;
+            })
             ->rawColumns([
                 'title',
                 'status',
@@ -340,7 +200,7 @@ class ProjectDataTable extends DataTable
             Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
             Column::make('user_receiver')->title(__('tables.th.receiver'))->width(60)->addClass('align-middle'),
             Column::make('warehouse_owner')->title(__('tables.th.warehouse.owner'))->width(90)->addClass('align-middle'),
-            Column::computed('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
+            Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
             Column::make('date')->title(__('tables.th.date.entry'))->width(200)->addClass('align-middle'),
             Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
             Column::make('note')->title(__('tables.th.note'))->addClass('align-middle'),
