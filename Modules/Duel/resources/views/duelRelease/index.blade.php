@@ -86,7 +86,7 @@
                             </select>
                         </div>
 
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label class="visually-hidden"
                                 for="cboExecutiveUnit">{{ __('menus.content.agency.executive.unit') }}</label>
                             <select id="cboExecutiveUnit" name="cboExecutiveUnit" class="form-select"
@@ -99,7 +99,7 @@
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 

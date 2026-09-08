@@ -132,7 +132,21 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-3 col-md-4">
+                                      <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="agency">{{ __('forms.agency') }} /
+                                                </label>
+                                            <input type="text" name="agency" required tabindex="3"
+                                                class="form-control"
+                                                data-pristine-required-message="{{ __('messages.required') }}" />
+                                            @error('agency')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+
+                                    {{-- <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="agency" class="form-label font-size-13 text-muted">
                                                 {{ __('forms.agency') }}
@@ -151,9 +165,9 @@
                                                 <div class="pristine-error text-help">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="col-lg-3 col-md-4">
+                                    {{-- <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="cboExecutive"
                                                 class="form-label font-size-13 text-muted">{{ __('forms.agency.executive.unit') }}</label>
@@ -163,7 +177,7 @@
                                                 <option value="">{{ __('forms.search...') }}</option>
                                             </select>
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
