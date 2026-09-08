@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('levels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->decimal('pocket_money', 10, 0);
+            $table->decimal('meal_money', 10, 0);
+            $table->decimal('accommodation_money', 10, 0);
             $table->timestamps();
             $table->softDeletes();
         });

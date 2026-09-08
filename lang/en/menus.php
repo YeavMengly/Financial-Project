@@ -6,6 +6,7 @@ return [
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
+    'employees' => 'មន្ត្រីរាជការ',
 
     // Inventory
     'budget' => 'ឥណទាន',
@@ -30,6 +31,11 @@ return [
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
     'content.expense.type' => 'ប្រភេទចំណាយ',
+    'content.position' => 'តួនាទី',
+    'content.level' => 'ប្រភេទមុខតំណែង',
+    'content.employee' => 'បុគ្គលិក',
+    'content.province'  =>  'រាជធានី / ខេត្ត',
+    'content.missions'  =>  'បេសកកម្ម',
 
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',

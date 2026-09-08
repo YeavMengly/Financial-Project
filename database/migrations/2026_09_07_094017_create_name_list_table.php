@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('name_list', function (Blueprint $table) {
             $table->id();
-            $table->string('id_number')->nullable();
-            $table->string('account_number');
-            $table->string('name_kh');
-            $table->string('name_latin');
+            $table->string('id_number')->nullable()->unique();
+            $table->string('account_number', 15)->unique();
+            $table->string('name_kh', 50)->unique();
+            $table->string('name_latin', 50)->unique();
             $table->timestamps();
             $table->softDeletes();
         });

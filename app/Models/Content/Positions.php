@@ -20,7 +20,7 @@ class Positions extends Model
      */
     protected $fillable = [
         'level_id',
-        'name_position',
+        'name',
     ];
 
     /* -----------------------------------------------------------------
@@ -48,7 +48,7 @@ class Positions extends Model
     {
         return LogOptions::defaults()
             ->useLogName(trans('menus.conten.position'))
-            ->logOnly(['level_id', 'name_position'])
+            ->logOnly(['level_id', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
@@ -60,7 +60,7 @@ class Positions extends Model
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();
-        $activity->default_field    = "{$this->name_position} ";
+        $activity->default_field    = "{$this->name} ";
         $activity->log_name         = trans('menus.content.position');
         $platform = $agent->platform();
         $browser = $agent->browser();
