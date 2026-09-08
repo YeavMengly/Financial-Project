@@ -122,6 +122,9 @@ return [
   'th.cost.total' => 'ប្រាក់សរុបជារៀល',
   'th.reactive.energy' => 'ថាមពលអំណានចាស់',
   'th.receipt.number' => 'លេខបណ្ណបញ្ចេញ',
+  'th.id.number' => 'អត្ដលេខ',
+  'th.id.account' => 'លេខគណនី',
+  'th.id.account' => 'លេខគណនី',
 
   'hide' => 'លាក់',
   'show' => 'បង្ហាញ',

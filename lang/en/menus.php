@@ -30,6 +30,7 @@ return [
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
     'content.expense.type' => 'ប្រភេទចំណាយ',
+    'content.employees' => 'រាយឈ្មោះបុគ្គលិក',
 
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
@@ -140,6 +141,8 @@ return [
     'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 
     'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ',
+
+    'employees' => 'រាយឈ្មោះបុគ្គលិក',
 
     // Filter
     'start_date' => 'ថ្ងៃចាប់ផ្ដើម',
