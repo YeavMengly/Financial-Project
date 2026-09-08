@@ -58,6 +58,7 @@ return [
     'decrease' => 'ថយ',
     'editorial'  => 'វិចារណកម្ម',
     'initial.budget.year' => 'កម្រងឆ្នាំ',
+    'id.number' => 'អត្ដលេខ',
 
     // Material
     'stock.number' => 'លេខបញ្ចូលឃ្លាំង',

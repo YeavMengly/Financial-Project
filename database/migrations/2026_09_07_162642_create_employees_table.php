@@ -11,12 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('name_list', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('id_number')->nullable()->unique();
+<<<<<<< HEAD:database/migrations/2026_09_07_094017_create_name_list_table.php
             $table->string('account_number', 15)->unique();
             $table->string('name_kh', 50)->unique();
             $table->string('name_latin', 50)->unique();
+=======
+            $table->string('account_number')->unique();
+            $table->string('name_kh')->unique();
+            $table->string('name_latin')->unique();
+>>>>>>> 7e99b755e862642799051072924caf2210ea68d0:database/migrations/2026_09_07_162642_create_employees_table.php
             $table->timestamps();
             $table->softDeletes();
         });
@@ -27,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('name_list');
+        Schema::dropIfExists('employees');
     }
 };
