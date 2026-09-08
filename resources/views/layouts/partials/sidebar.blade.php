@@ -636,7 +636,7 @@
                                 <a href="{{ route('employees.index') }}"
                                     class="{{ Request::routeIs('employees.*') ? 'active' : '' }}">
                                     <i data-feather="layers" ></i>
-                                    {{ __('menus.content.employees') }}
+                                    {{ __('menus.content.employee') }}
                                 </a>
                             </li>
                         @endif

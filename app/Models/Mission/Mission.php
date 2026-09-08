@@ -2,7 +2,7 @@
 
 namespace App\Models\Mission;
 
-
+use App\Models\Content\Employee;
 use App\Models\Content\Levels;
 use App\Models\Content\Ministry;
 use App\Models\Content\NameList;
@@ -121,9 +121,9 @@ class Mission extends Model
         return $this->belongsTo(Ministry::class);
     }
 
-    public function nameList()
+    public function employee()
     {
-        return $this->belongsTo(NameList::class);
+        return $this->belongsTo(Employee::class);
     }
 
     public function position()
