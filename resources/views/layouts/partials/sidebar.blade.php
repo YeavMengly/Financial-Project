@@ -145,7 +145,7 @@
                     <li>
                         <a href="{{ route('initialMissions.index') }}"
                             class="{{ Request::routeIs('initialMissions.*') ? 'active' : '' }}">
-                            <i data-feather="pie-chart"></i>
+                            <i data-feather="navigation"></i>
                             <span data-key="t-missions">
                                 {{ __('menus.missions') }}
                             </span>

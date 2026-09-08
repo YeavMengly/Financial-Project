@@ -276,7 +276,7 @@ class DuelReleaseController extends Controller
             'stock_number'     => 'required',
             'item_name'        => 'required',
             'agency'           => 'nullable|string',
-            'cboExecutive'     => 'nullable|string',
+            // 'cboExecutive'     => 'nullable|string',
             'receipt_number'   => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
             'receiver'         => 'nullable|string|max:255',
@@ -406,7 +406,7 @@ class DuelReleaseController extends Controller
                 'receipt_number'    => $validated['receipt_number'],
 
                 'agency'            => $validated['agency'] ?? null,
-                'executive_unit_id' => $validated['cboExecutive'] ?? null,
+                // 'executive_unit_id' => $validated['cboExecutive'] ?? null,
                 'title'             => $validated['title'] ?? null,
 
                 'user_request'      => $validated['user_request'],
@@ -550,8 +550,8 @@ class DuelReleaseController extends Controller
         $validated = $request->validate([
             'stock_number'     => 'required',
             'item_name'        => 'required',
-            'agency'           => 'nullable|integer',
-            'cboExecutive'     => 'nullable|integer',
+            'agency'           => 'required|string',
+            // 'cboExecutive'     => 'nullable|integer',
             'receipt_number'   => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
             'receiver'         => 'nullable|string|max:255',
@@ -603,7 +603,7 @@ class DuelReleaseController extends Controller
                 // 'stock_number'      => $validated['stock_number'],
                 'item_name'         => $validated['item_name'],
                 'agency'           => $validated['agency'] ?? null,
-                'executive_unit_id' => $validated['cboExecutive'],
+                // 'executive_unit_id' => $validated['cboExecutive'],
                 'receipt_number'   => $validated['receipt_number'],
                 'user_request'     => $validated['user_request'],
                 'receiver'     => $validated['receiver'],

@@ -170,7 +170,7 @@ class DuelReleaseDataTable extends DataTable
 
         $query = $model->newQuery()
             // 1. Join Related Lookups Properly
-            ->leftJoin('agencies', 'duel_releases.agency', '=', 'agencies.id')
+            // ->leftJoin('agencies', 'duel_releases.agency', '=', 'agencies.id')
             ->leftJoin('executive_units', 'duel_releases.executive_unit_id', '=', 'executive_units.id')
             ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
 
@@ -259,8 +259,9 @@ class DuelReleaseDataTable extends DataTable
             'duel_types.name_km as item_name',
             'duel_releases.receipt_number',
             'projects.stock_number',
-            'agencies.name as agency',
-            'executive_units.title as title_executive_units',
+            // 'agencies.name as agency',
+            // 'executive_units.title as title_executive_units',
+            'duel_releases.agency',
             'duel_releases.user_request',
             'duel_releases.receiver',
             'duel_releases.quantity_request',
@@ -292,7 +293,7 @@ class DuelReleaseDataTable extends DataTable
             Column::make('date_release')->title(__('tables.th.date.release'))->width(200)->addClass('align-middle'),
             Column::make('receipt_number')->title(__('tables.th.receipt.number'))->width(30)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(30)->addClass('align-middle'),
-            Column::make('title_executive_units')->title(__('tables.th.agency.executive.unit'))->width(30)->addClass('align-middle'),
+            // Column::make('title_executive_units')->title(__('tables.th.agency.executive.unit'))->width(30)->addClass('align-middle'),
             Column::make('user_request')->title(__('tables.th.user.req'))->width(30)->addClass('align-middle'),
             Column::make('receiver')->title(__('tables.th.user.rec'))->width(30)->addClass('align-middle'),
             Column::make('item_name')->title(__('tables.th.item.name'))->width(90)->addClass('align-middle'),

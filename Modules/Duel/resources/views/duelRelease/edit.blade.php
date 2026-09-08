@@ -142,14 +142,27 @@
                                     </div>
                                 </div>
 
+                                 <div class="col-xl-3 col-md-4">
+                                        <div class="form-group mb-3">
+                                            <label for="agency">{{ __('forms.agency') }} 
+                                                </label>
+                                            <input type="text" name="agency"​ value="{{old('agency', $duelRelease->agency)}}" required tabindex="3"
+                                                class="form-control"
+                                                data-pristine-required-message="{{ __('messages.required') }}" />
+                                            @error('agency')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+
                                 {{-- AGENCY --}}
-                                <div class="col-lg-3 col-md-6">
+                                {{-- <div class="col-lg-3 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="agency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
                                         </label>
                                         <select class="form-control" data-trigger id="dropAgency" name="agency"
-                                            {{-- required --}}
                                             data-pristine-required-message="{{ __('messages.required') }}">
                                             <option value="">{{ __('forms.search...') }}</option>
                                             @foreach ($agency as $item)
@@ -163,9 +176,9 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
 
-                                <div class="col-lg-3 col-md-4">
+                                {{-- <div class="col-lg-3 col-md-4">
                                     <div class="form-group mb-3">
                                         <label for="cboExecutive"
                                             class="form-label font-size-13 text-muted">{{ __('forms.agency.executive.unit') }}</label>
@@ -175,7 +188,7 @@
                                             <option value="">{{ __('forms.search...') }}</option>
                                         </select>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 {{-- DATE RELEASE --}}
                                 <div class="col-lg-3 col-md-6">
