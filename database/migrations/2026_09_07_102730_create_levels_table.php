@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('levels', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('position_id');
             $table->string('name');
+            $table->decimal('pocket_money');
+            $table->decimal('meal_money');
+            $table->decimal('accommodation_money');
             $table->timestamps();
             $table->softDeletes();
         });

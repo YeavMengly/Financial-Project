@@ -562,7 +562,8 @@
                     Request::routeIs('initialChapter.*') ||
                     Request::routeIs('initialProgram.*') ||
                     Request::routeIs('initialAgency.*') ||
-                    Request::routeIs('expenseType.*')
+                    Request::routeIs('expenseType.*') ||
+                    Request::routeIs('employees.*')
                         ? 'mm-active'
                         : '' }}">
 
@@ -576,7 +577,8 @@
                         Request::routeIs('initialChapter.*') ||
                         Request::routeIs('initialProgram.*') ||
                         Request::routeIs('initialAgency.*') ||
-                        Request::routeIs('expenseType.*')
+                        Request::routeIs('expenseType.*') ||
+                        Request::routeIs('employees.*')
                             ? 'true'
                             : 'false' }}">
 
@@ -626,6 +628,15 @@
                                     class="{{ Request::routeIs('expenseType.*') ? 'active' : '' }}">
                                     <i data-feather="layers" title="expense_ty"></i>
                                     {{ __('menus.content.expense.type') }}
+                                </a>
+                            </li>
+                        @endif
+                          @if (hasPermission('ministries.index'))
+                            <li>
+                                <a href="{{ route('employees.index') }}"
+                                    class="{{ Request::routeIs('employees.*') ? 'active' : '' }}">
+                                    <i data-feather="layers" ></i>
+                                    {{ __('menus.content.employees') }}
                                 </a>
                             </li>
                         @endif

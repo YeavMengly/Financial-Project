@@ -21,5 +21,5 @@ Route::prefix('content')->middleware(['auth'])->group(function () {
     require_once __DIR__ . '/agency.php';
     require_once __DIR__ . '/program.php';
     require_once __DIR__ . '/expenseType.php';
-    require_once __DIR__ . '/nameList.php';
+    require_once __DIR__ . '/employees.php';
 });

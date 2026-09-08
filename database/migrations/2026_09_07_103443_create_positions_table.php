@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('level_id');
             $table->string('name_position');
             $table->timestamps();
         });
