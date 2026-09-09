@@ -347,7 +347,7 @@ class ProjectsController extends Controller
             'user_entry'        => 'required|string',
             'user_receiver'     => 'required|string',
             'date'              => 'required|date',
-            'title'             => 'nullable|string',
+            // 'title'             => 'nullable|string',
             'note'              => 'required|string',
             'refer'             => 'required|string',
             'item_id'           => 'nullable|array',
@@ -387,7 +387,7 @@ class ProjectsController extends Controller
                 'user_entry'        => $validated['user_entry'],
                 'user_receiver'     => $validated['user_receiver'],
                 'date'              => $date,
-                'title'             => ($request->has('skip_title') || $request->has('skipTitleInput')) ? '' : ($validated['title'] ?? ''),
+                // 'title'             => ($request->has('skip_title') || $request->has('skipTitleInput')) ? '' : ($validated['title'] ?? ''),
                 'note'              => $noteContent,
                 'refer'             => $referContent,
             ];
