@@ -14,3 +14,4 @@ Route::controller(EmployeeController::class)->group(function () {
     Route::post('employees/update/{params}', 'update')->name('employees.update');
     Route::get('employees/restore/{params}', 'restore')->name('employees.restore');
 });
+Route::post('employees/import', [EmployeeController::class, 'import'])->name('employees.import');
