@@ -5,12 +5,14 @@ namespace Modules\Content\App\Http\Controllers;
 use App\DataTables\Content\EmployeeDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Employee;
+use App\Models\Content\Positions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class EmployeeController extends Controller
 {
@@ -27,7 +29,9 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('content::content.employees.create');
+        $position  = Positions::all();
+        return view('content::content.employees.create')
+            ->with('position', $position);
     }
 
     /**
@@ -35,24 +39,37 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'id_number' => [
-                'required',
+        $request->validate(
+            [
+                'id_number' => [
+                    'required',
+
+                ],
+                'account_number' => [
+                    'required',
+
+                ],
+                'name_kh' => [
+                    'required',
+
+                ],
+                'name_latin' => [
+                    'required',
+                ],
+
+                'cboPosition' => [
+                    'required',
+                ],
 
             ],
-            'account_number' => [
-                'required',
-
-            ],
-            'name_kh' => [
-                'required',
-
-            ],
-            'name_latin' => [
-                'required',
-            ],
-            'status' => ['nullable', 'boolean'], // ✅ ADD
-        ]);
+            [
+                'id_number.required' => 'សូមបញ្ចូលលេខអត្តលេខ។',
+                'account_number.required' => 'សូមបញ្ចូលលេខគណនី។',
+                'name_kh.required' => 'សូមបញ្ចូលឈ្មោះជាភាសាខ្មែរ។',
+                'name_latin.required' => 'សូមបញ្ចូលឈ្មោះជាភាសាឡាតាំង។',
+                'cboPosition.required' => 'សូមជ្រើរើសតួនាទី។',
+            ]
+        );
 
         DB::beginTransaction();
         try {
@@ -62,7 +79,7 @@ class EmployeeController extends Controller
                 'account_number' => $request->account_number,
                 'name_kh' => $request->name_kh,
                 'name_latin' => $request->name_latin,
-                'status' => $request->has('status') ? 1 : 0,
+                'position_id' => $request->cboPosition,
             ]);
 
             DB::commit();
@@ -76,14 +93,6 @@ class EmployeeController extends Controller
             return $request->submit == 'save'
                 ? redirect()->route('employees.index',)
                 : redirect()->route('employees.index',);
-        } catch (\Illuminate\Database\QueryException $e) {
-            DB::rollBack();
-
-            // If unique index blocked a duplicate, you can show friendly message
-            flash()->translate('en')->option('timeout', 2000)
-                ->error('This record already exists.', 'Duplicate')->flash();
-
-            return redirect()->route('employees.index',);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -112,9 +121,11 @@ class EmployeeController extends Controller
 
         $id = is_array($decoded) ? $decoded[0] : $decoded;
 
+        $position = Positions::all();
         $module = Employee::findOrFail($id);
 
         return view('content::content.employees.edit', [
+            'position' => $position,
             'module' => $module,
             'params' => $params,
         ]);
@@ -127,7 +138,7 @@ class EmployeeController extends Controller
             'account_number' => ['required'],
             'name_kh' => ['required'],
             'name_latin' => ['required'],
-            'status' => ['nullable', 'boolean'], // ✅ ADD
+            'cboPosition' => ['required'],
         ]);
 
         DB::beginTransaction();
@@ -144,7 +155,7 @@ class EmployeeController extends Controller
                 'account_number' => $request->account_number,
                 'name_kh' => $request->name_kh,
                 'name_latin' => $request->name_latin,
-                'status' => $request->has('status') ? 1 : 0,
+                'position_id' => $request->cboPosition
             ]);
 
             DB::commit();

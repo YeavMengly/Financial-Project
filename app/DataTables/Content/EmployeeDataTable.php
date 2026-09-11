@@ -43,18 +43,21 @@ class EmployeeDataTable extends DataTable
     {
         $model = $model->newQuery();
         $model->withTrashed();
+
+        $model->leftJoin('positions', 'employees.position_id', '=', 'positions.id');
         $model->select([
             'employees.id',
             'employees.id_number',
             'employees.account_number',
             'employees.name_kh',
             'employees.name_latin',
+            'positions.name as position',
             'employees.created_at',
             'employees.deleted_at',
         ]);
 
 
-        return $model->orderBy('employees.id', 'DESC');
+        return $model->orderBy('employees.id', 'asc');
     }
 
     /**
@@ -83,9 +86,11 @@ class EmployeeDataTable extends DataTable
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
 
             Column::make('id_number')->title(__('tables.th.id.number'))->width(60)->addClass('align-middle'),
-            Column::make('account_number')->title(__('tables.th.id.account'))->addClass('align-middle'),
             Column::make('name_kh')->title(__('tables.th.name.kh'))->width(200),
             Column::make('name_latin')->title(__('tables.th.name.en'))->width(100)->addClass('text-center'),
+            Column::make('account_number')->title(__('tables.th.id.account'))->addClass('align-middle'),
+            Column::make('position')->title(__('tables.th.position'))->addClass('align-middle'),
+
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),

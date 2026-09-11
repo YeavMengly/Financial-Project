@@ -12,7 +12,8 @@ class Province extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name', 
+        'budget'
     ];
 
     public function waterEntity()

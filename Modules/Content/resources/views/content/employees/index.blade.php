@@ -14,7 +14,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.employees') }} </h4>
+                <h4 class="mb-sm-0 font-size-18">{{ __('menus.content.employee') }} </h4>
 
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -36,8 +36,8 @@
                     @if (hasPermission('employees.create'))
                         <div class="col-sm">
                             <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('employees.create') }}"><i class="bx bx-plus me-1"></i>
+                                <a class="btn btn-light waves-effect waves-light" href="{{ route('employees.create') }}"><i
+                                        class="bx bx-plus me-1"></i>
                                     {{ __('buttons.create') }}</a>
                             </div>
                         </div>
@@ -92,5 +92,25 @@
     </script>
     {!! $dataTable->scripts() !!}
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
+            const form = document.getElementById('importEmployeeForm');
+            const button = document.getElementById('btnImportEmployee');
+
+            form.addEventListener('submit', function() {
+
+                button.disabled = true;
+
+                button.innerHTML = `
+            <span
+                class="spinner-border spinner-border-sm me-1"
+                role="status"
+            ></span>
+            Importing...
+        `;
+            });
+
+        });
+    </script>
 @endsection

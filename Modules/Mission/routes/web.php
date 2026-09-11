@@ -28,5 +28,6 @@ Route::prefix('missions')->middleware(['auth'])->group(function () {
         Route::get('initial_missions/{params}/restore', 'restore')->name('missions.restore');
 
         Route::get('initial_missions/get-by-level', 'getByLevel')->name('missions.by.level');
+          Route::get('initial_missions/position/levels', 'getByPositionLevel')->name('position.levels');
     });
 });
