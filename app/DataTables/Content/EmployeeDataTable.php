@@ -84,6 +84,28 @@ class EmployeeDataTable extends DataTable
                     'url' => asset('assets/lang/language.json'),
                 ],
             ])
+            ->initComplete('function () {
+                $("#filter").submit(function(event) {
+                    event.preventDefault();
+                    $("#employee-table").DataTable().ajax.reload();
+                });
+                var tr = document.createElement("tr");
+                var columns = this.api().init().columns;
+                this.api().columns().every(function (index) {
+                    var column = this;
+                    var td = document.createElement("td");
+                    if (columns[index] && columns[index].searchable) {
+                        var input = document.createElement("input");
+                        input.className = "form-control form-control-sm";
+                        $(input).on("change", function () {
+                            column.search($(this).val(), false, false, true).draw();
+                        }).appendTo(td);
+                    }
+                    $(td).appendTo(tr);
+                });
+                $(".table-responsive table thead").append(tr);
+            }')
+            ->columns($this->getColumns())
             ->orderBy(0, 'ASC');
     }
 

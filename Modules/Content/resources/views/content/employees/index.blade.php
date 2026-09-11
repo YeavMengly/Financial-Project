@@ -42,12 +42,12 @@
                             </div>
                         </div>
                     @endif
-                    <div class="col-sm-4">
+                    {{-- <div class="col-sm-4">
                         <label class="visually-hidden" for="employeeName">{{ __('menus.user.request') }}</label>
                         <input type="text" id="employeeName" name="employeeName" class="form-control"
                             placeholder="{{ __('menus.user.request') }}" value="{{ request('employeeName') }}"
                             data-pristine-required-message="{{ __('messages.required') }}" />
-                    </div>
+                    </div> --}}
                     <div class="col-sm-6">
                         <form action="{{ route('employees.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
