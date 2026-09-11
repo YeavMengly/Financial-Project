@@ -213,7 +213,7 @@
                                 </div>
 
                                 <!-- Title Section -->
-                                <div class="col-xl-4 col-md-6">
+                                {{-- <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <label for="titleInput" class="form-label mb-0">{{ __('forms.title') }}</label>
@@ -237,7 +237,7 @@
                                             <div class="pristine-error text-help">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
 
                             {{-- PROJECT TABLE --}}
