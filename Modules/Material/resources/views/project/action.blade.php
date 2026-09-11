@@ -1,4 +1,4 @@
-@if (hasPermission('project.edit') or hasPermission('project.destroy'))
+@if (hasPermission('project.edit') || hasPermission('project.destroy'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
@@ -6,25 +6,35 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @if (hasPermission('project.index'))
-                    <a download href="{{ asset($module->file) }}" class="dropdown-item"><i class="bx bx-download"></i>
-                        {{ __('buttons.download') }}</a>
+                @php
+                    // Checks if file exists directly under the public/ directory
+                    $hasFile = !empty($module->file) && file_exists(public_path($module->file));
+                    $hasOtherActions = hasPermission('project.edit') || hasPermission('project.destroy');
+                @endphp
+
+                @if (hasPermission('project.index') && $hasFile)
+                    <a download href="{{ asset($module->file) }}" class="dropdown-item">
+                        <i class="bx bx-download"></i>
+                        {{ __('buttons.download') }}
+                    </a>
+
+                    @if ($hasOtherActions)
+                        <hr class="dropdown-divider" />
+                    @endif
                 @endif
-                @if (hasPermission('project.edit') or hasPermission('project.destroy'))
-                    <hr />
-                @endif
+
                 @if (hasPermission('project.edit'))
                     <a href="{{ route('project.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
-                @endif
-                @if (hasPermission('project.edit'))
+
                     <a href="{{ route('project.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}</a>
                 @endif
+
                 @if (hasPermission('project.destroy'))
                     <a href="#"
                         onclick="confirm('{{ route('project.destroy', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 1)"
-                        class="dropdown-item">
+                        class="dropdown-item text-danger">
                         <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
                     </a>
                 @endif
