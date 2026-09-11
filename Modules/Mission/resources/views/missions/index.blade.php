@@ -22,9 +22,9 @@
                 <div class="page-title-right">
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a
-                                    href="javascript: void(0);"><span>{{ __('menus.content') }}</span></a>
-                            </li>
+                            {{-- <li class="breadcrumb-item"><a
+                                    href="javascript: void(0);"><span>{{ __('menus.missions') }}</span></a>
+                            </li> --}}
                             <li class="breadcrumb-item"><a
                                     href="javascript: void(0);"><span>{{ $ministry->year }}</span></a>
                             </li>
@@ -87,12 +87,12 @@
                                     class="form-label font-size-13 text-muted">{{ __('menus.employees') }}</label>
                                 <select class="form-control" name="cboName" id="cboName">
                                     <option value="">{{ __('forms.search...') }}</option>
-                                    {{-- @foreach ($employees as $emp)
+                                    @foreach ($employee as $emp)
                                         <option value="{{ $emp->id }}"
                                             {{ request('cboName') == $emp->id ? 'selected' : '' }}>
                                             {{ $emp->name_kh }} -   {{ $emp->name_latin }}
                                         </option>
-                                    @endforeach --}}
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
