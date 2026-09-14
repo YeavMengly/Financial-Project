@@ -62,10 +62,10 @@ class MissionDataTable extends DataTable
 
         // ===== Filter Data =====
         if ($request->has('cboTodo') && $request->cboTodo != '') {
-            $model->where('missions.is_archived', $request->cboTodo);
+            $model->where('missions.mission_type_is_archived', $request->cboTodo);
         }
         if ($request->has('cboStatus') && $request->cboStatus != '') {
-            $model->where('missions.soft_delete', $request->cboStatus);
+            $model->where('missions.deleted_at', $request->cboStatus);
         }
         if ($request->has('cboName') && $request->cboName != '') {
             $model->where('missions.employee_id', $request->cboName);
@@ -91,11 +91,40 @@ class MissionDataTable extends DataTable
 
         // ===== Select Columns =====   
         $model->select(
-            'missions.*',
+            'missions.id',
+            'missions.ministry_id',
+            'missions.employee_id',
+            'missions.position_id',
+            'missions.level_id',
+            'missions.province_id',
+            'missions.legal_number',
+            'missions.legal_date',
+            'missions.description',
+            'missions.start_date',
+            'missions.end_date',
+            'missions.days_count',
+            'missions.nights_count',
+            'missions.travel_allowance',
+            'missions.pocket_money',
+            'missions.total_pocket_money',
+            'missions.meal_money',
+            'missions.total_meal_money',
+            'missions.accommodation_money',
+            'missions.total_accommodation_money',
+            'missions.mission_type',
+            'missions.mission_type_is_archived',
+            'missions.total',
+            'missions.created_at',
+            'missions.deleted_at',
+
             'ministries.name as ministry_name',
-            'employees.name as employee_name',
+            // 'employees.name_kh as employee_name_kh',
+            'employees.name_kh as employee_name_kh',
+            'employees.name_latin as employee_name_latin',
+
             'positions.name as position_name',
             'levels.name as level_name',
+
             'provinces.name as province_name'
 
         );
@@ -173,7 +202,7 @@ class MissionDataTable extends DataTable
 
             Column::make('legal_number')->title(__('tables.th.legal.number'))->width(30)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(30)->addClass('align-middle'),
-            Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('description')->title(__('tables.th.mission.description'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
 
             Column::computed('action', __('tables.th.action'))

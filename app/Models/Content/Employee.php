@@ -21,16 +21,18 @@ class Employee extends Model
         'account_number',
         'name_kh',
         'name_latin',
+        'position_id'
     ];
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.employee'))
+            ->useLogName(trans('menus.content.employee'))
             ->logOnly([
                 'id_number',
                 'account_number',
                 'name_kh',
                 'name_latin',
+                'position_id'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -44,7 +46,7 @@ class Employee extends Model
     {
         $agent = new Agent();
         $activity->default_field = "{$this->name}";
-        $activity->log_name = trans('menus.employee');
+        $activity->log_name = trans('menus.content.employee');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();
         $activity->device = $agent->device();
