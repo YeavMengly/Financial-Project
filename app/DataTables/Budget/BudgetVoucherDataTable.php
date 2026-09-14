@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
+use Illuminate\Support\Facades\Storage;
 
 class BudgetVoucherDataTable extends DataTable
 {
@@ -64,15 +65,18 @@ class BudgetVoucherDataTable extends DataTable
                 return $notes;
             })
             ->editColumn('attachments', function ($row) {
-                if (!$row->attachments) {
+                if (
+                    empty($row->attachments) ||
+                    !Storage::disk('public')->exists($row->attachments)
+                ) {
                     return '<span class="text-muted">-</span>';
                 }
+
                 $url = asset('storage/' . $row->attachments);
-                $filename = basename($row->attachments);
 
                 return "<a href='{$url}' target='_blank' class='text-primary'>
-                <i class='fas fa-file-alt me-1'></i>Preview
-            </a>";
+        <i class='fas fa-file-alt me-1'></i> Preview
+    </a>";
             })
             ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
