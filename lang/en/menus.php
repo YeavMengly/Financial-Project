@@ -39,6 +39,7 @@ return [
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
     'expense.type' => 'ប្រភេទចំណាយ',
+    'header.expense.type' => 'ឧបសម្ពន្ធ',
 
     'budget.control' => 'និយ័តថវិកា',
     'budget.plan' => 'ចុះបញ្ជី',

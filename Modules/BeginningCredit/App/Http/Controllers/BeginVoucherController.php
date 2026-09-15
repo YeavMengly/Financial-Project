@@ -22,6 +22,7 @@ use App\Models\Content\Cluster;
 use App\Models\Content\ExpenseType;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
+use App\Models\HeaderExpenseType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -779,7 +780,7 @@ class BeginVoucherController extends Controller
     {
         $id   = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
-        $expenseTypes = ExpenseType::all();
+        $headerExpenseType = HeaderExpenseType::all();
         $module = BeginVoucher::where('id', decode_params($budgetAllocationId))
             ->where('ministry_id', $ministry->id)
             ->first();
@@ -788,7 +789,7 @@ class BeginVoucherController extends Controller
             'ministry'   => $ministry,
             'params' => $params,
             'budgetAllocationId' => $budgetAllocationId,
-            'expenseTypes' => $expenseTypes,
+            'headerExpenseType' => $headerExpenseType,
             'module' => $module
         ]);
     }
@@ -806,12 +807,12 @@ class BeginVoucherController extends Controller
         $beginVoucher = BeginVoucher::where('id', decode_params($budgetAllocationId))
             ->where('ministry_id', $ministry->id)
             ->firstOrFail();
-        $expenseTypes = ExpenseType::all();
+        $HeaderExpenseTypes = HeaderExpenseType::all();
         $allocations = BudgetAllocation::where('ministry_id', $ministry->id)
             ->where('budget_begin_voucher_id', $beginVoucher->id)
-            ->selectRaw('budget_expense_type_id, SUM(amount) as total_amount')
-            ->groupBy('budget_expense_type_id', 'budget_begin_voucher_id')
-            ->pluck('total_amount', 'budget_expense_type_id');
+            ->selectRaw('budget_header_expense_type_id, SUM(amount) as total_amount')
+            ->groupBy('budget_header_expense_type_id', 'budget_begin_voucher_id')
+            ->pluck('total_amount', 'budget_header_expense_type_id');
         $allocatedAmount = $allocations->sum();
         $remainingFinLaw = (float) $beginVoucher->fin_law - $allocatedAmount;
 
@@ -819,7 +820,7 @@ class BeginVoucherController extends Controller
             ->with('ministry', $ministry)
             ->with('params', $params)
             ->with('beginVoucher', $beginVoucher)
-            ->with('expenseTypes', $expenseTypes)
+            ->with('HeaderExpenseTypes', $HeaderExpenseTypes)
             ->with('remainingFinLaw', $remainingFinLaw)
             ->with('allocatedAmount', $allocatedAmount)
             ->with('budgetAllocationId', $budgetAllocationId);
@@ -845,7 +846,7 @@ class BeginVoucherController extends Controller
 
     //     $validatedData = $request->validate([
     //         'amount'         => 'required|numeric|min:0.01',
-    //         'cboExpenseType' => 'required|exists:expense_types,id',
+    //         'cboHeaderExpenseType' => 'required|exists:header_expenses_type,id',
     //         'rounds'         => 'nullable|integer|min:1|max:4', // Validate as single integer
     //     ]);
 
@@ -876,7 +877,7 @@ class BeginVoucherController extends Controller
     //         BudgetAllocation::create([
     //             'ministry_id'             => $ministry->id,
     //             'budget_begin_voucher_id' => $beginVoucher->id,
-    //             'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+    //             'budget_header_expense_type_id'  => $validatedData['cboHeaderExpenseType'],
     //             'amount'                  => $validatedData['amount'],
     //             'rounds'                  => $validatedData['rounds'], // Saves as 1, 2, 3, 4, or null
     //         ]);
@@ -911,7 +912,7 @@ class BeginVoucherController extends Controller
         // 1. VALIDATE FIRST! (Do not lock the cache if validation fails)
         $validatedData = $request->validate([
             'amount'         => 'required|numeric|min:0.01',
-            'cboExpenseType' => 'required|exists:expense_types,id',
+            'cboHeaderExpenseType' => 'required|exists:header_expenses_type,id',
             'rounds'         => 'nullable|array',
             'rounds.*'       => 'integer|min:1|max:4',
         ]);
@@ -940,7 +941,7 @@ class BeginVoucherController extends Controller
 
             // 4. Prevent Duplicate Database Entry for ANY of the selected rounds
             $existingAllocation = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
-                ->where('budget_expense_type_id', $validatedData['cboExpenseType'])
+                ->where('budget_header_expense_type_id', $validatedData['cboHeaderExpenseType'])
                 ->where(function ($query) use ($roundsToSave) {
                     if (in_array(null, $roundsToSave, true)) {
                         $query->whereNull('rounds');
@@ -970,7 +971,7 @@ class BeginVoucherController extends Controller
                 BudgetAllocation::create([
                     'ministry_id'             => $ministry->id,
                     'budget_begin_voucher_id' => $beginVoucher->id,
-                    'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+                    'budget_header_expense_type_id'  => $validatedData['cboHeaderExpenseType'],
                     'amount'                  => $validatedData['amount'],
                     'rounds'                  => $round, // Inserts 1, 2, 3, 4, or null
                 ]);
@@ -1005,7 +1006,7 @@ class BeginVoucherController extends Controller
             ->where('ministry_id', decode_params($params))
             ->first();
 
-        $expenseTypes = ExpenseType::whereIn('id', [2, 3, 4, 5, 7])->get();
+        $HeaderExpenseTypes = HeaderExpenseType::whereIn('id', [1,2,3,4])->get();
         // Fetch the specific Budget Allocation entry
         $module = BudgetAllocation::where('id', decode_params($id))
             ->where('budget_begin_voucher_id', $beginVoucher->id)
@@ -1028,7 +1029,7 @@ class BeginVoucherController extends Controller
             ->with('ministry', $ministry)
             ->with('params', $params)
             ->with('beginVoucher', $beginVoucher)
-            ->with('expenseTypes', $expenseTypes)
+            ->with('HeaderExpenseTypes', $HeaderExpenseTypes)
             ->with('budgetAllocationId', $budgetAllocationId)
             ->with('module', $module);
     }
@@ -1046,7 +1047,7 @@ class BeginVoucherController extends Controller
 
         $validatedData = $request->validate([
             'amount'         => 'required|numeric|min:0.01',
-            'cboExpenseType' => 'required|exists:expense_types,id',
+            'cboHeaderExpenseType' => 'required|exists:header_expenses_type,id',
             // 'rounds'         => 'nullable|integer|max:4',
         ]);
 
@@ -1061,7 +1062,7 @@ class BeginVoucherController extends Controller
 
             // 2. Prevent Duplicate Database Entry (IGNORE CURRENT RECORD)
             $existingAllocation = BudgetAllocation::where('budget_begin_voucher_id', $beginVoucher->id)
-                ->where('budget_expense_type_id', $validatedData['cboExpenseType'])
+                ->where('budget_header_expense_type_id', $validatedData['cboHeaderExpenseType'])
                 ->where('id', '!=', $allocation->id) // <--- CRITICAL: Ignore itself
                 ->exists();
 
@@ -1082,7 +1083,7 @@ class BeginVoucherController extends Controller
 
             // 4. Update the allocation
             $allocation->update([
-                'budget_expense_type_id'  => $validatedData['cboExpenseType'],
+                'budget_header_expense_type_id'  => $validatedData['cboHeaderExpenseType'],
                 'amount'                  => $validatedData['amount'],
                 // Add ?? null so it empties the field if user checked the skip button
                 // 'rounds'                  => $validatedData['rounds'] ?? null,

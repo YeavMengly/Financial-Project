@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('budget_begin_voucher_id');
-            $table->unsignedBigInteger('budget_expense_type_id');
+            $table->unsignedBigInteger('budget_header_expense_type_id');
 
             // $table->foreignId('budget_begin_voucher_id')
             //     ->constrained('begin_vouchers')
@@ -33,7 +33,7 @@ return new class extends Migration
 
             $table->unique([
                 'budget_begin_voucher_id',
-                'budget_expense_type_id',
+                'budget_header_expense_type_id',
                 'rounds'
             ]);
 

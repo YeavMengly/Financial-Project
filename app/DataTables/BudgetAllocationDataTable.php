@@ -77,10 +77,10 @@ class BudgetAllocationDataTable extends DataTable
                 'begin_vouchers.agency_id'
             )
             ->leftJoin(
-                'expense_types',
-                'expense_types.id',
+                'header_expenses_type',
+                'header_expenses_type.id',
                 '=',
-                'budget_allocations.budget_expense_type_id'
+                'budget_allocations.budget_header_expense_type_id'
             )
             ->where('begin_vouchers.ministry_id', $id)
             ->where('budget_allocations.budget_begin_voucher_id', $budgetAllocationId)
@@ -93,7 +93,7 @@ class BudgetAllocationDataTable extends DataTable
                 'begin_vouchers.txtDescription',
                 'agencies.name as agency_name',
                 'agencies.no as agency_no',
-                'expense_types.name_kh as expense_type_name',
+                'header_expenses_type.name_kh as expense_type_name',
             ]);
 
         // Apply filter using matching request parameter 'expenseType'
@@ -102,7 +102,7 @@ class BudgetAllocationDataTable extends DataTable
 
             // Skip filter if value is 1 ("All")
             if ($expenseType > 1) {
-                $query->where('budget_allocations.budget_expense_type_id', $expenseType);
+                $query->where('budget_allocations.budget_header_expense_type_id', $expenseType);
             }
         }
         $query->orderBy('begin_vouchers.no', 'ASC');
@@ -124,7 +124,7 @@ class BudgetAllocationDataTable extends DataTable
             ])
             ->ajax([
                 'data' => 'function(d) {
-                d.expenseType = $("#cboExpenseType").val();
+                d.expenseType = $("#cboHeaderExpenseType").val();
             }',
             ])
             ->initComplete('function () {
