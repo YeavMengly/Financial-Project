@@ -212,7 +212,7 @@ class MaterialReleaseController extends Controller
         try {
             $projectId    = $request->input('project_id');
             $subProjectId = $request->input('sub_project_id');
-            $releaseId = $request->input('release_id');
+            $releaseId    = $request->input('release_id');
 
             $projectId    = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
             $subProjectId = ($subProjectId && $subProjectId !== 'null' && $subProjectId !== 'undefined') ? $subProjectId : null;
@@ -231,20 +231,26 @@ class MaterialReleaseController extends Controller
 
             // Get entry IDs for the current edit batch to preserve them during updates
             $existingEntryIds = [];
+            $excludedReleaseIds = [];
+
             if ($releaseId) {
                 $release = MaterialRelease::find($releaseId);
                 if ($release) {
-                    $existingEntryIds = MaterialRelease::where('ministry_id', $release->ministry_id)
+                    $excludedReleaseIds = MaterialRelease::where('ministry_id', $release->ministry_id)
                         ->where('project_id', $release->project_id)
                         ->where('project_sub_id', $release->project_sub_id)
                         ->where('date_release', $release->date_release)
+                        ->pluck('id')
+                        ->toArray();
+
+                    $existingEntryIds = MaterialRelease::whereIn('id', $excludedReleaseIds)
                         ->pluck('material_entry_id')
                         ->filter()
                         ->toArray();
                 }
             }
 
-            // Check if entry qty is greater than total released quantity
+            // Filter material entries that still have remaining request quantity
             $query->where(function ($q) use ($existingEntryIds) {
                 $q->whereRaw('qty > (select coalesce(sum(quantity_request), 0) from material_releases where material_releases.material_entry_id = material_entries.id)');
 
@@ -252,6 +258,9 @@ class MaterialReleaseController extends Controller
                     $q->orWhereIn('id', $existingEntryIds);
                 }
             });
+
+            // Execute query to get entries
+            $materials = $query->get();
 
             // Filter out out-of-stock items dynamically
             $filteredMaterials = $materials->filter(function ($entry) use ($excludedReleaseIds) {
@@ -269,8 +278,11 @@ class MaterialReleaseController extends Controller
 
             return response()->json($filteredMaterials->values());
         } catch (\Throwable $e) {
-            Log::error('getByItemId Error: ' . $e->getMessage());
-            return response()->json([], 500);
+            Log::error('getByItemId Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

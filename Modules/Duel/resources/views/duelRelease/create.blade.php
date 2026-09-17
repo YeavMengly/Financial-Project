@@ -132,10 +132,10 @@
                                         </div>
                                     </div>
 
-                                      <div class="col-xl-3 col-md-4">
+                                    <div class="col-xl-3 col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="agency">{{ __('forms.agency') }} /
-                                                </label>
+                                            </label>
                                             <input type="text" name="agency" required tabindex="3"
                                                 class="form-control"
                                                 data-pristine-required-message="{{ __('messages.required') }}" />
@@ -588,18 +588,43 @@
     </script> --}}
 
     <script>
-        let programSubChoices = new Choices('#cboDuel', {
-            searchEnabled: true,
-            itemSelectText: '',
-            placeholder: true,
-            placeholderValue: "ស្វែងរក..."
+        let programSubChoices = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Stock Dropdown
+            const dropStockNumber = document.getElementById('dropStockNumber');
+            if (dropStockNumber) {
+                new Choices(dropStockNumber, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
+
+            // Initialize Fuel Dropdown
+            const cboDuel = document.getElementById('cboDuel');
+            if (cboDuel) {
+                programSubChoices = new Choices(cboDuel, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
         });
 
-        $('#dropStockNumber').change(function() {
+        // AJAX Handler
+        $('#dropStockNumber').on('change', function() {
             var id = $(this).val();
+
             $.ajax({
                 url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
-                type: 'get',
+                type: 'GET',
                 data: {
                     stock_number: id
                 },
@@ -607,18 +632,21 @@
                     if (programSubChoices) {
                         programSubChoices.destroy();
                     }
+
                     $('#cboDuel').html(data);
+
                     programSubChoices = new Choices('#cboDuel', {
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: "ស្វែងរក..."
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: 'ស្វែងរក...',
+                        shouldSort: false
                     });
                 }
             });
         });
     </script>
-
     <script>
         const titleInput = document.getElementById('title');
         const skipTitleCheckbox = document.getElementById('skipTitle');

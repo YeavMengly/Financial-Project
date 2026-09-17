@@ -142,18 +142,19 @@
                                     </div>
                                 </div>
 
-                                 <div class="col-xl-3 col-md-4">
-                                        <div class="form-group mb-3">
-                                            <label for="agency">{{ __('forms.agency') }} 
-                                                </label>
-                                            <input type="text" name="agency"​ value="{{old('agency', $duelRelease->agency)}}" required tabindex="3"
-                                                class="form-control"
-                                                data-pristine-required-message="{{ __('messages.required') }}" />
-                                            @error('agency')
-                                                <div class="pristine-error text-help">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+                                <div class="col-xl-3 col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="agency">{{ __('forms.agency') }}
+                                        </label>
+                                        <input type="text" name="agency"​
+                                            value="{{ old('agency', $duelRelease->agency) }}" required tabindex="3"
+                                            class="form-control"
+                                            data-pristine-required-message="{{ __('messages.required') }}" />
+                                        @error('agency')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
                                     </div>
+                                </div>
 
 
                                 {{-- AGENCY --}}
@@ -332,29 +333,12 @@
     </script>
 
     <script>
-        // 1. Declare globally at the top of your scripts
         let programSubChoices = null;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropStockNumber = document.getElementById('dropStockNumber');
-            new Choices(dropStockNumber, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-
-            const dropAgency = document.getElementById('dropAgency');
-            new Choices(dropAgency, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholderValue: 'ជ្រើសរើស',
-                searchPlaceholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-
-            // 2. Assign to the global variable instead of a local const
+        function initDuelChoices() {
+            if (programSubChoices) {
+                programSubChoices.destroy();
+            }
             const cboDuel = document.getElementById('cboDuel');
             if (cboDuel) {
                 programSubChoices = new Choices(cboDuel, {
@@ -365,39 +349,66 @@
                     shouldSort: false
                 });
             }
-        });
+        }
 
-        $('#dropStockNumber').change(function() {
-            var id = $(this).val();
+        function fetchDuelItems(stockId, selectedId = null) {
+            if (!stockId) return;
+
             $.ajax({
                 url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
-                type: 'get',
+                type: 'GET',
                 data: {
-                    stock_number: id
+                    stock_number: stockId,
+                    selected_id: selectedId,
+                    is_edit: 1 // Force controller to return ALL fuel types in Edit Mode
                 },
                 success: function(data) {
-                    // 3. Now safely destroy the previous Choices instance
                     if (programSubChoices) {
                         programSubChoices.destroy();
                     }
                     $('#cboDuel').html(data);
-                    programSubChoices = new Choices('#cboDuel', {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholderValue: 'ជ្រើសរើស',
-                        searchPlaceholderValue: "ស្វែងរក...",
-                        shouldSort: false
-                    });
+                    initDuelChoices();
                 }
             });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropStockNumber = document.getElementById('dropStockNumber');
+            if (dropStockNumber) {
+                new Choices(dropStockNumber, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
+
+            const dropAgency = document.getElementById('dropAgency');
+            if (dropAgency) {
+                new Choices(dropAgency, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
+
+            initDuelChoices();
+
+            // Load Edit Mode Items
+            const stockId = $('#dropStockNumber').val();
+            const currentSelectedItem = "{{ $duelRelease->item_name ?? '' }}";
+
+            if (stockId) {
+                fetchDuelItems(stockId, currentSelectedItem);
+            }
         });
 
-        // Auto trigger change once on edit
-        document.addEventListener('DOMContentLoaded', function() {
-            const stockSelect = document.getElementById('dropStockNumber');
-            if (stockSelect && stockSelect.value) {
-                $('#dropStockNumber').trigger('change');
-            }
+        $('#dropStockNumber').on('change', function() {
+            var stockId = $(this).val();
+            fetchDuelItems(stockId, null);
         });
     </script>
 
@@ -471,102 +482,7 @@
 
         });
     </script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            // 1. Grab the saved values from your database/old input
-            // Replace `$duelRelease->executive_unit_id` with your actual variable
-            const initialAgencyId = $('#cboAgency').val();
-            const initialExecutiveId = "{{ old('cboExecutive', $duelRelease->executive_unit_id ?? '') }}";
-
-            // ========= Choices Instances =========
-            let executiveChoices = new Choices('#cboExecutive', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក..."
-            });
-
-            // ========= Helpers =========
-            function resetSelect(selector) {
-                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
-            }
-
-            function resetChoices(selector, instance) {
-                instance.destroy();
-                return new Choices(selector, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក..."
-                });
-            }
-
-            function loadOptions({
-                url,
-                data,
-                targetSelect,
-                instanceRefSetter,
-                selectedValue
-            }) {
-                $.ajax({
-                    url,
-                    type: "GET",
-                    data,
-                    success: function(html) {
-                        // Populate the HTML
-                        $(targetSelect).html(html);
-
-                        // Re-initialize Choices.js
-                        instanceRefSetter();
-
-                        // 2. If an initial value was passed, set it in Choices.js
-                        if (selectedValue) {
-                            executiveChoices.setChoiceByValue(selectedValue.toString());
-                        }
-                    },
-                    error: function() {
-                        resetSelect(targetSelect);
-                    }
-                });
-            }
-
-            // ========= Script: Agency -> Executive Unit =========
-            // Added selectedExecutiveId parameter with a default of null
-            function handleAgencyChange(agencyId, selectedExecutiveId = null) {
-                resetSelect('#cboExecutive');
-                executiveChoices = resetChoices('#cboExecutive', executiveChoices);
-
-                if (!agencyId) return;
-
-                loadOptions({
-                    url: "{{ route('duelRelease.by.executive') }}",
-                    data: {
-                        agency_id: agencyId
-                    },
-                    targetSelect: '#cboExecutive',
-                    selectedValue: selectedExecutiveId, // Pass the value to the helper
-                    instanceRefSetter: () => {
-                        executiveChoices = resetChoices('#cboExecutive', executiveChoices);
-                    }
-                });
-            }
-
-            // ========= Events =========
-            $('#cboAgency').on('change', function() {
-                const agencyId = $(this).val();
-                // On manual change by the user, don't pre-select an executive unit
-                handleAgencyChange(agencyId, null);
-            });
-
-            // ========= Initialization for Edit View =========
-            // 3. If there is a saved Agency ID on page load, trigger the change automatically
-            if (initialAgencyId) {
-                handleAgencyChange(initialAgencyId, initialExecutiveId);
-            }
-
-        });
-    </script> --}}
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
