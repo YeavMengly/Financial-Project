@@ -116,7 +116,7 @@ return [
     'expense.type' => 'ប្រភេទចំណាយ',
     'type' => 'ប្រភេទ',
     'th.code' => 'លេខកូដសម្គាល់',
-    'header.expense.type' => 'ឧបសម្ពន្ធ',
+    'header.expense.type' => 'ឧបសម្ព័ន្ធ',
 
     'add' => 'បន្ថែមថ្មី',
     'remove' => 'លុបចោល',

@@ -12,6 +12,13 @@
                         <span data-key="t-dashboard">{{ __('menus.dashboard') }}</span>
                     </a>
                 </li>
+                 <li class="{{ Request::routeIs('dashboardSecond.*') ? 'mm-active' : '' }}">
+                    <a href="{{ route('dashboardSecond.index') }}"
+                        class="{{ Request::routeIs('dashboardSecond.*') ? 'active' : '' }}">
+                        <i data-feather="home"></i>
+                        <span data-key="t-dashboard">{{ __('menus.dashboard.second') }}</span>
+                    </a>
+                </li>
 
                 {{-- ========== Credit ========== --}}
                 <li class="menu-title" data-key="t-inventory">{{ __('menus.inventory') }}</li>

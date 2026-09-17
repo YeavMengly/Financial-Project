@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Content\App\Http\Controllers\ProgramController;
 use Modules\Dashboard\App\Http\Controllers\DashboardController;
+use Modules\Dashboard\App\Http\Controllers\DashboardSecondController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +28,12 @@ Route::prefix('dashboard')->middleware(['auth'])->group(function () {
             ->name("dashboard.account.subs");
     });
 });
-
-
+Route::prefix('dashboard_second')->middleware(['auth'])->group(function () {
+    Route::controller(DashboardSecondController::class)->group(function () {
+        Route::get("/", "index")->name("dashboardSecond.index");
+        
+    });
+});
 Route::get('/program-sub/{program}', [DashboardController::class, 'getProgramSubs']);
 Route::get(
     '/dashboard/program-sub/{programSub}/clusters',
