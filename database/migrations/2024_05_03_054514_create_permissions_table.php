@@ -243,6 +243,14 @@ return new class extends Migration
                 'delete' => 'expenseType.destroy',
             ],
 
+            'content.employee'                  => [
+                'view'   => 'employees.index',
+                'create' => 'employees.create',
+                'edit'   => 'employees.edit',
+                'delete' => 'employees.destroy',
+                'import' => 'employees.import'
+            ],
+
             // Project
             'project'                  => [
                 'show'   => 'initialProject.index',

@@ -631,11 +631,11 @@
                                 </a>
                             </li>
                         @endif
-                          @if (hasPermission('ministries.index'))
+                        @if (hasPermission('ministries.index'))
                             <li>
                                 <a href="{{ route('employees.index') }}"
                                     class="{{ Request::routeIs('employees.*') ? 'active' : '' }}">
-                                    <i data-feather="layers" ></i>
+                                    <i data-feather="layers"></i>
                                     {{ __('menus.content.employee') }}
                                 </a>
                             </li>
