@@ -10,6 +10,7 @@ use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
@@ -161,6 +162,8 @@ class MissionDataTable extends DataTable
         $model->leftJoin('provinces', 'missions.province_id', '=', 'provinces.id');
         $model->leftJoin('documents', 'missions.document_id', '=', 'documents.id');
 
+        $model->leftJoin('mission_employees', 'missions.id', '=', 'mission_employees.mission_id');
+
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
                 $model->where('missions.payment_is_archived', 1);
@@ -267,6 +270,36 @@ class MissionDataTable extends DataTable
             'missions.created_at',
             'missions.deleted_at',
 
+
+            // Count employees in this mission
+            DB::raw('COUNT(mission_employees.id) as employee_count'),
+
+        ]);
+
+        // ===== Group By =====
+
+        $model->groupBy([
+            'missions.id',
+            'missions.ministry_id',
+            'missions.document_id',
+            'missions.leader_id',
+            'missions.province_id',
+            'missions.legal_number',
+            'missions.legal_date',
+            'missions.description',
+            'missions.start_date',
+            'missions.end_date',
+            'missions.days_count',
+            'missions.nights_count',
+            'missions.mission_type',
+            'missions.mission_type_is_archived',
+            'missions.fileName',
+            'missions.payment_status',
+            'missions.payment_is_archived',
+            'documents.name',
+            'provinces.name',
+            'missions.created_at',
+            'missions.deleted_at',
         ]);
 
         // ===== Order =====
@@ -407,6 +440,11 @@ class MissionDataTable extends DataTable
 
             Column::make('province_name')
                 ->title(__('tables.th.province'))
+                ->width(150)
+                ->addClass('align-middle'),
+
+            Column::make('employee_count')
+                ->title(__('tables.th.mission.employee.count'))
                 ->width(150)
                 ->addClass('align-middle'),
 

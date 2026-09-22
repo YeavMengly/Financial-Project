@@ -640,10 +640,6 @@
                                     {{ __('buttons.save') }}
                                 </button>
 
-                                <button class="btn btn-info" type="submit" name="submit" value="save_create">
-                                    {{ __('buttons.save.create') }}
-                                </button>
-
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                     <i class="bi bi-arrow-clockwise"></i>
                                     {{ __('buttons.delete') }}
