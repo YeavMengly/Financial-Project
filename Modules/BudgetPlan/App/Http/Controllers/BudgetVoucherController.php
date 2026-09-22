@@ -423,7 +423,7 @@ class BudgetVoucherController extends Controller
             'requestDate'      => 'required|date',
             'legalDate'        => 'required|date',
         ]);
-dd($validated);
+
         DB::beginTransaction();
         try {
             // Decode ministry parameters and fetch target record
@@ -539,6 +539,196 @@ dd($validated);
             return back()->withInput();
         }
     }
+    // public function store(Request $request, $params)
+    // {
+    //     try {
+
+    //         // STEP 1
+    //         Log::info('BudgetVoucher STORE - START', [
+    //             'params' => $params,
+    //             'request' => $request->except('attachments'),
+    //         ]);
+
+    //         // STEP 2
+    //         $validated = $request->validate([
+    //             'legalID'          => 'required',
+    //             'paymentVoucher'   => 'required',
+    //             'legalNumber'      => 'nullable|string',
+    //             'legalName'        => 'nullable|string',
+    //             'cboProgram'       => 'required',
+    //             'cboProgramSub'    => 'required',
+    //             'cboCluster'       => 'required',
+    //             'cboAgency'        => 'required',
+    //             'cboSubAccount'    => 'required',
+    //             'budget'           => 'required|numeric|min:0',
+    //             'cboExpenseType'   => 'required',
+    //             'txtDescription'   => 'required',
+    //             'attachments'      => 'required|file|max:51200',
+    //             'transactionDate'  => 'required|date',
+    //             'requestDate'      => 'required|date',
+    //             'legalDate'        => 'required|date',
+    //         ]);
+
+    //         Log::info('BudgetVoucher STORE - VALIDATION PASSED', $validated);
+
+    //         DB::beginTransaction();
+
+    //         // STEP 3
+    //         $id = decode_params($params);
+
+    //         Log::info('Decoded ministry ID', [
+    //             'id' => $id,
+    //         ]);
+
+    //         $ministry = Ministry::where('id', $id)->first();
+
+    //         if (!$ministry) {
+    //             throw new \Exception("Ministry not found. ID: {$id}");
+    //         }
+
+    //         Log::info('Ministry found', [
+    //             'ministry_id' => $ministry->id,
+    //         ]);
+
+    //         // STEP 4
+    //         $beginVoucher = beginVoucher::where('account_sub_id', $validated['cboSubAccount'])
+    //             ->where('program_id', $validated['cboProgram'])
+    //             ->where('program_sub_id', $validated['cboProgramSub'])
+    //             ->where('cluster_id', $validated['cboCluster'])
+    //             ->where('ministry_id', $ministry->id)
+    //             ->first();
+
+    //         Log::info('Begin voucher lookup', [
+    //             'begin_voucher_id' => $beginVoucher?->id,
+    //             'account_sub_id'   => $validated['cboSubAccount'],
+    //             'program_id'       => $validated['cboProgram'],
+    //             'program_sub_id'   => $validated['cboProgramSub'],
+    //             'cluster_id'       => $validated['cboCluster'],
+    //             'ministry_id'      => $ministry->id,
+    //         ]);
+
+    //         if (!$beginVoucher) {
+    //             throw new \Exception('Begin voucher not found.');
+    //         }
+
+    //         // STEP 5
+    //         $applyValue = (float) $validated['budget'];
+    //         $currentCredit = (float) ($beginVoucher->credit ?? 0);
+    //         $remainingCredit = $currentCredit - $applyValue;
+
+    //         Log::info('Credit check', [
+    //             'credit'    => $currentCredit,
+    //             'budget'    => $applyValue,
+    //             'remaining' => $remainingCredit,
+    //         ]);
+
+    //         if ($remainingCredit < 0) {
+    //             throw new \Exception('ឥណទានមិនគ្រប់គ្រាន់។');
+    //         }
+
+    //         // STEP 6
+    //         $path_store = 'uploads/voucher/' . date('Y-m-d');
+
+    //         if (!File::exists(public_path($path_store))) {
+    //             File::makeDirectory(
+    //                 public_path($path_store),
+    //                 0777,
+    //                 true,
+    //                 true
+    //             );
+    //         }
+
+    //         Log::info('Uploading attachment');
+
+    //         $filePath = $request->file('attachments')
+    //             ->store($path_store, 'public');
+
+    //         Log::info('Attachment stored', [
+    //             'filePath' => $filePath,
+    //         ]);
+
+    //         // STEP 7
+    //         Log::info('Creating BudgetVoucher');
+
+    //         $budgetVoucher = BudgetVoucher::create([
+    //             'ministry_id'            => $ministry->id,
+    //             'agency_id'              => $validated['cboAgency'],
+    //             'program_id'             => $validated['cboProgram'],
+    //             'program_sub_id'         => $validated['cboProgramSub'],
+    //             'cluster_id'             => $validated['cboCluster'],
+    //             'account_sub_id'         => $validated['cboSubAccount'],
+    //             'no'                     => $beginVoucher->no,
+    //             'fin_law'                => $beginVoucher->fin_law,
+    //             'budget'                 => $applyValue,
+    //             'header_expense_type_id' => $validated['cboHeaderExpenseType'] ?? null,
+    //             'expense_type_id'        => $validated['cboExpenseType'],
+    //             'legal_id'               => $validated['legalID'],
+    //             'payment_voucher_number' => $validated['paymentVoucher'],
+    //             'legal_number'           => $validated['legalNumber'] ?? null,
+    //             'legal_name'             => $validated['legalName'] ?? null,
+    //             'status'                 => 'todo',
+    //             'is_archived'            => 1,
+    //             'description'            => strip_tags($validated['txtDescription']),
+    //             'attachments'            => $filePath,
+    //             'transaction_date'       => $validated['transactionDate'],
+    //             'request_date'           => $validated['requestDate'],
+    //             'legal_date'             => $validated['legalDate'],
+    //         ]);
+
+    //         Log::info('BudgetVoucher CREATED', [
+    //             'id' => $budgetVoucher->id,
+    //         ]);
+
+    //         $this->recalculateAndSaveReport($beginVoucher);
+
+    //         $beginVoucher->refresh();
+
+    //         $lastVoucher = BudgetVoucher::where('account_sub_id', $validated['cboSubAccount'])
+    //             ->where('program_id', $validated['cboProgram'])
+    //             ->where('program_sub_id', $validated['cboProgramSub'])
+    //             ->where('cluster_id', $validated['cboCluster'])
+    //             ->where('agency_id', $validated['cboAgency'])
+    //             ->latest()
+    //             ->first();
+
+    //         $beginVoucher->apply = $lastVoucher?->budget ?? 0;
+    //         $beginVoucher->save();
+
+    //         DB::commit();
+
+    //         Log::info('BudgetVoucher STORE - SUCCESS');
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 2000)
+    //             ->success('success_msg', 'successful')
+    //             ->flash();
+
+    //         if ($request->has('submit')) {
+    //             return redirect()->route('budgetVoucher.index', $params);
+    //         }
+
+    //         return redirect()->route('budgetVoucher.create', $params);
+    //     } catch (\Throwable $e) {
+
+    //         DB::rollBack();
+
+    //         Log::error('BudgetVoucher store failed', [
+    //             'message' => $e->getMessage(),
+    //             'file'    => $e->getFile(),
+    //             'line'    => $e->getLine(),
+    //             'trace'   => $e->getTraceAsString(),
+    //         ]);
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 5000)
+    //             ->error($e->getMessage(), 'បញ្ហា')
+    //             ->flash();
+
+    //         return back()->withInput();
+    //     }
+    // }
 
     /**
      *  Show the form for editing the specified resource.

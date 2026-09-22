@@ -17,7 +17,7 @@
 
                 <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
                     <i class="fa fa-arrow-left me-1"></i>
-                    ត្រឡប់
+                    {{ __('buttons.back') }}
                 </a>
             </div>
 
@@ -28,7 +28,7 @@
                     {{-- Legal Number --}}
                     <div class="col-md-4 mb-3">
                         <label class="fw-bold">
-                            លេខលិខិត
+                            {{ __('tables.th.legal.id') }}
                         </label>
 
                         <div class="mt-1">
@@ -39,7 +39,7 @@
                     {{-- Legal Date --}}
                     <div class="col-md-4 mb-3">
                         <label class="fw-bold">
-                            កាលបរិច្ឆេទលិខិត
+                            {{ __('tables.th.date.legal') }}
                         </label>
 
                         <div class="mt-1">
@@ -50,7 +50,7 @@
                     {{-- Province --}}
                     <div class="col-md-4 mb-3">
                         <label class="fw-bold">
-                            ខេត្ត/រាជធានី
+                            {{ __('tables.th.province') }}
                         </label>
 
                         <div class="mt-1">
@@ -61,7 +61,7 @@
                     {{-- Start Date --}}
                     <div class="col-md-4 mb-3">
                         <label class="fw-bold">
-                            ថ្ងៃចាប់ផ្តើម
+                            {{ __('tables.th.start.date') }}
                         </label>
 
                         <div class="mt-1">
@@ -72,7 +72,7 @@
                     {{-- End Date --}}
                     <div class="col-md-4 mb-3">
                         <label class="fw-bold">
-                            ថ្ងៃបញ្ចប់
+                            {{ __('tables.th.end.date') }}
                         </label>
 
                         <div class="mt-1">
@@ -83,7 +83,7 @@
                     {{-- Days --}}
                     <div class="col-md-2 mb-3">
                         <label class="fw-bold">
-                            ចំនួនថ្ងៃ
+                            {{ __('tables.th.days.count') }}
                         </label>
 
                         <div class="mt-1">
@@ -94,7 +94,7 @@
                     {{-- Nights --}}
                     <div class="col-md-2 mb-3">
                         <label class="fw-bold">
-                            ចំនួនយប់
+                            {{ __('tables.th.nights.count') }}
                         </label>
 
                         <div class="mt-1">
@@ -105,7 +105,7 @@
                     {{-- Mission Type --}}
                     <div class="col-md-4 mb-3">
                         <label class="fw-bold">
-                            ប្រភេទបេសកកម្ម
+                            {{ __('tables.th.mission.type') }}
                         </label>
 
                         <div class="mt-1">
@@ -122,7 +122,7 @@
                     {{-- Description --}}
                     <div class="col-md-8 mb-3">
                         <label class="fw-bold">
-                            សេចក្តីពិពណ៌នា
+                            {{ __('tables.th.mission.description') }}
                         </label>
 
                         <div class="mt-1">
@@ -141,7 +141,7 @@
 
             <div class="card-header">
                 <h5 class="mb-0">
-                   {{ __('forms.mission.employee') }}
+                    {{ __('forms.mission.employee') }}
                 </h5>
             </div>
 
@@ -166,7 +166,7 @@
                                 <th class="text-end">ប្រាក់ស្នាក់នៅ</th>
                                 <th class="text-end">សរុបប្រាក់ស្នាក់នៅ</th>
                                 <th class="text-end">សរុប</th>
-                                <th class="text-center">បែងចែកថវិកា</th>
+                                <th class="text-center"> {{ __('forms.assign') }}</th>
                             </tr>
                         </thead>
 
@@ -198,7 +198,7 @@
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->travel_allowance ?? 0) }}
+                                            {{ number_format($item->travel_allowance ?? 0) }} 
                                         </td>
 
                                         <td class="text-end">
@@ -233,7 +233,7 @@
 
                                             @if ($item->assign_budget)
                                                 <span class="badge bg-success">
-                                                    បាទ/ចាស
+                                                    អ្នកទទួល
                                                 </span>
                                             @else
                                                 <span class="badge bg-secondary">
@@ -250,7 +250,7 @@
 
                                 <tr>
                                     <td colspan="14" class="text-center text-muted py-3">
-                                        មិនមានទិន្នន័យមន្ត្រីទេ
+                                        {{ __('forms.mission.employee') }}
                                     </td>
                                 </tr>
                             @endforelse

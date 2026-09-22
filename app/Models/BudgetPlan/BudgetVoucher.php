@@ -47,7 +47,10 @@ class BudgetVoucher extends Model
     ];
 
     protected $casts = [
-        'date'        => 'date',
+        'transaction_date'  => 'date',
+        'request_date'  => 'date',
+        'legal_date'        => 'date',
+        'attachments' => 'array',
     ];
 
     /* -----------------------------------------------------------------

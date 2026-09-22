@@ -265,8 +265,7 @@
 
                                     <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
                                     <input type="file" id="fileInput" name="attachments" class="form-control"
-                                        accept=".pdf,.doc,.docx" required
-                                        data-allowed-extensions="pdf,doc,docx"
+                                        accept=".pdf,.doc,.docx" required data-allowed-extensions="pdf,doc,docx"
                                         data-pristine-required-message="{{ __('messages.required') }}" />
                                     <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
                                         file)</small>
@@ -291,13 +290,18 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <button class="btn btn-primary" type="submit" name="action" value="save">
+                            {{-- <button class="btn btn-primary" type="submit" name="action" value="save">
                                 {{ __('buttons.save') }}
                             </button>
 
                             <button class="btn btn-info" type="submit" name="action" value="save_create">
                                 {{ __('buttons.save.create') }}
-                            </button>
+                            </button> --}}
+
+                            <button class="btn btn-primary" type="submit" name="submit"
+                                value="save">{{ __('buttons.save') }}</button>
+                            <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
+
 
                             <a href="{{ url()->current() }}" class="btn btn-danger">
                                 <i class="bi bi-arrow-clockwise"></i>
