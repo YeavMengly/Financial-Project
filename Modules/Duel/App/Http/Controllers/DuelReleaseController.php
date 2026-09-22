@@ -61,25 +61,48 @@ class DuelReleaseController extends Controller
     {
         if ($request->stock_number) {
             $ministryId = decode_params($params);
-            $data = DuelEntry::select(
-                'duel_entries.id',
-                'duel_entries.project_id',
-                'duel_entries.item_name',
-                'duel_types.name_km'
-            )
-                ->leftJoin('duel_types', 'duel_entries.item_name', '=', 'duel_types.id')
-                ->where('duel_entries.ministry_id', $ministryId)
-                ->orderBy('duel_entries.item_name', 'asc')
-                ->get();
             $selectedId = $request->selected_id ?? null;
 
-            foreach ($data as $d) {
-                $selected = $selectedId == $d->stock_number ? 'selected' : '';
-                echo "<option value='{$d->item_name}' {$selected}>{$d->name_km}</option>";
-            }
-        }
-    }
+            // Check if explicit edit flag is set OR if a selected_id is provided
+            $isEditMode = $request->has('is_edit') ? (bool) $request->is_edit : !empty($selectedId);
 
+            // Fetch ALL master fuel types
+            $fuelTypes = DuelType::orderBy('id', 'asc')->get();
+
+            $options = '<option value="">' . __('forms.search...') . '</option>';
+
+            foreach ($fuelTypes as $type) {
+                if ($isEditMode) {
+                    // EDIT MODE: Always show ALL fuel types regardless of stock level
+                    $selected = ($selectedId == $type->id) ? 'selected' : '';
+                    $options .= "<option value='{$type->id}' {$selected}>{$type->name_km}</option>";
+                } else {
+                    // CREATE MODE: Calculate stock and only show items with remainingStock > 0
+                    $totalEntry = (float) DuelEntry::where('ministry_id', $ministryId)
+                        ->where('project_id', $request->stock_number)
+                        ->where('item_name', $type->id)
+                        ->whereNull('deleted_at')
+                        ->sum('quantity');
+
+                    $totalReleased = (float) DuelRelease::where('ministry_id', $ministryId)
+                        ->where('project_id', $request->stock_number)
+                        ->where('item_name', $type->id)
+                        ->whereNull('deleted_at')
+                        ->sum('quantity_request');
+
+                    $remainingStock = $totalEntry - $totalReleased;
+
+                    if ($remainingStock > 0) {
+                        $options .= "<option value='{$type->id}'>{$type->name_km}</option>";
+                    }
+                }
+            }
+
+            return response($options);
+        }
+
+        return response('<option value="">' . __('forms.search...') . '</option>');
+    }
     public function getByAgencyId(Request $request)
     {
         if ($request->agency_id) {
@@ -143,7 +166,7 @@ class DuelReleaseController extends Controller
             ->where('duel_entries.ministry_id', $ministry->id)
             ->whereNull('projects.deleted_at')
             ->whereNull('duel_entries.deleted_at') // Fix: Added table prefix to prevent ambiguous column error
-            ->orderBy('duel_entries.created_at', 'asc') // Optional: Ensure you get the latest entry per project
+            ->orderBy('duel_entries.created_at', 'desc') // Optional: Ensure you get the latest entry per project
             ->get()
             ->unique('project_id')
             ->values();
@@ -162,10 +185,6 @@ class DuelReleaseController extends Controller
             ->with('agency', $agency)
             ->with('params', $params);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
 
     public function store(Request $request, $params)
     {
@@ -397,34 +416,43 @@ class DuelReleaseController extends Controller
      */
     public function edit($params, $id)
     {
-        $ministry   = Ministry::where('id',  decode_params($params))->first();
-        $duelType = DuelType::orderBy('id', 'asc')->get();
+        $ministry = Ministry::where('id', decode_params($params))->firstOrFail();
+        $releaseId = decode_params($id);
 
-        // 1. Fetch the specific record you are editing
-        $duelRelease = DuelRelease::where('id', decode_params($id))
+        // 1. Fetch the specific record being edited
+        $duelRelease = DuelRelease::where('id', $releaseId)
             ->where('ministry_id', $ministry->id)
-            ->first();
+            ->firstOrFail();
 
-        // dd($duelRelease);
-        $unitType   = UnitType::where('name', 'លីត្រ')->get();
-        // 2. Get an array of all project IDs for this ministry
-        $projectIds = Projects::where('ministry_id', $ministry->id)->pluck('id');
+        // 2. Fetch all fuel types
+        $duelType = DuelType::all();
+        $unitType = UnitType::where('name', 'លីត្រ')->get();
+        $agency   = Agency::where('ministry_id', $ministry->id)->get();
 
+        // 3. Fetch project options for the Stock Number dropdown
         $duelEntry = DuelEntry::select(
+            'duel_entries.id',
             'duel_entries.project_id',
-            // 'duel_entries',
+            'duel_entries.ministry_id',
             'projects.stock_number',
             'projects.stock_name',
             'projects.title as project_title'
         )
-            ->where('duel_entries.ministry_id', $ministry->id)
             ->leftJoin('projects', 'duel_entries.project_id', '=', 'projects.id')
+            ->where('duel_entries.ministry_id', $ministry->id)
             ->whereNull('projects.deleted_at')
+            ->whereNull('duel_entries.deleted_at')
+            ->groupBy(
+                'duel_entries.id',
+                'duel_entries.project_id',
+                'duel_entries.ministry_id',
+                'projects.stock_number',
+                'projects.stock_name',
+                'projects.title'
+            )
             ->get()
             ->unique('project_id')
             ->values();
-        // 4. Fetch the agency list for your other dropdown
-        $agency = Agency::where('ministry_id', $ministry->id)->get();
 
         return view('duel::duelRelease.edit')
             ->with('duelRelease', $duelRelease)

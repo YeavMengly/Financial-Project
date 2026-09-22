@@ -426,51 +426,63 @@
         });
     </script>
 
-    {{-- <script>
-        let cboDuelChoice = new Choices('#cboDuel', {
-            searchEnabled: true,
-            itemSelectText: '',
-            placeholder: true,
-            placeholderValue: "ស្វែងរក..."
+    <script>
+        let programSubChoices = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Stock Dropdown
+            const dropStockNumber = document.getElementById('dropStockNumber');
+            if (dropStockNumber) {
+                new Choices(dropStockNumber, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
+
+            // Initialize Fuel Dropdown
+            const cboDuel = document.getElementById('cboDuel');
+            if (cboDuel) {
+                programSubChoices = new Choices(cboDuel, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false
+                });
+            }
         });
 
-        $('#dropStockNumber').change(function() {
+        // AJAX Handler
+        $('#dropStockNumber').on('change', function() {
             var id = $(this).val();
+
             $.ajax({
-                url: '{{ route('duelRelease.by.get.stock_number', ['params' => $params]) }}',
-                type: 'get',
+                url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
+                type: 'GET',
                 data: {
                     stock_number: id
                 },
                 success: function(data) {
-                    if (cboDuelChoice) {
-                        cboDuelChoice.destroy();
+                    if (programSubChoices) {
+                        programSubChoices.destroy();
                     }
+
                     $('#cboDuel').html(data);
-                    cboDuelChoice = new Choices('#cboDuel', {
+
+                    programSubChoices = new Choices('#cboDuel', {
                         searchEnabled: true,
                         itemSelectText: '',
                         placeholder: true,
-                        placeholderValue: "ស្វែងរក..."
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: 'ស្វែងរក...',
+                        shouldSort: false
                     });
                 }
-            });
-        });
-    </script> --}}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            // ==========================================
-            // 1. Initialize Choices.js
-            // ==========================================
-
-            let cboDuelChoice = new Choices('#cboDuel', {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: "ស្វែងរក...",
-                allowHTML: false
             });
 
 
@@ -661,7 +673,6 @@
 
         });
     </script>
-
     <script>
         const titleInput = document.getElementById('title');
         const skipTitleCheckbox = document.getElementById('skipTitle');

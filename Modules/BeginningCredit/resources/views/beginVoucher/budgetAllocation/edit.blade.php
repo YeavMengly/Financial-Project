@@ -105,19 +105,19 @@
 
                             <div class="col-md-12">
                                 <div class="form-group mb-3">
-                                    <label>{{ __('forms.expense.type') }}</label>
-                                    <!-- Updated name from 'cboExpenseType' to 'expense_type_id' -->
-                                    <select class="form-control" data-trigger id="cboExpenseType" name="cboExpenseType"
+                                    <label>{{ __('forms.header.expense.type') }}</label>
+                                    <!-- Updated name from 'cboHeaderExpenseType' to 'expense_type_id' -->
+                                    <select class="form-control" data-trigger id="cboHeaderExpenseType" name="cboHeaderExpenseType"
                                         required data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($expenseTypes as $item)
+                                        @foreach ($HeaderExpenseTypes as $item)
                                             <option value="{{ $item->id }}"
-                                                {{ $module->budget_expense_type_id == $item->id ? 'selected' : '' }}>
+                                                {{ $module->budget_header_expense_type_id == $item->id ? 'selected' : '' }}>
                                                 {{ $item->name_kh }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('cboExpenseType')
+                                    @error('cboHeaderExpenseType')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>

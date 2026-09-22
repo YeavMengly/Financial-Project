@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\BeginCredit\BeginMandate;
 use App\Models\BeginCredit\BeginVoucher;
-use App\Models\Content\ExpenseType;
+use App\Models\HeaderExpenseType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
@@ -19,7 +19,7 @@ class BudgetAllocation extends Model
     protected $fillable = [
         'ministry_id',
         'budget_begin_voucher_id',
-        'budget_expense_type_id',
+        'budget_header_expense_type_id',
         'amount',
         'rounds'
     ];
@@ -39,8 +39,8 @@ class BudgetAllocation extends Model
     public function expenseType()
     {
         return $this->belongsTo(
-            ExpenseType::class,
-            'budget_expense_type_id',
+            HeaderExpenseType::class,
+            'budget_header_expense_type_id',
             'id'
         );
     }
@@ -55,7 +55,7 @@ class BudgetAllocation extends Model
             ->logOnly([
                 'ministry_id',
                 'budget_begin_voucher_id',
-                'budget_expense_type_id',
+                'budget_header_expense_type_id',
                 'amount',
             ])
             ->logOnlyDirty()

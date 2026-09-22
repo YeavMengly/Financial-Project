@@ -6,15 +6,22 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-            @if (hasPermission('budgetMandate.index'))
+                @php
+                    // Checks if file exists directly under the public/ directory
+                    $hasFile = !empty($module->attachments) && file_exists(public_path($module->attachments));
+                    $hasOtherActions = hasPermission('budgetMandate.edit') || hasPermission('budgetMandate.destroy');
+                @endphp
+                @if (hasPermission('budgetMandate.index') && $hasFile)
                     <a download href="{{ asset($module->attachments) }}" class="dropdown-item"><i
                             class="bx bx-download"></i>
                         {{ __('buttons.download') }}</a>
+                    @if ($hasOtherActions)
+                        <hr class="dropdown-divider" />
+                    @endif
                 @endif
                 @if (hasPermission('budgetMandate.edit') or
                         hasPermission('budgetMandate.edit.doc') or
                         hasPermission('budgetMandate.destroy'))
-                    <hr />
                 @endif
                 @if (hasPermission('budgetMandate.edit'))
                     <a href="{{ route('budgetMandate.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"

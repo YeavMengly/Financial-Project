@@ -132,6 +132,21 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-sm-2">
+                            <div class="form-group mb-3">
+                                <label for="cboHeaderExpenseType"
+                                    class="form-label font-size-13 text-muted">{{ __('forms.header.expense.type') }}</label>
+                                <select class="form-select" id="cboHeaderExpenseType" name="cboHeaderExpenseType" required
+                                    tabindex="13" data-pristine-required-message="{{ __('messages.required') }}">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($HeaderExpenseTypes as $item)
+                                        <option value="{{ $item->id }}">
+                                            {{ $item->name_kh }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
@@ -183,7 +198,14 @@
                                         'budgetVoucher.export',
                                         array_merge(
                                             ['params' => $params],
-                                            request()->only(['cboTodo', 'cboStatus', 'cboExpenseType', 'cboAccountSub', 'start_date', 'end_date']),
+                                            request()->only([
+                                                'cboTodo',
+                                                'cboStatus',
+                                                'cboExpenseType',
+                                                'cboAccountSub',
+                                                'start_date',
+                                                'end_date',
+                                            ]),
                                         ),
                                     ) }}"
                                     class="btn btn-success d-flex align-items-center px-3">
@@ -331,6 +353,16 @@
                 shouldSort: false
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('cboHeaderExpenseType');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសឧបសម្ព័ន្ធ', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const cboProgramSelect = document.getElementById('cboProgram');
@@ -401,7 +433,7 @@
         });
     </script>
     <script>
-        $('#cboTodo, #cboStatus, #cboProgram, #cboAccountSub, #cboAgency, #cboExpenseType, #CboPaymentVoucherNumber,  #start_date, #end_date')
+        $('#cboTodo, #cboStatus, #cboProgram, #cboAccountSub, #cboAgency, #cboExpenseType,#cboHeaderExpenseType, #CboPaymentVoucherNumber,  #start_date, #end_date')
             .on('change keyup',
                 function() {
                     $('#budgetvoucher-table').DataTable().ajax.reload();

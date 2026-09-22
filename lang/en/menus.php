@@ -3,6 +3,7 @@
 return [
 
     'dashboard' => 'ទំព័រដើម',
+    'dashboard.second' => 'ទំព័រទី២',
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
@@ -39,6 +40,7 @@ return [
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
     'expense.type' => 'ប្រភេទចំណាយ',
+    'header.expense.type' => 'ឧបសម្ព័ន្ធ',
 
     'budget.control' => 'និយ័តថវិកា',
     'budget.plan' => 'ចុះបញ្ជី',

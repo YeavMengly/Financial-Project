@@ -15,6 +15,7 @@ use App\Models\Content\Cluster;
 use App\Models\Content\ExpenseType;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
+use App\Models\HeaderExpenseType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -60,6 +61,7 @@ class BudgetVoucherController extends Controller
 
         // Fetch all expense types for select inputs or filtering
         $expenseType = ExpenseType::all();
+        $HeaderExpenseTypes = HeaderExpenseType::all();
 
         // Fetch associated 
         $accountSub = AccountSub::where('ministry_id', $id)->get();
@@ -74,7 +76,8 @@ class BudgetVoucherController extends Controller
             'program'       => $program,
             'agency'        => $agency,
             'budgetVoucher' => $budgetVoucher,
-            'accountSub'    => $accountSub
+            'accountSub'    => $accountSub,
+            'HeaderExpenseTypes'    => $HeaderExpenseTypes
         ]);
     }
 

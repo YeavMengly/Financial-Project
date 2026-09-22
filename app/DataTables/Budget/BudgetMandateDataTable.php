@@ -14,6 +14,7 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
+use Illuminate\Support\Facades\Storage;
 
 class BudgetMandateDataTable extends DataTable
 {
@@ -66,15 +67,18 @@ class BudgetMandateDataTable extends DataTable
                 return $notes;
             })
             ->editColumn('attachments', function ($row) {
-                if (!$row->attachments) {
+                if (
+                    empty($row->attachments) ||
+                    !Storage::disk('public')->exists($row->attachments)
+                ) {
                     return '<span class="text-muted">-</span>';
                 }
+
                 $url = asset('storage/' . $row->attachments);
-                $filename = basename($row->attachments);
 
                 return "<a href='{$url}' target='_blank' class='text-primary'>
-                <i class='fas fa-file-alt me-1'></i>Preview
-            </a>";
+        <i class='fas fa-file-alt me-1'></i> Preview
+    </a>";
             })
             ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
@@ -285,7 +289,7 @@ class BudgetMandateDataTable extends DataTable
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            Column::make('name_kh')->title(__('tables.th.expense.type'))->width(80)->addClass('align-middle'),
+            // Column::make('name_kh')->title(__('tables.th.expense.type'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),

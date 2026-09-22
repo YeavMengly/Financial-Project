@@ -6,11 +6,25 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
+                @php
+                    // Checks if file exists directly under the public/ directory
+                    $hasFile = !empty($module->file) && file_exists(public_path($module->file));
+                    $hasOtherActions = hasPermission('duelRelease.edit') || hasPermission('duelRelease.destroy');
+                @endphp
+                @if (hasPermission('duelRelease.index') && $hasFile)
+                    <a download href="{{ asset($module->file) }}" class="dropdown-item">
+                        <i class="bx bx-download"></i>
+                        {{ __('buttons.download') }}
+                    </a>
+                    @if ($hasOtherActions)
+                        <hr class="dropdown-divider" />
+                    @endif
+                @endif
                 @if (hasPermission('duelRelease.edit'))
                     <a href="{{ route('duelRelease.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>
                 @endif
-                 @if (hasPermission('duelRelease.edit.doc'))
+                @if (hasPermission('duelRelease.edit.doc'))
                     <a href="{{ route('duelRelease.edit.doc', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item">
                         <i class="bx bx-edit"></i> {{ __('buttons.edit.document') }}

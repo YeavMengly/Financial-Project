@@ -27,6 +27,7 @@ use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Cluster;
 use App\Models\Content\ExpenseType;
+use App\Models\HeaderExpenseType;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
 use App\Models\Loans\BudgetMandateLoan;
@@ -53,6 +54,7 @@ class BudgetMandateController extends Controller
         $id = decode_params($params);
         $data = Ministry::where('id', $id)->first();
         $expenseType = ExpenseType::all();
+        $HeaderExpenseTypes = HeaderExpenseType::all();
         $program = Program::where('ministry_id', $data->id)->orderBy('no', 'asc')->get();
         $accountSub = AccountSub::where('ministry_id', $data->id)->orderBy('no', 'asc')->get();
         $agency = Agency::where('ministry_id', $id)->get();
@@ -65,7 +67,8 @@ class BudgetMandateController extends Controller
             'accountSub' => $accountSub,
             'expenseType' => $expenseType,
             'agency' => $agency,
-            'budgetMandate' => $budgetMandate
+            'budgetMandate' => $budgetMandate,
+            'HeaderExpenseTypes'  => $HeaderExpenseTypes
         ]);
     }
     public function getByExpenseId(Request $request)
