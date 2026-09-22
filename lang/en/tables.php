@@ -145,7 +145,8 @@ return [
   'th.receiver' => 'អ្នកទទួល',
 
   'th.mission.description' => 'កម្មវត្តុនៃការចុះបេសកកម្ម',
-  
+
+  'th.mission.employee.count' => 'ចំនួនសមាជិក',
   'th.mission.type' => 'ប្រភេទបេសកកម្ម',
   'th.time.date' => 'រយៈពេល'
 ];
