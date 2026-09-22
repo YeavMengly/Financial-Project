@@ -1338,7 +1338,7 @@
                            <div class="col-lg-2 col-md-4">
                                 <button type="button"
                                     class="btn btn-danger btn-remove-row"
-                                    data-id="{{ $missionEmployee->id }}">
+                                    >
                                     <i class="bx bx-trash"></i>
                                 </button>
                             </div>

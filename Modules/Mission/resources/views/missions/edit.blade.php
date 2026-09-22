@@ -1383,7 +1383,7 @@
                              <div class="col-lg-2 col-md-4">
                                 <div class="form-group mb-3">
 
-
+                                
                                 </div>
                             </div>
 
@@ -1419,8 +1419,12 @@
 
                             <div class="col-lg-2 col-md-4">
 
-                               <div class="employee-row border rounded p-3 mb-3"
-     data-id="{{ $missionEmployee->id }}">
+                                <button type="button"
+                                        class="btn btn-danger btn-remove-row">
+
+                                    <i class="bx bx-trash"></i>
+
+                                </button>
 
                             </div>
 
@@ -1519,83 +1523,83 @@
             //     updateRemoveButtons();
             // });
 
-            // $(document).on('click', '.btn-remove-row', function() {
+            $(document).on('click', '.btn-remove-row', function() {
 
-            //     const row = $(this).closest('.employee-row')[0];
+                const row = $(this).closest('.employee-row')[0];
 
-            //     if (!row) {
-            //         return;
-            //     }
+                if (!row) {
+                    return;
+                }
 
-            //     // Check whether removed row was leader
-            //     const wasLeader =
-            //         row.querySelector('.employee-leader')?.checked ?? false;
+                // Check whether removed row was leader
+                const wasLeader =
+                    row.querySelector('.employee-leader')?.checked ?? false;
 
-            //     // Destroy Choices
-            //     row.querySelectorAll('select').forEach(function(select) {
-            //         destroyChoices(select);
-            //     });
+                // Destroy Choices
+                row.querySelectorAll('select').forEach(function(select) {
+                    destroyChoices(select);
+                });
 
-            //     // Remove row
-            //     row.remove();
+                // Remove row
+                row.remove();
 
-            //     // Re-index leader radios
-            //     updateLeaderIndexes();
+                // Re-index leader radios
+                updateLeaderIndexes();
 
-            //     // If leader was removed,
-            //     // first remaining employee becomes leader
-            //     // if (wasLeader) {
+                // If leader was removed,
+                // first remaining employee becomes leader
+                // if (wasLeader) {
 
-            //     //     const firstRow = document.querySelector(
-            //     //         '#employeeRows .employee-row:first-child'
-            //     //     );
+                //     const firstRow = document.querySelector(
+                //         '#employeeRows .employee-row:first-child'
+                //     );
 
-            //     //     if (firstRow) {
+                //     if (firstRow) {
 
-            //     //         const firstLeader = firstRow.querySelector(
-            //     //             '.employee-leader'
-            //     //         );
+                //         const firstLeader = firstRow.querySelector(
+                //             '.employee-leader'
+                //         );
 
-            //     //         if (firstLeader) {
-            //     //             firstLeader.checked = true;
-            //     //         }
-            //     //     }
-            //     // }
+                //         if (firstLeader) {
+                //             firstLeader.checked = true;
+                //         }
+                //     }
+                // }
 
-            //     function assignFirstRowAsLeader() {
-            //         const rows = document.querySelectorAll('#employeeRows .employee-row');
+                function assignFirstRowAsLeader() {
+                    const rows = document.querySelectorAll('#employeeRows .employee-row');
 
-            //         rows.forEach(row => {
-            //             const checkbox = row.querySelector('.employee-leader');
-            //             const container = row.querySelector('.leader-container');
+                    rows.forEach(row => {
+                        const checkbox = row.querySelector('.employee-leader');
+                        const container = row.querySelector('.leader-container');
 
-            //             if (checkbox) {
-            //                 checkbox.checked = false;
-            //             }
+                        if (checkbox) {
+                            checkbox.checked = false;
+                        }
 
-            //             if (container) {
-            //                 container.style.display = 'none';
-            //             }
-            //         });
+                        if (container) {
+                            container.style.display = 'none';
+                        }
+                    });
 
-            //         if (rows.length > 0) {
-            //             const firstRow = rows[0];
+                    if (rows.length > 0) {
+                        const firstRow = rows[0];
 
-            //             const checkbox = firstRow.querySelector('.employee-leader');
-            //             const container = firstRow.querySelector('.leader-container');
+                        const checkbox = firstRow.querySelector('.employee-leader');
+                        const container = firstRow.querySelector('.leader-container');
 
-            //             if (container) {
-            //                 container.style.display = '';
-            //             }
+                        if (container) {
+                            container.style.display = '';
+                        }
 
-            //             if (checkbox) {
-            //                 checkbox.checked = true;
-            //             }
-            //         }
-            //     }
-            //     // Update remove buttons
-            //     updateRemoveButtons();
-            // });
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    }
+                }
+                // Update remove buttons
+                updateRemoveButtons();
+            });
 
             /*
             |--------------------------------------------------------------------------
