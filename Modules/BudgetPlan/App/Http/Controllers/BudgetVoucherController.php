@@ -266,6 +266,7 @@ class BudgetVoucherController extends Controller
         $program = Program::where('ministry_id', $ministry->id)->orderBy('no', 'asc')->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $expenseType = ExpenseType::all();
+        $headerExpenseTypes = HeaderExpenseType::all();
 
         // Query initial vouchers joined with matching sub-account names
         $beginVoucher = BeginVoucher::query()
@@ -291,6 +292,7 @@ class BudgetVoucherController extends Controller
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('expenseType', $expenseType)
+            ->with('headerExpenseTypes', $headerExpenseTypes)
             ->with('params', $params)
             ->with('beginVoucher', $beginVoucher)
             ->with('program', $program);
@@ -401,6 +403,7 @@ class BudgetVoucherController extends Controller
      */
     public function store(Request $request, $params)
     {
+        // dd($request->all());
         // Validate request inputs
         $validated = $request->validate([
             'legalID'          => 'required',
@@ -420,7 +423,7 @@ class BudgetVoucherController extends Controller
             'requestDate'      => 'required|date',
             'legalDate'        => 'required|date',
         ]);
-
+dd($validated);
         DB::beginTransaction();
         try {
             // Decode ministry parameters and fetch target record
@@ -479,6 +482,7 @@ class BudgetVoucherController extends Controller
                 'no'                     => $beginVoucher->no,
                 'fin_law'                => $beginVoucher->fin_law,
                 'budget'                 => $applyValue,
+                'header_expense_type_id'        => $validated['cboHeaderExpenseType'] ?? null,
                 'expense_type_id'        => $validated['cboExpenseType'],
                 'legal_id'               => $validated['legalID'],
                 'payment_voucher_number' => $validated['paymentVoucher'],

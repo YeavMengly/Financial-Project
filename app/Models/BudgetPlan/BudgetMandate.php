@@ -31,6 +31,7 @@ class BudgetMandate extends Model
         'account_sub_id',
         'no',
         'budget',
+        'header_expense_type_id',
         'expense_type_id',
         'legal_number',
         'legal_id',

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('account_sub_id');
             $table->unsignedBigInteger('no');
             $table->decimal('budget', 15, 2)->default(0);
+            $table->unsignedBigInteger('header_expense_type_id')->nullable();
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legal_number', 100);
             $table->string('legal_id', 100);
