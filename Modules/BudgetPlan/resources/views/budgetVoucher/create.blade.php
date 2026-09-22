@@ -202,7 +202,22 @@
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
                                 </div>
-
+                                {{-- <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cboHeaderExpenseType"
+                                            class="form-label font-size-13 text-muted">{{ __('forms.header.expense.type') }}</label>
+                                        <select class="form-select" id="cboHeaderExpenseType" name="cboHeaderExpenseType" required
+                                            tabindex="13"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                            <option value="">{{ __('forms.search...') }}</option>
+                                            @foreach ($headerExpenseTypes as $item)
+                                                <option value="{{ $item->id }}">
+                                                    {{ $item->name_kh }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div> --}}
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboExpenseType"
@@ -258,7 +273,7 @@
                                         </div>
 
                                         <input type="file" id="fileInput" name="attachments" class="form-control"
-                                            tabindex="16" accept=".pdf,.doc,.docx" required 
+                                            tabindex="16" accept=".pdf,.doc,.docx" required
                                             data-allowed-extensions="pdf,doc,docx"
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                         <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
@@ -339,6 +354,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const taskTypeSelect = document.getElementById('cboExpenseType');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
+            });
+        });
+         document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('cboHeaderExpenseType');
             const taskTypeChoices = new Choices(taskTypeSelect, {
                 searchEnabled: true,
                 itemSelectText: '', // Hide "Press to select"
@@ -744,7 +769,7 @@
     </script>
 
     <!-- 2. Include the relative external JavaScript file -->
-    <script src="{{ asset('js/budget-form.js') }}"></script>
+    {{-- <script src="{{ asset('js/budget-form.js') }}"></script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');

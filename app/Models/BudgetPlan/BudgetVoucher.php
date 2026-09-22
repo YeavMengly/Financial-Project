@@ -31,6 +31,7 @@ class BudgetVoucher extends Model
         'no',
         'fin_law',
         'budget',
+        'header_expense_type_id',
         'expense_type_id',
         'legal_id',
         'payment_voucher_number',

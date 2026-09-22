@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('no');
             $table->decimal('fin_law', 15, 0)->default(0);
             $table->decimal('budget', 15, 0)->default(0);
+            $table->unsignedBigInteger('header_expense_type_id')->nullable();
             $table->unsignedBigInteger('expense_type_id');
             $table->string('legal_id');
             $table->string('payment_voucher_number');
