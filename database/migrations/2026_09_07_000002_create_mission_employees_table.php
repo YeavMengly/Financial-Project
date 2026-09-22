@@ -11,46 +11,35 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('missions', function (Blueprint $table) {
+        Schema::create('mission_employees', function (Blueprint $table) {
             $table->id();
+            // $table->foreignId('ministry_id')->constrained('ministries')->cascadeOnDelete();
+
+            // Link to main mission
+            // $table->foreignId('mission_id')->constrained('missions')->cascadeOnDelete();
+            // Employee information
+            // $table->foreignId('employee_id')->constrained('employees')->restrictOnDelete();
+            // $table->foreignId('position_id')->constrained('positions')->restrictOnDelete();
+
+
             $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('mission_id');
             $table->unsignedBigInteger('employee_id');
             $table->unsignedBigInteger('position_id');
-            $table->unsignedBigInteger('level_id');
 
-            $table->string('legal_number', 10);
-            $table->date('legal_date');
-
-            $table->text('description');
-
-            $table->unsignedBigInteger('province_id');
-
-            $table->date('start_date');
-            $table->date('end_date');
-
-            $table->unsignedTinyInteger('days_count')->default(0);
-            $table->unsignedTinyInteger('nights_count')->default(0);
-
-            // Money
+            $table->string('level_name', 5);
+            // Allowances
             $table->decimal('travel_allowance', 15, 0)->default(0);
-
             $table->decimal('pocket_money', 15, 0)->default(0);
             $table->decimal('total_pocket_money', 15, 0)->default(0);
-
             $table->decimal('meal_money', 15, 0)->default(0);
             $table->decimal('total_meal_money', 15, 0)->default(0);
-
             $table->decimal('accommodation_money', 15, 0)->default(0);
             $table->decimal('total_accommodation_money', 15, 0)->default(0);
-
             $table->decimal('total', 15, 0)->default(0);
-
-            $table->enum('mission_type', ['local', 'abroad']);
-
-            $table->boolean('mission_type_is_archived')->default(true);
-
-            $table->boolean('assign_budget')->default(false);
-
+            // Assign budget checkbox
+            $table->boolean('assign_budget')
+                ->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -61,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('missions');
+        Schema::dropIfExists('mission_employees');
     }
 };

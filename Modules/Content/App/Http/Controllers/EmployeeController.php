@@ -39,7 +39,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(
+        $validated = $request->validate(
             [
                 'id_number' => [
                     'required',
@@ -75,18 +75,17 @@ class EmployeeController extends Controller
                     'required',
                 ],
             ]
-            // 'status' => ['nullable', 'boolean'], // ✅ ADD
         );
 
         DB::beginTransaction();
         try {
 
             Employee::firstOrCreate([
-                'id_number' => $request->id_number,
-                'account_number' => $request->account_number,
-                'name_kh' => $request->name_kh,
-                'name_latin' => $request->name_latin,
-                'position_id' => $request->cboPosition,
+                'id_number' => $validated['id_number'],
+                'account_number' => $validated['account_number'],
+                'name_kh' => $validated['name_kh'],
+                'name_latin' => $validated['name_latin'],
+                'position_id' => $validated['cboPosition'],
             ]);
 
             DB::commit();
@@ -100,17 +99,7 @@ class EmployeeController extends Controller
             return $request->submit == 'save'
                 ? redirect()->route('employees.index',)
                 : redirect()->route('employees.index',);
-        }
-        // catch (\Illuminate\Database\QueryException $e) {
-        //     DB::rollBack();
-
-        //     // If unique index blocked a duplicate, you can show friendly message
-        //     flash()->translate('en')->option('timeout', 2000)
-        //         ->error('This record already exists.', 'Duplicate')->flash();
-
-        //     return redirect()->route('employees.index',);
-        // } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
 
@@ -150,12 +139,14 @@ class EmployeeController extends Controller
 
     public function update(Request $request, $params): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'id_number' => ['required'],
             'account_number' => ['required'],
             'name_kh' => ['required'],
             'name_latin' => ['required'],
-            // 'status' => ['nullable', 'boolean'], // ✅ ADD
+            'cboPosition' => [
+                'required',
+            ],
         ]);
 
         DB::beginTransaction();
@@ -168,11 +159,11 @@ class EmployeeController extends Controller
             $employee = Employee::findOrFail($id);
 
             $employee->update([
-                'id_number' => $request->id_number,
-                'account_number' => $request->account_number,
-                'name_kh' => $request->name_kh,
-                'name_latin' => $request->name_latin,
-                // 'status' => $request->has('status') ? 1 : 0,
+                'id_number' => $validated['id_number'],
+                'account_number' => $validated['account_number'],
+                'name_kh' => $validated['name_kh'],
+                'name_latin' => $validated['name_latin'],
+                'position_id' => $validated['cboPosition'],
             ]);
 
             DB::commit();
