@@ -285,6 +285,7 @@
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     {{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> --}}
     <script src="{{ asset('assets/libs/dropzone/min/dropzone.min.js') }}"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboProgram');
@@ -308,6 +309,7 @@
             });
         });
     </script>
+
     <script>
         $(document).ready(function() {
             const element = document.getElementById('cboAgency');
@@ -338,6 +340,7 @@
             });
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

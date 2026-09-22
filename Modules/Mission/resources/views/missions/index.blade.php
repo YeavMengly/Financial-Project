@@ -44,29 +44,28 @@
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
                                 <label for="cboTodo" class="form-label font-size-13 text-muted">ជ្រើសរើស
-                                    កំណត់ចំណាំ</label>
+                                    ស្ថានភាពបង់ប្រាក់</label>
 
                                 {{-- <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label> --}}
                                 <select class="form-select" id="cboTodo" name="cboTodo">
                                     <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
-                                    <option value="2" selected>កំពុងធ្វើ</option>
-                                    <option value="3">បានបញ្ចប់</option>
+                                    <option value="2" selected>1. មិនទាន់ទូទាត់ - Unpaid</option>
+                                    <option value="3">2. បានទូទាត់រួចរាល់ - Paid</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="col-sm-2">
+                        {{-- <div class="col-sm-2">
                             <div class="form-group mb-3">
                                 <label for="cboStatus" class="form-label font-size-13 text-muted">ជ្រើសរើស ស្ថានភាព</label>
-                                {{-- <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label> --}}
+                               
                                 <select class="form-select" id="cboStatus" name="cboStatus">
                                     <option value="1">ជ្រើសរើស ស្ថានភាព</option>
                                     <option value="2" selected>សកម្ម</option>
                                     <option value="3">លុប</option>
                                 </select>
                             </div>
-                        </div>
-
+                        </div> --}}
 
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
@@ -75,8 +74,8 @@
                                 {{-- <label class="visually-hidden" for="cboStatus">ជ្រើសរើស ស្ថានភាព</label> --}}
                                 <select class="form-select" id="cboMissionType" name="cboMissionType">
                                     <option value="1">ជ្រើសរើស ប្រភេទបេសកកម្ម</option>
-                                    <option value="2" selected>ក្នុងប្រទេស</option>
-                                    <option value="3">ក្រៅប្រទេស</option>
+                                    <option value="2" selected>1. ក្នុងប្រទេស - local</option>
+                                    <option value="3">2. ក្រៅប្រទេស - abroad</option>
                                 </select>
                             </div>
                         </div>
@@ -87,17 +86,17 @@
                                     class="form-label font-size-13 text-muted">{{ __('menus.employees') }}</label>
                                 <select class="form-control" name="cboName" id="cboName">
                                     <option value="">{{ __('forms.search...') }}</option>
-                                    @foreach ($employee as $emp)
+                                    @foreach ($employees as $emp)
                                         <option value="{{ $emp->id }}"
                                             {{ request('cboName') == $emp->id ? 'selected' : '' }}>
-                                            {{ $emp->name_kh }} -   {{ $emp->name_latin }}
+                                            {{ $emp->name_kh }} - {{ $emp->name_latin }}
                                         </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
 
-                        <div class="col-sm-2">
+                        {{-- <div class="col-sm-2">
                             <div class="form-group mb-3">
                                 <label for="cboPosition"
                                     class="form-label font-size-13 text-muted">{{ __('menus.content.position') }}</label>
@@ -111,9 +110,9 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-2">
+                        {{-- <div class="col-sm-2">
                             <div class="form-group mb-3">
                                 <label for="cboLevel"
                                     class="form-label font-size-13 text-muted">{{ __('menus.content.level') }}</label>
@@ -127,7 +126,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
@@ -202,7 +201,7 @@
                 <div class="card-body">
                     {{-- @if (hasPermission('missions.create') && $module->is_archived != 2) --}}
                     <div class="col-sm">
-                        <div class="mb-4 d-flex flex-wrap gap-2">
+                        {{-- <div class="mb-4 d-flex flex-wrap gap-2">
                             @if (hasPermission('missions.create') && $ministry->is_archived != 2)
                                 <a class="btn btn-light waves-effect waves-light"
                                     href="{{ route('missions.create', $params) }}"><i class="bx bx-plus me-1"></i>
@@ -210,6 +209,26 @@
                             @endif
                             <a class="btn btn-dark"
                                 href="{{ route('initialMissions.index') }}">{{ __('buttons.back') }}</a>
+                        </div> --}}
+                        <div class="mb-4 d-flex flex-wrap gap-2">
+
+                            @if (hasPermission('missions.create') && $ministry->is_archived != 2)
+                                <a class="btn btn-light waves-effect waves-light"
+                                    href="{{ route('missions.create', $params) }}">
+                                    <i class="bx bx-plus me-1"></i>
+                                    {{ __('buttons.create') }}
+                                </a>
+                            @endif
+
+                            <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
+                                <i class="bx bx-money me-1"></i>
+                                បង់ប្រាក់
+                            </button>
+
+                            <a class="btn btn-dark" href="{{ route('initialMissions.index') }}">
+                                {{ __('buttons.back') }}
+                            </a>
+
                         </div>
                     </div>
                     {{-- @endif --}}
@@ -403,6 +422,77 @@
 
         const endDatePicker = flatpickr('#end_date', {
             dateFormat: 'Y-m-d'
+        });
+    </script>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        $(document).on('click', '#btnPaymentStatus', function() {
+            let cboId = $(".mission-checkbox:checked").map(function() {
+                return $(this).val();
+            }).get();
+
+            if (cboId.length === 0) {
+                toastr.warning('សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។');
+                return;
+            }
+
+            Swal.fire({
+                title: 'បញ្ជាក់ការបង់ប្រាក់',
+                text: 'តើអ្នកចង់ប្តូរស្ថានភាពបេសកកម្មដែលបានជ្រើសទៅជា បានបង់ មែនទេ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'បាទ/ចាស បង់ប្រាក់',
+                cancelButtonText: 'បោះបង់',
+                reverseButtons: true
+            }).then(function(result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('missions.updatePaymentStatus', $params) }}",
+                    type: "POST",
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        cboId: cboId
+                    },
+                    beforeSend: function() {
+                        $("#btnPaymentStatus")
+                            .prop("disabled", true)
+                            .html(`
+                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Processing...
+                    `);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Display success message returned from controller
+                            toastr.success(response.message);
+
+                            // Reload DataTable and clear selection state
+                            $("#mission-table").DataTable().ajax.reload(null, false);
+                            $("#checkAllMissions").prop("checked", false);
+                            $(".mission-checkbox").prop("checked", false);
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMsg = xhr.responseJSON?.message ||
+                            'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
+                        toastr.warning(errorMsg);
+                    },
+                    complete: function() {
+                        // Restore button appearance and re-evaluate state
+                        $("#btnPaymentStatus").html(`
+                    <i class="bx bx-money me-1"></i>
+                    បង់ប្រាក់
+                `);
+
+                        let checked = $(".mission-checkbox:checked").length;
+                        $("#btnPaymentStatus").prop("disabled", checked === 0);
+                    }
+                });
+            });
         });
     </script>
 @endsection

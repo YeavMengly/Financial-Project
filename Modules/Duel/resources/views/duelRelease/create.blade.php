@@ -34,13 +34,13 @@
             <div class="card">
                 <div class="card-body">
                     <div>
-                        <form id="pristine-valid-example" action="{{ route('duelRelease.store', $params) }}" method="POST"
+                        <form id="forms" action="{{ route('duelRelease.store', $params) }}" method="POST"
                             enctype="multipart/form-data" novalidate>
                             @csrf
 
                             <div class="row">
                                 <div class="row">
-                                    <div class="col-lg-3 col-md-4">
+                                    {{-- <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="stock_number" class="form-label font-size-13 text-muted">
                                                 {{ __('forms.stock.number') }}
@@ -60,9 +60,83 @@
                                                 <div class="pristine-error text-help">{{ $message }}</div>
                                             @enderror
                                         </div>
+                                    </div> --}}
+                                    <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+
+                                            <label for="stock_number" class="form-label font-size-13 text-muted">
+                                                {{ __('forms.stock.number') }}
+                                            </label>
+
+                                            <select class="form-control" data-trigger id="dropStockNumber"
+                                                name="stock_number" required tabindex="1"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                <option value="">
+                                                    {{ __('forms.search...') }}
+                                                </option>
+
+                                                @foreach ($duelEntry as $item)
+                                                    <option value="{{ $item->project_id }}">
+                                                        {{ $item->stock_number }} -
+                                                        {{ $item->stock_name }}
+                                                    </option>
+                                                @endforeach
+
+                                            </select>
+
+                                            {{-- Custom PristineJS error --}}
+                                            <div id="stockNumberError" class="pristine-error text-help text-danger mt-1">
+                                            </div>
+
+                                            @error('stock_number')
+                                                <div class="pristine-error text-help text-danger mt-1">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+
+                                        </div>
                                     </div>
 
                                     <div class="col-lg-3 col-md-4">
+                                        <div class="form-group mb-3">
+
+                                            <label for="item_name" class="form-label font-size-13 text-muted">
+                                                {{ __('forms.item.name') }}
+                                            </label>
+
+                                            {{-- <select id="cboDuel" class="form-select" name="item_name" required
+                                                tabindex="2"
+                                                data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                <option value="">
+                                                    {{ __('forms.search...') }}
+                                                </option>
+
+                                            </select> --}}
+                                            <select id="cboDuel" name="item_name" required
+                                                data-pristine-choicesrequired-message="{{ __('messages.required') }}">
+
+                                                <option value="">
+                                                    {{ __('forms.search...') }}
+                                                </option>
+
+                                            </select>
+
+                                            {{-- Custom PristineJS error --}}
+                                            <div id="itemNameError" class="pristine-error text-help text-danger mt-1">
+                                            </div>
+
+                                            @error('item_name')
+                                                <div class="pristine-error text-help text-danger mt-1">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
+
+                                        </div>
+                                    </div>
+
+                                    {{-- <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
                                             <label for="item_name" class="form-label font-size-13 text-muted">
                                                 {{ __('forms.item.name') }}
@@ -76,7 +150,7 @@
                                                 <div class="pristine-error text-help">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-xl-3 col-md-4">
                                         <div class="form-group mb-3">
@@ -144,40 +218,6 @@
                                             @enderror
                                         </div>
                                     </div>
-
-
-                                    {{-- <div class="col-lg-3 col-md-4">
-                                        <div class="form-group mb-3">
-                                            <label for="agency" class="form-label font-size-13 text-muted">
-                                                {{ __('forms.agency') }}
-                                            </label>
-                                            <select class="form-control" data-trigger id="cboAgency" name="agency"
-                                                tabindex="6"
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-                                                <option value="">{{ __('forms.search...') }}</option>
-                                                @foreach ($agency as $item)
-                                                    <option value="{{ $item->id }}">
-                                                        {{ $item->no }}-{{ $item->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('agency')
-                                                <div class="pristine-error text-help">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div> --}}
-
-                                    {{-- <div class="col-lg-3 col-md-4">
-                                        <div class="form-group mb-3">
-                                            <label for="cboExecutive"
-                                                class="form-label font-size-13 text-muted">{{ __('forms.agency.executive.unit') }}</label>
-                                            <select id="cboExecutive" class="form-select" name="cboExecutive"
-                                                data-trigger tabindex="7"
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-                                                <option value="">{{ __('forms.search...') }}</option>
-                                            </select>
-                                        </div>
-                                    </div> --}}
 
                                     <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
@@ -350,6 +390,7 @@
             });
         }
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const dropStockNumber = document.getElementById('dropStockNumber');
@@ -443,6 +484,193 @@
                     });
                 }
             });
+
+
+            // ==========================================
+            // 2. Initialize PristineJS
+            // ==========================================
+
+            const form = document.querySelector('#forms');
+
+            const pristine = new Pristine(form, {
+                classTo: 'form-group',
+                errorClass: 'is-invalid',
+                successClass: 'is-valid',
+                errorTextParent: 'form-group',
+                errorTextTag: 'div',
+                errorTextClass: 'text-help text-danger mt-1'
+            });
+
+
+            // ==========================================
+            // 3. Get elements
+            // ==========================================
+
+            const stockSelect = document.querySelector('#dropStockNumber');
+            const duelSelect = document.querySelector('#cboDuel');
+
+            const stockError = document.querySelector('#stockNumberError');
+            const itemError = document.querySelector('#itemNameError');
+
+
+            // ==========================================
+            // 4. Custom validation function
+            // ==========================================
+
+            function validateChoices(selectElement, errorElement) {
+
+                if (!selectElement.value || selectElement.value === '') {
+
+                    errorElement.textContent = "{{ __('messages.required') }}";
+
+                    selectElement.classList.add('is-invalid');
+
+                    return false;
+
+                } else {
+
+                    errorElement.textContent = '';
+
+                    selectElement.classList.remove('is-invalid');
+
+                    return true;
+
+                }
+
+            }
+
+
+            // ==========================================
+            // 5. Stock Number Change
+            // ==========================================
+
+            $('#dropStockNumber').on('change', function() {
+
+                const id = $(this).val();
+
+                // Validate stock number immediately
+                validateChoices(stockSelect, stockError);
+
+                if (!id) {
+
+                    // Clear item dropdown
+                    cboDuelChoice.clearChoices();
+
+                    cboDuelChoice.setChoices([{
+                        value: '',
+                        label: "{{ __('forms.search...') }}",
+                        disabled: true
+                    }], 'value', 'label', true);
+
+                    validateChoices(duelSelect, itemError);
+
+                    return;
+                }
+
+
+                // ======================================
+                // AJAX Load Item Name
+                // ======================================
+
+                $.ajax({
+
+                    url: '{{ route('duelRelease.by.get.stock_number', ['params' => $params]) }}',
+
+                    type: 'GET',
+
+                    data: {
+                        stock_number: id
+                    },
+
+                    success: function(data) {
+
+                        // Destroy old Choices instance
+                        if (cboDuelChoice) {
+                            cboDuelChoice.destroy();
+                        }
+
+                        // Replace options
+                        $('#cboDuel').html(data);
+
+                        // Reinitialize Choices
+                        cboDuelChoice = new Choices('#cboDuel', {
+                            searchEnabled: true,
+                            itemSelectText: '',
+                            placeholder: true,
+                            placeholderValue: "ស្វែងរក...",
+                            allowHTML: false
+                        });
+
+                        // Clear old item error
+                        itemError.textContent = '';
+
+                        duelSelect.classList.remove('is-invalid');
+
+                    },
+
+                    error: function() {
+
+                        itemError.textContent = "មិនអាចទាញយកទិន្នន័យបានទេ";
+
+                    }
+
+                });
+
+            });
+
+
+            // ==========================================
+            // 6. Validate Item Name when changed
+            // ==========================================
+
+            $('#cboDuel').on('change', function() {
+
+                validateChoices(duelSelect, itemError);
+
+            });
+
+
+            // ==========================================
+            // 7. Validate before submit
+            // ==========================================
+
+            form.addEventListener('submit', function(e) {
+
+                let isValid = true;
+
+                // Validate Stock Number
+                if (!validateChoices(stockSelect, stockError)) {
+                    isValid = false;
+                }
+
+                // Validate Item Name
+                if (!validateChoices(duelSelect, itemError)) {
+                    isValid = false;
+                }
+
+                // Run Pristine validation for all other fields
+                if (!pristine.validate()) {
+                    isValid = false;
+                }
+
+                if (!isValid) {
+
+                    e.preventDefault();
+
+                    // Scroll to first error
+                    const firstError = document.querySelector('.is-invalid');
+
+                    if (firstError) {
+                        firstError.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+
+                }
+
+            });
+
         });
     </script>
     <script>
@@ -489,17 +717,6 @@
             });
         };
 
-        // setupSkipField({
-        //     checkbox: skipLegalCheckbox,
-        //     input: legalInput,
-        //     defaultValue: '0',
-        //     restoreValidation: () => {
-        //         legalInput.setAttribute('required', true);
-        //         legalInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
-        //             .translations.required);
-        //     }
-        // });
-
         setupSkipField({
             checkbox: skipTitleCheckbox,
             input: titleInput,
@@ -521,110 +738,8 @@
             }
         });
     </script>
-    {{-- <script>
-        let cboAgencyChoice = new Choices('#cboAgency', {
-            searchEnabled: true,
-            itemSelectText: '',
-            placeholder: true,
-            placeholderValue: "ស្វែងរក..."
-        });
 
-        let cboExecutiveChoice = null;
-
-        $('#cboAgency').on('change', function() {
-            const agencyId = $(this).val();
-
-            resetSelect('#cboExecutive');
-            cboExecutiveChoice = resetChoices('#cboExecutive', cboExecutiveChoice);
-
-            if (!agencyId) return;
-
-            loadOptions({
-                url: "{{ route('duelRelease.by.executive') }}",
-                data: {
-                    agency_id: agencyId
-                },
-                targetSelect: '#cboExecutive',
-                instanceRefSetter: () => {
-                    cboExecutiveChoice = resetChoices('#cboExecutive', cboExecutiveChoice);
-                }
-            });
-        });
-    </script> --}}
     <script>
-        // document.addEventListener('DOMContentLoaded', function() {
-
-        //     // ========= Choices Instances =========
-        //     let executiveChoices = new Choices('#cboExecutive', {
-        //         searchEnabled: true,
-        //         itemSelectText: '',
-        //         placeholder: true,
-        //         placeholderValue: "ស្វែងរក..."
-        //     });
-
-        //     // ========= Helpers =========
-        //     function resetSelect(selector) {
-        //         $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
-        //     }
-
-        //     function resetChoices(selector, instance) {
-        //         instance.destroy();
-        //         return new Choices(selector, {
-        //             searchEnabled: true,
-        //             itemSelectText: '',
-        //             placeholder: true,
-        //             placeholderValue: "ស្វែងរក..."
-        //         });
-        //     }
-
-        //     function loadOptions({
-        //         url,
-        //         data,
-        //         targetSelect,
-        //         instanceRefSetter
-        //     }) {
-        //         $.ajax({
-        //             url,
-        //             type: "GET",
-        //             data,
-        //             success: function(html) {
-        //                 $(targetSelect).html(html);
-        //                 instanceRefSetter();
-        //             },
-        //             error: function() {
-        //                 // optional: keep empty if error
-        //                 resetSelect(targetSelect);
-        //             }
-        //         });
-        //     }
-
-        //     // ========= Script 1: Program -> ProgramSub =========
-        //     function handleProgramChangeForProgramSub(agencyId) {
-        //         resetSelect('#cboExecutive');
-        //         executiveChoices = resetChoices('#cboExecutive', executiveChoices);
-
-        //         if (!agencyId) return;
-
-        //         loadOptions({
-        //             url: "{{ route('beginVoucher.by.program_sub') }}",
-        //             data: {
-        //                 agency_id: agencyId
-        //             },
-        //             targetSelect: '#cboExecutive',
-        //             instanceRefSetter: () => {
-        //                 executiveChoices = resetChoices('#cboExecutive', executiveChoices);
-        //             }
-        //         });
-        //     }
-
-        //     // ========= Events =========
-        //     $('#cboAgency').on('change', function() {
-        //         const agencyId = $(this).val();
-
-        //         // when program changes -> always clear cluster too
-        //         handleProgramChangeForProgramSub(agencyId);
-        //     });
-        // });
         document.addEventListener('DOMContentLoaded', function() {
 
             // ========= Choices Instances =========

@@ -126,6 +126,11 @@ return [
   'th.id.number' => 'អត្ដលេខ',
   'th.id.account' => 'លេខគណនី',
   'th.position' => 'តួនាទី',
+  'th.levels' => 'ប្រភេទមុខតំណែង',
+  'th.start.date' => 'ថ្ងៃចាប់ផ្ដើម',
+  'th.end.date' => 'ថ្ងៃបញ្ចប់',
+  'th.days.count' => 'ចំនួនថ្ងៃ',
+  'th.nights.count' => 'ចំនួនយប់',
 
   'hide' => 'លាក់',
   'show' => 'បង្ហាញ',
@@ -137,7 +142,10 @@ return [
 
   'th.warehouse.voucher' => 'បណ្ណបញ្ចេញឃ្លាំង',
   'th.warehouse.owner' => 'ឃ្លាំង',
-  'th.receiver' => 'អ្នកទទួល', 
+  'th.receiver' => 'អ្នកទទួល',
 
-   'th.mission.description' => 'កម្មវត្តុនៃការចុះបេសកកម្ម'
+  'th.mission.description' => 'កម្មវត្តុនៃការចុះបេសកកម្ម',
+  
+  'th.mission.type' => 'ប្រភេទបេសកកម្ម',
+  'th.time.date' => 'រយៈពេល'
 ];

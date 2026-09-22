@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('employee_position_histories', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_order');
-            $table->string('name');
-            $table->string('name_kh');
-            $table->string('doc_type');
-            $table->string('description');
+            
+            $table->foreignId('employee_id')
+                ->constrained('employees')
+                ->restrictOnDelete();
+
+            $table->foreignId('position_id')
+                ->constrained('positions')
+                ->restrictOnDelete();
+
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('employee_position_histories');
     }
 };

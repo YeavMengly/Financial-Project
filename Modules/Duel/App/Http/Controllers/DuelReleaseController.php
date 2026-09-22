@@ -155,7 +155,9 @@ class DuelReleaseController extends Controller
 
         // 2. Query DuelEntry using whereIn for the array of project IDs
         $duelEntry = DuelEntry::select(
-            'duel_entries.*',
+             'duel_entries.id',
+            'duel_entries.project_id',
+            'duel_entries.item_name',
             'projects.stock_number',
             'projects.stock_name',
             'projects.title as project_title'
@@ -169,6 +171,12 @@ class DuelReleaseController extends Controller
             ->unique('project_id')
             ->values();
 
+    //  $data = DuelEntry::distinct()->pluck('project_id');
+
+    //  $duelEntry = DuelEntry::where('project_id', $data)->get();
+
+        // dd($duelEntry);
+        
         return view('duel::duelRelease.create')
             ->with('ministry', $ministry)
             ->with('duelType', $duelType)
