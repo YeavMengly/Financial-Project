@@ -130,9 +130,9 @@ class InitialMissionsDataTable extends DataTable
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
 
             Column::make('year')->title(__('tables.th.year'))->width(80)->addClass('align-middle'),
-            // Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
-            // Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
-            // Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
+            Column::make('title')->title(__('tables.th.title'))->addClass('align-middle'),
+            Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
+            Column::make('name')->title(__('tables.th.description'))->addClass('align-middle'),
 
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
             Column::computed(

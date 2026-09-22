@@ -10,6 +10,7 @@ use App\Models\Content\Positions;
 use App\Models\Province;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Jenssegers\Agent\Agent;
 use Spatie\Activitylog\LogOptions;
@@ -22,35 +23,33 @@ class Mission extends Model
 
     protected $fillable = [
         'ministry_id',
-        'name_list_id',
-        'position_id',
-        'level_id',
+        'document_id',
+        'leader_id',
+        'province_id',
         'legal_number',
         'legal_date',
         'description',
-        'province_id',
         'start_date',
         'end_date',
         'days_count',
         'nights_count',
-        'travel_allowance',
-        'pocket_money',
-        'total_pocket_money',
-        'meal_money',
-        'total_meal_money',
-        'accommodation_money',
-        'total_accommodation_money',
         'mission_type',
-        'is_archived',
-        'total',
+        'mission_type_is_archived',
+        'fileName',
+        'payment_status',
+        'payment_is_archived',
+        'program_id',
+        'program_sub_id',
+        'cluster_id',
+        // 'account_sub_id',
     ];
 
     protected $casts = [
         'legal_date' => 'date',
         'start_date' => 'date',
         'end_date' => 'date',
-        'is_archived' => 'boolean',
     ];
+
 
     /*
     |--------------------------------------------------------------------------
@@ -64,32 +63,26 @@ class Mission extends Model
             ->useLogName(trans('menus.content.missions'))
             ->logOnly([
                 'ministry_id',
-                'name_list_id',
-                'position_id',
-                'level_id',
+                'document_id',
+                'leader_id',
+                'province_id',
                 'legal_number',
                 'legal_date',
                 'description',
-                'province_id',
                 'start_date',
                 'end_date',
                 'days_count',
                 'nights_count',
-                'travel_allowance',
-                'pocket_money',
-                'total_pocket_money',
-                'meal_money',
-                'total_meal_money',
-                'accommodation_money',
-                'total_accommodation_money',
                 'mission_type',
-                'is_archived',
-                'total',
+                'mission_type_is_archived',
+                'fileName',
+                'payment_status',
+                'payment_is_archived'
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(
-                fn (string $eventName) => $eventName
+                fn(string $eventName) => $eventName
             );
     }
 
@@ -139,5 +132,10 @@ class Mission extends Model
     public function province()
     {
         return $this->belongsTo(Province::class);
+    }
+
+    public function missionEmployees()
+    {
+        return $this->hasMany(MissionEmployee::class, 'mission_id', 'id');
     }
 }

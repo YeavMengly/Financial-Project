@@ -45,6 +45,9 @@ class EmployeeDataTable extends DataTable
     {
         $query = $model->newQuery();
         $query->withTrashed();
+
+        $query->leftJoin('positions', 'employees.position_id', '=', 'positions.id');
+
         $query->select([
             'employees.id',
             'employees.id_number',

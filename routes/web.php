@@ -11,6 +11,7 @@ use App\Livewire\BudgetPlan\ProcurementFile;
 use App\Livewire\BudgetPlan\ExpenseRecordTrainingFile;
 use App\Livewire\BudgetPlan\PaymentDeadlineTraining;
 use App\Livewire\Duel\Release;
+use App\Livewire\Mission\EditFileMission;
 use App\Livewire\Project\EditFileProject;
 use App\Livewire\project\Project;
 use Illuminate\Support\Facades\Auth;
@@ -43,9 +44,13 @@ Route::prefix('budgetplan')->middleware(['auth'])->group(function () {
     Route::get('voucher/{params}/budget-voucher-file/{id}', EditFileVoucher::class)->name('budgetVoucher.edit.doc');
     Route::get('mandate/{params}/budget-mandate-file/{id}', EditFileMandate::class)->name('budgetMandate.edit.doc');
 });
+
 Route::prefix('project')->middleware(['auth'])->group(function () {
     Route::get('{params}/project-file/{id}', EditFileProject::class)->name('project.edit.doc');
-     
+});
+
+Route::prefix('mission')->middleware(['auth'])->group(function () {
+    Route::get('{params}/mission-file/{id}', EditFileMission::class)->name('missions.edit.doc');
 });
 
 Route::prefix('duel')->middleware(['auth'])->group(function () {

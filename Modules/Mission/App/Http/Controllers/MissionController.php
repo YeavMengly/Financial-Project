@@ -5,23 +5,30 @@ namespace Modules\Mission\App\Http\Controllers;
 use App\DataTables\Mission\InitialMissionsDataTable;
 use App\DataTables\Mission\MissionDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\Content\Agency;
+use App\Models\Content\Cluster;
 use App\Models\Content\Levels;
 use App\Models\Content\Ministry;
 use App\Models\Content\Employee;
 use App\Models\Content\Positions;
+use App\Models\Content\Program;
+use App\Models\Content\ProgramSub;
+use App\Models\Document;
 use App\Models\Mission\Mission;
+use App\Models\Mission\MissionEmployee;
 use App\Models\Province;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Monolog\Level;
+use Illuminate\View\View;
 
 class MissionController extends Controller
 {
 
     public function getIndex(InitialMissionsDataTable $dataTable)
     {
+        // return view('maintenance.maintenance');
         return $dataTable->render('mission::missions.initialMissions.index');
     }
 
@@ -34,14 +41,14 @@ class MissionController extends Controller
         $position = Positions::all();
         $level = Levels::all();
         $provinces = Province::all();
-        $employee = Employee::all();
+        $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
         return $dataTable->render('mission::missions.index', [
             'params' => $params,
             'ministry' => $ministry,
             'position' => $position,
             'level' => $level,
             'provinces' => $provinces,
-            'employee' => $employee
+            'employees' => $employees
         ]);
     }
 
@@ -49,7 +56,7 @@ class MissionController extends Controller
     {
         if ($request->position_id) {
             $data = Levels::select('id', 'position_id', 'name')
-                ->where('position_id', $request->position_id)
+                ->where('id', $request->position_id)
                 ->get();
 
             $selectedId = $request->selected_id ?? null;
@@ -83,23 +90,172 @@ class MissionController extends Controller
     }
 
     /**
+     * AJAX: Fetch program sub-options by program ID request.
+     */
+    public function getByProgramId(Request $request)
+    {
+        if ($request->program_id) {
+            $data = ProgramSub::select('id', 'program_id', 'no', 'decription')
+                ->where('program_id', $request->program_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByProgramId(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = ProgramSub::select('id', 'no', 'decription')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
+    }
+
+    public function getByAgency(Request $request)
+    {
+        if ($request->program_id) {
+            $data = Agency::select('id', 'program_id', 'no', 'name')
+                ->where('program_id', $request->program_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByAgency(Request $request)
+    {
+        if (!$request->program_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Agency::select('id', 'no', 'name')
+            ->where('program_id', $request->program_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
+        }
+
+        return response($html);
+    }
+
+    public function getByProgramSubId(Request $request)
+    {
+        if ($request->program_sub_id) {
+
+            $data = Cluster::select('id', 'program_sub_id', 'no', 'decription')
+                ->where('program_sub_id', $request->program_sub_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = ((string)$selectedId === (string)$d->id) ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+            }
+
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByProgramSubId(Request $request)
+    {
+        if (!$request->program_sub_id) {
+            return response('<option value="">ស្វែងរក...</option>');
+        }
+
+        $data = Cluster::select('id', 'no', 'decription')
+            ->where('program_sub_id', $request->program_sub_id)
+            ->get();
+
+        $selectedId = (string) $request->selected_id;
+
+        $html = '<option value="">ស្វែងរក...</option>';
+
+        foreach ($data as $d) {
+            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->decription}</option>";
+        }
+
+        return response($html);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create($params)
     {
         $id = decode_params($params);
         $ministry = Ministry::where('id', $id)->first();
-        $position = Positions::all();
+        $positions = Positions::all();
         $provinces = Province::all();
-        $employee = Employee::all();
+        // $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
+        $employees = Employee::whereNotNull('name_kh')
+            ->whereNotNull('account_number')
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MIN(id)')
+                    ->from('employees')
+                    // ->whereNotNull('id_number')
+                    ->groupBy('name_kh', 'account_number');
+            })
+            ->orderBy('id')
+            ->get();
+        $document = Document::all();
+        $program   = Program::where('ministry_id', $ministry->id)->orderBy('no')->get();
+        // $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
 
         return view('mission::missions.create')
             ->with('ministry', $ministry)
-            ->with('position', $position)
+            ->with('positions', $positions)
             ->with('provinces', $provinces)
-            ->with('employee', $employee)
+            ->with('employees', $employees)
             ->with('params', $params)
+            ->with('document', $document)
+            ->with('program', $program)
+            // ->with('accountSub', $accountSub)
         ;
     }
 
@@ -108,20 +264,18 @@ class MissionController extends Controller
      */
     public function store(Request $request, $params)
     {
-
-    // dd($request->all());
+        // dd($request->all());
         $validated = $request->validate([
-            'legal_number'     => 'required|integer',
+            'cboDocument' => 'required',
+
+            'legal_number'     => 'required|string',
             'legal_date'  => 'required|date',
 
             'cboName'             => 'required|array|min:1',
             'cboName.*'             => 'required|integer|exists:employees,id',
 
             'cboPosition'             => 'required|array|min:1',
-            'cboPosition.*'             => 'required|integer|exists:levels,id',
-
-            'cboLevel'             => 'required|array|min:1',
-            'cboLevel.*'             => 'required|integer|exists:levels,id',
+            'cboPosition.*'             => 'required|integer|exists:positions,id',
 
             'cboProvince'        => 'required|integer|exists:provinces,id',
 
@@ -130,14 +284,25 @@ class MissionController extends Controller
 
             'txtDescription' => 'required|string|max:9999',
 
-            // 'mission_type' => 'required|integer',
-
+            'leader_index' =>  'required',
             // Assign checkbox
             'assign_budget' => 'required|array',
-            'assign_budget.*' => 'required|boolean'
-        ]);
+            'assign_budget.*' => 'required|integer',
 
-        dd($validated);
+            'fileName' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:10240', // 10MB in Kilobytes (10 * 1024)
+            ],
+
+            'cboProgram'     => 'nullable|integer',
+            'cboProgramSub'  => 'nullable|integer',
+            'cboCluster'     => 'nullable|integer',
+            // 'cboAgency'           => 'nullable|integer',
+            // 'cboSubAccount'       => 'nullable|integer',
+        ]);
+        // dd($validated);
         $id = decode_params($params);
         DB::beginTransaction();
         try {
@@ -148,7 +313,6 @@ class MissionController extends Controller
             |--------------------------------------------------------------------------
             */
             $ministry   = Ministry::where('id', $id)->first();
-
             /*
             |--------------------------------------------------------------------------
             | Calculate days / nights
@@ -157,48 +321,81 @@ class MissionController extends Controller
             $startDate = Carbon::parse($validated['start_date']);
             $endDate = Carbon::parse($validated['end_date']);
 
-            // Example:
-            // 01 -> 01 = 1 day, 0 nights
-            // 01 -> 02 = 2 days, 1 night
-
-            // Total count day and night in mission
             $daysCount = $startDate->diffInDays($endDate) + 1;
             $nightsCount = max($daysCount - 1, 0);
 
-            $position = Positions::all();
-            $level    = Levels::where('id', $position->level_id)->first();
             $province = Province::where('id', $validated['cboProvince'])->first();
 
             /*
-        |--------------------------------------------------------------------------
-        | Create Mission for each employee
-        |--------------------------------------------------------------------------
-        */
+            |--------------------------------------------------------------------------
+            | Create Mission for each employee
+            |--------------------------------------------------------------------------
+            */
+
+            /*
+            |--------------------------------------------------------------------------
+            | 2. Store Table 1: missions
+            |--------------------------------------------------------------------------
+            */
+            // dd($validated['legal_type']);
+            $is_archived = 1;/*
+            |--------------------------------------------------------------------------
+            | Get employee IDs
+            |--------------------------------------------------------------------------
+            */
+            $employeeIds = $request->input('cboName', []);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get selected leader row index
+            |--------------------------------------------------------------------------
+            */
+            $leaderIndex = (int) $request->input('leader_index', 0);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get leader employee ID from cboName[]
+            |--------------------------------------------------------------------------
+            */
+            $leaderEmployeeId = $employeeIds[$leaderIndex] ?? null;
+
+            $mission = Mission::create([
+                'leader_id' => $leaderEmployeeId,
+                'ministry_id' => $ministry->id,
+                'payment_status' => 'unpaid',
+                'payment_is_archived' => 1,
+                'legal_number' => $validated['legal_number'],
+                'legal_date' => $validated['legal_date'],
+                'description' => strip_tags($validated['txtDescription']),
+                'province_id' => $validated['cboProvince'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'],
+                'days_count' => $daysCount,
+                'nights_count' => $nightsCount,
+                'mission_type' => $is_archived == 1 ? 'local' : 'abroad',
+                'mission_type_is_archived' => $is_archived,
+                'document_id' => $validated['cboDocument'],
+                'fileName' => $validated['fileName'] ?? null,
+                'program_id'          => $validated['cboProgram'],
+                'program_sub_id'      => $validated['cboProgramSub'],
+                'cluster_id'          => $validated['cboCluster'],
+                // 'account_sub_id'      => $validated['cboSubAccount'],
+            ]);
 
             foreach ($validated['cboName'] as $index => $employeeId) {
 
                 $positionId = $validated['cboPosition'][$index] ?? null;
-                $levelId    = $validated['cboLevel'][$index] ?? null;
-
-                // 1 = assigned
-                // 0 = not assigned
                 $assignBudget = (int) ($validated['assign_budget'][$index] ?? 0);
 
-                /*
-                |--------------------------------------------------------------------------
-                | Budget
-                |--------------------------------------------------------------------------
-                |
-                | Put your budget calculation here.
-                |
-                | Currently:
-                | assigned = use budget calculation
-                | not assigned = null
-                |
-                */
-
-
-
+                $position = Positions::where('id', $positionId)->first();
+                // ទាញយក Level តាមរយៈ $levelId របស់ជួរដេកនីមួយៗ
+                $level = Levels::where('id', $position->level_id)->first();
+                // ការពារករណីរកមិនឃើញ Level
+                // if (!$level) {
+                //     throw new \Exception("Level ID {$levelId} not found.");
+                // }
                 $pocketMoney = $level->pocket_money;
                 $totalPocketMoney = $pocketMoney * $daysCount;
 
@@ -210,55 +407,57 @@ class MissionController extends Controller
 
                 // Condition assign budget
                 if ($assignBudget === 1) {
-
-                    $travelAllowance = null;
-                    $travelAllowance = $province->budget;
+                    $travelAllowance = $province->budget ?? 0;
                     $total = $travelAllowance + $totalPocketMoney + $totalMealMoney + $totalAccommodationMoney;
                 } else {
-                    $travelAllowance = null;
+                    $travelAllowance = 0;
+                    $total = $totalPocketMoney + $totalMealMoney + $totalAccommodationMoney; // កែសម្រួលបន្ថែមតាមតម្រូវការគណនាសរុប
                 }
 
-                $is_archived = 1;
+                $usedDays = Mission::whereHas('missionEmployees', function ($query) use ($employeeId) {
+                    $query->where('employee_id', $employeeId);
+                })
+                    ->where(function ($query) use ($startDate) {
+                        $query->whereYear('start_date', $startDate->year)
+                            ->whereMonth('start_date', $startDate->month);
+                    })
+                    ->sum('days_count');
 
+                $totalDays = $usedDays + $daysCount;
 
-                Mission::create([
+                if ($totalDays > 10) {
+
+                    $employee = Employee::find($employeeId);
+
+                    throw new \Exception(
+                        'បុគ្គលិក ' .
+                            ($employee->name_kh ?? $employeeId) .
+                            ' បានប្រើប្រាស់ថ្ងៃបេសកកម្ម ' .
+                            $usedDays .
+                            ' ថ្ងៃក្នុងខែនេះ។ ' .
+                            'មិនអាចបញ្ចូលបន្ថែម ' .
+                            $daysCount .
+                            ' ថ្ងៃបានទេ ព្រោះអតិបរមា 10 ថ្ងៃក្នុងមួយខែ។'
+                    );
+                }
+
+                MissionEmployee::create([
                     'ministry_id' => $ministry->id,
-
+                    'mission_id' => $mission->id,
                     'employee_id' => $employeeId,
                     'position_id' => $positionId,
-                    'level_id' => $levelId,
-
-                    'legal_number' => $validated['legal_number'],
-                    'legal_date' => $validated['legal_date'],
-                    'description' => $validated['txtDescription'],
-                    'province_id' => $validated['cboProvince'],
-                    'start_date' => $validated['start_date'],
-                    'end_date' => $validated['end_date'],
-
-                    'days_count' => $daysCount,
-                    'nights_count' => $nightsCount,
-
+                    'level_name' => $level->name,
                     'travel_allowance' => $travelAllowance,
-
                     'pocket_money' => $pocketMoney,
                     'total_pocket_money' => $totalPocketMoney,
-
                     'meal_money' => $mealMoney,
                     'total_meal_money' => $totalMealMoney,
-
                     'accommodation_money' => $accommodationMoney,
                     'total_accommodation_money' => $totalAccommodationMoney,
-
                     'total' => $total,
-
-                    // 'mission_type' => $is_archived == 1 ? 'local' : 'abroad',
-                    'mission_type' => $is_archived == 1 ? 'local' : 'abroad',
-                    'mission_type_is_archived' => $is_archived,
-
-                    'assign_budget' => $validated['assign_budget']
+                    'assign_budget' => $assignBudget // ប្រើអញ្ញាតដែលបានបំលែងជា int រួច
                 ]);
             }
-
             DB::commit();
 
             flash()
@@ -286,163 +485,211 @@ class MissionController extends Controller
             return redirect()->route('missions.index', $params);
         }
     }
-    // public function store(Request $request, $params)
+
+    public function show($params, $id): View
+    {
+
+        // dd([$params, $id]);
+        $ministryId = decode_params($params);
+        $missionId = decode_params($id);
+
+        $mission = DB::table('missions')
+            ->leftJoin(
+                'mission_employees',
+                'missions.id',
+                '=',
+                'mission_employees.mission_id'
+            )
+            ->leftJoin(
+                'employees',
+                'mission_employees.employee_id',
+                '=',
+                'employees.id'
+            )
+            ->leftJoin(
+                'positions',
+                'mission_employees.position_id',
+                '=',
+                'positions.id'
+            )
+            // ->leftJoin(
+            //     'levels',
+            //     'mission_employees.level_id',
+            //     '=',
+            //     'levels.id'
+            // )
+            ->leftJoin(
+                'provinces',
+                'missions.province_id',
+                '=',
+                'provinces.id'
+            )
+            ->where('missions.id', $missionId)
+            ->where('missions.ministry_id', $ministryId)
+            ->select([
+                'missions.*',
+
+                'provinces.name as province_name',
+
+                'mission_employees.id as mission_employee_id',
+                'mission_employees.travel_allowance',
+                'mission_employees.pocket_money',
+                'mission_employees.total_pocket_money',
+                'mission_employees.meal_money',
+                'mission_employees.total_meal_money',
+                'mission_employees.accommodation_money',
+                'mission_employees.total_accommodation_money',
+                'mission_employees.assign_budget',
+                'mission_employees.total',
+
+                'employees.id as employee_id',
+                'employees.name_kh',
+                'employees.name_latin',
+                'employees.account_number',
+                'employees.id_number',
+
+                'mission_employees.level_name',
+
+                'positions.name',
+            ])
+            ->get();
+
+        if ($mission->isEmpty()) {
+            abort(404);
+        }
+
+        return view('mission::missions.show', [
+            'params' => $params,
+            'mission' => $mission,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($params, $id)
+    {
+        $ministry = Ministry::where('id', decode_params($params))->first();
+
+        $mission = Mission::where('id', decode_params($id))
+            ->where('ministry_id', $ministry->id)
+            ->firstOrFail();
+
+        $missionEmployees = MissionEmployee::where('mission_id', $mission->id)
+            ->get();
+
+        $positions = Positions::orderBy('name')->get();
+
+        $provinces = Province::orderBy('name')->get();
+
+        $employees = Employee::whereNotNull('name_kh')
+            ->whereNotNull('account_number')
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MIN(id)')
+                    ->from('employees')
+                    ->whereNotNull('name_kh')
+                    ->whereNotNull('account_number')
+                    ->groupBy('name_kh', 'account_number');
+            })
+            ->orderBy('id')
+            ->get();
+
+        $document = Document::all();
+
+        $program = Program::where('ministry_id', $ministry->id)
+            ->orderBy('no')
+            ->get();
+
+        return view('mission::missions.edit')
+            ->with('ministry', $ministry)
+            ->with('mission', $mission)
+            ->with('positions', $positions)
+            ->with('provinces', $provinces)
+            ->with('employees', $employees)
+            ->with('params', $params)
+            ->with('document', $document)
+            ->with('program', $program)
+            ->with('missionEmployees', $missionEmployees);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    // public function update(Request $request, $params, $id)
     // {
+    //     //  dd($request->all());
+    //     $validated = $request->validate([
+    //         'cboDocument' => 'required|integer|exists:documents,id',
+
+    //         'legal_number' => 'required|string',
+
+    //         'legal_date' => 'required|date',
+
+    //         'cboProvince' => 'required|integer|exists:provinces,id',
+
+    //         'start_date' => 'required|date',
+
+    //         'end_date' => 'required|date|after_or_equal:start_date',
+
+    //         'txtDescription' => 'required|string|max:9999',
+
+    //         'cboName' => 'required|array|min:1',
+    //         'cboName.*' => 'required|integer|exists:employees,id',
+
+    //         'cboPosition' => 'required|array|min:1',
+    //         'cboPosition.*' => 'required|integer|exists:levels,id',
+
+    //         'leader_index' => 'required|integer|min:0',
+
+    //         'assign_budget' => 'required|array',
+    //         'assign_budget.*' => 'required|integer|in:0,1',
+
+    //         'fileName' => [
+    //             'nullable',
+    //             'file',
+    //             'mimes:pdf',
+    //             'max:10240',
+    //         ],
+
+    //         'cboProgram' => 'nullable|integer',
+    //         'cboProgramSub' => 'nullable|integer',
+    //         'cboCluster' => 'nullable|integer',
+
+    //         'submit' => 'required|in:save,save_create',
+    //     ]);
+
+
+
     //     DB::beginTransaction();
 
     //     try {
 
     //         /*
     //     |--------------------------------------------------------------------------
-    //     | Validate request
-    //     |--------------------------------------------------------------------------
-    //     */
-    //         $validated = $request->validate([
-    //             'legal_number' => [
-    //                 'required',
-    //                 'integer',
-    //                 'min:1',
-    //             ],
-
-    //             'legal_date' => [
-    //                 'required',
-    //                 'date',
-    //             ],
-
-    //             'start_date' => [
-    //                 'required',
-    //                 'date',
-    //             ],
-
-    //             'end_date' => [
-    //                 'required',
-    //                 'date',
-    //                 'after_or_equal:start_date',
-    //             ],
-
-    //             'cboProvince' => [
-    //                 'required',
-    //                 'integer',
-    //                 'exists:provinces,id',
-    //             ],
-
-    //             'txtDescription' => [
-    //                 'required',
-    //                 'string',
-    //                 'max:9999',
-    //             ],
-
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Employees
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             'cboName' => [
-    //                 'required',
-    //                 'array',
-    //                 'min:1',
-    //             ],
-
-    //             'cboName.*' => [
-    //                 'required',
-    //                 'integer',
-    //                 'exists:employees,id',
-    //             ],
-
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Positions
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             'cboPosition' => [
-    //                 'required',
-    //                 'array',
-    //                 'min:1',
-    //             ],
-
-    //             'cboPosition.*' => [
-    //                 'required',
-    //                 'integer',
-    //                 'exists:positions,id',
-    //             ],
-
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Levels
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             'cboLevel' => [
-    //                 'required',
-    //                 'array',
-    //                 'min:1',
-    //             ],
-
-    //             'cboLevel.*' => [
-    //                 'required',
-    //                 'integer',
-    //                 'exists:levels,id',
-    //             ],
-
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Assign Budget
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             'assign_budget' => [
-    //                 'required',
-    //                 'array',
-    //                 'min:1',
-    //             ],
-
-    //             'assign_budget.*' => [
-    //                 'required',
-    //                 'boolean',
-    //             ],
-    //         ]);
-    //         /*
-    //     |--------------------------------------------------------------------------
-    //     | Decode ministry ID
-    //     |--------------------------------------------------------------------------
-    //     */
-    //         $id = decode_params($params);
-
-    //         /*
-    //     |--------------------------------------------------------------------------
     //     | Get Ministry
     //     |--------------------------------------------------------------------------
     //     */
-    //         $ministry = Ministry::find($id);
 
-    //         if (!$ministry) {
-    //             throw new \Exception('Ministry not found.');
-    //         }
+    //         $ministry = Ministry::where('id', decode_params($params))->first();
 
     //         /*
     //     |--------------------------------------------------------------------------
-    //     | Get Province
+    //     | Get Mission
     //     |--------------------------------------------------------------------------
     //     */
-    //         $province = Province::find($validated['cboProvince']);
 
-    //         if (!$province) {
-    //             throw new \Exception('Province not found.');
-    //         }
-
+    //         $mission = Mission::where('id', $id)
+    //             ->where('ministry_id', $ministry->id)
+    //             ->first();
+    //         // dd($mission);
     //         /*
     //     |--------------------------------------------------------------------------
-    //     | Calculate days / nights
+    //     | Calculate Days / Nights
     //     |--------------------------------------------------------------------------
     //     */
+
     //         $startDate = Carbon::parse($validated['start_date']);
-    //         $endDate   = Carbon::parse($validated['end_date']);
-
-    //         /*
-    //     Example:
-
-    //     01 -> 01 = 1 day / 0 nights
-    //     01 -> 02 = 2 days / 1 night
-    //     01 -> 03 = 3 days / 2 nights
-    //     */
+    //         $endDate = Carbon::parse($validated['end_date']);
 
     //         $daysCount = $startDate->diffInDays($endDate) + 1;
 
@@ -450,66 +697,158 @@ class MissionController extends Controller
 
     //         /*
     //     |--------------------------------------------------------------------------
-    //     | Create Mission for each employee
+    //     | Province
     //     |--------------------------------------------------------------------------
     //     */
+
+    //         $province = Province::findOrFail(
+    //             $validated['cboProvince']
+    //         );
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | Leader
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $employeeIds = $validated['cboName'];
+
+    //         $leaderIndex = (int) $validated['leader_index'];
+
+    //         $leaderEmployeeId = $employeeIds[$leaderIndex] ?? null;
+
+    //         if (!$leaderEmployeeId) {
+    //             throw new \Exception('Leader employee is required.');
+    //         }
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | Mission Type
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $isArchived = 1;
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | File
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $fileName = $mission->fileName;
+
+    //         if ($request->hasFile('fileName')) {
+
+    //             $file = $request->file('fileName');
+
+    //             $folder = 'uploads/mission/' . now()->format('Y-m-d');
+
+    //             $fileName = $file->store($folder, 'public');
+    //         }
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | Update Mission
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         $mission->update([
+
+    //             'leader_id' => $leaderEmployeeId,
+
+    //             'legal_number' => $validated['legal_number'],
+
+    //             'legal_date' => $validated['legal_date'],
+
+    //             'description' => strip_tags(
+    //                 $validated['txtDescription']
+    //             ),
+
+    //             'province_id' => $validated['cboProvince'],
+
+    //             'start_date' => $validated['start_date'],
+
+    //             'end_date' => $validated['end_date'],
+
+    //             'days_count' => $daysCount,
+
+    //             'nights_count' => $nightsCount,
+
+    //             'mission_type' => $isArchived == 1
+    //                 ? 'local'
+    //                 : 'abroad',
+
+    //             'mission_type_is_archived' => $isArchived,
+
+    //             'document_id' => $validated['cboDocument'],
+
+    //             'fileName' => $fileName,
+
+    //             'program_id' => $validated['cboProgram'] ?? null,
+
+    //             'program_sub_id' => $validated['cboProgramSub'] ?? null,
+
+    //             'cluster_id' => $validated['cboCluster'] ?? null,
+    //         ]);
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | Delete Existing Mission Employees
+    //     |--------------------------------------------------------------------------
+    //     */
+
+    //         MissionEmployee::where('mission_id', $mission->id)->delete();
+
+    //         /*
+    //     |--------------------------------------------------------------------------
+    //     | Re-create Mission Employees
+    //     |--------------------------------------------------------------------------
+    //     */
+
     //         foreach ($validated['cboName'] as $index => $employeeId) {
 
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Get values for current row
-    //         |--------------------------------------------------------------------------
-    //         */
     //             $positionId = $validated['cboPosition'][$index] ?? null;
-    //             $levelId    = $validated['cboLevel'][$index] ?? null;
+
+    //             $assignBudget = (int) (
+    //                 $validated['assign_budget'][$index] ?? 0
+    //             );
 
     //             /*
     //         |--------------------------------------------------------------------------
-    //         | Assign budget
+    //         | Get Position
     //         |--------------------------------------------------------------------------
     //         */
-    //             $assignBudget = (int) ($validated['assign_budget'][$index] ?? 0);
+
+
+    //             $position = Positions::where('level_id', $positionId)->first();
 
     //             /*
     //         |--------------------------------------------------------------------------
-    //         | Get level for current employee
+    //         | Get Level
     //         |--------------------------------------------------------------------------
     //         */
-    //             $level = Levels::find($levelId);
 
-    //             if (!$level) {
-    //                 throw new \Exception(
-    //                     "Level not found for employee row " . ($index + 1)
-    //                 );
-    //             }
+    //             // ទាញយក Level តាមរយៈ $levelId របស់ជួរដេកនីមួយៗ
+    //             $level = Levels::where('id', $position->level_id)->first();
 
     //             /*
     //         |--------------------------------------------------------------------------
-    //         | Calculate Pocket Money
+    //         | Calculate Money
     //         |--------------------------------------------------------------------------
     //         */
-    //             $pocketMoney = (float) $level->pocket_money;
+
+    //             $pocketMoney = $level->pocket_money ?? 0;
 
     //             $totalPocketMoney =
     //                 $pocketMoney * $daysCount;
 
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Calculate Meal Money
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             $mealMoney = (float) $level->meal_money;
+    //             $mealMoney = $level->meal_money ?? 0;
 
     //             $totalMealMoney =
     //                 $mealMoney * $daysCount;
 
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Calculate Accommodation Money
-    //         |--------------------------------------------------------------------------
-    //         */
     //             $accommodationMoney =
-    //                 (float) $level->accommodation_money;
+    //                 $level->accommodation_money ?? 0;
 
     //             $totalAccommodationMoney =
     //                 $accommodationMoney * $nightsCount;
@@ -519,63 +858,44 @@ class MissionController extends Controller
     //         | Travel Allowance
     //         |--------------------------------------------------------------------------
     //         */
-    //             $travelAllowance = 0;
 
     //             if ($assignBudget === 1) {
 
-    //                 $travelAllowance = (float) $province->budget;
+    //                 $travelAllowance =
+    //                     $province->budget ?? 0;
+
+    //                 $total =
+    //                     $travelAllowance
+    //                     + $totalPocketMoney
+    //                     + $totalMealMoney
+    //                     + $totalAccommodationMoney;
+    //             } else {
+
+    //                 $travelAllowance = 0;
+
+    //                 $total =
+    //                     $totalPocketMoney
+    //                     + $totalMealMoney
+    //                     + $totalAccommodationMoney;
     //             }
 
     //             /*
     //         |--------------------------------------------------------------------------
-    //         | Calculate Total
+    //         | Create Mission Employee
     //         |--------------------------------------------------------------------------
     //         */
-    //             $total =
-    //                 $travelAllowance
-    //                 + $totalPocketMoney
-    //                 + $totalMealMoney
-    //                 + $totalAccommodationMoney;
 
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Mission Type
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             $isArchived = 1;
-
-    //             $missionType = 'local';
-
-    //             /*
-    //         |--------------------------------------------------------------------------
-    //         | Create Mission
-    //         |--------------------------------------------------------------------------
-    //         */
-    //             Mission::create([
+    //             MissionEmployee::create([
 
     //                 'ministry_id' => $ministry->id,
 
+    //                 'mission_id' => $mission->id,
+
     //                 'employee_id' => $employeeId,
 
-    //                 'position_id' => $positionId,
+    //                 'position_id' => $position->id,
 
-    //                 'level_id' => $levelId,
-
-    //                 'legal_number' => $validated['legal_number'],
-
-    //                 'legal_date' => $validated['legal_date'],
-
-    //                 'description' => $validated['txtDescription'],
-
-    //                 'province_id' => $validated['cboProvince'],
-
-    //                 'start_date' => $validated['start_date'],
-
-    //                 'end_date' => $validated['end_date'],
-
-    //                 'days_count' => $daysCount,
-
-    //                 'nights_count' => $nightsCount,
+    //                 'level_name' => $level->name,
 
     //                 'travel_allowance' => $travelAllowance,
 
@@ -587,94 +907,58 @@ class MissionController extends Controller
 
     //                 'total_meal_money' => $totalMealMoney,
 
-    //                 'accommodation_money' => $accommodationMoney,
+    //                 'accommodation_money' =>
+    //                 $accommodationMoney,
 
-    //                 'total_accommodation_money' => $totalAccommodationMoney,
+    //                 'total_accommodation_money' =>
+    //                 $totalAccommodationMoney,
 
     //                 'total' => $total,
 
-    //                 'mission_type' => $missionType,
-
-    //                 'mission_type_is_archived' => $isArchived,
-
-    //                 /*
-    //             | IMPORTANT:
-    //             | Store only current employee's value,
-    //             | not the entire assign_budget array.
-    //             */
     //                 'assign_budget' => $assignBudget,
     //             ]);
     //         }
 
-    //         /*
-    //     |--------------------------------------------------------------------------
-    //     | Commit transaction
-    //     |--------------------------------------------------------------------------
-    //     */
+    //         if ($request->input('submit') === 'save') {
+
+    //             return redirect()
+    //                 ->route('missions.index', $params)
+    //                 ->with('success', 'Updated successfully');
+    //         }
+
+    //         if ($request->input('submit') === 'save_create') {
+
+    //             return redirect()
+    //                 ->route('missions.create', $params)
+    //                 ->with('success', 'Updated successfully');
+    //         }
+
     //         DB::commit();
 
-    //         /*
-    //     |--------------------------------------------------------------------------
-    //     | Success message
-    //     |--------------------------------------------------------------------------
-    //     */
     //         flash()
     //             ->translate('en')
     //             ->option('timeout', 2000)
-    //             ->success('success_msg', 'successful')
+    //             ->success(
+    //                 'បញ្ចូលទិន្នន័យបានជោគជ័យ!',
+    //                 'ជោគជ័យ'
+    //             )
     //             ->flash();
+    //         return redirect()
+    //             ->route('missions.index', $params);
+    //     } catch (\Exception $e) {
 
-    //         /*
-    //     |--------------------------------------------------------------------------
-    //     | Redirect
-    //     |--------------------------------------------------------------------------
-    //     */
-    //         if ($request->has('submit')) {
+    //         DB::rollBack();
 
-    //             return redirect()->route(
-    //                 'missions.index',
-    //                 $params
-    //             );
-    //         }
-
-    //         return redirect()->route(
-    //             'missions.create',
-    //             $params
+    //         Log::error(
+    //             'Mission update failed: ' .
+    //                 $e->getMessage()
     //         );
-    //     } catch (\Illuminate\Validation\ValidationException $e) {
-
-    //         /*
-    //     |--------------------------------------------------------------------------
-    //     | Validation failed
-    //     |--------------------------------------------------------------------------
-    //     |
-    //     | Do not redirect manually here.
-    //     | Laravel will return to the form with validation errors.
-    //     |
-    //     */
-    //         DB::rollBack();
-
-    //         throw $e;
-    //     } catch (\Throwable $e) {
-
-    //         /*
-    //     |--------------------------------------------------------------------------
-    //     | Database / processing error
-    //     |--------------------------------------------------------------------------
-    //     */
-    //         DB::rollBack();
-
-    //         Log::error('Mission store failed', [
-    //             'message' => $e->getMessage(),
-    //             'file' => $e->getFile(),
-    //             'line' => $e->getLine(),
-    //         ]);
 
     //         flash()
     //             ->translate('en')
-    //             ->option('timeout', 5000)
+    //             ->option('timeout', 2000)
     //             ->error(
-    //                 'បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(),
+    //                 'បញ្ហាក្នុងការកែប្រែ: ' . $e->getMessage(),
     //                 'បញ្ហា'
     //             )
     //             ->flash();
@@ -684,158 +968,560 @@ class MissionController extends Controller
     //             ->withInput();
     //     }
     // }
-
-    // public function store(Request $request, $params)
-    // {
-    //     $validated = $request->validate([
-    //         'legal_number'     => 'required|integer',
-    //         'legal_date'       => 'required|date',
-
-    //         'cboName'          => 'required|array|min:1',
-    //         'cboName.*'        => 'required|integer|exists:employees,id',
-
-    //         'cboPosition'      => 'required|array|min:1',
-    //         'cboPosition.*'    => 'required|integer|exists:positions,id',
-
-    //         'cboLevel'         => 'required|array|min:1',
-    //         'cboLevel.*'       => 'required|integer|exists:levels,id',
-
-    //         'cboProvince'      => 'required|integer|exists:provinces,id',
-
-    //         'start_date'       => 'required|date',
-    //         'end_date'         => 'required|date|after_or_equal:start_date',
-
-    //         'txtDescription'   => 'required|string|max:9999',
-
-    //         // Assign checkbox
-    //         'assign_budget'    => 'required|array',
-    //         'assign_budget.*'  => 'required|boolean'
-    //     ]);
-
-    //     $id = decode_params($params);
-    //     DB::beginTransaction();
-
-    //     try {
-    //         $ministry = Ministry::where('id', $id)->first();
-
-    //         $startDate = Carbon::parse($validated['start_date']);
-    //         $endDate = Carbon::parse($validated['end_date']);
-
-    //         $daysCount = $startDate->diffInDays($endDate) + 1;
-    //         $nightsCount = max($daysCount - 1, 0);
-
-    //         $province = Province::where('id', $validated['cboProvince'])->first();
-
-    //         foreach ($validated['cboName'] as $index => $employeeId) {
-    //             $positionId = $validated['cboPosition'][$index] ?? null;
-    //             $levelId    = $validated['cboLevel'][$index] ?? null;
-    //             $assignBudget = (int) ($validated['assign_budget'][$index] ?? 0);
-
-    //             $level = Levels::where('id', $levelId)->first();
-
-    //             $pocketMoney = $level ? $level->pocket_money : 0;
-    //             $totalPocketMoney = $pocketMoney * $daysCount;
-
-    //             $mealMoney = $level ? $level->meal_money : 0;
-    //             $totalMealMoney = $mealMoney * $daysCount;
-
-    //             $accommodationMoney = $level ? $level->accommodation_money : 0;
-    //             $totalAccommodationMoney = $accommodationMoney * $nightsCount;
-
-    //             $travelAllowance = null;
-    //             $total = $totalPocketMoney + $totalMealMoney + $totalAccommodationMoney;
-
-    //             if ($assignBudget === 1 && $province) {
-    //                 $travelAllowance = $province->budget;
-    //                 $total += $travelAllowance;
-    //             }
-
-    //             $is_archived = 1;
-
-    //             Mission::create([
-    //                 'ministry_id'               => $ministry->id ?? null,
-    //                 'employee_id'               => $employeeId,
-    //                 'position_id'               => $positionId,
-    //                 'level_id'                  => $levelId,
-    //                 'legal_number'              => $validated['legal_number'],
-    //                 'legal_date'                => $validated['legal_date'],
-    //                 'description'               => $validated['txtDescription'],
-    //                 'province_id'               => $validated['cboProvince'],
-    //                 'start_date'                => $validated['start_date'],
-    //                 'end_date'                  => $validated['end_date'],
-    //                 'days_count'                => $daysCount,
-    //                 'nights_count'              => $nightsCount,
-    //                 'travel_allowance'          => $travelAllowance,
-    //                 'pocket_money'              => $pocketMoney,
-    //                 'total_pocket_money'        => $totalPocketMoney,
-    //                 'meal_money'                => $mealMoney,
-    //                 'total_meal_money'          => $totalMealMoney,
-    //                 'accommodation_money'       => $accommodationMoney,
-    //                 'total_accommodation_money' => $totalAccommodationMoney,
-    //                 'total'                     => $total,
-    //                 'mission_type'              => $is_archived == 1 ? 'local' : 'abroad',
-    //                 'mission_type_is_archived'  => $is_archived,
-    //                 'assign_budget'             => $assignBudget
-    //             ]);
-    //         }
-
-    //         DB::commit();
-
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->success('success_msg', 'successful')
-    //             ->flash();
-
-    //         if ($request->has('submit')) {
-    //             return redirect()->route('missions.index', $params);
-    //         }
-
-    //         return redirect()->route('missions.create', $params);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         Log::error($e->getMessage());
-
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
-    //             ->flash();
-
-    //         return redirect()->route('missions.index', $params);
-    //     }
-    // }
-
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function update(Request $request, $params, $id)
     {
-        return view('mission::show');
-    }
+        $validated = $request->validate([
+            'cboDocument' => 'required|integer|exists:documents,id',
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        return view('mission::edit');
-    }
+            'legal_number' => 'required|string',
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        //
+            'legal_date' => 'required|date',
+
+            'cboProvince' => 'required|integer|exists:provinces,id',
+
+            'start_date' => 'required|date',
+
+            'end_date' => 'required|date|after_or_equal:start_date',
+
+            'txtDescription' => 'required|string|max:9999',
+
+            'cboName' => 'required|array|min:1',
+            'cboName.*' => 'required|integer|exists:employees,id',
+
+            'cboPosition' => 'required|array|min:1',
+            'cboPosition.*' => 'required|integer|exists:positions,id',
+
+            'leader_index' => 'required|integer|min:0',
+
+            'assign_budget' => 'nullable|array',
+            'assign_budget.*' => 'nullable|integer|in:0,1',
+
+            'fileName' => [
+                'nullable',
+                'file',
+                'mimes:pdf',
+                'max:10240',
+            ],
+
+            'cboProgram' => 'nullable|integer',
+            'cboProgramSub' => 'nullable|integer',
+            'cboCluster' => 'nullable|integer',
+
+            'submit' => 'required|in:save,save_create',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            // ---------------------------------------------------------
+            // Ministry
+            // ---------------------------------------------------------
+
+            $ministry = Ministry::where('id', decode_params($params))
+                ->firstOrFail();
+            // ---------------------------------------------------------
+            // Mission
+            // ---------------------------------------------------------
+
+            $mission = Mission::where('id', $id)
+                ->where('ministry_id', $ministry->id)
+                ->firstOrFail();
+
+            // ---------------------------------------------------------
+            // Dates
+            // ---------------------------------------------------------
+
+            $startDate = Carbon::parse($validated['start_date']);
+            $endDate = Carbon::parse($validated['end_date']);
+
+            $daysCount = $startDate->diffInDays($endDate) + 1;
+
+            $nightsCount = max($daysCount - 1, 0);
+
+            // ---------------------------------------------------------
+            // Province
+            // ---------------------------------------------------------
+
+            $province = Province::findOrFail(
+                $validated['cboProvince']
+            );
+
+            // ---------------------------------------------------------
+            // Leader
+            // ---------------------------------------------------------
+
+            $employeeIds = $validated['cboName'];
+
+            $leaderIndex = (int) $validated['leader_index'];
+
+            $leaderEmployeeId = $employeeIds[$leaderIndex] ?? null;
+
+            if (!$leaderEmployeeId) {
+                throw new \Exception('Leader employee is required.');
+            }
+
+            // ---------------------------------------------------------
+            // File
+            // ---------------------------------------------------------
+
+            $fileName = $mission->fileName;
+
+            if ($request->hasFile('fileName')) {
+
+                $file = $request->file('fileName');
+
+                $folder = 'uploads/mission/' . now()->format('Y-m-d');
+
+                $fileName = $file->store(
+                    $folder,
+                    'public'
+                );
+            }
+
+            // ---------------------------------------------------------
+            // Update Mission
+            // ---------------------------------------------------------
+
+            $mission->update([
+                'leader_id' => $leaderEmployeeId,
+
+                'legal_number' => $validated['legal_number'],
+
+                'legal_date' => $validated['legal_date'],
+
+                'description' => strip_tags(
+                    $validated['txtDescription']
+                ),
+
+                'province_id' => $validated['cboProvince'],
+
+                'start_date' => $validated['start_date'],
+
+                'end_date' => $validated['end_date'],
+
+                'days_count' => $daysCount,
+
+                'nights_count' => $nightsCount,
+
+                'mission_type' => 'local',
+
+                'mission_type_is_archived' => 1,
+
+                'document_id' => $validated['cboDocument'],
+
+                'fileName' => $fileName,
+
+                'program_id' =>
+                $validated['cboProgram'] ?? null,
+
+                'program_sub_id' =>
+                $validated['cboProgramSub'] ?? null,
+
+                'cluster_id' =>
+                $validated['cboCluster'] ?? null,
+            ]);
+
+            // ---------------------------------------------------------
+            // Soft delete OLD mission employees
+            // ---------------------------------------------------------
+
+            MissionEmployee::where(
+                'mission_id',
+                $mission->id
+            )->delete();
+
+            // ---------------------------------------------------------
+            // Create CURRENT mission employees
+            // ---------------------------------------------------------
+
+            foreach ($employeeIds as $index => $employeeId) {
+
+                $positionId =
+                    $validated['cboPosition'][$index] ?? null;
+
+                $assignBudget = (int) (
+                    $validated['assign_budget'][$index] ?? 0
+                );
+
+                if (!$positionId) {
+                    throw new \Exception(
+                        "Position is missing for employee row {$index}."
+                    );
+                }
+
+                // Position ID
+                $position = Positions::findOrFail($positionId);
+
+                // Position -> Level
+                $level = Levels::findOrFail($position->level_id);
+
+                // -----------------------------------------------------
+                // Money calculation
+                // -----------------------------------------------------
+
+                $pocketMoney =
+                    $level->pocket_money ?? 0;
+
+                $totalPocketMoney =
+                    $pocketMoney * $daysCount;
+
+                $mealMoney =
+                    $level->meal_money ?? 0;
+
+                $totalMealMoney =
+                    $mealMoney * $daysCount;
+
+                $accommodationMoney =
+                    $level->accommodation_money ?? 0;
+
+                $totalAccommodationMoney =
+                    $accommodationMoney * $nightsCount;
+
+                // -----------------------------------------------------
+                // Travel allowance
+                // -----------------------------------------------------
+
+                if ($assignBudget === 1) {
+
+                    $travelAllowance =
+                        $province->budget ?? 0;
+                } else {
+
+                    $travelAllowance = 0;
+                }
+
+                // -----------------------------------------------------
+                // Total
+                // -----------------------------------------------------
+
+                $total =
+                    $travelAllowance
+                    + $totalPocketMoney
+                    + $totalMealMoney
+                    + $totalAccommodationMoney;
+
+                // -----------------------------------------------------
+                // Create
+                // -----------------------------------------------------
+
+                MissionEmployee::create([
+
+                    'ministry_id' =>
+                    $ministry->id,
+
+                    'mission_id' =>
+                    $mission->id,
+
+                    'employee_id' =>
+                    $employeeId,
+
+                    'position_id' =>
+                    $position->id,
+
+                    'level_name' =>
+                    $level->name,
+
+                    'travel_allowance' =>
+                    $travelAllowance,
+
+                    'pocket_money' =>
+                    $pocketMoney,
+
+                    'total_pocket_money' =>
+                    $totalPocketMoney,
+
+                    'meal_money' =>
+                    $mealMoney,
+
+                    'total_meal_money' =>
+                    $totalMealMoney,
+
+                    'accommodation_money' =>
+                    $accommodationMoney,
+
+                    'total_accommodation_money' =>
+                    $totalAccommodationMoney,
+
+                    'total' =>
+                    $total,
+
+                    'assign_budget' =>
+                    $assignBudget,
+                ]);
+            }
+
+            // ---------------------------------------------------------
+            // COMMIT MUST BE BEFORE REDIRECT
+            // ---------------------------------------------------------
+
+            DB::commit();
+
+            // ---------------------------------------------------------
+            // Redirect
+            // ---------------------------------------------------------
+
+            if ($request->input('submit') === 'save_create') {
+
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->success(
+                        'បញ្ចូលទិន្នន័យបានជោគជ័យ!',
+                        'ជោគជ័យ'
+                    )
+                    ->flash();
+                return redirect()
+                    ->route(
+                        'missions.create',
+                        $params
+                    );
+            }
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success(
+                    'បញ្ចូលទិន្នន័យបានជោគជ័យ!',
+                    'ជោគជ័យ'
+                )
+                ->flash();
+            return redirect()
+                ->route(
+                    'missions.index',
+                    $params
+                );
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+            dd(
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine()
+            );
+            Log::error(
+                'Mission update failed',
+                [
+                    'mission_id' => $id,
+                    'params' => $params,
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]
+            );
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error(
+                    'បញ្ហាក្នុងការកែប្រែ: ' .
+                        $e->getMessage(),
+                    'បញ្ហា'
+                )
+                ->flash();
+
+            return redirect()
+                ->back()
+                ->withInput();
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($params, $id)
     {
-        //
+        try {
+
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $mission = Mission::where('id', decode_params($id))
+                ->where('ministry_id', $ministry->id)
+                ->firstOrFail();
+            // Cannot delete a paid mission
+            if (
+                $mission->payment_status === 'paid' &&
+                (int) $mission->payment_is_archived === 2
+            ) {
+
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 3000)
+                    ->error(
+                        'មិនអាចលុបបេសកកម្មនេះបានទេ ព្រោះការទូទាត់បានបង់រួចហើយ។',
+                        'មិនអាចលុបបាន'
+                    )
+                    ->flash();
+
+                return redirect()
+                    ->route('missions.index', $params);
+            }
+
+            // Delete mission employees first
+            MissionEmployee::where(
+                'mission_id',
+                $mission->id
+            )->delete();
+
+            // Soft delete mission
+            $mission->delete();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('លុបទិន្នន័យបានជោគជ័យ!', 'ជោគជ័យ')
+                ->flash();
+
+            return redirect()
+                ->route('missions.index', $params);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Mission delete failed', [
+                'mission_id' => $id,
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('បញ្ហាក្នុងការលុបទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+
+            return redirect()
+                ->back();
+        }
+    }
+
+    public function updatePaymentStatus(Request $request, $params)
+    {
+        $validated = $request->validate([
+            'cboId' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+
+            'cboId.*' => [
+                'required',
+                'integer',
+                'exists:missions,id',
+            ],
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            $updatedCount = Mission::whereIn('id', $validated['cboId'])
+                ->where('payment_status', '!=', 'paid')
+                ->where('payment_is_archived', '!=', 2)
+                ->update([
+                    'payment_status' => 'paid',
+                    'payment_is_archived' => 2,
+                    'updated_at' => now(),
+                ]);
+
+            // Nothing was updated
+            if ($updatedCount === 0) {
+
+                DB::rollBack();
+
+                flash()
+                    ->translate('en')
+                    ->option('timeout', 2000)
+                    ->error(
+                        'The selected missions have already been paid.',
+                        'Payment'
+                    )
+                    ->flash();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The selected missions have already been paid.',
+                ], 422);
+            }
+
+            DB::commit();
+
+            // Success flash
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('success_msg', 'paid')
+                ->flash();
+
+
+            return redirect()->route('missions.index', $params);
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error(
+                    'បញ្ហាក្នុងការបង់ប្រាក់: ' . $e->getMessage(),
+                    'បញ្ហា'
+                )
+                ->flash();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'មានបញ្ហាក្នុងការបង់ប្រាក់។',
+            ], 500);
+        }
+    }
+
+    public function destroyEmployee($params, $id)
+    {
+        dd([$params, $id]);
+        DB::beginTransaction();
+
+        try {
+
+            $missionEmployee = MissionEmployee::wherre('params', $params)->findOrFail($id);
+
+            $mission = Mission::findOrFail($missionEmployee->mission_id);
+
+            $wasLeader = $mission->leader_id == $missionEmployee->employee_id;
+
+            $missionEmployee->delete();
+
+            if ($wasLeader) {
+
+                $nextEmployee = MissionEmployee::where('mission_id', $mission->id)
+                    ->where('id', '!=', $missionEmployee->id)
+                    ->orderBy('id')
+                    ->first();
+
+                $mission->leader_id = $nextEmployee?->employee_id;
+                $mission->save();
+            }
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('លុបទិន្នន័យបានជោគជ័យ!', 'ជោគជ័យ')
+                ->flash();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee deleted successfully.',
+                'leader_id' => $mission->leader_id,
+            ]);
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
