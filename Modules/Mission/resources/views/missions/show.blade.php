@@ -15,7 +15,7 @@
                     ព័ត៌មានបេសកកម្ម
                 </h5>
 
-                <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                <a href="{{ url()->previous() }}" class="btn btn-danger btn-sm">
                     <i class="fa fa-arrow-left me-1"></i>
                     {{ __('buttons.back') }}
                 </a>
@@ -198,35 +198,35 @@
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->travel_allowance ?? 0) }} 
+                                            {{ number_format($item->travel_allowance ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->pocket_money ?? 0) }}
+                                            {{ number_format($item->pocket_money ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->total_pocket_money ?? 0) }}
+                                            {{ number_format($item->total_pocket_money ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->meal_money ?? 0) }}
+                                            {{ number_format($item->meal_money ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->total_meal_money ?? 0) }}
+                                            {{ number_format($item->total_meal_money ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->accommodation_money ?? 0) }}
+                                            {{ number_format($item->accommodation_money ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->total_accommodation_money ?? 0) }}
+                                            {{ number_format($item->total_accommodation_money ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-end fw-bold">
-                                            {{ number_format($item->total ?? 0) }}
+                                            {{ number_format($item->total ?? 0) }} ៛
                                         </td>
 
                                         <td class="text-center">
@@ -236,7 +236,7 @@
                                                     អ្នកទទួល
                                                 </span>
                                             @else
-                                                <span class="badge bg-secondary">
+                                                <span class="badge bg-danger">
                                                     ទេ
                                                 </span>
                                             @endif
@@ -266,7 +266,7 @@
                                 </td>
 
                                 <td class="text-end">
-                                    {{ number_format($mission->sum('total')) }}
+                                    {{ number_format($mission->sum('total')) }} ៛
                                 </td>
 
                                 <td></td>

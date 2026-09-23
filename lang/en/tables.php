@@ -131,7 +131,7 @@ return [
   'th.end.date' => 'ថ្ងៃបញ្ចប់',
   'th.days.count' => 'ចំនួនថ្ងៃ',
   'th.nights.count' => 'ចំនួនយប់',
-
+  'th.amount' => 'សរុបរួម',
   'hide' => 'លាក់',
   'show' => 'បង្ហាញ',
 

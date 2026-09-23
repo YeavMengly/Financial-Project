@@ -222,7 +222,7 @@
 
                             <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
                                 <i class="bx bx-money me-1"></i>
-                                បង់ប្រាក់
+                                ទូទាត់
                             </button>
 
                             <a class="btn btn-dark" href="{{ route('initialMissions.index') }}">
@@ -428,6 +428,163 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>
         $(document).on('click', '#btnPaymentStatus', function() {
+
+            let cboId = $(".mission-checkbox:checked").map(function() {
+                return $(this).val();
+            }).get();
+
+            if (cboId.length === 0) {
+                toastr.warning('សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។');
+                return;
+            }
+
+            // Show loading while calculating total
+            Swal.fire({
+                title: 'កំពុងប្រតិបត្តិការ...',
+                text: 'សូមរង់ចាំបន្តិច',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: "{{ route('missions.paymentTotal', $params) }}",
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    cboId: cboId
+                },
+
+                success: function(response) {
+
+                    if (!response.success) {
+                        Swal.close();
+                        toastr.warning('មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។');
+                        return;
+                    }
+
+                    let totalAmount = parseFloat(response.total_amount || 0);
+
+                    // Format number: 1,234,567.00
+                    let formattedTotal = totalAmount.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    // Now show confirmation
+                    Swal.fire({
+                        title: 'បញ្ជាក់ការទូទាត់',
+                        html: `
+                        <div class="text-start">
+                            <p>
+                                តើអ្នកចង់ប្តូរស្ថានភាពបេសកកម្ម
+                                <strong>${cboId.length}</strong>
+                                ដែលបានជ្រើសទៅជា
+                                <strong>ទូទាត់</strong> <i class="bx bx-money me-1"></i> មែនទេ?
+                            </p>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between">
+                                <strong>ចំនួនបេសកកម្ម:</strong>
+                                <strong>${cboId.length}</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+                                <strong>សរុបប្រាក់:</strong>
+                                <strong class="text-primary fs-5">
+                                    ${formattedTotal}
+                                </strong>
+                            </div>
+                        </div>
+                    `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'បាទ/ចាស ទូទាត់',
+                        cancelButtonText: 'បោះបង់',
+                        reverseButtons: true
+                    }).then(function(result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        // Disable button
+                        $("#btnPaymentStatus")
+                            .prop("disabled", true)
+                            .html(`
+                            <span class="spinner-border spinner-border-sm me-1"
+                                  role="status"></span>
+                            កំពុងដំណើរការ...
+                        `);
+
+                        $.ajax({
+                            url: "{{ route('missions.updatePaymentStatus', $params) }}",
+                            type: "POST",
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                cboId: cboId
+                            },
+
+                            success: function(response) {
+
+                                if (response.success) {
+
+                                    toastr.success(response.message);
+
+                                    $("#mission-table")
+                                        .DataTable()
+                                        .ajax.reload(null, false);
+
+                                    $("#checkAllMissions")
+                                        .prop("checked", false);
+
+                                    $(".mission-checkbox")
+                                        .prop("checked", false);
+                                }
+                            },
+
+                            error: function(xhr) {
+
+                                let errorMsg = xhr.responseJSON?.message ||
+                                    'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
+
+                                toastr.warning(errorMsg);
+                            },
+
+                            complete: function() {
+
+                                $("#btnPaymentStatus").html(`
+                                <i class="bx bx-money me-1"></i>
+                                ទូទាត់
+                            `);
+
+                                let checked =
+                                    $(".mission-checkbox:checked").length;
+
+                                $("#btnPaymentStatus")
+                                    .prop("disabled", checked === 0);
+                            }
+                        });
+                    });
+                },
+
+                error: function(xhr) {
+
+                    Swal.close();
+
+                    let errorMsg = xhr.responseJSON?.message ||
+                        'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។';
+
+                    toastr.warning(errorMsg);
+                }
+            });
+        });
+    </script>
+    {{-- <script>
+        $(document).on('click', '#btnPaymentStatus', function() {
             let cboId = $(".mission-checkbox:checked").map(function() {
                 return $(this).val();
             }).get();
@@ -494,5 +651,5 @@
                 });
             });
         });
-    </script>
+    </script> --}}
 @endsection

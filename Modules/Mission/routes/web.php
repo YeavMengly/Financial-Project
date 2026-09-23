@@ -31,14 +31,16 @@ Route::prefix('missions')->middleware(['auth'])->group(function () {
             'initial_missions/{params}/update/{id}',
             'update'
         )->name('missions.update');
-
         Route::get('initial_missions/{params}/restore', 'restore')->name('missions.restore');
 
         Route::get('initial_missions/get-by-level', 'getByLevel')->name('missions.by.level');
         Route::get('initial_missions/position/levels', 'getByPositionLevel')->name('position.levels');
 
+        // Info Details
         Route::get('initial_missions/{params}/show/{id}/details', 'show')->name('missions.show');
 
+        // Add to payment
+        Route::post('/missions/payment-total', 'paymentTotal')->name('missions.paymentTotal');
         Route::post(
             'initial_missions/{params}/update-payment-status',
             'updatePaymentStatus'
@@ -54,8 +56,11 @@ Route::prefix('missions')->middleware(['auth'])->group(function () {
         Route::get('initial_missions/edit-by-program-sub/clusters', 'editByProgramSubId')->name('missions.edit.cluster');
     });
 });
-
-Route::get(
+// Route::get(
+//     'initial_missions/{params}/employee/{id}',
+//     [MissionController::class, 'destroyEmployee']
+// )->name('missions.employee.destroy');
+Route::delete(
     'initial_missions/{params}/employee/{id}',
     [MissionController::class, 'destroyEmployee']
 )->name('missions.employee.destroy');

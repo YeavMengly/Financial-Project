@@ -611,12 +611,16 @@
                                                             {{-- Remove --}}
                                                             <div class="col-lg-2 col-md-4">
 
-                                                                <button type="button"
-                                                                    class="btn btn-danger btn-remove-row">
-
-                                                                    <i class="bx bx-trash"></i>
-
-                                                                </button>
+                                                                {{-- Remove Button (Hidden for index 0 / First Row) --}}
+                                                                <div class="col-lg-2 col-md-4">
+                                                                    @if (!$loop->first)
+                                                                        <button type="button"
+                                                                            class="btn btn-danger btn-remove-row"
+                                                                            data-id="{{ $missionEmployee->id ?? '' }}">
+                                                                            <i class="bx bx-trash"></i>
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
 
                                                             </div>
 
@@ -624,13 +628,9 @@
 
                                                     </div>
                                                 @endforeach
-
                                             </div>
-
                                         </div>
-
                                     </div>
-
                                 </div>
                             </div>
 
@@ -923,7 +923,7 @@
         });
     </script>
 
-    {{-- Keep this code --}}
+    {{-- Laod request to save --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -1441,160 +1441,109 @@
                 updateRemoveButtons();
             });
 
+            function updateEmployeeRowNumbers() {
+                $('.employee-row').each(function(index) {
+                    $(this).find('.row-number').text(index + 1);
+                });
+            }
 
             /*
             |--------------------------------------------------------------------------
             | Remove employee row
             |--------------------------------------------------------------------------
             */
-            // $(document).on('click', '.btn-remove-row', function() {
-
-            //     const row = $(this).closest('.employee-row')[0];
-
-            //     if (!row) {
-            //         return;
-            //     }
-
-            //     /*
-            //     |--------------------------------------------------------------------------
-            //     | Check whether the removed row was the leader
-            //     |--------------------------------------------------------------------------
-            //     */
-            //     const wasLeader = row.querySelector('.employee-leader')?.checked ?? false;
-
-
-
-            //     /*
-            //     |--------------------------------------------------------------------------
-            //     | Destroy Choices before removing
-            //     |--------------------------------------------------------------------------
-            //     */
-            //     row.querySelectorAll('select').forEach(function(select) {
-            //         destroyChoices(select);
-            //     });
-
-            //     /*
-            //     |--------------------------------------------------------------------------
-            //     | Remove employee row
-            //     |--------------------------------------------------------------------------
-            //     */
-            //     row.remove();
-
-            //     /*
-            //     |--------------------------------------------------------------------------
-            //     | Update leader radio indexes
-            //     |--------------------------------------------------------------------------
-            //     */
-            //     updateLeaderIndexes();
-
-
-            //     /*
-            //     |--------------------------------------------------------------------------
-            //     | If the leader was removed, select the first employee as leader
-            //     |--------------------------------------------------------------------------
-            //     */
-            //     if (wasLeader) {
-
-            //         const firstRow = document.querySelector(
-            //             '#employeeRows .employee-row:first-child'
-            //         );
-
-            //         if (firstRow) {
-
-            //             const firstLeader = firstRow.querySelector(
-            //                 '.employee-leader'
-            //             );
-
-            //             if (firstLeader) {
-            //                 firstLeader.checked = true;
-            //                 firstLeader.value = '0';
-            //             }
-            //         }
-            //     }
-            //     /*
-            //        |--------------------------------------------------------------------------
-            //        | Update remove buttons
-            //        |--------------------------------------------------------------------------
-            //        */
-            //     updateRemoveButtons();
-            // });
-
             $(document).on('click', '.btn-remove-row', function() {
-
-                const row = $(this).closest('.employee-row')[0];
-
-                if (!row) {
+                const button = $(this);
+                const row = button.closest('.employee-row');
+                const rows = $('.employee-row'); // Get database ID 
+                const recordId = button.attr(
+                    'data-id'
+                ); // ===================================================== // PREVENT DELETING FIRST ROW // ===================================================== 
+                if (rows.index(row) === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'មិនអាចលុបបានទេ',
+                        text: 'មិនអាចលុបជួរទី ១ បានទេ។',
+                        confirmButtonText: 'យល់ព្រម'
+                    });
                     return;
-                }
-
-                // Check whether removed row was leader
-                const wasLeader =
-                    row.querySelector('.employee-leader')?.checked ?? false;
-
-                // Destroy Choices
-                row.querySelectorAll('select').forEach(function(select) {
-                    destroyChoices(select);
-                });
-
-                // Remove row
-                row.remove();
-
-                // Re-index leader radios
-                updateLeaderIndexes();
-
-                // If leader was removed,
-                // first remaining employee becomes leader
-                // if (wasLeader) {
-
-                //     const firstRow = document.querySelector(
-                //         '#employeeRows .employee-row:first-child'
-                //     );
-
-                //     if (firstRow) {
-
-                //         const firstLeader = firstRow.querySelector(
-                //             '.employee-leader'
-                //         );
-
-                //         if (firstLeader) {
-                //             firstLeader.checked = true;
-                //         }
-                //     }
-                // }
-
-                function assignFirstRowAsLeader() {
-                    const rows = document.querySelectorAll('#employeeRows .employee-row');
-
-                    rows.forEach(row => {
-                        const checkbox = row.querySelector('.employee-leader');
-                        const container = row.querySelector('.leader-container');
-
-                        if (checkbox) {
-                            checkbox.checked = false;
-                        }
-
-                        if (container) {
-                            container.style.display = 'none';
+                } // ===================================================== // NEW UNSAVED ROW // ===================================================== 
+                if (!recordId) { // Destroy Choices before removing row
+                    row.find('select').each(function() {
+                        if (typeof destroyChoices === 'function') {
+                            destroyChoices(this);
                         }
                     });
-
-                    if (rows.length > 0) {
-                        const firstRow = rows[0];
-
-                        const checkbox = firstRow.querySelector('.employee-leader');
-                        const container = firstRow.querySelector('.leader-container');
-
-                        if (container) {
-                            container.style.display = '';
+                    row.remove();
+                    updateLeaderIndexes();
+                    assignFirstRowAsLeader();
+                    updateRemoveButtons();
+                    checkSingleRowState();
+                    updateEmployeeRowNumbers();
+                    return;
+                } // ===================================================== // EXISTING DATABASE RECORD // ===================================================== 
+                Swal.fire({
+                    title: 'តើអ្នកពិតជាចង់លុបមែនទេ?',
+                    text: 'ទិន្នន័យនេះនឹងត្រូវលុបចេញពីប្រព័ន្ធ!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'បាទ/ចាស លុប',
+                    cancelButtonText: 'បោះបង់',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    } // Generate Laravel delete URL 
+                    let deleteUrl =
+                        "{{ route('missions.employee.destroy', ['params' => $params, 'id' => '__ID__']) }}";
+                    deleteUrl = deleteUrl.replace('__ID__',
+                        recordId
+                    ); // ================================================= // SHOW LOADING // ================================================= 
+                    button.prop('disabled', true);
+                    button.html(
+                        '<span class="spinner-border spinner-border-sm"></span>'
+                    ); // ================================================= // DELETE FROM DATABASE // ================================================= 
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'DELETE',
+                        data: {
+                            _token: $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(
+                            response
+                        ) { // ========================================= // REMOVE ROW IMMEDIATELY AFTER DB SUCCESS // ========================================= 
+                            row.find('select').each(function() {
+                                if (typeof destroyChoices === 'function') {
+                                    destroyChoices(this);
+                                }
+                            });
+                            row.remove(); // Recalculate UI 
+                            updateLeaderIndexes();
+                            assignFirstRowAsLeader();
+                            updateRemoveButtons();
+                            checkSingleRowState();
+                            updateEmployeeRowNumbers(); // Success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'បានលុបជោគជ័យ',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        },
+                        error: function(xhr) {
+                            console.error('Delete failed:', xhr.status, xhr
+                                .responseText); // Restore button 
+                            button.prop('disabled', false);
+                            button.html('<i class="fa fa-trash"></i>');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'មានបញ្ហា',
+                                text: 'មិនអាចលុបទិន្នន័យបានទេ។ សូមព្យាយាមម្ដងទៀត។',
+                                confirmButtonText: 'យល់ព្រម'
+                            });
                         }
-
-                        if (checkbox) {
-                            checkbox.checked = true;
-                        }
-                    }
-                }
-                // Update remove buttons
-                updateRemoveButtons();
+                    });
+                });
             });
 
             /*
@@ -1658,19 +1607,7 @@
         }
     </script>
 
-    {{-- <script>
-        $(document).on('change', '.assign-budget', function() {
-
-            $('.assign-budget').not(this).prop('checked', false);
-            $('.assign-budget-value').val(0);
-
-            const row = $(this).closest('.employee-row');
-            const hiddenInput = row.find('.assign-budget-value');
-
-            hiddenInput.val(this.checked ? 1 : 0);
-        });
-    </script> --}}
-
+    {{-- Assign Budget to Members --}}
     <script>
         // Handle assign budget checkbox for each employee row 
         $(document).on('change', '.assign-budget', function() {
@@ -1694,33 +1631,123 @@
     </script>
 
     <script>
-        $(document).on('change', '.employee-name', function() {
+        // $(document).on('change', '.employee-name', function() {
 
-            // Get all employee rows
-            const rows = $('.employee-row');
+        //     // Get all employee rows
+        //     const rows = $('.employee-row');
 
-            // If mission has only ONE person
-            if (rows.length === 1) {
+        //     // If mission has only ONE person
+        //     if (rows.length === 1) {
 
-                const row = $(this).closest('.employee-row');
+        //         const row = $(this).closest('.employee-row');
 
-                // Automatically assign budget = 1
-                row.find('.assign-budget-value').val(1);
+        //         // Automatically assign budget = 1
+        //         row.find('.assign-budget-value').val(1);
 
-                // Optional: show checkbox as checked
-                row.find('.assign-budget')
-                    .prop('checked', true)
-                    .prop('disabled', true);
+        //         // Optional: show checkbox as checked
+        //         row.find('.assign-budget')
+        //             .prop('checked', true)
+        //             .prop('disabled', true);
 
-            } else {
+        //     } else {
 
-                // More than one person
-                const row = $(this).closest('.employee-row');
+        //         // More than one person
+        //         const row = $(this).closest('.employee-row');
 
-                // Allow user to choose
-                row.find('.assign-budget').prop('disabled', false);
-            }
-        });
+        //         // Allow user to choose
+        //         row.find('.assign-budget').prop('disabled', false);
+        //     }
+        // });
+
+        // Seconds
+        // $(document).on('click', '.btn-remove-row', function() {
+        //     const row = $(this).closest('.employee-row');
+        //     const rows = $('.employee-row');
+
+        //     // Check if this row is the first one (index 0)
+        //     if (rows.index(row) === 0) {
+        //         toastr.warning('មិនអាចលុបជួរទី ១ បានទេ។'); // Cannot delete the first row
+        //         return;
+        //     }
+
+        //     // Otherwise, allow deletion if there is more than 1 row
+        //     if (rows.length > 1) {
+        //         row.remove();
+
+        //         // Re-run your check in case it drops back down to 1 row
+        //         if ($('.employee-row').length === 1) {
+        //             const remainingRow = $('.employee-row');
+        //             remainingRow.find('.assign-budget-value').val(1);
+        //             remainingRow.find('.assign-budget').prop('checked', true).prop('disabled', true);
+        //         }
+        //     }
+        // });
+
+        // $(document).on('click', '.btn-remove-row', function() {
+        //     const row = $(this).closest('.employee-row');
+        //     const rows = $('.employee-row');
+        //     const recordId = $(this).data('id'); // Get database ID
+
+        //     // Prevent deleting the first row (Index 0)
+        //     if (rows.index(row) === 0) {
+        //         toastr.warning('មិនអាចលុបជួរទី ១ បានទេ។');
+        //         return;
+        //     }
+
+        //     // Confirm deletion with SweetAlert
+        //     Swal.fire({
+        //         title: 'តើអ្នកពិតជាចង់លុបមែនទេ?',
+        //         text: 'ទិន្នន័យនេះនឹងត្រូវលុបចេញពីប្រព័ន្ធ!',
+        //         icon: 'warning',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'បាទ/ចាស លុប',
+        //         cancelButtonText: 'បោះបង់',
+        //         reverseButtons: true
+        //     }).then((result) => {
+        //         if (!result.isConfirmed) {
+        //             return;
+        //         }
+
+        //         // If the row has a database ID, delete it via AJAX
+        //         if (recordId) {
+        //             $.ajax({
+        //                 url: `/missions/employee/${recordId}`, // Adjust your route URL here
+        //                 type: 'DELETE',
+        //                 data: {
+        //                     _token: $('meta[name="csrf-token"]').attr('content')
+        //                 },
+        //                 success: function(response) {
+        //                     if (response.success) {
+        //                         toastr.success(response.message || 'បានលុបដោយជោគជ័យ។');
+        //                         row.remove();
+        //                         checkSingleRowState();
+        //                     } else {
+        //                         toastr.warning('មិនអាចលុបទិន្នន័យបានទេ។');
+        //                     }
+        //                 },
+        //                 error: function(xhr) {
+        //                     let errorMsg = xhr.responseJSON?.message ||
+        //                         'មានបញ្ហាក្នុងការលុបទិន្នន័យ។';
+        //                     toastr.warning(errorMsg);
+        //                 }
+        //             });
+        //         } else {
+        //             // If it's a newly added dynamic row (not saved yet), just remove it from DOM
+        //             row.remove();
+        //             checkSingleRowState();
+        //         }
+        //     });
+        // });
+
+
+        // Helper function to handle layout states if it drops down to 1 row
+        // function checkSingleRowState() {
+        //     if ($('.employee-row').length === 1) {
+        //         const remainingRow = $('.employee-row');
+        //         remainingRow.find('.assign-budget-value').val(1);
+        //         remainingRow.find('.assign-budget').prop('checked', true).prop('disabled', true);
+        //     }
+        // }
     </script>
 
     {{-- Skip File Input --}}

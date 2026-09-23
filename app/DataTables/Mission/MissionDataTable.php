@@ -122,6 +122,9 @@ class MissionDataTable extends DataTable
                     ? Carbon::parse($row->end_date)->format('Y-m-d')
                     : '-';
             })
+            ->editColumn('total_amount', function ($row) {
+                return number_format($row->total_amount ?? 0) . ' ៛';
+            })
             ->editColumn('fileName', function ($row) {
                 if (!$row->fileName) {
                     return '<span class="text-muted">-</span>';
@@ -273,6 +276,7 @@ class MissionDataTable extends DataTable
 
             // Count employees in this mission
             DB::raw('COUNT(mission_employees.id) as employee_count'),
+            DB::raw('SUM(mission_employees.total) as total_amount'),
 
         ]);
 
@@ -427,6 +431,11 @@ class MissionDataTable extends DataTable
                 ->title(__('Task'))
                 ->width(60)
                 ->addClass('text-center align-middle'),
+
+            Column::make('total_amount')
+                ->title(__('tables.th.amount'))
+                ->width(150)
+                ->addClass('align-middle'),
 
             Column::make('legal_number')
                 ->title(__('tables.th.legal.number'))
