@@ -140,8 +140,8 @@
                                     tabindex="13" data-pristine-required-message="{{ __('messages.required') }}">
                                     <option value="">{{ __('forms.search...') }}</option>
                                     @foreach ($HeaderExpenseTypes as $item)
-                                        <option value="{{ $item->id }}">
-                                            {{ $item->name_kh }}
+                                        <option value="{{ $item->id  }}">
+                                            {{ $item->id }}-{{ $item->name_kh }}
                                         </option>
                                     @endforeach
                                 </select>

@@ -46,6 +46,19 @@
                         <div class="row">
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
+                                    <label for="cboHeaderExpenseType"
+                                        class="form-label text-muted">{{ __('forms.header.expense.type') }}</label>
+                                    <select id="cboHeaderExpenseType" class="form-select" name="cboHeaderExpenseType"
+                                        required data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($headerExpenseTypes as $item)
+                                            <option value="{{ $item->id }}">{{ $item->name_kh }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
                                     <label for="cboExpenseType"
                                         class="form-label text-muted">{{ __('forms.expense.type') }}</label>
                                     <select id="cboExpenseType" class="form-select" name="cboExpenseType" required
@@ -265,8 +278,7 @@
 
                                     <!-- Added data-max-size="5" (in MB) and data-allowed-extensions -->
                                     <input type="file" id="fileInput" name="attachments" class="form-control"
-                                        accept=".pdf,.doc,.docx" required
-                                        data-allowed-extensions="pdf,doc,docx"
+                                        accept=".pdf,.doc,.docx" required data-allowed-extensions="pdf,doc,docx"
                                         data-pristine-required-message="{{ __('messages.required') }}" />
                                     <small class="form-text text-muted">Allowed types: PDF, DOC, DOCX (Max: 5MB per
                                         file)</small>
@@ -363,6 +375,16 @@
                     ['para', ['ul', 'ol', 'paragraph']],
                     ['color', ['color']],
                 ]
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('cboHeaderExpenseType');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
             });
         });
     </script>

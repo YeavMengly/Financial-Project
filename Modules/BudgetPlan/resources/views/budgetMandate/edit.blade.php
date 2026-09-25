@@ -32,6 +32,22 @@
                         @csrf
 
                         <div class="row">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="cboHeaderExpenseType"
+                                        class="form-label text-muted">{{ __('forms.expense.type') }}</label>
+                                    <select id="cboHeaderExpenseType" class="form-select" name="cboHeaderExpenseType"
+                                        required data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($headerExpenseTypes as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ $item->id == $module->header_expense_type_id ? 'selected' : '' }}>
+                                                {{ $item->name_kh }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
@@ -327,6 +343,16 @@
                     ['para', ['ul', 'ol', 'paragraph']],
                     ['color', ['color']],
                 ]
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskTypeSelect = document.getElementById('cboHeaderExpenseType');
+            const taskTypeChoices = new Choices(taskTypeSelect, {
+                searchEnabled: true,
+                itemSelectText: '', // Hide "Press to select"
+                placeholderValue: 'ជ្រើសរើសប្រភេទ', // Khmer placeholder
+                searchPlaceholderValue: 'ស្វែងរក...', // Khmer search placeholder
+                shouldSort: false
             });
         });
     </script>

@@ -214,7 +214,23 @@
                                     @enderror
                                 </div>
                             </div>
-
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="cboHeaderExpenseType"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.header.expense.type') }}</label>
+                                    <select class="form-select" id="cboHeaderExpenseType" name="cboHeaderExpenseType"
+                                        required tabindex="13"
+                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($headerExpenseTypes as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ $module->header_expense_type_id == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name_kh }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboExpenseType"
@@ -671,6 +687,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboExpenseType');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+         document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboHeaderExpenseType');
             const choices = new Choices(element, {
                 searchEnabled: true,
                 itemSelectText: '',

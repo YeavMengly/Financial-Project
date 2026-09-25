@@ -50,7 +50,7 @@
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" type="number"
-                                            class="form-control" placeholder="{{ __('forms.legal.id') }}" name="legalID"
+                                            class="form-control" placeholder="{{ __('forms.legal.id') }}"  
                                             tabindex="1" name="legalID" min="0" max="999"
                                             oninput="if(this.value.length > 3) this.value = this.value.slice(0,3)" />
                                     </div>
@@ -202,7 +202,7 @@
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
                                 </div>
-                                {{-- <div class="col-lg-4 col-md-6">
+                                <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboHeaderExpenseType"
                                             class="form-label font-size-13 text-muted">{{ __('forms.header.expense.type') }}</label>
@@ -217,7 +217,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                </div> --}}
+                                </div>
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
                                         <label for="cboExpenseType"
@@ -298,7 +298,7 @@
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
-                                <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
+                                <button class="btn btn-info" type="submit" name="submit">{{ __('buttons.save.create') }}</button>
                                 <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                     <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>

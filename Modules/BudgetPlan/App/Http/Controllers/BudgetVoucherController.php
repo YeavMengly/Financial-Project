@@ -4,7 +4,7 @@ namespace Modules\BudgetPlan\App\Http\Controllers;
 
 use App\DataTables\Budget\BudgetVoucherDataTable;
 use App\DataTables\Budget\InitialVoucherDataTable;
-use App\Exports\BeginExport;
+use App\Exports\BeginguaranteeExport;
 use App\Http\Controllers\Controller;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
@@ -406,24 +406,25 @@ class BudgetVoucherController extends Controller
         // dd($request->all());
         // Validate request inputs
         $validated = $request->validate([
-            'legalID'          => 'required',
-            'paymentVoucher'   => 'required',
-            'legalNumber'      => 'nullable|string',
-            'legalName'        => 'nullable|string',
-            'cboProgram'       => 'required',
-            'cboProgramSub'    => 'required',
-            'cboCluster'       => 'required',
-            'cboAgency'        => 'required',
-            'cboSubAccount'    => 'required',
-            'budget'           => 'required|numeric|min:0',
-            'cboExpenseType'   => 'required',
-            'txtDescription'   => 'required',
-            'attachments'      => 'required|file|max:51200',
-            'transactionDate'  => 'required|date',
-            'requestDate'      => 'required|date',
-            'legalDate'        => 'required|date',
+            'legalID'                => 'required',
+            'paymentVoucher'         => 'required',
+            'legalNumber'            => 'nullable|string',
+            'legalName'              => 'nullable|string',
+            'cboProgram'             => 'required',
+            'cboProgramSub'          => 'required',
+            'cboCluster'             => 'required',
+            'cboAgency'              => 'required',
+            'cboSubAccount'          => 'required',
+            'budget'                 => 'required|numeric|min:0',
+            'cboExpenseType'         => 'required',
+            'cboHeaderExpenseType'   => 'nullable',
+            'txtDescription'         => 'required',
+            'attachments'            => 'nullable|file|max:51200',
+            'transactionDate'        => 'required|date',
+            'requestDate'            => 'required|date',
+            'legalDate'              => 'required|date',
         ]);
-dd($validated);
+
         DB::beginTransaction();
         try {
             // Decode ministry parameters and fetch target record
@@ -464,12 +465,18 @@ dd($validated);
                 return back();
             }
 
-            // Store file consistently in 'sources/voucher/pdf' on the public disk
-            $path_store = 'uploads/voucher/' . date('Y-m-d');
-            if (! File::exists($path_store)) {
-                File::makeDirectory($path_store, 0777, true, true);
+            $filePath = null;
+
+            if ($request->hasFile('attachments')) {
+                $path_store = 'uploads/voucher/' . date('Y-m-d');
+
+                // Storage::makeDirectory is preferred over File::makeDirectory when using public disk
+                if (! File::exists(public_path($path_store))) {
+                    File::makeDirectory(public_path($path_store), 0755, true, true);
+                }
+
+                $filePath = $request->file('attachments')->store($path_store, 'public');
             }
-            $filePath = $request->file('attachments')->store($path_store, 'public');
 
             // Create new budget voucher entry
             BudgetVoucher::create([
@@ -557,7 +564,7 @@ dd($validated);
         $agency      = Agency::where('ministry_id', $ministry->id)->get();
         $expenseType = ExpenseType::all();
         $accountSub  = AccountSub::where('ministry_id', $ministry->id)->get();
-
+        $headerExpenseTypes = HeaderExpenseType::all();
         // Locate active budget voucher record
         $module = BudgetVoucher::where('id', $id)
             ->where('ministry_id', $ministry->id)
@@ -600,6 +607,7 @@ dd($validated);
 
         return view('budgetplan::budgetVoucher.edit')
             ->with('expenseType', $expenseType)
+            ->with('headerExpenseTypes', $headerExpenseTypes)
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('program', $program)
@@ -626,6 +634,7 @@ dd($validated);
             'cboAgency'        => 'required',
             'cboSubAccount'    => 'required',
             'cboExpenseType'   => 'required',
+            'cboHeaderExpenseType'   => 'nullable',
             'budget'           => 'required',
             'txtDescription'   => 'required',
             'transactionDate'  => 'required|date',
@@ -676,6 +685,7 @@ dd($validated);
                 'fin_law'                => $beginVoucher->fin_law,
                 'budget'                 => $applyValue,
                 'expense_type_id'        => $validated['cboExpenseType'],
+                'header_expense_type_id'        => $validated['cboHeaderExpenseType'] ?? null,
                 'legal_id'               => $validated['legalID'],
                 'payment_voucher_number' => $validated['paymentVoucher'],
                 'legal_number'           => $validated['legalNumber'] ?? null,
@@ -1471,7 +1481,7 @@ dd($validated);
                 'count'       => $data->count(),
             ]);
 
-            $export = new BeginExport(
+            $export = new BeginguaranteeExport(
                 $data,
                 $id,
                 $request->start_date,
