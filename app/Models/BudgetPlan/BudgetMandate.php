@@ -30,29 +30,30 @@ class BudgetMandate extends Model
         'cluster_id',
         'account_sub_id',
         'no',
-        'fin_law',
         'budget',
+        'header_expense_type_id',
         'expense_type_id',
-        'legal_id',
-        'payment_voucher_number',
         'legal_number',
+        'legal_id',
         'legal_name',
+        'temporary_id',
+        'payment_voucher_number',
+        'day_of_number',
         'status',
         'is_archived',
         'description',
         'attachments',
         'transaction_date',
-        'request_date',
-        'legal_date',
+        'request_date'
     ];
 
     protected $casts = [
-        'attachments' => 'array',
         'transaction_date' => 'date',
         'request_date' => 'date',
         'legal_date' => 'date',
-        'expense_type_id' => 'array',
+        'attachments' => 'array',
     ];
+
     /* -----------------------------------------------------------------
      |  Relationships
      | -----------------------------------------------------------------

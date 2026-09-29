@@ -2,6 +2,7 @@
 
 namespace App\Models\Content;
 
+use App\Models\BudgetAllocation;
 use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +33,14 @@ class ExpenseType extends Model
     public function budgetMandate()
     {
         return $this->hasMany(BudgetMandate::class, 'expense_type_id', 'id');
+    }
+
+    /**
+     * Get the budgetAllocation under this ministry.
+     */
+    public function budgetAllocation()
+    {
+        return $this->hasMany(BudgetAllocation::class, 'budget_expense_type_id', 'id');
     }
 
 

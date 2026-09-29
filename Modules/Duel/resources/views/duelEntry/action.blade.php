@@ -17,6 +17,14 @@
                         <i class="bx bx-trash"></i> {{ __('buttons.delete') }}
                     </a>
                 @endif
+            @else
+                @if (hasPermission('duelEntry.destroy'))
+                    <a href="#"
+                        onclick="confirm('{{ route('duelEntry.restore', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}', 2)"
+                        class="dropdown-item">
+                        <i class="bx bx-undo"></i> {{ __('buttons.restore') }}
+                    </a>
+                @endif
             @endif
         </ul>
     </div>

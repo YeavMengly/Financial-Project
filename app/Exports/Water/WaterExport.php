@@ -30,7 +30,7 @@ class WaterExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('water_template.xlsx');
+        $templatePath = storage_path('excel/template/water_template.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 

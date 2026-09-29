@@ -5,63 +5,50 @@ namespace App\DataTables\Material;
 use App\Models\Material\MaterialEntry;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class MaterialEntryDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
-     *
-     * @param QueryBuilder $query Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        // Calculate totals dynamically using the computed columns
+        $totalQtyBefore = (clone $query)->sum('material_entries.qty');
+        $totalQtyAfter  = (clone $query)->sum(DB::raw('CAST(material_entries.qty AS SIGNED) - COALESCE(material_releases_sum.total_released, 0)'));
+
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('qty_before_release', function ($row) {
+                return number_format($row->qty_before_release ?? 0);
+            })
+            ->editColumn('qty_after_release', function ($row) {
+                return number_format($row->qty_after_release ?? 0);
+            })
             ->editColumn('price', function ($row) {
                 return number_format($row->price ?? 0) . ' ៛';
             })
             ->editColumn('total_price', function ($row) {
                 return number_format($row->total_price ?? 0) . ' ៛';
             })
-            ->editColumn('soft_delete', function ($soft_delete) {
-                $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
-                return $active;
+            ->editColumn('soft_delete', function ($row) { // Fixed parameter name from $soft_delete to $row
+                return is_null($row->deleted_at)
+                    ? '<span class="badge bg-success">' . __('buttons.active') . '</span>'
+                    : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
             })
             ->addColumn('action', function ($module) {
                 return view('material::materialEntry.action', ['module' => $module]);
             })
-            ->editColumn('note', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->note) . '</div>';
-            })
-            ->editColumn('refer', function ($row) {
-                return '<div style="max-height: 40px; overflow-x: auto; white-space: normal;">' . e($row->refer) . '</div>';
-            })
-            ->editColumn('file', function ($row) {
-                if (!$row->attachments) {
-                    return '<span class="text-muted">-</span>';
-                }
-                $files = json_decode($row->file, true);
-                if (is_array($files)) {
-                    $html = '<ul class="list-unstyled m-0">';
-                    foreach ($files as $file) {
-                        $url = asset('storage/uploads/' . $file);
-                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                } else {
-                    $url = asset('storage/uploads/' . $row->file);
-                    return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
-                }
-            })
-            ->rawColumns(['note', 'refer', 'file']);
+            ->rawColumns(['soft_delete', 'action'])
+            ->with([
+                'total_qty_before' => number_format($totalQtyBefore),
+                'total_qty_after'  => number_format($totalQtyAfter),
+            ]);
     }
 
     /**
@@ -72,38 +59,69 @@ class MaterialEntryDataTable extends DataTable
         $params = $request->params;
         $id = decode_params($params);
 
-        $query = $model->newQuery()
+        // Fixed: Added clean_pname projection to match the join condition
+        $releasedSubquery = DB::table('material_releases')
+            ->select(
+                'p_name',
+                'ministry_id',
+                DB::raw('LOWER(TRIM(p_name)) as clean_pname'),
+                DB::raw('SUM(quantity_total) as total_released')
+            )
+            ->groupBy('p_name', 'ministry_id');
+
+        $query = $model->newQuery();
+        $query->where('material_entries.ministry_id', $id)
+            ->leftJoin('projects', 'material_entries.project_sub_id', '=', 'projects.id')
+            ->leftJoinSub($releasedSubquery, 'material_releases_sum', function ($join) {
+                $join->on(DB::raw('LOWER(TRIM(material_entries.p_name))'), '=', 'material_releases_sum.clean_pname')
+                    ->on('material_entries.ministry_id', '=', 'material_releases_sum.ministry_id');
+            })
             ->select([
                 'material_entries.id',
                 'material_entries.ministry_id',
-                'material_entries.company_name',
-                'material_entries.stock_number',
-                'material_entries.stock_name',
-                'material_entries.user_entry',
-                'material_entries.p_code',
+                'material_entries.project_id',
+                'material_entries.project_sub_id',
+                'projects.sub_project',
                 'material_entries.p_name',
                 'material_entries.p_year',
-                'material_entries.title',
                 'material_entries.unit',
-                'material_entries.quantity',
+                'material_entries.qty',
                 'material_entries.price',
                 'material_entries.total_price',
                 'material_entries.source',
-                'material_entries.note',
-                'material_entries.refer',
-                'material_entries.date_entry',
-                'material_entries.file',
+                'material_entries.deleted_at', // Fixed: Added deleted_at for badge status check
                 'material_entries.created_at',
                 'material_entries.updated_at',
             ])
-            ->where('material_entries.ministry_id', $id);
+            ->orderBy('material_entries.project_id', 'ASC');
+
+        if ($request->filled('project')) {
+            $query->where('material_entries.project_id', $request->input('project'));
+        }
+        if ($request->filled('companyName')) {
+            $query->where('projects.company_name', $request->input('companyName'));
+        }
+        if ($request->filled('userEntry')) {
+            $query->where('projects.user_entry', $request->input('userEntry'));
+        }
+        if ($request->filled('source')) {
+            $query->where('projects.source', 'LIKE', '%' . $request->input('source') . '%');
+        }
+        if ($request->filled('Pname')) {
+            $query->where('projects.p_name', 'LIKE', '%' . $request->input('Pname') . '%');
+        }
+
+        $query->when($request->filled('start_date'), function ($q) use ($request) {
+            $q->whereDate('material_entries.updated_at', '>=', $request->start_date);
+        });
+
+        $query->when($request->filled('end_date'), function ($q) use ($request) {
+            $q->whereDate('material_entries.updated_at', '<=', $request->end_date);
+        });
 
         return $query;
     }
 
-    /**
-     * Optional method if you want to use the html builder.
-     */
     public function html(): HtmlBuilder
     {
         return $this->builder()
@@ -113,8 +131,29 @@ class MaterialEntryDataTable extends DataTable
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
                 ],
+                'drawCallback' => 'function(settings) {
+                var json = this.api().ajax.json();
+                if (json) {
+                    if (json.total_qty_before !== undefined) {
+                        $("#total-qty-before").html(json.total_qty_before);
+                    }
+                    if (json.total_qty_after !== undefined) {
+                        $("#total-qty-after").html(json.total_qty_after);
+                    }
+                }
+            }',
             ])
-            ->orderBy(2, 'ASC');
+            ->ajax([
+                'data' => 'function(d) {
+                d.project = $("#project").val();
+                d.companyName = $("#companyName").val();
+                d.userEntry = $("#userEntry").val();
+                d.source = $("#source").val();
+                d.Pname = $("#Pname").val();
+                d.start_date = $("#start_date").val();
+                d.end_date = $("#end_date").val();
+            }',
+            ]);
     }
 
     /**
@@ -125,33 +164,19 @@ class MaterialEntryDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-
-            Column::make('company_name')->title(__('tables.th.company.name'))->width(90)->addClass('align-middle'),
-            Column::make('stock_number')->title(__('tables.th.stock.number'))->width(30)->addClass('align-middle'),
-            Column::make('stock_name')->title(__('tables.th.stock.name'))->width(30)->addClass('align-middle'),
-            Column::make('user_entry')->title(__('tables.th.user.entry'))->width(60)->addClass('align-middle'),
-            Column::make('p_code')->title(__('tables.th.pro.code'))->width(60)->addClass('align-middle'),
-            Column::make('p_name')->title(__('tables.th.pro.name'))->width(80)->addClass('align-middle'),
-            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
-            Column::make('title')->title(__('tables.th.title'))->width(80)->addClass('align-middle'),
+            Column::make('sub_project')->title(__('tables.th.sub.pro'))->width(80)->addClass('align-middle'),
+            Column::make('p_name')->title(__('tables.th.item.name'))->width(80)->addClass('align-middle'),
             Column::make('unit')->title(__('tables.th.unit'))->width(80)->addClass('align-middle'),
-            Column::make('quantity')->title(__('tables.th.quantity'))->width(80)->addClass('align-middle'),
+            Column::make('qty')->title(__('tables.th.total'))->width(90)->addClass('text-center align-middle'),
             Column::make('price')->title(__('tables.th.price'))->width(80)->addClass('align-middle'),
             Column::make('total_price')->title(__('tables.th.total.price'))->width(80)->addClass('align-middle'),
             Column::make('source')->title(__('tables.th.source'))->width(80)->addClass('align-middle'),
-            Column::make('note')->title(__('tables.th.note'))->addClass('align-middle'),
-            Column::make('refer')->title(__('tables.th.refer'))->addClass('align-middle'),
-            Column::make('date_entry')->title(__('tables.th.date.entry'))->width(200)->addClass('align-middle'),
-            Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
-
+            Column::make('p_year')->title(__('tables.th.pro.year'))->width(80)->addClass('align-middle'),
             Column::computed('action', __('tables.th.action'))
                 ->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];
     }
 
-    /**
-     * Get the filename for export.
-     */
     protected function filename(): string
     {
         return 'MaterialEntry_' . date('YmdHis');

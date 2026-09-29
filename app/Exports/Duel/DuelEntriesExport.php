@@ -36,7 +36,7 @@ class DuelEntriesExport
             ->get();
         $first   = $entries->first();
 
-        $templatePath = public_path('duel_entries_template.xlsx');
+        $templatePath = storage_path('excel/template/duel_entries_template.xlsx');
         $spreadsheet  = IOFactory::load($templatePath);
         $sheet        = $spreadsheet->getActiveSheet();
 

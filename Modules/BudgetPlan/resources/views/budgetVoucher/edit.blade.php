@@ -13,7 +13,7 @@
                 <h4 class="mb-sm-0 font-size-18">{{ __('buttons.edit') }}</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('menus.payment') }}</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{ __('menus.voucher') }}</a></li>
                         <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                     </ol>
                 </div>
@@ -32,71 +32,88 @@
                         @csrf
 
                         <div class="row">
-
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="cboExpenseType"
-                                        class="form-label text-muted">{{ __('forms.expense.type') }}</label>
-                                    <select id="cboExpenseType" class="form-select" name="cboExpenseType" required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                        @foreach ($expenseType as $item)
-                                            <option value="{{ $item->id }}"
-                                                {{ $item->id == $module->expense_type_id ? 'selected' : '' }}>
-                                                {{ $item->name_kh }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="cboPaymentVoucherNumber" class="form-label font-size-13 text-muted">
-                                        {{ __('forms.payment.voucher') }}
-                                    </label>
-                                    <select id="cboPaymentVoucherNumber" class="form-select" name="cboPaymentVoucherNumber"
-                                        required
-                                        data-old="{{ old('cboPaymentVoucherNumber', $module->legal_number ?? '') }}"
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-                                        <option value="">{{ __('forms.search...') }}</option>
-                                    </select>
-
-                                    @error('cboPaymentVoucherNumber')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.legal.name') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        type="text" class="form-control" name="legalName"
-                                        value="{{ old('legalName', $module->legal_name) }}" tabindex="2" />
-                                </div>
-                            </div>
-                            <div class="col-lg-4 col-md-6">
-                                <div class="form-group mb-3">
-                                    <label>{{ __('forms.temporary.id') }}</label>
+                                    <label>{{ __('forms.legal.id') }}</label>
                                     <input required data-pristine-required-message="{{ __('messages.required') }}"
                                         data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
-                                        value="{{ old('cbotemporaryId', $module->temporary_id) }}" type="number"
-                                        class="form-control" placeholder="{{ __('forms.temporary.id') }}"
-                                        name="cbotemporaryId" tabindex="2" />
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                        class="form-control" placeholder="{{ __('forms.legal.id') }}" name="legalID"
+                                        value="{{ old('legalID', $module->legal_id) }}" tabindex="2" />
                                 </div>
                             </div>
+
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label>{{ __('forms.day.number') }}</label>
-                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
-                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
-                                        value="{{ old('cbodayOfNumber', $module->day_of_number) }}" type="text"
-                                        class="form-control" placeholder="{{ __('forms.day.number') }}"
-                                        name="cbodayOfNumber" tabindex="2" />
+
+                                    <label for="legalDate" class="form-label">{{ __('forms.select_legal_date') }}</label>
+                                    <input type="text" id="legalDate" name="legalDate" class="form-control"
+                                        value="{{ old('legalDate', $module->legal_date) }}"
+                                        placeholder="{{ __('forms.select_legal_date') }}" required
+                                        data-pristine-required-message="{{ __('messages.required') }}" />
                                 </div>
                             </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>{{ __('forms.payment.voucher') }}</label>
+                                    <input required data-pristine-required-message="{{ __('messages.required') }}"
+                                        data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
+                                        data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
+                                        value="{{ old('paymentVoucher', $module->payment_voucher_number) }}"
+                                        class="form-control" placeholder="{{ __('forms.payment.voucher') }}"
+                                        name="paymentVoucher" tabindex="2" />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="legalNumber"
+                                            class="form-label mb-0">{{ __('forms.legal.number') }}</label>
+                                        <div class="form-check form-switch mb-0">
+                                            <!-- Check the switch automatically if the value is empty/skipped in DB -->
+                                            <input class="form-check-input" type="checkbox" role="switch" tabindex="4"
+                                                id="skipLegalNumber" style="cursor: pointer;"
+                                                {{ empty($module->legal_number) ? 'checked' : '' }}>
+                                            <label class="form-check-label font-size-12 text-muted" for="skipLegalNumber"
+                                                style="cursor: pointer;">
+                                                រំលង / មិនបញ្ចូលលេខ
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <input class="form-control" id="legalNumber" name="legalNumber"
+                                        data-pristine-required-message="{{ __('messages.required') }}" type="text"
+                                        value="{{ old('legalNumber', $module->legal_number) }}"
+                                        placeholder="{{ __('forms.legal.number') }}"
+                                        {{ empty($module->legal_number) ? 'disabled' : 'required' }} tabindex="5">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label for="legalName" class="form-label mb-0">{{ __('forms.legal.name') }}</label>
+                                        <div class="form-check form-switch mb-0">
+                                            <input class="form-check-input" type="checkbox" role="switch"
+                                                id="skipLegalName" style="cursor: pointer;"
+                                                {{ empty($module->legal_name) ? 'checked' : '' }}>
+                                            <label class="form-check-label font-size-12 text-muted" for="skipLegalName"
+                                                style="cursor: pointer;">
+                                                រំលង / មិនបញ្ចូលលេខ
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <input class="form-control" id="legalName" name="legalName"
+                                        data-pristine-required-message="{{ __('messages.required') }}" type="text"
+                                        value="{{ old('legalName', $module->legal_name) }}"
+                                        placeholder="{{ __('forms.legal.name') }}"
+                                        {{ empty($module->legal_name) ? 'disabled' : 'required' }} tabindex="6">
+                                </div>
+                            </div>
+
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProgram" class="form-label font-size-13 text-muted">
@@ -128,6 +145,7 @@
                                         data-pristine-required-message="{{ __('messages.required') }}">
                                         <option value="">{{ __('forms.search...') }}</option>
                                     </select>
+
                                     @error('cboProgramSub')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
@@ -188,7 +206,7 @@
                             <div class="col-xl-4 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="budget">{{ __('forms.budget') }}</label>
-                                    <input type="number" min="0" name="budget" id="budget" required
+                                    <input type="number" min="0" name="budget" id="budget"
                                         class="form-control" value="{{ old('budget', $module->budget) }}"
                                         data-pristine-required-message="{{ __('messages.required') }}" />
                                     @error('budget')
@@ -196,10 +214,44 @@
                                     @enderror
                                 </div>
                             </div>
-
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="transactionDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                    <label for="cboHeaderExpenseType"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.header.expense.type') }}</label>
+                                    <select class="form-select" id="cboHeaderExpenseType" name="cboHeaderExpenseType"
+                                        required tabindex="13"
+                                        data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($headerExpenseTypes as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ $module->header_expense_type_id == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name_kh }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="cboExpenseType"
+                                        class="form-label font-size-13 text-muted">{{ __('forms.expense.type') }}</label>
+                                    <select class="form-select" id="cboExpenseType" name="cboExpenseType" required
+                                        tabindex="13" data-pristine-required-message="{{ __('messages.required') }}">
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                        @foreach ($expenseType as $item)
+                                            <option value="{{ $item->id }}"
+                                                {{ $module->expense_type_id == $item->id ? 'selected' : '' }}>
+                                                {{ $item->name_kh }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4 col-md-6">
+                                <div class="form-group mb-3"> <label for="transactionDate"
+                                        class="form-label">{{ __('forms.select_date') }}( PO
+                                        FMIS )</label>
                                     <input type="text" id="transactionDate" name="transactionDate"
                                         class="form-control"
                                         value="{{ old('transactionDate', $module->transaction_date) }}"
@@ -210,14 +262,11 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="requestDate" class="form-label">{{ __('forms.select_date') }}</label>
+                                    <label for="fileInput" class="form-label mb-0">{{ __('forms.file.type') }}</label>
                                     <input type="text" id="requestDate" name="requestDate" class="form-control"
-                                        value="{{ old('date', $module->request_date) }}"
+                                        value="{{ old('requestDate', $module->request_date) }}"
                                         placeholder="{{ __('forms.select_request_date') }}" required
                                         data-pristine-required-message="{{ __('messages.required') }}" />
-                                    @error('date')
-                                        <div class="pristine-error text-help">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -238,11 +287,8 @@
                                 id="insertToTableBtn">{{ __('buttons.save') }}</button>
                             <a class="btn btn-dark"
                                 href="{{ route('budgetVoucher.index', $params) }}">{{ __('buttons.back') }}</a>
-
                         </div>
                     </form>
-
-
                 </div>
 
                 {{-- Numbers table (same as create) --}}
@@ -649,69 +695,110 @@
                 shouldSort: false
             });
         });
+         document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboHeaderExpenseType');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
     </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            /* ================== Choices Instance ================== */
-            let legalChoices = initChoices('#cboPaymentVoucherNumber');
+            const form = document.getElementById('pristine-valid-example');
+            if (!form) return;
 
-            function initChoices(selector) {
-                return new Choices(selector, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក...",
-                    shouldSort: false
-                });
+            const pristine = new Pristine(form, {
+                classTo: 'form-group',
+                errorClass: 'has-danger',
+                successClass: 'has-success',
+                errorTextParent: 'form-group',
+                errorTextTag: 'div',
+                errorTextClass: 'text-danger mt-1'
+            });
+
+            const fields = [{
+                    checkbox: document.getElementById('skipLegalNumber'),
+                    input: document.getElementById('legalNumber')
+                },
+                {
+                    checkbox: document.getElementById('skipLegalName'),
+                    input: document.getElementById('legalName')
+                },
+                {
+                    checkbox: document.getElementById('skipFileInput'),
+                    input: document.getElementById('fileInput')
+                }
+            ];
+
+            function setupSkipField(field) {
+                const checkbox = field.checkbox;
+                const input = field.input;
+
+                if (!checkbox || !input) return;
+
+                function toggle() {
+                    const group = input.closest('.form-group');
+
+                    if (checkbox.checked) {
+                        // SKIP ON
+                        input.disabled = true;
+                        input.removeAttribute('required');
+                        input.value = '';
+
+                        input.classList.add('border-success', 'bg-success-subtle');
+
+                        if (group) {
+                            group.classList.remove('has-danger');
+                            group.classList.add('has-success');
+                        }
+                    } else {
+                        // SKIP OFF
+                        input.disabled = false;
+                        input.setAttribute('required', 'required');
+
+                        input.classList.remove('border-success', 'bg-success-subtle');
+
+                        if (group) {
+                            group.classList.remove('has-success');
+                        }
+                    }
+
+                    // Clear old validation messages
+                    pristine.reset();
+                }
+
+                // Run on page load
+                toggle();
+
+                checkbox.addEventListener('change', toggle);
             }
 
-            function resetSelect(selector) {
-                $(selector).html(`<option value="">ស្វែងរក...</option>`);
-            }
+            fields.forEach(field => {
+                setupSkipField(field);
+            });
 
-            function resetChoices(selector, instance) {
-                instance.destroy();
-                return initChoices(selector);
-            }
+            form.addEventListener('submit', function(e) {
+                // Validate only enabled fields
+                const valid = pristine.validate();
 
-            function loadLegalNumber(expenseTypeId, selectedId = null) {
+                if (!valid) {
+                    e.preventDefault();
+                    return false;
+                }
 
-                resetSelect('#cboPaymentVoucherNumber');
-                legalChoices = resetChoices('#cboPaymentVoucherNumber', legalChoices);
-
-                if (!expenseTypeId) return;
-
-                $.ajax({
-                    url: "{{ route('budgetVoucher.edit.expense_type_id') }}",
-                    type: "GET",
-                    data: {
-                        expense_type_id: expenseTypeId,
-                        selected_id: selectedId
-                    },
-                    success: function(html) {
-
-                        $('#cboPaymentVoucherNumber').html(html);
-
-                        legalChoices = resetChoices('#cboPaymentVoucherNumber', legalChoices);
+                // Enable disabled fields before submission (Safely checking for null)
+                fields.forEach(field => {
+                    if (field.input && field.input.disabled) {
+                        field.input.disabled = false;
+                        field.input.value = '';
                     }
                 });
-            }
-
-            /* ================== PRELOAD EDIT DATA ================== */
-
-            const expenseTypeId = $('#cboExpenseType').val();
-            const oldLegalId = $('#cboPaymentVoucherNumber').data('old');
-
-            if (expenseTypeId) {
-                loadLegalNumber(expenseTypeId, oldLegalId);
-            }
-
-            /* ================== EVENT ================== */
-
-            $('#cboExpenseType').on('change', function() {
-                loadLegalNumber($(this).val());
             });
 
         });

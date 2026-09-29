@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('begin_vouchers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ministry_id');
-            $table->unsignedBigInteger('type_id');
+            $table->unsignedBigInteger('type_id')->nullable();
             $table->unsignedBigInteger('agency_id');
             $table->unsignedBigInteger('program_id');
             $table->unsignedBigInteger('program_sub_id');
@@ -33,9 +33,9 @@ return new class extends Migration
             $table->decimal('credit', 15, 0)->default(0);
             $table->decimal('law_average', 15, 2)->default(0);
             $table->decimal('law_correction', 15, 2)->default(0);
-            $table->unsignedBigInteger('expense_type_id');
+            // $table->unsignedBigInteger('expense_type_id');
             $table->timestamps();
-            // $table->softDeletes();
+            $table->softDeletes();
         });
     }
 

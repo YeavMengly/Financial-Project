@@ -91,6 +91,40 @@
         .cardhover:hover {
             background-color: #fdf9f9;
         }
+
+        .tooltip-btn {
+            position: relative;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        /* Tooltip container element */
+        .tooltip-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+
+            /* Hidden by default */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Show on hover */
+        .tooltip-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 @endsection
 
@@ -583,31 +617,15 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#1fad12"></i>
                                         <span class="me-3">{{ __('menus.advance.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                            data-tooltip="ស្នើរសុំ">
                                             {{ $totalCountAdvance }}
                                         </button>
-                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                        {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountPayment }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </button>
+                                        </button> --}}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -620,28 +638,9 @@
                                         <i class="mdi mdi-circle align-middle font-size-12 me-3"
                                             style="color:#f6ff00"></i>
                                         <span class="me-3">{{ __('menus.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountPayment }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown w-100">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalPayment) }}
-                                                            រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -659,31 +658,15 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#fa2314"></i>
                                             <span class="me-3">{{ __('menus.direct.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            <button type="button"
+                                                class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                                data-tooltip="ស្នើរសុំ">
                                                 {{ $totalCountExpenseR }}
                                             </button>
-                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountPaymentD }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
-                                            </button>
+                                            </button> --}}
                                         </p>
                                         <h6>
                                             <span class="text-muted font-size-14 fw-normal">
@@ -696,27 +679,9 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#00fff2"></i>
                                             <span class="me-3">{{ __('menus.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountPaymentD }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown w-100">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalDirPayment) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
                                             </button>
                                         </p>
                                         <h6>
@@ -742,31 +707,15 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#faad14"></i>
                                         <span class="me-3">{{ __('menus.expenditure.guarantee') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                            data-tooltip="ស្នើរសុំ">
                                             {{ $totalCountArch }}
                                         </button>
-                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                        {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountDir }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </button>
+                                        </button> --}}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -779,27 +728,9 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#2200ff"></i>
                                         <span class="me-3">{{ __('menus.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountDir }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown w-100">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalDir) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -817,31 +748,15 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#fa14fa"></i>
                                             <span class="me-3">{{ __('menus.expenditure.procurement') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            <button type="button"
+                                                class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                                data-tooltip="ស្នើរសុំ">
                                                 {{ $totalCountPro }}
                                             </button>
-                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountExp }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
-                                            </button>
+                                            </button> --}}
                                         </p>
                                         <h6>
                                             <span class="text-muted font-size-14 fw-normal">
@@ -854,27 +769,9 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#65203e"></i>
                                             <span class="me-3">{{ __('menus.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountExp }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown w-100">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalExpenditureProcurement) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
                                             </button>
                                         </p>
                                         <h6>
@@ -910,11 +807,13 @@
                                 <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
                                 </button>
-                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
-                                    {{ $program->total_record_mandate }}
-                                </button>
-                                <button type="button" class="btn btn-soft-danger btn-sm">
+                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn tooltip-btn"
+                                    data-tooltip="ស្នើរសុំ">
                                     {{ $program->total_record_voucher }}
+                                </button>
+                                <button type="button" class="btn btn-soft-danger btn-sm tooltip-btn"
+                                    data-tooltip="ទូទាត់">
+                                    {{ $program->total_record_mandate }}
                                 </button>
                             </div>
                         </div>
@@ -958,8 +857,7 @@
                     <select class="form-select-sm" name="chapterLabels" id="chapterLabels">
                         <option selected="">ជំពូក</option>
                         @foreach ($chapterLabels as $ch)
-                            <option value="{{ $ch }}"
-                                {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
+                            <option value="{{ $ch }}" {{ request('chapterLabels') == $ch ? 'selected' : '' }}>
                                 {{ $ch }}
                             </option>
                         @endforeach
@@ -1021,7 +919,7 @@
             $qtyFuelRemain = max(($qtyFuel ?? 0) - ($qtyFuelRelease ?? 0), 0);
         @endphp
 
-        <div class="col-xl-3 col-md-6">
+        {{-- <div class="col-xl-3 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
@@ -1077,8 +975,299 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
+        <div class="col-xl-3 col-md-6">
 
+            <div class="card card-h-100" style="cursor: pointer;" data-bs-toggle="modal"
+                data-bs-target="#fuelDetailModal">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <span class="text-muted lh-4 d-block text-truncate">
+                            ប្រេងសាំង
+                        </span>
+
+                        <div class="ms-auto d-flex align-items-center gap-1">
+
+                            <button type="button" class="btn btn-soft-primary btn-sm mb-3"
+                                onclick="event.stopPropagation()">
+                                {{ $totalFuel }}
+                            </button>
+
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3"
+                                onclick="event.stopPropagation()">
+                                {{ $totalFuelRelease }}
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row align-items-center">
+
+                        <div class="col-12">
+
+                            <div class="row g-2">
+
+                                <div class="col-6">
+
+                                    <div class="p-2 rounded bg-success-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.entry') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuel ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-6">
+
+                                    <div class="p-2 rounded bg-danger-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.release') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuelRelease ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-12">
+
+                                    <div class="p-2 rounded bg-primary-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.remain') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuelRemain ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-nowrap mt-3">
+
+                        <span class="badge bg-info-subtle text-info">
+                            Entry vs Release
+                        </span>
+
+                        <span class="ms-1 text-muted font-size-13">
+                            {{-- {{ $year }} --}}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="modal fade" id="fuelDetailModal" tabindex="-1" aria-labelledby="fuelDetailModalLabel"
+            aria-hidden="true">
+
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+                <div class="modal-content">
+
+                    {{-- Header --}}
+                    <div class="modal-header bg-light">
+
+                        <div>
+
+                            <h5 class="modal-title fw-semibold" id="fuelDetailModalLabel">
+
+                                <i class="ri-oil-line align-middle me-1 text-primary"></i>
+
+                                របាយការណ៍ការបញ្ចេញប្រេងសាំង
+
+                            </h5>
+
+                            <small class="text-muted">
+                                បញ្ជី Duel Release ប្រចាំឆ្នាំ
+                                {{-- {{ $year }} --}}
+                            </small>
+
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+
+                    {{-- Body --}}
+                    <div class="modal-body">
+
+                        {{-- Summary --}}
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-success-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            ចំនួនឯកសារ Entry
+                                        </div>
+
+                                        <h4 class="mb-0 text-success">
+
+                                            {{ number_format($totalFuel) }}
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-danger-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            សរុបបញ្ចេញ
+                                        </div>
+
+                                        <h4 class="mb-0 text-danger">
+
+                                            {{ number_format($qtyFuelRelease) }}
+
+                                            <span class="fs-6">
+                                                លីត្រ
+                                            </span>
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-primary-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            សល់
+                                        </div>
+
+                                        <h4 class="mb-0 text-primary">
+
+                                            {{ number_format($qtyFuelRemain) }}
+
+                                            <span class="fs-6">
+                                                លីត្រ
+                                            </span>
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Chart --}}
+                        <div class="card border shadow-none">
+
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <h5 class="card-title mb-1">
+                                        <i class="ri-bar-chart-2-line text-primary me-1"></i>
+                                        ក្រាបការបញ្ចេញប្រេងសាំង
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        ប្រៀបធៀប បរិមាណសរុប / បញ្ចេញ / សល់
+                                    </small>
+                                </div>
+
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{-- {{ $year }} --}}
+                                </span>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div id="fuelReleaseChart" style="min-height: 380px;"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Footer --}}
+                    <div class="modal-footer bg-light">
+
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+
+                            <i class="ri-close-line me-1"></i>
+
+                            បិទ
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
         @php
             $qtyDieselRemain = max(($qtyDiesel ?? 0) - ($qtyDieselRelease ?? 0), 0);
         @endphp
@@ -1196,6 +1385,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xl-2 col-md-6">
             <!-- card -->
             <div class="card card-h-100">
@@ -1227,6 +1417,26 @@
                     </div>
                 </div><!-- end card body -->
             </div><!-- end card -->
+        </div>
+    </div>
+    {{-- ំMaterial --}}
+    <div class="row card">
+        <div class="card-body">
+
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="card-title mb-1">
+                        {{ __('menus.material') }}
+                    </div>
+                    <p class="text-muted mb-0">
+                        Entry vs Release
+                    </p>
+                </div>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="materialMovementChart"></canvas>
+            </div>
+
         </div>
     </div>
     {{-- Modal Program Sub --}}
@@ -1308,6 +1518,238 @@
                 searchPlaceholderValue: 'ស្វែងរក...',
                 shouldSort: false
             });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const labels = @json($chartLabels);
+
+            const entryQty = @json($entryQty);
+            const releaseQty = @json($releaseQty);
+
+            const entryTotalQ = @json($entryTotalQ);
+            const releaseTotalQ = @json($releaseTotalQ);
+
+            const entryPrice = @json($entryPrice);
+            const releasePrice = @json($releasePrice);
+
+
+            const ctx = document
+                .getElementById('materialMovementChart')
+                .getContext('2d');
+
+
+            new Chart(ctx, {
+
+                type: 'bar',
+
+                data: {
+                    labels: labels,
+
+                    datasets: [
+
+                        // ==========================
+                        // ENTRY
+                        // ==========================
+                        {
+                            label: 'បញ្ចូល',
+
+                            data: entryQty,
+
+                            backgroundColor: '#3b82f6',
+
+                            borderRadius: 1,
+
+                            barPercentage: 0.75,
+
+                            categoryPercentage: 0.65,
+                            totalQ: entryTotalQ,
+
+                            // Save price for tooltip
+                            totalPrice: entryPrice
+                        },
+
+
+                        // ==========================
+                        // RELEASE
+                        // ==========================
+                        {
+                            label: 'បញ្ចេញ',
+
+                            data: releaseQty,
+
+                            backgroundColor: '#ef4444',
+
+                            borderRadius: 1,
+
+                            barPercentage: 0.75,
+
+                            categoryPercentage: 0.65,
+                            totalQ: releaseTotalQ,
+
+                            // Save price for tooltip
+                            totalPrice: releasePrice
+                        }
+
+                    ]
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+
+                    plugins: {
+
+                        legend: {
+                            position: 'top',
+
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                title: function(tooltipItems) {
+
+                                    return tooltipItems[0].label;
+
+                                },
+
+
+                                label: function(context) {
+
+                                    const dataset = context.dataset;
+
+                                    const index = context.dataIndex;
+
+                                    const qty = context.raw;
+                                    const qtytotal = dataset.totalQ[index] ?? 0;
+
+                                    const price = dataset.totalPrice[index] ?? 0;
+
+                                    return [
+                                        `${dataset.label}ផលិតផល: ${Number(qty).toLocaleString()} ប្រភេទ`,
+                                        `${dataset.label}ចំនួនសរុប: ${Number(qtytotal).toLocaleString()}`,
+                                        `ថ្លៃសរុប: ៛​ ${Number(price).toLocaleString()}`
+                                    ];
+
+                                }
+
+                            }
+
+                        },
+
+
+                        // Show quantity above every bar
+                        datalabels: false
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+
+                        },
+
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            title: {
+                                display: true,
+                                text: 'Quantity'
+                            },
+
+                            ticks: {
+
+                                callback: function(value) {
+                                    return Number(value).toLocaleString();
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+
+                plugins: [
+
+                    {
+
+                        id: 'valueLabels',
+
+                        afterDatasetsDraw(chart) {
+
+                            const {
+                                ctx
+                            } = chart;
+
+                            chart.data.datasets.forEach((dataset, datasetIndex) => {
+
+                                const meta = chart.getDatasetMeta(datasetIndex);
+
+                                meta.data.forEach((bar, index) => {
+
+                                    const value = dataset.data[index];
+
+                                    if (value === 0) {
+                                        return;
+                                    }
+
+                                    ctx.save();
+
+                                    ctx.fillStyle = '#1f2937';
+
+                                    ctx.font = 'bold 12px Arial';
+
+                                    ctx.textAlign = 'center';
+
+                                    ctx.textBaseline = 'bottom';
+
+                                    ctx.fillText(
+                                        Number(value).toLocaleString(),
+                                        bar.x,
+                                        bar.y - 5
+                                    );
+
+                                    ctx.restore();
+
+                                });
+
+                            });
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
         });
     </script>
     {{-- mini cahart --}}
@@ -1591,11 +2033,11 @@
                                             <button type="button" class="btn btn-soft-info btn-sm">
                                                 ${sub.total_records ?? 0}
                                             </button>
-                                             <button type="button" class="btn btn-soft-primary btn-sm">
-                                                ${sub.total_record_sub_mandate ?? 0}
-                                            </button>
-                                             <button type="button" class="btn btn-soft-danger btn-sm">
+                                             <button type="button" class="btn btn-soft-primary btn-sm tooltip-btn" data-tooltip="ស្នើរសុំ">
                                                 ${sub.total_record_sub_voucher ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-danger btn-sm tooltip-btn" data-tooltip="ទូទាត់">
+                                                ${sub.total_record_sub_mandate ?? 0}
                                             </button>
                                         </div>
                                     </div>
@@ -2094,3 +2536,536 @@
             });
         });
     </script> --}}
+
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const fuelReleases = @json($fuelReleases);
+            const dieselReleases = @json($dieselReleases);
+            const oilReleases = @json($oilReleases);
+
+
+            const modal = document.getElementById('duelReleaseModal');
+
+            if (!modal) {
+                return;
+            }
+
+
+            modal.addEventListener('show.bs.modal', function(event) {
+
+                const card = event.relatedTarget;
+
+                if (!card) {
+                    return;
+                }
+
+
+                const item = card.dataset.item;
+                const title = card.dataset.title;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Select Data
+                |--------------------------------------------------------------------------
+                */
+
+                let releases = [];
+
+                if (item === '1') {
+
+                    releases = fuelReleases;
+
+                } else if (item === '2') {
+
+                    releases = dieselReleases;
+
+                } else if (item === '3') {
+
+                    releases = oilReleases;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Modal Title
+                |--------------------------------------------------------------------------
+                */
+
+                document.getElementById(
+                    'duelReleaseTitle'
+                ).innerText = title;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Summary
+                |--------------------------------------------------------------------------
+                */
+
+                const totalRelease = releases.reduce(
+                    function(total, row) {
+
+                        return total +
+                            Number(row.quantity_request || 0);
+
+                    },
+                    0
+                );
+
+
+                const lastRow =
+                    releases.length > 0 ?
+                    releases[releases.length - 1] :
+                    null;
+
+
+                const remaining =
+                    lastRow ?
+                    Number(lastRow.quantity_remain || 0) :
+                    0;
+
+
+                document.getElementById(
+                    'modalEntryCount'
+                ).innerText = releases.length.toLocaleString();
+
+
+                document.getElementById(
+                        'modalReleaseQuantity'
+                    ).innerText =
+                    numberFormat(totalRelease) + ' លីត្រ';
+
+
+                document.getElementById(
+                        'modalRemainQuantity'
+                    ).innerText =
+                    numberFormat(remaining) + ' លីត្រ';
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Table
+                |--------------------------------------------------------------------------
+                */
+
+                renderReleaseTable(releases);
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Render Table
+            |--------------------------------------------------------------------------
+            */
+
+            function renderReleaseTable(releases) {
+
+                const tbody =
+                    document.getElementById(
+                        'duelReleaseModalTable'
+                    );
+
+
+                tbody.innerHTML = '';
+
+
+                if (!releases.length) {
+
+                    tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="text-center text-muted py-5">
+
+                        <i class="ri-database-2-line fs-2 d-block mb-2"></i>
+
+                        មិនមានទិន្នន័យ
+
+                    </td>
+                </tr>
+            `;
+
+                    return;
+                }
+
+
+                releases.forEach(function(row, index) {
+
+                    const date = row.date_release ?
+                        formatDate(row.date_release) :
+                        '-';
+
+
+                    tbody.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+                    <td>
+                        <span class="fw-semibold">
+                            ${row.receipt_number ?? '-'}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td class="text-end">
+
+                        ${numberFormat(row.quantity_total)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                    <td class="text-end text-danger fw-semibold">
+
+                        ${numberFormat(row.quantity_request)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                    <td class="text-end text-primary fw-semibold">
+
+                        ${numberFormat(row.quantity_remain)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+                });
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Number Format
+            |--------------------------------------------------------------------------
+            */
+
+            function numberFormat(value) {
+
+                return Number(value || 0).toLocaleString(
+                    'en-US', {
+                        maximumFractionDigits: 2
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Date Format
+            |--------------------------------------------------------------------------
+            */
+
+            function formatDate(value) {
+
+                const date = new Date(value);
+
+                if (isNaN(date.getTime())) {
+                    return value;
+                }
+
+                const day =
+                    String(date.getDate()).padStart(2, '0');
+
+                const month =
+                    String(date.getMonth() + 1).padStart(2, '0');
+
+                const year =
+                    date.getFullYear();
+
+
+                return `${day}/${month}/${year}`;
+
+            }
+
+        });
+    </script> --}}
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const fuelReleases = @json($fuelReleases);
+
+            const dates = fuelReleases.map(function(item) {
+                return item.date_release ?
+                    formatDate(item.date_release) :
+                    '-';
+            });
+
+            const quantityTotal = fuelReleases.map(function(item) {
+                return Number(item.quantity_total ?? 0);
+            });
+
+            const quantityRequest = fuelReleases.map(function(item) {
+                return Number(item.quantity_request ?? 0);
+            });
+
+            const quantityRemain = fuelReleases.map(function(item) {
+                return Number(item.quantity_remain ?? 0);
+            });
+
+
+            // ==========================================
+            // Fuel Release Chart
+            // ==========================================
+
+            const chartElement = document.querySelector('#fuelReleaseChart');
+
+            if (!chartElement) {
+                return;
+            }
+
+            const options = {
+
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: {
+                        show: true
+                    },
+                    zoom: {
+                        enabled: true
+                    }
+                },
+
+                series: [{
+                        name: 'បរិមាណសរុប',
+                        data: quantityTotal
+                    },
+                    {
+                        name: 'បញ្ចេញ',
+                        data: quantityRequest
+                    },
+                    {
+                        name: 'សល់',
+                        data: quantityRemain
+                    }
+                ],
+
+                xaxis: {
+                    categories: dates,
+                    title: {
+                        text: 'កាលបរិច្ឆេទ'
+                    },
+                    labels: {
+                        rotate: -45
+                    }
+                },
+
+                yaxis: {
+                    title: {
+                        text: 'បរិមាណ (លីត្រ)'
+                    },
+
+                    labels: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString();
+                        }
+                    }
+                },
+
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+
+                markers: {
+                    size: 5,
+                    hover: {
+                        size: 7
+                    }
+                },
+
+                dataLabels: {
+                    enabled: false
+                },
+
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+
+                    y: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString() + ' លីត្រ';
+                        }
+                    }
+                },
+
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center'
+                },
+
+                grid: {
+                    strokeDashArray: 4
+                },
+
+                noData: {
+                    text: 'មិនមានទិន្នន័យ'
+                }
+            };
+
+
+            const fuelChart = new ApexCharts(
+                chartElement,
+                options
+            );
+
+            fuelChart.render();
+
+
+            // ==========================================
+            // Format Date
+            // ==========================================
+
+            function formatDate(value) {
+
+                const date = new Date(value);
+
+                if (isNaN(date.getTime())) {
+                    return value;
+                }
+
+                const day = String(date.getDate()).padStart(2, '0');
+
+                const month = String(
+                    date.getMonth() + 1
+                ).padStart(2, '0');
+
+                const year = date.getFullYear();
+
+                return `${day}/${month}/${year}`;
+            }
+
+        });
+    </script> --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const chartLabels = @json($chartLabels);
+
+    const entryQty = @json($fuelEntryQty);
+
+    const releaseQty = @json($fuelReleaseQty);
+
+    const remainQty = @json($fuelRemainQty);
+
+
+    const chartElement = document.querySelector('#fuelReleaseChart');
+
+    if (!chartElement) {
+        return;
+    }
+
+
+    const options = {
+
+        chart: {
+            type: 'line',
+            height: 400,
+            toolbar: {
+                show: true
+            }
+        },
+
+        series: [
+            {
+                name: 'Entry',
+                data: entryQty
+            },
+            {
+                name: 'Release',
+                data: releaseQty
+            },
+            {
+                name: 'Remain',
+                data: remainQty
+            }
+        ],
+
+        xaxis: {
+            categories: chartLabels,
+
+            title: {
+                text: 'Month'
+            }
+        },
+
+        yaxis: {
+            title: {
+                text: 'Quantity (Liter)'
+            },
+
+            labels: {
+                formatter: function (value) {
+                    return Number(value).toLocaleString();
+                }
+            }
+        },
+
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+
+        markers: {
+            size: 5
+        },
+
+        tooltip: {
+            shared: true,
+            intersect: false,
+
+            y: {
+                formatter: function (value) {
+                    return Number(value).toLocaleString() + ' លីត្រ';
+                }
+            }
+        },
+
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center'
+        },
+
+        grid: {
+            strokeDashArray: 4
+        },
+
+        noData: {
+            text: 'មិនមានទិន្នន័យ'
+        }
+    };
+
+
+    const fuelChart = new ApexCharts(
+        chartElement,
+        options
+    );
+
+    fuelChart.render();
+
+});
+</script>

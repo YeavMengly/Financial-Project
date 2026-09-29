@@ -14,22 +14,34 @@ class Document extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
 
-    protected $fillable = ['user_id', 'cate_id', 'sub_id', 'year', 'title', 'description', 'fileName'];
+    protected $fillable = [
+        'id_order',
+        'name',
+        'name_kh',
+        'doc_type',
+        'description'
+    ];
 
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->useLogName(trans('menus.document'))
-            ->logOnly(['user_id', 'cate_id', 'sub_id', 'year', 'title', 'description', 'fileName'])
+            ->logOnly([
+                'id_order',
+                'name',
+                'name_kh',
+                'doc_type',
+                'description'
+            ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn (string $eventName) => "{$eventName}");
+            ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
     }
 
     public function tapActivity(Activity $activity)
     {
         $agent = new Agent();
-        $activity->default_field = "{$this->title} ";
+        $activity->default_field = "{$this->name} ";
         $activity->log_name = trans('menus.document');
         $platform = $agent->platform();
         $browser = $agent->browser();

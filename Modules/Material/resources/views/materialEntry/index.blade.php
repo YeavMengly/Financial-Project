@@ -8,6 +8,7 @@
     <link href="{{ asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/flatpickr/flatpickr.min.css') }}">
 @endsection
 @section('content')
     <!-- start page title -->
@@ -15,8 +16,10 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">
-                    {{ __('menus.material.entry') }}
-
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"> {{ __('menus.material') }}</li>
+                        <li class="breadcrumb-item">{{ __('menus.entry') }}</li>
+                    </ol>
                 </h4>
                 <div class="page-title-right">
                     <div class="page-title-right">
@@ -39,90 +42,112 @@
             <div class="card">
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
+                        <div class="row">
+                            <!-- Project Dropdown -->
+                            <div class="col-sm-2">
+                                <label for="project"
+                                    class="form-label font-size-13 text-muted">{{ __('forms.project') }}</label>
+                                <select class="form-control" name="project" id="project">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($project as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request('project') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->stock_number }}-{{ $item->stock_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div class="col-sm-3">
-                            <label for="companyName" class="form-label font-size-13 text-muted">
-                                {{ __('forms.company.name') }}
-                            </label>
-                            <select class="form-control" name="company_name" id="companyName">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('company_name') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->company_name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <!-- Company Name Dropdown -->
+                            <div class="col-sm-2">
+                                <label for="companyName"
+                                    class="form-label font-size-13 text-muted">{{ __('forms.company.name') }}</label>
+                                <select class="form-control" name="company_name" id="companyName">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($companies as $item)
+                                        <option value="{{ $item->company_name }}"
+                                            {{ request('company_name') == $item->company_name ? 'selected' : '' }}>
+                                            {{ $item->company_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- User Entry Dropdown -->
+                            <div class="col-sm-2">
+                                <label for="userEntry"
+                                    class="form-label font-size-13 text-muted">{{ __('forms.user.entry') }}</label>
+                                <select class="form-control" name="user_entry" id="userEntry">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($userEntries as $item)
+                                        <option value="{{ $item->user_entry }}"
+                                            {{ request('user_entry') == $item->user_entry ? 'selected' : '' }}>
+                                            {{ $item->user_entry }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Source Dropdown -->
+                            <div class="col-sm-2">
+                                <label for="source"
+                                    class="form-label font-size-13 text-muted">{{ __('forms.source') }}</label>
+                                <select class="form-control" name="source" id="source">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($sources as $item)
+                                        <option value="{{ $item->source }}"
+                                            {{ request('source') == $item->source ? 'selected' : '' }}>
+                                            {{ $item->source }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <label for="item_name" class="form-label font-size-13 text-muted">
+                                    {{ __('forms.pro.name') }}
+                                </label>
+                                <select class="form-control" name="p_name" id="Pname">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($materialEntry as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request('p_name') == $item->p_name ? 'selected' : '' }}>
+                                            {{ $item->p_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- <div class="col-sm-2">
+                                <label for="unit" class="form-label font-size-13 text-muted">
+                                    {{ __('forms.unit') }}
+                                </label>
+                                <select class="form-control" name="unit" id="unit">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($unitType as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request('unit') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div> --}}
                         </div>
-
-                        <div class="col-sm-3">
-                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                {{ __('forms.user.entry') }}
-                            </label>
-                            <select class="form-control" name="user_entry" id="userEntry">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('user_entry') == $item->user_entry ? 'selected' : '' }}>
-                                        {{ $item->user_entry }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                {{ __('forms.source') }}
-                            </label>
-                            <select class="form-control" name="source" id="source">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('source') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->source }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                {{ __('forms.pro.name') }}
-                            </label>
-                            <select class="form-control" name="p_name" id="Pname">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('p_name') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->p_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <label for="unit" class="form-label font-size-13 text-muted">
-                                {{ __('forms.unit') }}
-                            </label>
-                            <select class="form-control" name="unit" id="unit">
-                                <option value="">{{ __('forms.search...') }}</option>
-                                @foreach ($materialEntry as $item)
-                                    <option value="{{ $item->id }}"
-                                        {{ request('unit') == $item->id ? 'selected' : '' }}>
-                                        {{ $item->unit }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label for="stock_number" class="form-label font-size-13 text-muted">
                                 {{ __('forms.stock.number') }}
                             </label>
-                            <input type="text" class="form-control" name="stock_number"
+                            <input type="text" class="form-control" name="stock_number" id="stockNum"
                                 value="{{ request('stock_number') }}" />
-                        </div>
+                        </div> --}}
 
+                        <div class="col-sm-3">
+                            <label class=" form-label font-size-13 text-muted"
+                                for="end_date">{{ __('menus.end_date') }}</label>
+                            <input type="text" id="end_date" name="end_date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
                         <div class="col-sm-3 d-flex align-items-center gap-2" style="margin-top: 34px;">
 
                             {{-- Search --}}
@@ -178,6 +203,8 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="{{ asset('assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+
 
     <script>
         function confirm(url, condi) {
@@ -214,6 +241,16 @@
     </script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const project = document.getElementById('project');
+            const projectChoices = new Choices(project, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false,
+            });
+        });
         document.addEventListener('DOMContentLoaded', function() {
             const companyName = document.getElementById('companyName');
             const companyNameChoices = new Choices(companyName, {
@@ -289,6 +326,58 @@
                 }
             });
         });
+    </script>
+    <script>
+        let fpStart = null;
+        let fpEnd = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to extract URL parameters (keeps date values after page refresh)
+            function getUrlParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            const initialStartDate = getUrlParam('start_date') || document.getElementById('start_date')?.value || null;
+            const initialEndDate = getUrlParam('end_date') || document.getElementById('end_date')?.value || null;
+
+            // Common config with auto-reload on selection
+            const dateConfig = {
+                dateFormat: 'Y-m-d',
+                altInput: true,
+                altFormat: 'd/m/Y',
+                allowInput: true,
+                onChange: function(selectedDates, dateStr) {
+                    // Instantly refresh DataTables when date changes
+                    if ($.fn.DataTable.isDataTable('#materialentry-table')) {
+                        $('#materialentry-table').DataTable().ajax.reload();
+                    }
+                }
+            };
+            const startDateEl = document.getElementById('start_date');
+            const endDateEl = document.getElementById('end_date');
+            // Initialize Start Date Flatpickr
+            if (startDateEl) {
+                fpStart = flatpickr(startDateEl, {
+                    ...dateConfig,
+                    defaultDate: initialStartDate
+                });
+            }
+            // Initialize End Date Flatpickr
+            if (endDateEl) {
+                fpEnd = flatpickr(endDateEl, {
+                    ...dateConfig,
+                    defaultDate: initialEndDate
+                });
+            }
+        });
+    </script>
+    <script>
+        $('#project, #companyName, #userEntry, #source, #Pname,#stockNum')
+            .on('change keyup',
+                function() {
+                    $('#materialentry-table').DataTable().ajax.reload();
+                });
     </script>
 
     {!! $dataTable->scripts() !!}

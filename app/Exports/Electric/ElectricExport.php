@@ -30,7 +30,7 @@ class ElectricExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('electric_template.xlsx');
+        $templatePath = storage_path('excel/template/electric_template.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 

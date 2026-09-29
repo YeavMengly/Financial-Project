@@ -12,6 +12,7 @@ use App\Models\Content\Ministry;
 use App\Models\Duel\DuelEntry;
 use App\Models\Duel\DuelRelease;
 use App\Models\DuelType;
+use App\Models\Material\Projects;
 use App\Models\UnitType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,12 +20,14 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class DuelReleaseController extends Controller
 {
     public function getIndex(InitialDuelReleaseDataTable $dataTable)
     {
+        //  return view('maintenance.maintenance');
         return $dataTable->render('duel::duelRelease.initialDuelRelease.index');
     }
 
@@ -58,21 +61,86 @@ class DuelReleaseController extends Controller
     {
         if ($request->stock_number) {
             $ministryId = decode_params($params);
-            $data = DuelEntry::select(
-                'duel_entries.id',
-                'duel_entries.stock_number',
-                'duel_types.name_km'
-            )
-                ->leftJoin('duel_types', 'duel_entries.item_name', '=', 'duel_types.id')
-                ->where('duel_entries.ministry_id', $ministryId)
-                ->get();
             $selectedId = $request->selected_id ?? null;
 
-            foreach ($data as $d) {
-                $selected = $selectedId == $d->stock_number ? 'selected' : '';
-                echo "<option value='{$d->id}' {$selected}>{$d->name_km}</option>";
+            // Check if explicit edit flag is set OR if a selected_id is provided
+            $isEditMode = $request->has('is_edit') ? (bool) $request->is_edit : !empty($selectedId);
+
+            // Fetch ALL master fuel types
+            $fuelTypes = DuelType::orderBy('id', 'asc')->get();
+
+            $options = '<option value="">' . __('forms.search...') . '</option>';
+
+            foreach ($fuelTypes as $type) {
+                if ($isEditMode) {
+                    // EDIT MODE: Always show ALL fuel types regardless of stock level
+                    $selected = ($selectedId == $type->id) ? 'selected' : '';
+                    $options .= "<option value='{$type->id}' {$selected}>{$type->name_km}</option>";
+                } else {
+                    // CREATE MODE: Calculate stock and only show items with remainingStock > 0
+                    $totalEntry = (float) DuelEntry::where('ministry_id', $ministryId)
+                        ->where('project_id', $request->stock_number)
+                        ->where('item_name', $type->id)
+                        ->whereNull('deleted_at')
+                        ->sum('quantity');
+
+                    $totalReleased = (float) DuelRelease::where('ministry_id', $ministryId)
+                        ->where('project_id', $request->stock_number)
+                        ->where('item_name', $type->id)
+                        ->whereNull('deleted_at')
+                        ->sum('quantity_request');
+
+                    $remainingStock = $totalEntry - $totalReleased;
+
+                    if ($remainingStock > 0) {
+                        $options .= "<option value='{$type->id}'>{$type->name_km}</option>";
+                    }
+                }
             }
+
+            return response($options);
         }
+
+        return response('<option value="">' . __('forms.search...') . '</option>');
+    }
+    public function getByAgencyId(Request $request)
+    {
+        if ($request->agency_id) {
+            $data = ExecutiveUnit::select('id', 'agency_id', 'title')
+                ->where('agency_id', $request->agency_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->title}</option>";
+            }
+            return response($html);
+        }
+
+        return response('');
+    }
+
+    public function editByAgencyId(Request $request)
+    {
+        if ($request->agency_id) {
+            $data = ExecutiveUnit::select('id', 'agency_id', 'title')
+                ->where('agency_id', $request->agency_id)
+                ->get();
+
+            $selectedId = $request->selected_id ?? null;
+
+            $html = '';
+            foreach ($data as $d) {
+                $selected = $selectedId == $d->id ? 'selected' : '';
+                $html .= "<option value='{$d->id}' {$selected}>{$d->title}</option>";
+            }
+            return response($html);
+        }
+
+        return response('');
     }
 
     /**
@@ -84,11 +152,31 @@ class DuelReleaseController extends Controller
         $duelType = DuelType::all();
         $agency = Agency::where('ministry_id', $ministry->id)->get();
         $unitType = UnitType::where('name', 'លីត្រ')->get();
-        $duelEntry = DuelEntry::where('ministry_id', $ministry->id)
-            ->pluck('stock_number')
-            ->unique()
+
+        // 2. Query DuelEntry using whereIn for the array of project IDs
+        $duelEntry = DuelEntry::select(
+             'duel_entries.id',
+            'duel_entries.project_id',
+            'duel_entries.item_name',
+            'projects.stock_number',
+            'projects.stock_name',
+            'projects.title as project_title'
+        )
+            ->leftJoin('projects', 'duel_entries.project_id', '=', 'projects.id')
+            ->where('duel_entries.ministry_id', $ministry->id)
+            ->whereNull('projects.deleted_at')
+            ->whereNull('duel_entries.deleted_at') // Fix: Added table prefix to prevent ambiguous column error
+            ->orderBy('duel_entries.created_at', 'desc') // Optional: Ensure you get the latest entry per project
+            ->get()
+            ->unique('project_id')
             ->values();
 
+    //  $data = DuelEntry::distinct()->pluck('project_id');
+
+    //  $duelEntry = DuelEntry::where('project_id', $data)->get();
+
+        // dd($duelEntry);
+        
         return view('duel::duelRelease.create')
             ->with('ministry', $ministry)
             ->with('duelType', $duelType)
@@ -98,137 +186,6 @@ class DuelReleaseController extends Controller
             ->with('params', $params);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request, $params)
-    // {
-    //     $ministryId = decode_params($params);
-
-    //     $validated = $request->validate([
-    //         'stock_number'      => 'required',
-    //         'item_name'         => 'required',           // DuelEntry ID
-    //         // 'unit'              => 'required',
-    //         'agency'            => 'required|integer',
-    //         'receipt_number'    => 'required|string|max:255',
-    //         'user_request'      => 'required|string|max:255',
-    //         'quantity_request'  => 'required|numeric|min:0',
-    //         'date_release'      => 'required|string',
-    //         'title'             => 'required|string|max:255',
-    //         'refer'             => 'required|string',
-    //         'note'              => 'required|string',
-    //         'file'              => 'nullable|array',
-    //         'file.*'            => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
-    //     ]);
-
-    //     DB::beginTransaction();
-
-    //     try {
-
-    //         // ✅ Correct file storing
-    //         $paths = [];
-    //         if ($request->hasFile('file')) {
-    //             foreach ($request->file('file') as $file) {
-    //                 if ($file->isValid()) {
-    //                     $paths[] = $file->store('duelRelease', 'public');
-    //                 }
-    //             }
-    //         }
-
-    //         $ministry = Ministry::where('id', $ministryId)->firstOrFail();
-
-    //         // ✅ DuelEntry selected in the dropdown (item_name is DuelEntry ID)
-    //         $duelEntry = DuelEntry::findOrFail($validated['item_name']);
-
-    //         // ---------------------- 🔥 CORE LOGIC 🔥 ----------------------
-    //         // 1. Initial stock from DuelEntry (first time)
-    //         $initialQuantity = $duelEntry->quantity ?? 0;
-
-    //         // 2. Find last release for this (ministry + stock_number + item_name)
-    //         $lastRelease = DuelRelease::where('ministry_id', $ministry->id)
-    //             ->where('stock_number', $validated['stock_number'])
-    //             ->where('item_name', $duelEntry->item_name)   // item_name stored as text
-    //             ->orderBy('id', 'desc')
-    //             ->first();
-
-    //         // 3. quantity_total = balance BEFORE this release
-    //         //    - if no previous release: use initial stock
-    //         //    - else: use last duel_total
-    //         if ($lastRelease) {
-    //             $quantityTotal = $lastRelease->duel_total;   // e.g. 79,400 for the second row
-    //         } else {
-    //             $quantityTotal = $initialQuantity;           // e.g. 79,600 for the first row
-    //         }
-
-    //         // 4. duel_total = balance AFTER this release
-    //         $duelTotal = $quantityTotal - $validated['quantity_request'];
-
-    //         // 5. Prevent negative balance
-    //         if ($duelTotal < 0) {
-    //             throw new \Exception('ឥណទានមិនគ្រប់ចំនួន សូមពិនិត្យម្តងទៀត!');
-    //         }
-    //         // ---------------------- 🔥 END CORE LOGIC 🔥 ----------------------
-
-    //         // date parsing
-    //         try {
-    //             $dateRelease = Carbon::createFromFormat('d/m/Y', $validated['date_release'])->format('Y-m-d');
-    //         } catch (\Exception $e) {
-    //             $dateRelease = $validated['date_release'];
-    //         }
-
-    //         // ✅ Create DuelRelease record
-    //         DuelRelease::create([
-    //             'ministry_id'      => $ministry->id,
-    //             'stock_number'     => $validated['stock_number'],   // code or number
-    //             'item_name'        => $duelEntry->item_name,        // store name from DuelEntry
-    //             'unit'             => 2,
-    //             'agency'           => $validated['agency'],
-    //             'receipt_number'   => $validated['receipt_number'],
-    //             'user_request'     => $validated['user_request'],
-    //             'quantity_request' => $validated['quantity_request'],
-
-    //             // ⭐ now matches your table:
-    //             // first row:  quantity_total = 79,600, duel_total = 79,400
-    //             // second row: quantity_total = 79,400, duel_total = 79,250
-    //             'quantity_total'   => $quantityTotal,
-    //             'duel_total'       => $duelTotal,
-
-    //             'date_release'     => $dateRelease,
-    //             'title'            => $validated['title'],
-    //             'note'             => strip_tags($validated['note'] ?? ''),
-    //             'refer'            => strip_tags($validated['refer']),
-    //             'file'             => json_encode($paths),
-    //         ]);
-
-    //         // (Optional) also update DuelEntry stock itself:
-    //         // $duelEntry->update(['quantity' => $duelTotal]);
-
-    //         DB::commit();
-
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->success('បញ្ចូលទិន្នន័យបានជោគជ័យ!', 'ជោគជ័យ')
-    //             ->flash();
-
-    //         return redirect()->route('duelRelease.index', $params);
-    //     } catch (\Throwable $e) {
-    //         DB::rollBack();
-
-    //         Log::error('DuelRelease Store Error: ' . $e->getMessage(), [
-    //             'trace' => $e->getTraceAsString(),
-    //         ]);
-
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->error('បញ្ហាក្នុងការរក្សាទុកទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
-    //             ->flash();
-
-    //         return back()->withInput();
-    //     }
-    // }
-
     public function store(Request $request, $params)
     {
         $ministryId = decode_params($params);
@@ -236,16 +193,17 @@ class DuelReleaseController extends Controller
         $validated = $request->validate([
             'stock_number'     => 'required',
             'item_name'        => 'required',
-            'agency'           => 'required|integer',
-            'receipt_number'   => 'required|string|max:255',
+            'agency'           => 'nullable|string',
+            // 'cboExecutive'     => 'nullable|string',
+            'receipt_number'   => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
-            'quantity_request' => 'required|numeric|min:0',
-            'date_release'     => 'required|string',
-            'title'            => 'required|string|max:255',
+            'receiver'         => 'nullable|string|max:255',
+            'quantity_request' => 'required|numeric|min:0.01',
+            'date_release'     => 'required|date',
+            'title'            => 'nullable|string|max:255',
             'refer'            => 'required|string',
             'note'             => 'required|string',
-            'file'             => 'nullable|array',
-            'file.*'           => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'file'             => 'nullable|file|max:51200',
         ]);
 
         $paths = [];
@@ -253,74 +211,192 @@ class DuelReleaseController extends Controller
         DB::beginTransaction();
 
         try {
-            // 1. Save uploaded files
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
-                        $paths[] = $file->store('duelRelease', 'public');
-                    }
-                }
+
+            // =========================================================
+            // 1. Get Ministry
+            // =========================================================
+
+            $ministry = Ministry::where('id', $ministryId)
+                ->firstOrFail();
+
+            // =========================================================
+            // 2. Get DuelEntry
+            // =========================================================
+
+            $duelEntry = DuelEntry::where('project_id', $validated['stock_number'])
+                ->where('ministry_id', $ministry->id)
+                ->where('item_name', $validated['item_name'])
+                ->firstOrFail();
+
+            // =========================================================
+            // 3. Check current stock
+            // =========================================================
+
+            $stockQuantity = (float) ($duelEntry->quantity ?? 0);
+
+            if ($stockQuantity <= 0) {
+                throw new \Exception(
+                    'សម្ភារៈនេះមិនមានចំនួននៅសល់ទេ!'
+                );
             }
 
-            $ministry  = Ministry::where('id', $ministryId)->firstOrFail();
-            $duelEntry = DuelEntry::findOrFail($validated['item_name']);
+            // =========================================================
+            // 4. Calculate existing requested quantity
+            // =========================================================
 
-            // 2. Date parsing
+            $alreadyRequested = DuelRelease::where('ministry_id', $ministry->id)
+                ->where('duel_entries_id', $duelEntry->id)
+                ->sum('quantity_request');
+
+            $alreadyRequested = (float) $alreadyRequested;
+
+            // =========================================================
+            // 5. New request quantity
+            // =========================================================
+
+            $newRequest = (float) $validated['quantity_request'];
+
+            // =========================================================
+            // 6. Calculate total requested
+            // =========================================================
+
+            $totalRequested = $alreadyRequested + $newRequest;
+
+            // =========================================================
+            // 7. Check quantity
+            // =========================================================
+
+            if ($totalRequested > $stockQuantity) {
+
+                $remaining = $stockQuantity - $alreadyRequested;
+
+                throw new \Exception(
+                    "ចំនួនមិនគ្រប់! ចំនួនមាន: {$stockQuantity}, " .
+                        "បានស្នើរួច: {$alreadyRequested}, " .
+                        "អាចស្នើបានតែ: {$remaining}"
+                );
+            }
+
+            // =========================================================
+            // 8. Upload file
+            // =========================================================
+
+            $filePath = null;
+
+            if ($request->hasFile('file')) {
+
+                $pathStore = 'uploads/duel/release/' . date('Y-m-d');
+
+                if (!File::exists($pathStore)) {
+                    File::makeDirectory(
+                        $pathStore,
+                        0777,
+                        true,
+                        true
+                    );
+                }
+
+                $filePath = $request->file('file')
+                    ->store($pathStore, 'public');
+
+                $paths[] = $filePath;
+            }
+
+            // =========================================================
+            // 9. Convert date
+            // =========================================================
             try {
                 $dateRelease = Carbon::createFromFormat('d/m/Y', $validated['date_release'])->format('Y-m-d');
             } catch (\Exception $e) {
                 $dateRelease = $validated['date_release'];
             }
 
-            // 3. Create initial record (placeholder totals, recalculated in step 4)
-            $duelRelease = DuelRelease::create([
-                'ministry_id'      => $ministry->id,
-                'stock_number'     => $validated['stock_number'],
-                'item_name'        => $duelEntry->item_name,
-                'unit'             => 2, // Verify if hardcoding '2' is intended
-                'agency'           => $validated['agency'],
-                'receipt_number'   => $validated['receipt_number'],
-                'user_request'     => $validated['user_request'],
-                'quantity_request' => $validated['quantity_request'],
-                'quantity_total'   => 0, // Temporarily 0
-                'duel_total'       => 0, // Temporarily 0
-                'date_release'     => $dateRelease,
-                'title'            => $validated['title'],
-                'note'             => strip_tags($validated['note'] ?? ''),
-                'refer'            => strip_tags($validated['refer']),
-                'file'             => json_encode($paths),
+            // =========================================================
+            // 10. Create DuelRelease
+            // =========================================================
+
+            DuelRelease::create([
+                'ministry_id'       => $ministry->id,
+                'project_id'        => $duelEntry->project_id,
+                'duel_entries_id'   => $duelEntry->id,
+
+                'item_name'         => $validated['item_name'],
+                'receipt_number'    => $validated['receipt_number'],
+
+                'agency'            => $validated['agency'] ?? null,
+                // 'executive_unit_id' => $validated['cboExecutive'] ?? null,
+                'title'             => $validated['title'] ?? null,
+
+                'user_request'      => $validated['user_request'],
+                'receiver'          => $validated['receiver'] ?? null,
+
+                'unit'              => 2,
+
+                'quantity_total'    => 0,
+                'quantity_request'  => $newRequest,
+                'quantity_remain'   => 0,
+
+                'date_release'      => $dateRelease,
+
+                'note'              => strip_tags($validated['note']),
+                'refer'             => strip_tags($validated['refer']),
+
+                'file'              => $filePath,
             ]);
 
-            // 4. Recalculate running totals for this stock item across all records
-            $this->recalculateLedger($ministry->id, $validated['stock_number'], $duelEntry->item_name);
+            // =========================================================
+            // 11. Recalculate ALL releases
+            // =========================================================
+
+            $this->recalculateLedger(
+                $ministry->id,
+                $validated['stock_number'],
+                $validated['item_name']
+            );
+
+            // =========================================================
+            // 12. Commit
+            // =========================================================
 
             DB::commit();
 
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
-                ->success('បញ្ចូលទិន្នន័យបានជោគជ័យ!', 'ជោគជ័យ')
+                ->success(
+                    'បញ្ចូលទិន្នន័យបានជោគជ័យ!',
+                    'ជោគជ័យ'
+                )
                 ->flash();
 
-            return redirect()->route('duelRelease.index', $params);
+            return redirect()->route(
+                'duelRelease.index',
+                $params
+            );
         } catch (\Throwable $e) {
+
             DB::rollBack();
 
-            // 5. Clean up any uploaded files if the transaction failed
+            // Delete uploaded file if transaction failed
             foreach ($paths as $path) {
+
                 if (Storage::disk('public')->exists($path)) {
                     Storage::disk('public')->delete($path);
                 }
             }
 
-            Log::error('DuelRelease Store Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            Log::error('DuelRelease Store Error', [
+                'message' => $e->getMessage(),
+                'trace'   => $e->getTraceAsString(),
             ]);
 
             flash()
                 ->translate('en')
-                ->option('timeout', 2000)
-                ->error('បញ្ហាក្នុងការរក្សាទុកទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->option('timeout', 3000)
+                ->error(
+                    $e->getMessage(),
+                    'បញ្ហា'
+                )
                 ->flash();
 
             return back()->withInput();
@@ -340,17 +416,42 @@ class DuelReleaseController extends Controller
      */
     public function edit($params, $id)
     {
-        $ministry   = Ministry::where('id',  decode_params($params))->first();
-        $duelType = DuelType::all();
-        $duelRelease = DuelRelease::where('id', decode_params($id))
-            ->where('ministry_id', $ministry->id)
-            ->first();
-        $unitType   = UnitType::where('name', 'លីត្រ')->get();
+        $ministry = Ministry::where('id', decode_params($params))->firstOrFail();
+        $releaseId = decode_params($id);
 
-        $agency     = Agency::where('ministry_id', $ministry->id)->get();
-        $duelEntryStock = DuelEntry::where('ministry_id', $ministry->id)
-            ->pluck('stock_number')
-            ->unique()
+        // 1. Fetch the specific record being edited
+        $duelRelease = DuelRelease::where('id', $releaseId)
+            ->where('ministry_id', $ministry->id)
+            ->firstOrFail();
+
+        // 2. Fetch all fuel types
+        $duelType = DuelType::all();
+        $unitType = UnitType::where('name', 'លីត្រ')->get();
+        $agency   = Agency::where('ministry_id', $ministry->id)->get();
+
+        // 3. Fetch project options for the Stock Number dropdown
+        $duelEntry = DuelEntry::select(
+            'duel_entries.id',
+            'duel_entries.project_id',
+            'duel_entries.ministry_id',
+            'projects.stock_number',
+            'projects.stock_name',
+            'projects.title as project_title'
+        )
+            ->leftJoin('projects', 'duel_entries.project_id', '=', 'projects.id')
+            ->where('duel_entries.ministry_id', $ministry->id)
+            ->whereNull('projects.deleted_at')
+            ->whereNull('duel_entries.deleted_at')
+            ->groupBy(
+                'duel_entries.id',
+                'duel_entries.project_id',
+                'duel_entries.ministry_id',
+                'projects.stock_number',
+                'projects.stock_name',
+                'projects.title'
+            )
+            ->get()
+            ->unique('project_id')
             ->values();
 
         return view('duel::duelRelease.edit')
@@ -359,89 +460,34 @@ class DuelReleaseController extends Controller
             ->with('unitType', $unitType)
             ->with('duelType', $duelType)
             ->with('agency', $agency)
-            ->with('duelEntry', $duelEntryStock)
+            ->with('duelEntry', $duelEntry)
             ->with('ministry', $ministry);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    // public function update(Request $request, $params, $id)
-    // {
-
-    //     $validated = $request->validate([
-    //         'stock_number' => 'required',
-    //         'item_name'  => 'required',
-    //         'quantity_request' => 'required|numeric',
-    //         'agency' => 'required',
-    //         'receipt_number' => 'required',
-    //         'user_request' => 'required',
-    //         'date_release' => 'required|date',
-    //         'refer' => 'required',
-    //         'note' => 'required',
-    //     ]);
-    //     DB::beginTransaction();
-    //     try {
-
-    //         $ministry = Ministry::where('id', decode_params($params))->first();
-    //         $duelRelease = DuelRelease::where('id', $id)->where('ministry_id', $ministry->id)->first();
-
-
-    //         // Update main DuelRelease record
-    //         $duelRelease->update([
-    //             'stock_number' => $validated['stock_number'],
-    //             'item_name' => $validated['item_name'],
-    //             'quantity_request' => $validated['quantity_request'],
-    //             'user_request' => $validated['user_request'],
-    //             'agency' => $validated['agency'],
-    //             'date_release' => $validated['date_release'],
-    //             'refer' => strip_tags($validated['refer']),
-    //             'note'  => strip_tags($validated['note']),
-    //         ]);
-
-    //         DB::commit();
-
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->success('success_msg', 'successful')
-    //             ->flash();
-    //         return redirect()->route('duelRelease.index', $params);
-    //     } catch (\Exception $e) {
-
-    //         DB::rollBack();
-    //         Log::error($e->getMessage());
-
-    //         flash()
-    //             ->translate('en')
-    //             ->option('timeout', 2000)
-    //             ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
-    //             ->flash();
-
-    //         return redirect()->route('duelRelease.index', $params);
-    //     }
-    // }
     public function update(Request $request, $params, $id)
     {
         $ministryId = decode_params($params);
 
         $validated = $request->validate([
             'stock_number'     => 'required',
-            'item_name'        => 'required', // DuelEntry ID from dropdown
-            'agency'           => 'nullable|integer',
-            'receipt_number'   => 'required|string|max:255',
+            'item_name'        => 'required',
+            'agency'           => 'required|string',
+            // 'cboExecutive'     => 'nullable|integer',
+            'receipt_number'   => ['required', 'string', 'digits:4'],
             'user_request'     => 'required|string|max:255',
+            'receiver'         => 'nullable|string|max:255',
             'quantity_request' => 'required|numeric|min:0',
             'date_release'     => 'required|string',
-            // 'title'            => 'required|string|max:255',
+            'title'            => 'nullable|string|max:255',
             'refer'            => 'required|string',
             'note'             => 'required|string',
-            'file'             => 'nullable|array',
-            'file.*'           => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
-        // dd($validated);
-        DB::beginTransaction();
 
+        DB::beginTransaction();
+        //    dd($validated);
         try {
             $ministry = Ministry::where('id', $ministryId)->firstOrFail();
             $duelRelease = DuelRelease::where('id', $id)
@@ -449,11 +495,13 @@ class DuelReleaseController extends Controller
                 ->firstOrFail();
 
             // 1. Keep track of old stock details before update in case the item/stock changed
-            $oldStockNumber = $duelRelease->stock_number;
+            $oldStockNumber = $duelRelease->project_id;
             $oldItemName = $duelRelease->item_name;
 
             // 2. Resolve selected DuelEntry (matches store logic)
-            $duelEntry = DuelEntry::findOrFail($validated['item_name']);
+            $duelEntry = DuelEntry::where('project_id', $validated['stock_number'])
+                ->where('ministry_id', $ministry->id)
+                ->firstOrFail();
 
             // 3. Date parsing (matches store logic)
             try {
@@ -463,28 +511,32 @@ class DuelReleaseController extends Controller
             }
 
             // 4. File management (append new uploads to existing files)
-            $existingFiles = json_decode($duelRelease->file, true) ?? [];
-            if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
-                    if ($file->isValid()) {
-                        $existingFiles[] = $file->store('duelRelease', 'public');
-                    }
-                }
-            }
+            // $existingFiles = json_decode($duelRelease->file, true) ?? [];
+            // if ($request->hasFile('file')) {
+            //     foreach ($request->file('file') as $file) {
+            //         if ($file->isValid()) {
+            //             $existingFiles[] = $file->store('duelRelease', 'public');
+            //         }
+            //     }
+            // }
 
             // 5. Update current record basic details
             $duelRelease->update([
-                'stock_number'     => $validated['stock_number'],
-                'item_name'        => $duelEntry->item_name,
+                'project_id'        => $duelEntry->project_id,
+                'duel_entries_id'   => $duelEntry->id,
+                // 'stock_number'      => $validated['stock_number'],
+                'item_name'         => $validated['item_name'],
                 'agency'           => $validated['agency'] ?? null,
+                // 'executive_unit_id' => $validated['cboExecutive'],
                 'receipt_number'   => $validated['receipt_number'],
                 'user_request'     => $validated['user_request'],
+                'receiver'     => $validated['receiver'],
                 'quantity_request' => $validated['quantity_request'],
                 'date_release'     => $dateRelease,
-                // 'title'            => $validated['title'],
+                'title'            => $validated['title'] ?? null,
                 'refer'            => strip_tags($validated['refer']),
                 'note'             => strip_tags($validated['note']),
-                'file'             => json_encode($existingFiles),
+                // 'file'             => json_encode($existingFiles),
             ]);
 
             // 6. Recalculate running totals for the new/updated item sequence
@@ -526,54 +578,75 @@ class DuelReleaseController extends Controller
      */
     private function recalculateLedger($ministryId, $stockNumber, $itemName)
     {
-        // Find initial stock quantity from DuelEntry
-        $duelEntry = DuelEntry::where('item_name', $itemName)->first();
-        $runningBalance = $duelEntry ? ($duelEntry->quantity ?? 0) : 0;
+        // =========================================================
+        // 1. Find DuelEntry
+        // =========================================================
 
-        // Fetch all releases for this specific stock item ordered by ID (creation order)
-        $releases = DuelRelease::where('ministry_id', $ministryId)
-            ->where('stock_number', $stockNumber)
+        $duelEntry = DuelEntry::where('ministry_id', $ministryId)
+            ->where('project_id', $stockNumber)
             ->where('item_name', $itemName)
-            ->orderBy('id', 'asc')
+            ->firstOrFail();
+
+        // Initial stock
+        $runningBalance = (float) ($duelEntry->quantity ?? 0);
+
+        // =========================================================
+        // 2. Get all releases
+        // =========================================================
+
+        $releases = DuelRelease::where('ministry_id', $ministryId)
+            ->where('duel_entries_id', $duelEntry->id)
+            ->where('item_name', $itemName)
+            ->orderBy('date_release', 'ASC')
+            ->orderBy('receipt_number', 'ASC')
+            ->orderBy('id', 'ASC')
             ->get();
 
-        foreach ($releases as $release) {
-            $quantityTotal = $runningBalance;
-            $duelTotal = $quantityTotal - $release->quantity_request;
+        // =========================================================
+        // 3. Recalculate
+        // =========================================================
 
-            // Enforce stock non-negativity constraint across the entire timeline
+        foreach ($releases as $release) {
+
+            // Stock available before this release
+            $quantityTotal = $runningBalance;
+
+            // Requested quantity
+            $quantityRequest = (float) $release->quantity_request;
+
+            // Remaining after request
+            $duelTotal = $quantityTotal - $quantityRequest;
+
+            // =====================================================
+            // Prevent negative balance
+            // =====================================================
+
             if ($duelTotal < 0) {
-                throw new \Exception('ឥណទានមិនគ្រប់ចំនួន សូមពិនិត្យម្តងទៀត!');
+
+                throw new \Exception(
+                    "ចំនួនមិនគ្រប់! " .
+                        "មាន {$quantityTotal} " .
+                        "ប៉ុន្តែស្នើ {$quantityRequest}"
+                );
             }
 
+            // =====================================================
+            // Update ledger
+            // =====================================================
+
             $release->update([
-                'quantity_total' => $quantityTotal,
-                'duel_total'     => $duelTotal,
+                'quantity_total'  => $quantityTotal,
+                'duel_total'      => $duelTotal,
+                'quantity_remain' => $duelTotal,
             ]);
 
-            // Pass updated balance down to the next row in the sequence
+            // =====================================================
+            // Move balance to next release
+            // =====================================================
+
             $runningBalance = $duelTotal;
         }
     }
-
-    // public function destroy($params, $id)
-    // {
-    //     $id = decode_params($id);
-
-    //     $ministry = Ministry::where('id', decode_params($params))->first();
-    //     $duelRelease = DuelRelease::where('id', $id)
-    //         ->where('ministry_id', $ministry->id)->first();
-    //     $duelRelease->delete();
-
-    //     flash()
-    //         ->translate('en')
-    //         ->option('timeout', 2000)
-    //         ->error('delete_msg', 'delete')
-    //         ->flash();
-
-    //     return redirect()->route('duelRelease.index', $params);
-    // }
-    // use Illuminate\Support\Facades\Storage;
 
     public function destroy($params, $id)
     {
@@ -590,16 +663,34 @@ class DuelReleaseController extends Controller
                 ->firstOrFail();
 
             // 1. Remember stock details to recalculate ledger after deletion
-            $stockNumber = $duelRelease->stock_number;
+            $stockNumber = $duelRelease->project_id;
             $itemName    = $duelRelease->item_name;
 
             // 2. Delete associated file uploads from disk storage
-            if (!empty($duelRelease->file)) {
-                $files = json_decode($duelRelease->file, true) ?? [];
-                foreach ($files as $filePath) {
-                    if (Storage::disk('public')->exists($filePath)) {
-                        Storage::disk('public')->delete($filePath);
+            // if (!empty($duelRelease->file)) {
+            //     $files = json_decode($duelRelease->file, true) ?? [];
+            //     foreach ($files as $filePath) {
+            //         if (Storage::disk('public')->exists($filePath)) {
+            //             Storage::disk('public')->delete($filePath);
+            //         }
+            //     }
+            // }
+            if ($duelRelease->file) {
+                $filePath = $duelRelease->file;
+
+                if (Storage::disk('public')->exists($filePath)) {
+                    $trashPath = 'trash/' . $filePath;
+
+                    // Ensure trash directory exists before moving
+                    $trashDir = dirname($trashPath);
+                    if (!Storage::disk('public')->exists($trashDir)) {
+                        Storage::disk('public')->makeDirectory($trashDir);
                     }
+
+                    Storage::disk('public')->move($filePath, $trashPath);
+
+                    $duelRelease->file = $trashPath;
+                    $duelRelease->save();
                 }
             }
 
@@ -645,7 +736,7 @@ class DuelReleaseController extends Controller
             $query = DuelRelease::query()
                 ->where('duel_releases.ministry_id', $ministryId)
                 ->leftJoin('duel_entries', function ($join) use ($ministryId) {
-                    $join->on('duel_entries.stock_number', '=', 'duel_releases.stock_number')
+                    $join->on('duel_entries.project_id', '=', 'duel_releases.project_id')
                         ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
                         ->where('duel_entries.ministry_id', '=', $ministryId);
                 })
@@ -656,8 +747,42 @@ class DuelReleaseController extends Controller
                 ->orderBy('duel_releases.date_release', 'ASC')
                 ->orderBy('duel_releases.receipt_number', 'ASC');
 
-            $data = $query->get();
+            if ($request->filled('cboDuelType')) {
+                $query->where('duel_releases.item_name', $request->cboDuelType);
+            }
+            if ($request->filled('cboExecutiveUnit')) {
+                $query->where('duel_releases.agency', $request->cboExecutiveUnit);
+            }
+            if ($request->filled('start_date')) {
+                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+                $query->whereDate('duel_releases.date_release', '>=', $startDate);
+            }
 
+            if ($request->filled('end_date')) {
+                $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+                $query->whereDate('duel_releases.date_release', '<=', $endDate);
+            }
+            $data = $query->get();
+            if ($request->filled('start_date')) {
+
+                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+
+                foreach ($data as $item) {
+
+                    $releasedBefore = DuelRelease::where('ministry_id', $ministryId)
+                        ->where('stock_number', $item->stock_number)
+                        ->where('item_name', $item->item_name)
+                        ->whereDate('date_release', '<', $startDate)
+                        ->sum('quantity_request');
+
+                    $item->opening_quantity = max(0, $item->quantity - $releasedBefore);
+                }
+            } else {
+
+                foreach ($data as $item) {
+                    $item->opening_quantity = $item->quantity;
+                }
+            }
             Log::info('Exported DuelExport Count', [
                 'ministry_id' => $ministryId,
                 'count'       => $data->count(),
@@ -672,8 +797,13 @@ class DuelReleaseController extends Controller
 
                 return redirect()->route('duelRelease.index', $params);
             }
-            $export = new DuelReleaseExport($data, $ministryId);
 
+            $export = new DuelReleaseExport(
+                $data,
+                $ministryId,
+                $request->start_date,
+                $request->end_date
+            );
             return $export->export($request);
             // return view('maintenance.maintenance');
         } catch (\Throwable $e) {

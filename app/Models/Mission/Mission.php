@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Models\Mission;
+
+use App\Models\Content\Employee;
+use App\Models\Content\Levels;
+use App\Models\Content\Ministry;
+use App\Models\Content\NameList;
+use App\Models\Content\Positions;
+use App\Models\Province;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Jenssegers\Agent\Agent;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+class Mission extends Model
+{
+    use HasFactory, SoftDeletes, LogsActivity;
+
+    protected $fillable = [
+        'ministry_id',
+        'document_id',
+        'leader_id',
+        'province_id',
+        'legal_number',
+        'legal_date',
+        'description',
+        'start_date',
+        'end_date',
+        'days_count',
+        'nights_count',
+        'mission_type',
+        'mission_type_is_archived',
+        'fileName',
+        'payment_status',
+        'payment_is_archived',
+        'program_id',
+        'program_sub_id',
+        'cluster_id',
+        // 'account_sub_id',
+    ];
+
+    protected $casts = [
+        'legal_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Log
+    |--------------------------------------------------------------------------
+    */
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName(trans('menus.content.missions'))
+            ->logOnly([
+                'ministry_id',
+                'document_id',
+                'leader_id',
+                'province_id',
+                'legal_number',
+                'legal_date',
+                'description',
+                'start_date',
+                'end_date',
+                'days_count',
+                'nights_count',
+                'mission_type',
+                'mission_type_is_archived',
+                'fileName',
+                'payment_status',
+                'payment_is_archived'
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(
+                fn(string $eventName) => $eventName
+            );
+    }
+
+    public function tapActivity(Activity $activity): void
+    {
+        $agent = new Agent();
+
+        $activity->default_field = "{$this->name}";
+
+        $activity->log_name = trans('menus.content.missions');
+
+        $browser = $agent->browser();
+
+        $activity->ip_address = request()->ip();
+        $activity->platform = $agent->platform();
+        $activity->device = $agent->device();
+        $activity->browser = $browser;
+        $activity->browser_version = $agent->version($browser);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
+    public function ministry()
+    {
+        return $this->belongsTo(Ministry::class);
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Positions::class);
+    }
+
+    public function level()
+    {
+        return $this->belongsTo(Levels::class);
+    }
+
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function missionEmployees()
+    {
+        return $this->hasMany(MissionEmployee::class, 'mission_id', 'id');
+    }
+}

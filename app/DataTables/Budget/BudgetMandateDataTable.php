@@ -14,6 +14,7 @@ use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
+use Illuminate\Support\Facades\Storage;
 
 class BudgetMandateDataTable extends DataTable
 {
@@ -32,9 +33,7 @@ class BudgetMandateDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0) . ' ៛';
             })
-            ->editColumn('voucher_budget', function ($row) {
-                return number_format($row->voucher_budget ?? 0) . ' ៛';
-            })
+
             ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
 
@@ -68,24 +67,20 @@ class BudgetMandateDataTable extends DataTable
                 return $notes;
             })
             ->editColumn('attachments', function ($row) {
-                if (!$row->attachments) {
+                if (
+                    empty($row->attachments) ||
+                    !Storage::disk('public')->exists($row->attachments)
+                ) {
                     return '<span class="text-muted">-</span>';
                 }
-                $files = json_decode($row->attachments, true);
-                if (is_array($files)) {
-                    $html = '<ul class="list-unstyled m-0">';
-                    foreach ($files as $file) {
-                        $url = asset('storage/uploads/' . $file);
-                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                } else {
-                    $url = asset('storage/uploads/' . $row->attachments);
-                    return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
-                }
+
+                $url = asset('storage/' . $row->attachments);
+
+                return "<a href='{$url}' target='_blank' class='text-primary'>
+        <i class='fas fa-file-alt me-1'></i> Preview
+    </a>";
             })
-            ->rawColumns(['description', 'attachments', 'agency', 'is_archived', 'soft_delete']);
+            ->rawColumns(['soft_delete', 'description', 'attachments', 'agency', 'is_archived']);
     }
 
     /**
@@ -115,35 +110,82 @@ class BudgetMandateDataTable extends DataTable
         if ($request->cboTodo) {
             if ($request->cboTodo == 2) {
                 $model->where('budget_mandates.is_archived', 1);
-                $model->where('budget_mandates.expense_type_id', 1);
             } elseif ($request->cboTodo == 3) {
                 $model->where('budget_mandates.is_archived', 2);
-                $model->where('budget_mandates.expense_type_id', 1);
             }
         } else {
             $model->where('budget_mandates.is_archived', 1);
-            $model->where('budget_mandates.expense_type_id', 1);
-        }
-
-        if ($request->filled('subAccountNumber')) {
-            $model->where('account_subs.no', $request->subAccountNumber);
-        }
-        if ($request->filled('CboPaymentVoucherNumber')) {
-            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
         }
 
         if ($request->filled('cboProgram')) {
             $model->where('programs.id', $request->cboProgram);
         }
+
+        if ($request->cboAccountSub) {
+            $model->where('budget_mandates.account_sub_id', $request->cboAccountSub);
+        }
+
+        if ($request->cboAgency) {
+            $model->where('budget_mandates.agency_id', $request->cboAgency);
+        }
+
+        if ($request->filled('cboExpenseType')) {
+            $model->where(
+                'budget_mandates.expense_type_id',
+                $request->cboExpenseType
+            );
+        }
+        if ($request->filled('cboHeaderExpenseType')) {
+            $model->where(
+                'budget_mandates.header_expense_type_id',
+                $request->cboHeaderExpenseType
+            );
+        }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
+
+        if ($request->filled('cboDayNumber')) {
+            $model->where('budget_mandates.day_of_number', $request->cboDayNumber);
+        }
+
+        // if ($request->filled('start_date') && $request->filled('end_date')) {
+        //     $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+        //         ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+        // } else {
+        //     if ($request->filled('start_date')) {
+        //         $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+        //     }
+        //     if ($request->filled('end_date')) {
+        //         $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+        //     }
+        // }
+
+        $startDateColumn = 'budget_mandates.request_date';
         if ($request->filled('start_date') && $request->filled('end_date')) {
-            $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
-                ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+
+            $model->whereDate($startDateColumn, '>=', $request->start_date)
+                ->whereDate(
+                    'budget_mandates.transaction_date',
+                    '<=',
+                    $request->end_date
+                );
         } else {
+
             if ($request->filled('start_date')) {
-                $model->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+                $model->whereDate(
+                    $startDateColumn,
+                    '>=',
+                    $request->start_date
+                );
             }
+
             if ($request->filled('end_date')) {
-                $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
+                $model->whereDate(
+                    'budget_mandates.transaction_date',
+                    '<=',
+                    $request->end_date
+                );
             }
         }
         // ===== Left Join Table =====
@@ -159,11 +201,10 @@ class BudgetMandateDataTable extends DataTable
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_mandates.expense_type_id', '=', 'expense_types.id');
-        // $model->leftJoin('budget_vouchers', 'budget_mandates.payment_voucher_number', '=', 'budget_vouchers.payment_voucher_number');
-
+        $model->leftJoin('budget_vouchers', 'budget_mandates.payment_voucher_number', '=', 'budget_vouchers.payment_voucher_number');
+        $model->leftJoin('header_expenses_type', 'budget_mandates.header_expense_type_id', '=', 'header_expenses_type.id');
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
-        // $model->where('budget_mandates.expense_type_id', 1);
 
         // ===== SELECT =====
         $model->select([
@@ -171,28 +212,36 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.ministry_id',
             'agencies.no AS agency_no',
             'agencies.name AS agency_name',
-            'budget_mandates.program_id',
             'account_subs.no as account_sub_no',
             'budget_mandates.no',
             'budget_mandates.budget',
-            'budget_mandates.expense_type_id',
-            'budget_mandates.legal_id',
-            'budget_mandates.payment_voucher_number AS pvn',
             'budget_mandates.legal_number',
             'budget_mandates.legal_name',
+            'budget_mandates.temporary_id',
+            'budget_mandates.payment_voucher_number as pvn',
+            'budget_mandates.day_of_number',
             'budget_mandates.is_archived',
+            'header_expenses_type.name_kh AS hx',
+            'budget_mandates.header_expense_type_id',
+            'budget_mandates.expense_type_id',
             'expense_types.name_kh',
             'budget_mandates.description',
             'budget_mandates.attachments',
             'budget_mandates.transaction_date',
             'budget_mandates.request_date',
-            'budget_mandates.legal_date',
             'budget_mandates.created_at',
-            'budget_mandates.deleted_at',
-            // 'budget_vouchers.budget AS voucher_budget',
+            'budget_mandates.deleted_at'
         ]);
 
-        $model->orderByDesc('budget_mandates.created_at');
+        // ==========================================
+        // Sorting Logic
+        // ==========================================
+        if (!$request->has('order')) {
+            $model->orderBy('budget_mandates.payment_voucher_number', 'asc')
+                ->orderBy('budget_mandates.day_of_number', 'asc')
+                ->orderBy('account_subs.no', 'asc')
+                ->orderBy('budget_mandates.no', 'asc');
+        }
 
         return $model;
     }
@@ -210,14 +259,17 @@ class BudgetMandateDataTable extends DataTable
             ])
             ->ajax([
                 'data' => 'function(d) {
-                d.agency     = $("#agency").val();
-                d.cboProgram    = $("#cboProgram").val();
-                d.CboPaymentVoucherNumber    = $("#CboPaymentVoucherNumber").val();
-                d.subAccountNumber  = $("#subAccountNumber").val();
-                d.cboTodo = $("#cboTodo").val();
-                d.cboStatus = $("#cboStatus").val();
-                d.start_date = $("#start_date").val();
-                d.end_date = $("#end_date").val();
+                   d.cboTodo = $("#cboTodo").val();
+                    d.cboStatus = $("#cboStatus").val();
+                    d.cboProgram = $("#cboProgram").val();
+                    d.cboAccountSub = $("#cboAccountSub").val();
+                    d.cboAgency = $("#cboAgency").val();
+                    d.cboExpenseType = $("#cboExpenseType").val();
+                    d.cboHeaderExpenseType = $("#cboHeaderExpenseType").val();
+                    d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
+                          d.cboDayNumber = $("#cboDayNumber").val();
+                    d.start_date = $("#start_date").val();
+                    d.end_date = $("#end_date").val();
                 }',
             ])
             ->initComplete('function () {
@@ -239,18 +291,22 @@ class BudgetMandateDataTable extends DataTable
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
-            Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
+            Column::make('hx')->title(__('tables.th.header.expense.type'))->width(80)->addClass('align-middle'),
+            Column::make('name_kh')->title(__('tables.th.expense.type'))->width(30)->addClass('align-middle'),
+
+            Column::make('pvn')->title(__('tables.th.pvn'))->width(30)->addClass('align-middle'),
+            Column::make('day_of_number')->title(__('tables.th.day.number'))->width(30)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
-            // Column::make('voucher_budget')->title(__('tables.th.voucher.budgeted'))->width(80)->addClass('align-middle'),
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
             Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
-            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
             Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
             Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
+            Column::make('temporary_id')->title(__('tables.th.temporary.id'))->width(30)->addClass('align-middle'),
+            Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center align-middle'),

@@ -1,0 +1,39 @@
+ // Modal Cluster
+    public function getClusters($programSubId)
+    {
+        $clusters = Cluster::where('program_sub_id', $programSubId)
+            ->select(
+                'id',
+                'no',
+                'decription as description'
+            )
+            ->get();
+        // 2️⃣ Get totals grouped by program_sub_id
+        $clusterTotal = DB::table('begin_vouchers')
+            ->where('program_sub_id', $programSubId) // 🔥 IMPORTANT
+            ->groupBy('cluster_id')
+            ->selectRaw('
+            cluster_id,
+            SUM(fin_law) AS fin_law,
+            SUM(apply) AS apply,
+            SUM(deadline_balance) AS remain,
+            SUM(credit) AS credit,
+            COUNT(*) AS total_records
+        ')
+            ->get()
+            ->keyBy('cluster_id');
+        // 3️⃣ Merge totals into program subs
+        $clusters = $clusters->map(function ($cluster) use ($clusterTotal) {
+            $total = $clusterTotal->get($cluster->id);
+            $cluster->fin_law       = $total->fin_law ?? 0;
+            $cluster->apply         = $total->apply ?? 0;
+            $cluster->remain        = $total->remain ?? 0;
+            $cluster->credit        = $total->credit ?? 0;
+            $cluster->total_records = $total->total_records ?? 0;
+            $cluster->percent       = $cluster->fin_law > 0
+                ? ($cluster->apply / $cluster->fin_law) * 100
+                : 0;
+            return $cluster;
+        });
+        return response()->json($clusters);
+    }

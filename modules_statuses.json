@@ -18,5 +18,6 @@
     "Water": true,
     "Electric": true,
     "Content": true,
-    "Report": true
+    "Report": true,
+    "Mission": true
 }

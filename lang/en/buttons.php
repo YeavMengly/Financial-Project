@@ -40,4 +40,6 @@ return [
     'executive.units' => 'អង្គភាពប្រតិបត្តិ',
     'action' => 'សកម្មភាព',
     'back' => 'ត្រឡប់វិញ',
+
+    'budget.allocation' => 'ការបែងចែកឥណទាន'
 ];
