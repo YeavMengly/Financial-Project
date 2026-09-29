@@ -355,7 +355,7 @@
             if (!stockId) return;
 
             $.ajax({
-                url: '{{ route('duelRelease.by.stock_number', ['params' => $params]) }}',
+                url: '{{ route('duelRelease.by.get.stock_number', ['params' => $params]) }}',
                 type: 'GET',
                 data: {
                     stock_number: stockId,
