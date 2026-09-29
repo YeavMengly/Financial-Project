@@ -114,7 +114,7 @@ class DuelEntriesExport
         |     C → unit
         |     D → quantity
         |     E → price
-        |     F → duel_total
+        |     F → total_price
         |     G → source
         |     H → note/blank
         |--------------------------------------------------------
@@ -128,11 +128,11 @@ class DuelEntriesExport
             $sheet->setCellValue("C{$row}", $item->name);
             $sheet->setCellValue("D{$row}", $item->quantity);
             $sheet->setCellValue("E{$row}", $item->price);
-            $sheet->setCellValue("F{$row}", $item->duel_total);
+            $sheet->setCellValue("F{$row}", $item->total_price);
             $sheet->setCellValue("G{$row}", $item->source ?? '');
             $sheet->setCellValue("H{$row}", null);
 
-            $totalDuel += (float) $item->duel_total;
+            $totalDuel += (float) $item->total_price;
 
             $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
                 'font' => [
