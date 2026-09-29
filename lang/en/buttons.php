@@ -24,7 +24,6 @@ return [
     "search" => "ស្វែងរក",
     "download" => "ទាញយក ឯកសារ",
     "download.file" => "ឯកសារប្រចាំឆ្នាំ",
-
     "select" => "ជ្រើសរើស",
     'download' => 'ទាញយក',
     'credit' => 'កំណត់ឥណទាន',

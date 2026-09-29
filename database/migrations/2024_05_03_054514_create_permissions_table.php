@@ -259,7 +259,7 @@ return new class extends Migration
                 'create' => 'employees.create',
                 'edit'   => 'employees.edit',
                 'delete' => 'employees.destroy',
-                'import' => 'employees.import'
+                // 'import' => 'employees.import'
             ],
 
             // Project
@@ -277,7 +277,6 @@ return new class extends Migration
                 'show'   => 'initialMissions.index',
                 'view'   => 'missions.index',
                 'create' => 'missions.create',
-                'detail'   => 'missions.show',
                 'edit'   => 'missions.edit',
                 'delete' => 'missions.destroy',
             ],
