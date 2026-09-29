@@ -346,7 +346,7 @@ class DashboardController extends Controller
             return $account;
         });
         // expense Type donut chart
-        //exp_directPayment
+        // Fetch datasets
         $budgetVouchers = DB::table('budget_vouchers')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->where('budget_vouchers.is_archived', 1)
@@ -354,64 +354,64 @@ class DashboardController extends Controller
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
-        //exp_guarantee
+
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->where('budget_mandates.is_archived', 2)
             ->where('budget_mandates.status', 'done')
+            ->whereNull('budget_mandates.deleted_at')
             ->select('budget_mandates.*')
             ->where('ministries.year', $year)
-            ->where('budget_mandates.deleted_at', null)
             ->get();
-        $expenditure_Guarantee = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
-        $advance_Payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
-        $expense_Record = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
-        $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
 
-        $direct_Payment = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
-        $payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
-        $payment_Deadline = $budgetMandate->where('expense_type_id', '3')->pluck('budget');
-        $expenditure_Procurement = $budgetMandate->where('expense_type_id', '4')->pluck('budget');
+        // Calculate sums (casting expense_type_id to integer)
+        $expenditure_Guarantee   = (float) $budgetVouchers->where('expense_type_id', 1)->sum('budget');
+        $advance_Payment         = (float) $budgetVouchers->where('expense_type_id', 2)->sum('budget');
+        $expense_Record          = (float) $budgetVouchers->where('expense_type_id', 3)->sum('budget');
+        $procurement             = (float) $budgetVouchers->where('expense_type_id', 4)->sum('budget');
 
-        $expenditure_Guarantee = round($budgetVouchers->where('expense_type_id', '1')->sum('budget'), 2);
-        $advance_Payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
-        $expense_Record = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
-        $procurement = round($budgetVouchers->where('expense_type_id', '4')->sum('budget'), 2);
-        $direct_Payment = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
-        $payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
-        $payment_Deadline = round($budgetMandate->where('expense_type_id', '3')->sum('budget'), 2);
-        $expenditure_Procurement = round($budgetMandate->where('expense_type_id', '4')->sum('budget'), 2);
+        $direct_Payment          = (float) $budgetMandate->where('expense_type_id', 1)->sum('budget');
+        $payment                 = (float) $budgetMandate->where('expense_type_id', 2)->sum('budget');
+        $payment_Deadline        = (float) $budgetMandate->where('expense_type_id', 3)->sum('budget');
+        $expenditure_Procurement = (float) $budgetMandate->where('expense_type_id', 4)->sum('budget');
 
-        $totalCountArch = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountDir = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
-        $totalCountAdvance   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPayment   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
-        $totalCountExpenseR   = $budgetVouchers->where('expense_type_id', '3')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPaymentD   = $budgetMandate->where('expense_type_id', '3')->where('is_archived', ' 2')->where('status', 'done')->count();
-        $totalCountPro   = $budgetVouchers->where('expense_type_id', '4')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountExp   = $budgetMandate->where('expense_type_id', '4')->where('is_archived', ' 2')->where('status', 'done')->count();
+        // Corrected counts (removed spaces from '2')
+        $totalCountArch     = $budgetVouchers->where('expense_type_id', 1)->count();
+        $totalCountAdvance  = $budgetVouchers->where('expense_type_id', 2)->count();
+        $totalCountExpenseR = $budgetVouchers->where('expense_type_id', 3)->count();
+        $totalCountPro      = $budgetVouchers->where('expense_type_id', 4)->count();
 
+        $totalCountDir      = $budgetMandate->where('expense_type_id', 1)->count();
+        $totalCountPayment  = $budgetMandate->where('expense_type_id', 2)->count();
+        $totalCountPaymentD = $budgetMandate->where('expense_type_id', 3)->count();
+        $totalCountExp      = $budgetMandate->where('expense_type_id', 4)->count();
+
+        // Calculate Total Expenses across all categories
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
 
-        $total_fin_law       = $budgetReport->sum('fin_law');
-        $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
-        $percent_expense_record = $total_fin_law > 0 ? ($expense_Record / $total_fin_law) * 100 : 0;
-        $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
-        $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
-        $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
-        $percent_Payment = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
-        $percent_Payment_Deadline = $total_fin_law > 0 ? ($payment_Deadline / $total_fin_law) * 100 : 0;
+        // 1. Get total baseline budget (float)
+        $total_fin_law = (float) $budgetReport->sum('fin_law');
+
+        // 2. Compute percentages relative to $total_fin_law
+        $percent_expenditure_Guarantee   = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
+        $percent_advance_Payment         = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
+        $percent_expense_record          = $total_fin_law > 0 ? ($expense_Record / $total_fin_law) * 100 : 0;
+        $percent_procurement             = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+
+        $percent_direct_Payment          = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
+        $percent_Payment                 = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
+        $percent_Payment_Deadline        = $total_fin_law > 0 ? ($payment_Deadline / $total_fin_law) * 100 : 0;
         $percent_expenditure_Procurement = $total_fin_law > 0 ? ($expenditure_Procurement / $total_fin_law) * 100 : 0;
 
         $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
         $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
         $totalDirPayment = $expense_Record > 0 ? $expense_Record - $payment_Deadline : 0;
         $totalExpenditureProcurement = $procurement > 0 ? $procurement - $expenditure_Procurement : 0;
-        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record) : 0;
+        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record + $procurement) : 0;
 
         // =========================
         // MATERIAL ENTRY
