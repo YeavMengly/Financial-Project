@@ -6,7 +6,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\File;
 class MaterialEntriesExport
 {
     protected $data;
@@ -23,7 +23,7 @@ class MaterialEntriesExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = storage_path('excel/template/material_entries_template.xlsx');
+        $templatePath = storage_path('app/excel/template/material_entries_template.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -91,16 +91,37 @@ class MaterialEntriesExport
             ],
         ];
 
-        $fileName = 'material_entries_template.xlsx';
+        // $fileName = 'material_entries_template.xlsx';
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            'Cache-Control' => 'max-age=0',
-        ]);
+        // return response()->streamDownload(function () use ($spreadsheet) {
+        //     $writer = new Xlsx($spreadsheet);
+        //     $writer->save('php://output');
+        // }, $fileName, [
+        //     'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        //     'Cache-Control' => 'max-age=0',
+        // ]);
+        $exportDirectory = storage_path('app/excel/export');
+
+        if (!File::exists($exportDirectory)) {
+            File::makeDirectory($exportDirectory, 0755, true);
+        }
+
+        $fileName = 'material_entries.xlsx';
+
+        $outputPath = $exportDirectory . '/' . $fileName;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($outputPath);
+
+        return response()->download(
+            $outputPath,
+            $fileName,
+            [
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
     }
 
     // private function initTotals(): array

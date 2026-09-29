@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\File;
 
 class DuelReleaseExport
 {
@@ -32,7 +33,7 @@ class DuelReleaseExport
         // Use passed data or load by ministry_id
         $release = $this->data ?: DuelRelease::where('ministry_id', $id)->get();
 
-        $templatePath = storage_path('excel/template/duel_release_template.xlsx');
+        $templatePath = storage_path('app/excel/template/duel_release_template.xlsx');
         $spreadsheet  = IOFactory::load($templatePath);
         $sheet        = $spreadsheet->getActiveSheet();
 
@@ -324,15 +325,36 @@ class DuelReleaseExport
     | Output Stream
     |--------------------------------------------------------
     */
-        $fileName = 'duel_release_template.xlsx';
+        // $fileName = 'duel_release_template.xlsx';
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            'Cache-Control'       => 'max-age=0',
-        ]);
+        // return response()->streamDownload(function () use ($spreadsheet) {
+        //     $writer = new Xlsx($spreadsheet);
+        //     $writer->save('php://output');
+        // }, $fileName, [
+        //     'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        //     'Cache-Control'       => 'max-age=0',
+        // ]);
+        $exportDirectory = storage_path('app/excel/export');
+
+        if (!File::exists($exportDirectory)) {
+            File::makeDirectory($exportDirectory, 0755, true);
+        }
+
+        $fileName = 'duel_release.xlsx';
+
+        $outputPath = $exportDirectory . '/' . $fileName;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($outputPath);
+
+        return response()->download(
+            $outputPath,
+            $fileName,
+            [
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
     }
 }

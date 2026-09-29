@@ -155,7 +155,7 @@ class DuelReleaseController extends Controller
 
         // 2. Query DuelEntry using whereIn for the array of project IDs
         $duelEntry = DuelEntry::select(
-             'duel_entries.id',
+            'duel_entries.id',
             'duel_entries.project_id',
             'duel_entries.item_name',
             'projects.stock_number',
@@ -171,12 +171,12 @@ class DuelReleaseController extends Controller
             ->unique('project_id')
             ->values();
 
-    //  $data = DuelEntry::distinct()->pluck('project_id');
+        //  $data = DuelEntry::distinct()->pluck('project_id');
 
-    //  $duelEntry = DuelEntry::where('project_id', $data)->get();
+        //  $duelEntry = DuelEntry::where('project_id', $data)->get();
 
         // dd($duelEntry);
-        
+
         return view('duel::duelRelease.create')
             ->with('ministry', $ministry)
             ->with('duelType', $duelType)
@@ -731,21 +731,23 @@ class DuelReleaseController extends Controller
      */
     public function export(Request $request, $params)
     {
+
         try {
             $ministryId = decode_params($params);
             $query = DuelRelease::query()
                 ->where('duel_releases.ministry_id', $ministryId)
-                ->leftJoin('duel_entries', function ($join) use ($ministryId) {
-                    $join->on('duel_entries.project_id', '=', 'duel_releases.project_id')
-                        ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
-                        ->where('duel_entries.ministry_id', '=', $ministryId);
-                })
+
+                ->leftJoin('duel_entries', 'duel_releases.duel_entries_id', '=', 'duel_entries.id')
+                ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
+                ->leftJoin('projects', 'duel_releases.project_id', '=', 'projects.id')
                 ->select(
                     'duel_releases.*',
                     'duel_entries.quantity as quantity'
                 )
                 ->orderBy('duel_releases.date_release', 'ASC')
                 ->orderBy('duel_releases.receipt_number', 'ASC');
+
+            $data = $query->get();
 
             if ($request->filled('cboDuelType')) {
                 $query->where('duel_releases.item_name', $request->cboDuelType);
@@ -762,7 +764,6 @@ class DuelReleaseController extends Controller
                 $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
                 $query->whereDate('duel_releases.date_release', '<=', $endDate);
             }
-            $data = $query->get();
             if ($request->filled('start_date')) {
 
                 $startDate = Carbon::parse($request->start_date)->format('Y-m-d');

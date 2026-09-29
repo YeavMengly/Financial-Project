@@ -244,7 +244,7 @@ class BudgetVoucherDataTable extends DataTable
             'budget_vouchers.created_at',
             'budget_vouchers.deleted_at',
         ]);
-
+        $model->orderBy('budget_vouchers.created_at', 'asc');
         // ==========================================
         // Sorting Logic
         // ==========================================

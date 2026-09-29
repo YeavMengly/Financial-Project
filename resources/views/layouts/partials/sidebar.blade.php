@@ -12,7 +12,7 @@
                         <span data-key="t-dashboard">{{ __('menus.dashboard') }}</span>
                     </a>
                 </li>
-                 <li class="{{ Request::routeIs('dashboardSecond.*') ? 'mm-active' : '' }}">
+                <li class="{{ Request::routeIs('dashboardSecond.*') ? 'mm-active' : '' }}">
                     <a href="{{ route('dashboardSecond.index') }}"
                         class="{{ Request::routeIs('dashboardSecond.*') ? 'active' : '' }}">
                         <i data-feather="home"></i>
@@ -145,20 +145,21 @@
 
                 {{-- ========== Missions ========== --}}
                 @php
-                    $missionActive = Request::routeIs('initialMission.*') || Request::routeIs('mission.*');
+                    $missionActive = Request::routeIs('initialMission.*') || Request::routeIs('missions.*');
                 @endphp
 
-                @if (hasPermission('initialMissions.index'))
+                {{-- @if (hasPermission('initialMission.index'))
                     <li>
-                        <a href="{{ route('initialMissions.index') }}"
-                            class="{{ Request::routeIs('initialMissions.*') ? 'active' : '' }}">
+                        <a href="{{ route('initialMission.index') }}"
+                            class="{{ Request::routeIs('initialMission.*') ? 'active' : '' }}">
                             <i data-feather="navigation"></i>
+
                             <span data-key="t-missions">
                                 {{ __('menus.missions') }}
                             </span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
                 {{-- Material --}}
                 <li class="menu-title" data-key="t-inventory">{{ __('menus.material') }}</li>

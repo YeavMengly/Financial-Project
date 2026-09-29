@@ -1,4 +1,4 @@
-@if (hasPermission('initialMissions.index'))
+@if (hasPermission('initialMission.index'))
     <div class="dropdown">
         <button class="btn btn-link font-size-16 shadow-none py-0 text-muted dropdown-toggle" type="button"
             data-bs-toggle="dropdown" aria-expanded="false">
@@ -12,9 +12,9 @@
                     </a>
                 @endif
             @else
-                @if (hasPermission('initialMissions.destroy'))
+                @if (hasPermission('initialMission.destroy'))
                     <a href="#"
-                        onclick="confirm('{{ route('initialMissions.restore', encode_params($module->id)) }}', 2)"
+                        onclick="confirm('{{ route('initialMission.restore', encode_params($module->id)) }}', 2)"
                         class="dropdown-item"><i class="bx bx-undo"></i> {{ __('buttons.restore') }}</a>
                 @endif
             @endif

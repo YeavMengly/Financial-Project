@@ -221,7 +221,7 @@
                                 ទូទាត់
                             </button>
 
-                            <a class="btn btn-dark" href="{{ route('initialMissions.index') }}">
+                            <a class="btn btn-dark" href="{{ route('initialMission.index') }}">
                                 {{ __('buttons.back') }}
                             </a>
 
