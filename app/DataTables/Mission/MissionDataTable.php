@@ -27,14 +27,18 @@ class MissionDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->addColumn('select', function ($row) {
-                // Already paid
                 if ((int) $row->payment_is_archived === 2) {
                     return '';
                 }
-                // Not paid yet
+
                 return '
-                    <input type="checkbox" class="form-check-input mission-checkbox" value="' . e($row->id) . '">
-                ';
+            <input
+                type="checkbox"
+                class="form-check-input mission-checkbox"
+                name="cboId[]"
+                value="' . e($row->id) . '"
+            >
+        ';
             })
             ->editColumn('soft_delete', function ($row) {
 
@@ -121,6 +125,9 @@ class MissionDataTable extends DataTable
                 return $row->end_date
                     ? Carbon::parse($row->end_date)->format('Y-m-d')
                     : '-';
+            })
+            ->editColumn('total_amount', function ($row) {
+                return number_format($row->total_amount ?? 0) . ' ៛';
             })
             ->editColumn('fileName', function ($row) {
                 if (!$row->fileName) {
@@ -273,6 +280,7 @@ class MissionDataTable extends DataTable
 
             // Count employees in this mission
             DB::raw('COUNT(mission_employees.id) as employee_count'),
+            DB::raw('SUM(mission_employees.total) as total_amount'),
 
         ]);
 
@@ -411,22 +419,27 @@ class MissionDataTable extends DataTable
 
             Column::computed('select')
                 ->title('
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="checkAllMissions"
-                >')
+        <input
+            type="checkbox"
+            class="form-check-input"
+            id="checkAllMissions"
+        >
+    ')
                 ->exportable(false)
                 ->printable(false)
                 ->orderable(false)
                 ->searchable(false)
                 ->addClass('text-center align-middle')
                 ->width(50),
-
             Column::computed('payment_status')
                 ->title(__('Task'))
                 ->width(60)
                 ->addClass('text-center align-middle'),
+
+            Column::make('total_amount')
+                ->title(__('tables.th.amount'))
+                ->width(150)
+                ->addClass('align-middle'),
 
             Column::make('legal_number')
                 ->title(__('tables.th.legal.number'))

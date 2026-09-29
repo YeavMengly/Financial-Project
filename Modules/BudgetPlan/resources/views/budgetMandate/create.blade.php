@@ -303,13 +303,18 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2">
-                            <button class="btn btn-primary" type="submit" name="action" value="save">
+                            {{-- <button class="btn btn-primary" type="submit" name="action" value="save">
                                 {{ __('buttons.save') }}
                             </button>
 
                             <button class="btn btn-info" type="submit" name="action" value="save_create">
                                 {{ __('buttons.save.create') }}
-                            </button>
+                            </button> --}}
+
+                            <button class="btn btn-primary" type="submit" name="submit"
+                                value="save">{{ __('buttons.save') }}</button>
+                            <button class="btn btn-info" type="submit">{{ __('buttons.save.create') }}</button>
+
 
                             <a href="{{ url()->current() }}" class="btn btn-danger">
                                 <i class="bi bi-arrow-clockwise"></i>

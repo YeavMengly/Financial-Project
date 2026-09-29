@@ -177,17 +177,13 @@
                                     <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                                 </a>
                                 {{-- Export --}}
-                                {{-- <a id="btnExport"
-                                    href="{{ route(
-                                        'budgetVoucher.export',
-                                        array_merge(
-                                            ['params' => $params],
-                                            request()->only(['cboTodo', 'cboStatus', 'cboExpenseType', 'cboAccountSub', 'start_date', 'end_date']),
-                                        ),
-                                    ) }}"
+                                <a id="btnExport" href="{{ route('missions.export', ['params' => $params]) }}"
                                     class="btn btn-success d-flex align-items-center px-3">
-                                    <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
-                                </a> --}}
+
+                                    <i class="bx bx-download me-1"></i>
+                                    {{ __('buttons.download') }}
+
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -222,7 +218,7 @@
 
                             <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
                                 <i class="bx bx-money me-1"></i>
-                                បង់ប្រាក់
+                                ទូទាត់
                             </button>
 
                             <a class="btn btn-dark" href="{{ route('initialMissions.index') }}">
@@ -425,9 +421,10 @@
         });
     </script>
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script>
+    {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
+    {{-- <script>
         $(document).on('click', '#btnPaymentStatus', function() {
+
             let cboId = $(".mission-checkbox:checked").map(function() {
                 return $(this).val();
             }).get();
@@ -437,62 +434,1687 @@
                 return;
             }
 
+            // Show loading while calculating total
             Swal.fire({
-                title: 'បញ្ជាក់ការបង់ប្រាក់',
-                text: 'តើអ្នកចង់ប្តូរស្ថានភាពបេសកកម្មដែលបានជ្រើសទៅជា បានបង់ មែនទេ?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'បាទ/ចាស បង់ប្រាក់',
-                cancelButtonText: 'បោះបង់',
-                reverseButtons: true
-            }).then(function(result) {
-                if (!result.isConfirmed) {
-                    return;
+                title: 'កំពុងប្រតិបត្តិការ...',
+                text: 'សូមរង់ចាំបន្តិច',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
+            });
 
-                $.ajax({
-                    url: "{{ route('missions.updatePaymentStatus', $params) }}",
-                    type: "POST",
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        cboId: cboId
-                    },
-                    beforeSend: function() {
+            $.ajax({
+                url: "{{ route('missions.paymentTotal', $params) }}",
+                type: "POST",
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    cboId: cboId
+                },
+
+                success: function(response) {
+
+                    if (!response.success) {
+                        Swal.close();
+                        toastr.warning('មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។');
+                        return;
+                    }
+
+                    let totalAmount = parseFloat(response.total_amount || 0);
+
+                    // Format number: 1,234,567.00
+                    let formattedTotal = totalAmount.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    // Now show confirmation
+                    Swal.fire({
+                        title: 'បញ្ជាក់ការទូទាត់',
+                        html: `
+                        <div class="text-start">
+                            <p>
+                                តើអ្នកចង់ប្តូរស្ថានភាពបេសកកម្ម
+                                <strong>${cboId.length}</strong>
+                                ដែលបានជ្រើសទៅជា
+                                <strong>ទូទាត់</strong> <i class="bx bx-money me-1"></i> មែនទេ?
+                            </p>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between">
+                                <strong>ចំនួនបេសកកម្ម:</strong>
+                                <strong>${cboId.length}</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-2">
+                                <strong>សរុបប្រាក់:</strong>
+                                <strong class="text-primary fs-5">
+                                    ${formattedTotal}
+                                </strong>
+                            </div>
+                        </div>
+                    `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'បាទ/ចាស ទូទាត់',
+                        cancelButtonText: 'បោះបង់',
+                        reverseButtons: true
+                    }).then(function(result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        // Disable button
                         $("#btnPaymentStatus")
                             .prop("disabled", true)
                             .html(`
-                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                        Processing...
-                    `);
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            // Display success message returned from controller
-                            toastr.success(response.message);
+                            <span class="spinner-border spinner-border-sm me-1"
+                                  role="status"></span>
+                            កំពុងដំណើរការ...
+                        `);
 
-                            // Reload DataTable and clear selection state
-                            $("#mission-table").DataTable().ajax.reload(null, false);
-                            $("#checkAllMissions").prop("checked", false);
-                            $(".mission-checkbox").prop("checked", false);
+                        $.ajax({
+                            url: "{{ route('missions.updatePaymentStatus', $params) }}",
+                            type: "POST",
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                cboId: cboId
+                            },
+
+                            success: function(response) {
+
+                                if (response.success) {
+
+                                    toastr.success(response.message);
+
+                                    $("#mission-table")
+                                        .DataTable()
+                                        .ajax.reload(null, false);
+
+                                    $("#checkAllMissions")
+                                        .prop("checked", false);
+
+                                    $(".mission-checkbox")
+                                        .prop("checked", false);
+                                }
+                            },
+
+                            error: function(xhr) {
+
+                                let errorMsg = xhr.responseJSON?.message ||
+                                    'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
+
+                                toastr.warning(errorMsg);
+                            },
+
+                            complete: function() {
+
+                                $("#btnPaymentStatus").html(`
+                                <i class="bx bx-money me-1"></i>
+                                ទូទាត់
+                            `);
+
+                                let checked =
+                                    $(".mission-checkbox:checked").length;
+
+                                $("#btnPaymentStatus")
+                                    .prop("disabled", checked === 0);
+                            }
+                        });
+                    });
+                },
+
+                error: function(xhr) {
+
+                    Swal.close();
+
+                    let errorMsg = xhr.responseJSON?.message ||
+                        'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។';
+
+                    toastr.warning(errorMsg);
+                }
+            });
+        });
+    </script>
+--}}
+    <script>
+        $('#btnExport').on('click', function(e) {
+            e.preventDefault();
+
+            let url = $(this).attr('href');
+
+            let selectedIds = [];
+
+            $('.mission-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+
+            let params = new URLSearchParams();
+
+            // Selected missions
+            selectedIds.forEach(function(id) {
+                params.append('cboId[]', id);
+            });
+
+            // Existing filters
+            let cboTodo = $('#cboTodo').val();
+            let cboMissionType = $('#cboMissionType').val();
+            let cboName = $('#cboName').val();
+            let cboProvince = $('#cboProvince').val();
+            let startDate = $('#start_date').val();
+            let endDate = $('#end_date').val();
+
+            if (cboTodo) {
+                params.append('cboTodo', cboTodo);
+            }
+
+            if (cboMissionType) {
+                params.append('cboMissionType', cboMissionType);
+            }
+
+            if (cboName) {
+                params.append('cboName', cboName);
+            }
+
+            if (cboProvince) {
+                params.append('cboProvince', cboProvince);
+            }
+
+            if (startDate) {
+                params.append('start_date', startDate);
+            }
+
+            if (endDate) {
+                params.append('end_date', endDate);
+            }
+
+            let queryString = params.toString();
+
+            if (queryString) {
+                url += '?' + queryString;
+            }
+
+            window.location.href = url;
+        });
+    </script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- <script>
+        $(document).on('click', '#btnPaymentStatus', function() {
+
+            const $button = $("#btnPaymentStatus");
+
+            // ==========================================================
+            // 1. Get selected mission IDs
+            // ==========================================================
+
+            let cboId = $(".mission-checkbox:checked")
+                .map(function() {
+                    return $(this).val();
+                })
+                .get();
+
+            // Remove duplicates
+            cboId = [...new Set(cboId)];
+
+
+            // ==========================================================
+            // 2. Check selection
+            // ==========================================================
+
+            if (cboId.length === 0) {
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'បញ្ជាក់',
+                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។'
+                });
+
+                return;
+            }
+
+
+            // ==========================================================
+            // 3. CSRF
+            // ==========================================================
+
+            const csrfToken =
+                $('meta[name="csrf-token"]').attr('content');
+
+
+            // ==========================================================
+            // 4. Loading - calculate total
+            // ==========================================================
+
+            Swal.fire({
+                title: 'កំពុងប្រតិបត្តិការ...',
+                text: 'កំពុងគណនាចំនួនប្រាក់ សូមរង់ចាំបន្តិច',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: function() {
+                    Swal.showLoading();
+                }
+            });
+
+
+            // ==========================================================
+            // 5. Calculate payment total
+            // ==========================================================
+
+            $.ajax({
+
+                url: "{{ route('missions.paymentTotal', $params) }}",
+
+                type: "POST",
+
+                data: {
+                    _token: csrfToken,
+                    cboId: cboId
+                },
+
+
+                // ======================================================
+                // Payment total success
+                // ======================================================
+
+                success: function(response) {
+
+                    if (!response.success) {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'បញ្ហា',
+                            text: response.message ||
+                                'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។'
+                        });
+
+                        return;
+                    }
+
+
+                    // ==================================================
+                    // 6. Format total
+                    // ==================================================
+
+                    let totalAmount =
+                        parseFloat(response.total_amount || 0);
+
+                    let formattedTotal =
+                        totalAmount.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+
+
+                    // ==================================================
+                    // 7. Confirmation
+                    // ==================================================
+
+                    Swal.fire({
+
+                        title: 'បញ្ជាក់ការទូទាត់',
+
+                        html: `
+                    <div class="text-start">
+
+                        <p>
+                            តើអ្នកចង់ប្តូរស្ថានភាព
+                            <strong>${cboId.length}</strong>
+                            បេសកកម្មដែលបានជ្រើស
+                            ទៅជា
+                            <strong class="text-success">
+                                ទូទាត់
+                            </strong>
+                            មែនទេ?
+                        </p>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <strong>ចំនួនបេសកកម្ម:</strong>
+                            <strong>${cboId.length}</strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <strong>សរុបប្រាក់:</strong>
+
+                            <strong class="text-primary fs-5">
+                                ${formattedTotal}
+                            </strong>
+                        </div>
+
+                        <div class="mt-3 text-muted small">
+                            បន្ទាប់ពីទូទាត់រួច ប្រព័ន្ធនឹងទាញយក
+                            Excel ដោយស្វ័យប្រវត្តិ។
+                        </div>
+
+                    </div>
+                `,
+
+                        icon: 'question',
+
+                        showCancelButton: true,
+
+                        confirmButtonText: 'បាទ/ចាស ទូទាត់ និងទាញយក Excel',
+
+                        cancelButtonText: 'បោះបង់',
+
+                        reverseButtons: true,
+
+                        focusCancel: true
+
+                    }).then(function(result) {
+
+                        // ==================================================
+                        // User cancelled
+                        // ==================================================
+
+                        if (!result.isConfirmed) {
+                            return;
                         }
-                    },
-                    error: function(xhr) {
-                        let errorMsg = xhr.responseJSON?.message ||
-                            'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
-                        toastr.warning(errorMsg);
-                    },
-                    complete: function() {
-                        // Restore button appearance and re-evaluate state
-                        $("#btnPaymentStatus").html(`
-                    <i class="bx bx-money me-1"></i>
-                    បង់ប្រាក់
+
+
+                        // ==================================================
+                        // 8. Disable button
+                        // ==================================================
+
+                        $button
+                            .prop("disabled", true)
+                            .html(`
+                        <span
+                            class="spinner-border spinner-border-sm me-1"
+                            role="status">
+                        </span>
+                        កំពុងទូទាត់...
+                    `);
+
+
+                        // ==================================================
+                        // 9. Update payment status
+                        // ==================================================
+
+                        $.ajax({
+
+                            url: "{{ route('missions.updatePaymentStatus', $params) }}",
+
+                            type: "POST",
+
+                            data: {
+
+                                _token: csrfToken,
+
+                                cboId: cboId
+
+                            },
+
+
+                            // ==================================================
+                            // 10. Payment update successful
+                            // ==================================================
+
+                            success: function(response) {
+
+                                if (!response.success) {
+
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'បញ្ហា',
+                                        text: response.message ||
+                                            'មិនអាចប្តូរស្ថានភាពការទូទាត់បានទេ។'
+                                    });
+
+                                    return;
+                                }
+
+
+
+                                // ==================================================
+                                // 11. Build Excel export URL
+                                // ==================================================
+
+                                // Get exactly the IDs that were paid
+                                const paidMissionIds = response.mission_ids;
+
+                                let exportUrl =
+                                    "{{ route('missions.export', ['params' => $params]) }}";
+
+                                let exportParams = new URLSearchParams();
+
+                                paidMissionIds.forEach(function(id) {
+                                    exportParams.append('cboId[]', id);
+                                });
+                                // let exportUrl =
+                                //     "{{ route('missions.export', ['params' => $params]) }}";
+
+
+                                // let exportParams =
+                                //     new URLSearchParams();
+
+
+                                // ==================================================
+                                // 12. Selected missions
+                                // ==================================================
+
+                                cboId.forEach(function(id) {
+
+                                    exportParams.append(
+                                        'cboId[]',
+                                        id
+                                    );
+
+                                });
+
+
+                                // ==================================================
+                                // 13. Current filters
+                                // ==================================================
+
+                                let cboTodo =
+                                    $('#cboTodo').val();
+
+                                let cboMissionType =
+                                    $('#cboMissionType').val();
+
+                                let cboName =
+                                    $('#cboName').val();
+
+                                let cboProvince =
+                                    $('#cboProvince').val();
+
+                                let startDate =
+                                    $('#start_date').val();
+
+                                let endDate =
+                                    $('#end_date').val();
+
+
+                                if (cboTodo) {
+
+                                    exportParams.append(
+                                        'cboTodo',
+                                        cboTodo
+                                    );
+
+                                }
+
+
+                                if (cboMissionType) {
+
+                                    exportParams.append(
+                                        'cboMissionType',
+                                        cboMissionType
+                                    );
+
+                                }
+
+
+                                if (cboName) {
+
+                                    exportParams.append(
+                                        'cboName',
+                                        cboName
+                                    );
+
+                                }
+
+
+                                if (cboProvince) {
+
+                                    exportParams.append(
+                                        'cboProvince',
+                                        cboProvince
+                                    );
+
+                                }
+
+
+                                if (startDate) {
+
+                                    exportParams.append(
+                                        'start_date',
+                                        startDate
+                                    );
+
+                                }
+
+
+                                if (endDate) {
+
+                                    exportParams.append(
+                                        'end_date',
+                                        endDate
+                                    );
+
+                                }
+
+
+                                // ==================================================
+                                // 14. Final export URL
+                                // ==================================================
+
+                                const finalExportUrl =
+                                    exportUrl +
+                                    '?' +
+                                    exportParams.toString();
+
+                                window.location.href = finalExportUrl;
+                                // ==================================================
+                                // 15. Show success
+                                // ==================================================
+
+                                Swal.fire({
+
+                                    icon: 'success',
+
+                                    title: 'ទូទាត់ជោគជ័យ',
+
+                                    html: `
+                                <p>
+                                    បានទូទាត់
+                                    <strong>${cboId.length}</strong>
+                                    បេសកកម្មជោគជ័យ។
+                                </p>
+
+                                <p class="text-muted mb-0">
+                                    កំពុងទាញយក Excel...
+                                </p>
+                            `,
+
+                                    timer: 1500,
+
+                                    showConfirmButton: false,
+
+                                    allowOutsideClick: false
+
+                                });
+
+
+                                // ==================================================
+                                // 16. Reload DataTable
+                                // ==================================================
+
+                                $("#mission-table")
+                                    .DataTable()
+                                    .ajax.reload(
+                                        null,
+                                        false
+                                    );
+
+
+                                // ==================================================
+                                // 17. Clear checkbox
+                                // ==================================================
+
+                                $("#checkAllMissions")
+                                    .prop("checked", false);
+
+                                $(".mission-checkbox")
+                                    .prop("checked", false);
+
+
+                                // ==================================================
+                                // 18. Download Excel
+                                // ==================================================
+
+                                setTimeout(function() {
+
+                                    window.location.href =
+                                        finalExportUrl;
+
+                                }, 700);
+
+                            },
+
+
+                            // ==================================================
+                            // 19. Payment update error
+                            // ==================================================
+
+                            error: function(xhr) {
+
+                                console.error(
+                                    'Payment Update Error:',
+                                    xhr.responseText
+                                );
+
+                                let errorMsg =
+                                    xhr.responseJSON?.message ||
+                                    'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'បញ្ហា',
+                                    text: errorMsg
+                                });
+
+                            },
+
+
+                            // ==================================================
+                            // 20. Restore button
+                            // ==================================================
+
+                            complete: function() {
+
+                                $button
+                                    .html(`
+                                <i class="bx bx-money me-1"></i>
+                                ទូទាត់
+                            `);
+
+                                /*
+                                 * We already clear the checkboxes after
+                                 * successful payment.
+                                 *
+                                 * Therefore disable the button.
+                                 */
+
+                                $button.prop(
+                                    "disabled",
+                                    true
+                                );
+
+                            }
+
+                        });
+
+                    });
+
+                },
+
+
+                // ==========================================================
+                // 21. Payment total error
+                // ==========================================================
+
+                error: function(xhr) {
+
+                    console.error(
+                        'Payment Total Error:',
+                        xhr.responseText
+                    );
+
+                    let errorMsg =
+                        xhr.responseJSON?.message ||
+                        'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។';
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'បញ្ហា',
+                        text: errorMsg
+                    });
+
+                }
+
+            });
+
+        });
+    </script> --}}
+    {{-- <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <script>
+        $(document).on('click', '#btnPaymentStatus', function() {
+
+            // ==========================================================
+            // 1. Get selected mission IDs
+            // ==========================================================
+
+            let cboId = $(".mission-checkbox:checked").map(function() {
+                return $(this).val();
+            }).get();
+
+            // Remove duplicate IDs
+            cboId = [...new Set(cboId)];
+
+            // No mission selected
+            if (cboId.length === 0) {
+
+                toastr.warning(
+                    'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។'
+                );
+
+                return;
+            }
+
+
+            // ==========================================================
+            // 2. Show loading
+            // ==========================================================
+
+            Swal.fire({
+                title: 'កំពុងប្រតិបត្តិការ...',
+                text: 'កំពុងគណនាចំនួនប្រាក់ សូមរង់ចាំបន្តិច',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: function() {
+                    Swal.showLoading();
+                }
+            });
+
+
+            // ==========================================================
+            // 3. Get CSRF token
+            // ==========================================================
+
+            let csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+
+            // ==========================================================
+            // 4. Calculate payment total
+            // ==========================================================
+
+            $.ajax({
+
+                url: "{{ route('missions.paymentTotal', $params) }}",
+
+                type: "POST",
+
+                data: {
+                    _token: csrfToken,
+                    cboId: cboId
+                },
+
+                success: function(response) {
+
+                    // --------------------------------------------------
+                    // Check response
+                    // --------------------------------------------------
+
+                    if (!response.success) {
+
+                        Swal.close();
+
+                        toastr.warning(
+                            'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។'
+                        );
+
+                        return;
+                    }
+
+
+                    // --------------------------------------------------
+                    // Format total amount
+                    // --------------------------------------------------
+
+                    let totalAmount = parseFloat(
+                        response.total_amount || 0
+                    );
+
+                    let formattedTotal = totalAmount.toLocaleString(
+                        'en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+
+
+                    // ==================================================
+                    // 5. Confirmation dialog
+                    // ==================================================
+
+                    Swal.fire({
+
+                        title: 'បញ្ជាក់ការទូទាត់',
+
+                        html: `
+                    <div class="text-start">
+
+                        <p>
+                            តើអ្នកចង់ប្តូរស្ថានភាព
+                            <strong>${cboId.length}</strong>
+                            បេសកកម្មដែលបានជ្រើស
+                            ទៅជា
+                            <strong class="text-success">
+                                ទូទាត់
+                            </strong>
+                            មែនទេ?
+                        </p>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <strong>ចំនួនបេសកកម្ម:</strong>
+
+                            <strong>
+                                ${cboId.length}
+                            </strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-2">
+                            <strong>សរុបប្រាក់:</strong>
+
+                            <strong class="text-primary fs-5">
+                                ${formattedTotal}
+                            </strong>
+                        </div>
+
+                    </div>
+                `,
+
+                        icon: 'question',
+
+                        showCancelButton: true,
+
+                        confirmButtonText: 'បាទ/ចាស ទូទាត់ និងទាញយក Excel',
+
+                        cancelButtonText: 'បោះបង់',
+
+                        reverseButtons: true,
+
+                        focusCancel: true
+
+                    }).then(function(result) {
+
+
+                        // ==================================================
+                        // 6. User cancelled
+                        // ==================================================
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+
+                        // ==================================================
+                        // 7. Disable payment button
+                        // ==================================================
+
+                        $("#btnPaymentStatus")
+                            .prop("disabled", true)
+                            .html(`
+                        <span
+                            class="spinner-border spinner-border-sm me-1"
+                            role="status"
+                            aria-hidden="true">
+                        </span>
+
+                        កំពុងទូទាត់...
+                    `);
+
+
+                        // ==================================================
+                        // 8. Update payment status
+                        // ==================================================
+
+                        $.ajax({
+
+                            url: "{{ route('missions.updatePaymentStatus', $params) }}",
+
+                            type: "POST",
+
+                            data: {
+
+                                _token: csrfToken,
+
+                                cboId: cboId
+
+                            },
+
+
+                            // ==================================================
+                            // 9. Payment success
+                            // ==================================================
+
+                            success: function(response) {
+
+                                if (!response.success) {
+
+                                    toastr.warning(
+                                        response.message ||
+                                        'មិនអាចប្តូរស្ថានភាពការទូទាត់បានទេ។'
+                                    );
+
+                                    return;
+                                }
+
+
+                                // ------------------------------------------------
+                                // Payment successful
+                                // ------------------------------------------------
+
+                                toastr.success(
+                                    response.message ||
+                                    'ប្រតិបត្តិការទូទាត់ជោគជ័យ'
+                                );
+
+
+                                // ==================================================
+                                // 10. Build Excel export URL
+                                // ==================================================
+
+                                let exportUrl =
+                                    "{{ route('missions.export', ['params' => $params]) }}";
+
+
+                                let exportParams =
+                                    new URLSearchParams();
+
+
+                                // ------------------------------------------------
+                                // Selected Mission IDs
+                                // ------------------------------------------------
+
+                                cboId.forEach(function(id) {
+
+                                    exportParams.append(
+                                        'cboId[]',
+                                        id
+                                    );
+
+                                });
+
+
+                                // ==================================================
+                                // 11. Add current filters
+                                // ==================================================
+
+                                let cboTodo =
+                                    $('#cboTodo').val();
+
+                                let cboMissionType =
+                                    $('#cboMissionType').val();
+
+                                let cboName =
+                                    $('#cboName').val();
+
+                                let cboProvince =
+                                    $('#cboProvince').val();
+
+                                let startDate =
+                                    $('#start_date').val();
+
+                                let endDate =
+                                    $('#end_date').val();
+
+
+                                // ------------------------------------------------
+                                // Payment status
+                                // ------------------------------------------------
+
+                                if (cboTodo) {
+
+                                    exportParams.append(
+                                        'cboTodo',
+                                        cboTodo
+                                    );
+
+                                }
+
+
+                                // ------------------------------------------------
+                                // Mission type
+                                // ------------------------------------------------
+
+                                if (cboMissionType) {
+
+                                    exportParams.append(
+                                        'cboMissionType',
+                                        cboMissionType
+                                    );
+
+                                }
+
+
+                                // ------------------------------------------------
+                                // Employee / Leader
+                                // ------------------------------------------------
+
+                                if (cboName) {
+
+                                    exportParams.append(
+                                        'cboName',
+                                        cboName
+                                    );
+
+                                }
+
+
+                                // ------------------------------------------------
+                                // Province
+                                // ------------------------------------------------
+
+                                if (cboProvince) {
+
+                                    exportParams.append(
+                                        'cboProvince',
+                                        cboProvince
+                                    );
+
+                                }
+
+
+                                // ------------------------------------------------
+                                // Start date
+                                // ------------------------------------------------
+
+                                if (startDate) {
+
+                                    exportParams.append(
+                                        'start_date',
+                                        startDate
+                                    );
+
+                                }
+
+
+                                // ------------------------------------------------
+                                // End date
+                                // ------------------------------------------------
+
+                                if (endDate) {
+
+                                    exportParams.append(
+                                        'end_date',
+                                        endDate
+                                    );
+
+                                }
+
+
+                                // ==================================================
+                                // 12. Final Excel URL
+                                // ==================================================
+
+                                let finalExportUrl =
+                                    exportUrl +
+                                    '?' +
+                                    exportParams.toString();
+
+
+                                // ==================================================
+                                // 13. Reload DataTable
+                                // ==================================================
+
+                                $("#mission-table")
+                                    .DataTable()
+                                    .ajax.reload(
+                                        null,
+                                        false
+                                    );
+
+
+                                // ==================================================
+                                // 14. Clear selected checkboxes
+                                // ==================================================
+
+                                $("#checkAllMissions")
+                                    .prop("checked", false);
+
+                                $(".mission-checkbox")
+                                    .prop("checked", false);
+
+
+                                // ==================================================
+                                // 15. Download Excel
+                                // ==================================================
+
+                                setTimeout(function() {
+
+                                    window.location.href =
+                                        finalExportUrl;
+
+                                }, 500);
+
+                            },
+
+
+                            // ==================================================
+                            // 16. Payment error
+                            // ==================================================
+
+                            error: function(xhr) {
+
+                                let errorMsg =
+                                    xhr.responseJSON?.message ||
+                                    'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
+
+                                toastr.warning(errorMsg);
+
+                            },
+
+
+                            // ==================================================
+                            // 17. Always restore button
+                            // ==================================================
+
+                            complete: function() {
+
+                                $("#btnPaymentStatus")
+                                    .html(`
+                                <i class="bx bx-money me-1"></i>
+                                ទូទាត់
+                            `);
+
+
+                                // Check remaining selected rows
+
+                                let checked =
+                                    $(".mission-checkbox:checked").length;
+
+
+                                $("#btnPaymentStatus")
+                                    .prop(
+                                        "disabled",
+                                        checked === 0
+                                    );
+
+                            }
+
+                        });
+
+                    });
+
+                },
+
+
+                // ==========================================================
+                // 18. Calculate total error
+                // ==========================================================
+
+                error: function(xhr) {
+
+                    Swal.close();
+
+                    let errorMsg =
+                        xhr.responseJSON?.message ||
+                        'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។';
+
+                    toastr.warning(errorMsg);
+
+                }
+
+            });
+
+        });
+    </script> --}}
+
+    <script>
+        $(document).on('click', '#btnPaymentStatus', function() {
+
+            const $button = $('#btnPaymentStatus');
+
+            // ==========================================================
+            // 1. Get selected mission IDs
+            // ==========================================================
+
+            let cboId = $('.mission-checkbox:checked')
+                .map(function() {
+                    return $(this).val();
+                })
+                .get();
+
+            // Remove duplicate IDs
+            cboId = [...new Set(cboId)];
+
+            // ==========================================================
+            // 2. Check selection
+            // ==========================================================
+
+            if (cboId.length === 0) {
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'បញ្ជាក់',
+                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។'
+                });
+
+                return;
+            }
+
+            // ==========================================================
+            // 3. CSRF
+            // ==========================================================
+
+            const csrfToken =
+                $('meta[name="csrf-token"]').attr('content');
+
+            // ==========================================================
+            // 4. Disable button
+            // ==========================================================
+
+            $button
+                .prop('disabled', true)
+                .html(`
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    កំពុងគណនា...
                 `);
 
-                        let checked = $(".mission-checkbox:checked").length;
-                        $("#btnPaymentStatus").prop("disabled", checked === 0);
-                    }
-                });
+            // ==========================================================
+            // 5. Loading
+            // ==========================================================
+
+            Swal.fire({
+                title: 'កំពុងប្រតិបត្តិការ...',
+                text: 'កំពុងគណនាចំនួនប្រាក់ សូមរង់ចាំបន្តិច',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: function() {
+                    Swal.showLoading();
+                }
             });
+
+            // ==========================================================
+            // 6. Calculate payment total
+            // ==========================================================
+
+            $.ajax({
+
+                url: "{{ route('missions.paymentTotal', $params) }}",
+
+                type: 'POST',
+
+                data: {
+                    _token: csrfToken,
+                    cboId: cboId
+                },
+
+                success: function(response) {
+
+                    if (!response.success) {
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'បញ្ហា',
+                            text: response.message ||
+                                'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។'
+                        });
+
+                        return;
+                    }
+
+                    // ==================================================
+                    // Format total
+                    // ==================================================
+
+                    const totalAmount =
+                        parseFloat(response.total_amount || 0);
+
+                    const formattedTotal =
+                        totalAmount.toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+
+                    // ==================================================
+                    // Confirmation
+                    // ==================================================
+
+                    Swal.fire({
+
+                        title: 'បញ្ជាក់ការទូទាត់',
+
+                        html: `
+                                    <div class="text-start">
+
+                                        <p>
+                                            តើអ្នកចង់ប្តូរស្ថានភាព
+                                            <strong>${cboId.length}</strong>
+                                            បេសកកម្មដែលបានជ្រើស
+                                            ទៅជា
+                                            <strong class="text-success">
+                                                ទូទាត់
+                                            </strong>
+                                            មែនទេ?
+                                        </p>
+
+                                        <hr>
+
+                                        <div class="d-flex justify-content-between">
+                                            <strong>ចំនួនបេសកកម្ម:</strong>
+                                            <strong>${cboId.length}</strong>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between mt-2">
+                                            <strong>សរុបប្រាក់:</strong>
+
+                                            <strong class="text-primary fs-5">
+                                                ${formattedTotal}
+                                            </strong>
+                                        </div>
+
+                                        <div class="mt-3 text-muted small">
+                                            បន្ទាប់ពីទូទាត់រួច
+                                            ប្រព័ន្ធនឹងទាញយក Excel ដោយស្វ័យប្រវត្តិ។
+                                        </div>
+
+                                    </div>
+                                `,
+
+                        icon: 'question',
+
+                        showCancelButton: true,
+
+                        confirmButtonText: 'បាទ/ចាស ទូទាត់ និងទាញយក Excel',
+
+                        cancelButtonText: 'បោះបង់',
+
+                        reverseButtons: true,
+
+                        focusCancel: true
+
+                    }).then(function(result) {
+
+                        // ==================================================
+                        // Cancel
+                        // ==================================================
+
+                        if (!result.isConfirmed) {
+
+                            $button
+                                .prop('disabled', false)
+                                .html(`
+                            <i class="bx bx-money me-1"></i>
+                            ទូទាត់
+                        `);
+
+                            return;
+                        }
+
+                        // ==================================================
+                        // Update button
+                        // ==================================================
+
+                        $button
+                            .prop('disabled', true)
+                            .html(`
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        កំពុងទូទាត់...
+                    `);
+
+                        // ==================================================
+                        // 7. Update payment status
+                        // ==================================================
+
+                        $.ajax({
+
+                            url: "{{ route('missions.updatePaymentStatus', $params) }}",
+
+                            type: 'POST',
+
+                            data: {
+                                _token: csrfToken,
+                                cboId: cboId
+                            },
+
+                            success: function(response) {
+
+                                if (!response.success) {
+
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'បញ្ហា',
+                                        text: response.message ||
+                                            'មិនអាចប្តូរស្ថានភាពការទូទាត់បានទេ។'
+                                    });
+
+                                    return;
+                                }
+
+                                // ==================================================
+                                // 8. Get ONLY successfully paid mission IDs
+                                // ==================================================
+
+                                const paidMissionIds =
+                                    response.mission_ids || [];
+
+                                if (paidMissionIds.length === 0) {
+
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'បញ្ហា',
+                                        text: 'មិនមានបេសកកម្មដែលបានទូទាត់ទេ។'
+                                    });
+
+                                    return;
+                                }
+
+                                console.log(
+                                    'Paid Mission IDs:',
+                                    paidMissionIds
+                                );
+
+                                // ==================================================
+                                // 9. Build export URL
+                                // ==================================================
+
+                                const exportUrl =
+                                    "{{ route('missions.export', ['params' => $params]) }}";
+
+                                const exportParams =
+                                    new URLSearchParams();
+
+                                // IMPORTANT:
+                                // Add IDs ONLY ONCE
+                                paidMissionIds.forEach(function(id) {
+
+                                    exportParams.append(
+                                        'cboId[]',
+                                        id
+                                    );
+
+                                });
+
+                                // ==================================================
+                                // 10. Add current filters
+                                // ==================================================
+
+                                const cboTodo =
+                                    $('#cboTodo').val();
+
+                                const cboMissionType =
+                                    $('#cboMissionType').val();
+
+                                const cboName =
+                                    $('#cboName').val();
+
+                                const cboProvince =
+                                    $('#cboProvince').val();
+
+                                const startDate =
+                                    $('#start_date').val();
+
+                                const endDate =
+                                    $('#end_date').val();
+
+                                if (cboTodo) {
+
+                                    exportParams.append(
+                                        'cboTodo',
+                                        cboTodo
+                                    );
+
+                                }
+
+                                if (cboMissionType) {
+
+                                    exportParams.append(
+                                        'cboMissionType',
+                                        cboMissionType
+                                    );
+
+                                }
+
+                                if (cboName) {
+
+                                    exportParams.append(
+                                        'cboName',
+                                        cboName
+                                    );
+
+                                }
+
+                                if (cboProvince) {
+
+                                    exportParams.append(
+                                        'cboProvince',
+                                        cboProvince
+                                    );
+
+                                }
+
+                                if (startDate) {
+
+                                    exportParams.append(
+                                        'start_date',
+                                        startDate
+                                    );
+
+                                }
+
+                                if (endDate) {
+
+                                    exportParams.append(
+                                        'end_date',
+                                        endDate
+                                    );
+
+                                }
+
+                                // ==================================================
+                                // 11. Final export URL
+                                // ==================================================
+
+                                const finalExportUrl =
+                                    exportUrl +
+                                    '?' +
+                                    exportParams.toString();
+
+                                console.log(
+                                    'Export URL:',
+                                    finalExportUrl
+                                );
+
+                                // ==================================================
+                                // 12. Success message
+                                // ==================================================
+
+                                Swal.fire({
+
+                                    icon: 'success',
+
+                                    title: 'ទូទាត់ជោគជ័យ',
+
+                                    html: `
+                                <p>
+                                    បានទូទាត់
+                                    <strong>${paidMissionIds.length}</strong>
+                                    បេសកកម្មជោគជ័យ។
+                                </p>
+
+                                <p class="text-muted mb-0">
+                                    កំពុងទាញយក Excel...
+                                </p>
+                            `,
+
+                                    timer: 1500,
+
+                                    showConfirmButton: false,
+
+                                    allowOutsideClick: false
+
+                                });
+
+                                // ==================================================
+                                // 13. Clear selection
+                                // ==================================================
+
+                                $('#checkAllMissions')
+                                    .prop('checked', false);
+
+                                $('.mission-checkbox')
+                                    .prop('checked', false);
+
+                                // ==================================================
+                                // 14. Reload DataTable
+                                // ==================================================
+
+                                $('#mission-table')
+                                    .DataTable()
+                                    .ajax
+                                    .reload(null, false);
+
+                                // ==================================================
+                                // 15. Download Excel ONCE
+                                // ==================================================
+
+                                setTimeout(function() {
+
+                                    window.location.href =
+                                        finalExportUrl;
+
+                                }, 700);
+
+                            },
+
+                            error: function(xhr) {
+
+                                console.error(
+                                    'Payment Update Error:',
+                                    xhr.responseText
+                                );
+
+                                const errorMsg =
+                                    xhr.responseJSON?.message ||
+                                    'មានបញ្ហាក្នុងការប្តូរស្ថានភាពបង់ប្រាក់។';
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'បញ្ហា',
+                                    text: errorMsg
+                                });
+
+                            },
+
+                            complete: function() {
+
+                                $button
+                                    .prop('disabled', true)
+                                    .html(`
+                                <i class="bx bx-money me-1"></i>
+                                ទូទាត់
+                            `);
+
+                            }
+
+                        });
+
+                    });
+
+                },
+
+                error: function(xhr) {
+
+                    console.error(
+                        'Payment Total Error:',
+                        xhr.responseText
+                    );
+
+                    const errorMsg =
+                        xhr.responseJSON?.message ||
+                        'មិនអាចគណនាចំនួនទឹកប្រាក់បានទេ។';
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'បញ្ហា',
+                        text: errorMsg
+                    });
+
+                    $button
+                        .prop('disabled', false)
+                        .html(`
+                    <i class="bx bx-money me-1"></i>
+                    ទូទាត់
+                `);
+                }
+
+            });
+
         });
     </script>
 @endsection

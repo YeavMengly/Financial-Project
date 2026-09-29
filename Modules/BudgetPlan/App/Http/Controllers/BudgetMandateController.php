@@ -377,6 +377,7 @@ class BudgetMandateController extends Controller
 
     public function store(Request $request, $params)
     {
+        // dd($request->all());
         $validated = $request->validate([
             'cboPaymentVoucherNumber' =>   'required',
             'legalName' =>  'nullable',
@@ -395,7 +396,7 @@ class BudgetMandateController extends Controller
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
         ]);
-
+// dd($validated);
         DB::beginTransaction();
         try {
             $ministryId = decode_params($params);
