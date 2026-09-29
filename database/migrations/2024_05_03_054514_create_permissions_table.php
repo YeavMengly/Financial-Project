@@ -42,6 +42,17 @@ return new class extends Migration
             ],
 
             /**
+             *   Begin Credit allocation
+             */
+
+            'budget.allocation'                  => [
+                'view'   => 'budgetAllocation.index',
+                'create' => 'budgetAllocation.create',
+                'edit'   => 'budgetAllocation.edit',
+                'delete' => 'budgetAllocation.destroy',
+            ],
+
+            /**
              *   Payment
              */
             'expenditure.guarantee'                  => [
@@ -266,6 +277,7 @@ return new class extends Migration
                 'show'   => 'initialMissions.index',
                 'view'   => 'missions.index',
                 'create' => 'missions.create',
+                'detail'   => 'missions.show',
                 'edit'   => 'missions.edit',
                 'delete' => 'missions.destroy',
             ],
