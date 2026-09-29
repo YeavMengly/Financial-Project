@@ -15,7 +15,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class InitialMissionsDataTable extends DataTable
+class InitialMissionDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -39,7 +39,7 @@ class InitialMissionsDataTable extends DataTable
                 return Carbon::parse($module->created_at)->format('Y-m-d  h:i:s A');
             })
             ->addColumn('action', function ($model) {
-                return view('mission::missions.initialMissions.action', ['module' => $model]);
+                return view('mission::missions.initialMission.action', ['module' => $model]);
             })
             ->rawColumns(['status', 'soft_delete', 'action', 'is_archived']);
     }
@@ -96,7 +96,7 @@ class InitialMissionsDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('initialmissions-table')
+            ->setTableId('initialmission-table')
             ->parameters([
                 'language' => [
                     'url' => asset('assets/lang/language.json'),
@@ -148,6 +148,6 @@ class InitialMissionsDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'InitialMissions_' . date('YmdHis');
+        return 'InitialMission_' . date('YmdHis');
     }
 }

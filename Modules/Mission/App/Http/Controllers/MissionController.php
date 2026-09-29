@@ -2,7 +2,7 @@
 
 namespace Modules\Mission\App\Http\Controllers;
 
-use App\DataTables\Mission\InitialMissionsDataTable;
+use App\DataTables\Mission\InitialMissionDataTable;
 use App\DataTables\Mission\MissionDataTable;
 use App\Exports\Mission\MissionExport;
 use App\Http\Controllers\Controller;
@@ -27,10 +27,10 @@ use Illuminate\View\View;
 class MissionController extends Controller
 {
 
-    public function getIndex(InitialMissionsDataTable $dataTable)
+    public function getIndex(InitialMissionDataTable $dataTable)
     {
         // return view('maintenance.maintenance');
-        return $dataTable->render('mission::missions.initialMissions.index');
+        return $dataTable->render('mission::missions.initialMission.index');
     }
 
     /**

@@ -274,7 +274,7 @@ return new class extends Migration
 
             // Missions
             'missions'                  => [
-                'show'   => 'initialMissions.index',
+                'show'   => 'initialMission.index',
                 'view'   => 'missions.index',
                 'create' => 'missions.create',
                 'edit'   => 'missions.edit',
