@@ -73,6 +73,7 @@ return [
   'th.apply' => 'អនុវត្ត',
   'th.remaining_credit' => 'ឥណទាននៅសល់',
   'th.deadline_balance' => 'សមតុល្យចុងគ្រា',
+  'th.header.expense.type' => 'ឧបសម្ព័ន្ធ',
 
   'th.internal' => 'កើនផ្ទៃក្នុង',
   'th.unexpected'  => 'មិនបានគ្រោងទុក',

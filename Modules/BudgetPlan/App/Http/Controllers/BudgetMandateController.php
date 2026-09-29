@@ -14,7 +14,7 @@ use App\DataTables\Budget\InitialProcurementDataTable;
 use App\DataTables\Budget\InitialRoyaltyMandateDataTable;
 use App\DataTables\Budget\InitialTrainingDataTable;
 use App\Exports\BeginMandateExport;
-use App\Exports\BeginguaranteeExport;
+use App\Exports\BeginExport;
 use App\Exports\ExpenseRecordExport;
 use App\Exports\ExpenseRecordTrainingExport;
 use App\Http\Controllers\Controller;
@@ -262,6 +262,7 @@ class BudgetMandateController extends Controller
         $program = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $expenseType = ExpenseType::all();
+        $headerExpenseTypes = HeaderExpenseType::all();
 
         $beginMandate = BeginMandate::query()
             ->join('account_subs', function ($join) use ($ministry) {
@@ -286,6 +287,7 @@ class BudgetMandateController extends Controller
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('expenseType', $expenseType)
+            ->with('headerExpenseTypes', $headerExpenseTypes)
             ->with('params', $params)
             ->with('beginMandate', $beginMandate)
             ->with('program', $program);
@@ -386,9 +388,10 @@ class BudgetMandateController extends Controller
             'cboAgency'       => 'required',
             'cboSubAccount'   => 'required',
             'budget'          => 'required|numeric|min:0',
+            'cboHeaderExpenseType'       => 'nullable',
             'cboExpenseType'       => 'required',
             'txtDescription'  => 'required',
-            'attachments'      => 'required|file|max:51200',
+            'attachments'      => 'nullable|file|max:51200',
             'transactionDate'            => 'required|date',
             'requestDate'            => 'required|date',
         ]);
@@ -464,13 +467,19 @@ class BudgetMandateController extends Controller
 
                 return back();
             }
+           
+            $filePath = null;
 
-            // Store file consistently in 'sources/voucher/pdf' on the public disk
-            $path_store = 'uploads/mandate/' . date('Y-m-d');
-            if (! File::exists($path_store)) {
-                File::makeDirectory($path_store, 0777, true, true);
+            if ($request->hasFile('attachments')) {
+                $path_store = 'uploads/mandate/' . date('Y-m-d');
+
+                // Storage::makeDirectory is preferred over File::makeDirectory when using public disk
+                if (! File::exists(public_path($path_store))) {
+                    File::makeDirectory(public_path($path_store), 0755, true, true);
+                }
+
+                $filePath = $request->file('attachments')->store($path_store, 'public');
             }
-            $filePath = $request->file('attachments')->store($path_store, 'public');
 
             BudgetMandate::create([
                 'ministry_id'    => $ministry->id,
@@ -482,6 +491,7 @@ class BudgetMandateController extends Controller
                 'no'             => $beginMandate->no,
                 'budget'         => $applyValue,
                 'expense_type_id'      => (int) $validated['cboExpenseType'],
+                'header_expense_type_id'      => (int) $validated['cboHeaderExpenseType'] ?? null,
                 'legal_id'      => $budgetVoucher->legal_id,
                 'legal_name'      => $validated['legalName'] ?? null,
                 'temporary_id'      => $validated['cboTemporaryId'] ?? null,
@@ -584,7 +594,8 @@ class BudgetMandateController extends Controller
 
         $expenseType = ExpenseType::where('id', $module->expense_type_id)
             ->get();
-
+        $headerExpenseTypes = HeaderExpenseType::where('id', $module->header_expense_type_id)
+            ->get();
         $program     = Program::where('ministry_id', $ministry->id)->get();
         $programId   = Program::findOrFail($module->program_id);
         $programSub  = ProgramSub::where('ministry_id', $ministry->id)
@@ -611,6 +622,7 @@ class BudgetMandateController extends Controller
 
         return view('budgetplan::budgetMandate.edit')
             ->with('expenseType', $expenseType)
+            ->with('headerExpenseTypes', $headerExpenseTypes)
             ->with('accountSub', $accountSub)
             ->with('agency', $agency)
             ->with('program', $program)
@@ -638,6 +650,7 @@ class BudgetMandateController extends Controller
             'cboSubAccount'          => 'required',
             'budget'                 => 'required|numeric|min:0',
             'cboExpenseType'         => 'required',
+            'cboHeaderExpenseType'         => 'nullable',
             'txtDescription'         => 'required',
             'transactionDate'        => 'required|date',
             'requestDate'            => 'required|date',
@@ -678,6 +691,7 @@ class BudgetMandateController extends Controller
                 'no'                     => $beginCredit->no,
                 'budget'                 => $applyValue,
                 'expense_type_id'        => $validated['cboExpenseType'],
+                'header_expense_type_id'        => $validated['cboHeaderExpenseType'] ?? null,
                 'payment_voucher_number' => $validated['cboPaymentVoucherNumber'],
                 'temporary_id'           => $validated['cboTemporaryId'],
                 'day_of_number'          => $validated['cbodayOfNumber'],
@@ -1171,11 +1185,11 @@ class BudgetMandateController extends Controller
             }
             // Date
             if ($request->filled('start_date') && $request->filled('end_date')) {
-                $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date)
+                $query->whereDate('budget_mandates.request_date', '>=', $request->start_date)
                     ->whereDate('budget_mandates.request_date', '<=', $request->end_date);
             } else {
                 if ($request->filled('start_date')) {
-                    $query->whereDate('budget_mandates.legal_date', '>=', $request->start_date);
+                    $query->whereDate('budget_mandates.request_date', '>=', $request->start_date);
                 }
                 if ($request->filled('end_date')) {
                     $query->whereDate('budget_mandates.request_date', '<=', $request->end_date);
@@ -1214,7 +1228,7 @@ class BudgetMandateController extends Controller
                 'count'       => $data->count(),
             ]);
 
-            $export = new BeginguaranteeExport(
+            $export = new BeginExport(
                 $data,
                 $ministryId,
                 $request->start_date,

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->decimal('budget', 15, 2)->default(0);
             $table->unsignedBigInteger('header_expense_type_id')->nullable();
             $table->unsignedBigInteger('expense_type_id');
-            $table->string('legal_number', 100);
+            $table->string('legal_number', 100)->nullable();
             $table->string('legal_id', 100);
             $table->string('legal_name')->nullable();
             $table->string('temporary_id', 100)->nullable();
