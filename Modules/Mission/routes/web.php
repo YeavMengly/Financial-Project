@@ -32,6 +32,8 @@ Route::prefix('missions')->middleware(['auth'])->group(function () {
             'update'
         )->name('missions.update');
         Route::get('initial_missions/{params}/restore', 'restore')->name('missions.restore');
+        Route::get('{params}/initial_missions/export', 'export')->name('missions.export');
+
 
         Route::get('initial_missions/get-by-level', 'getByLevel')->name('missions.by.level');
         Route::get('initial_missions/position/levels', 'getByPositionLevel')->name('position.levels');
@@ -40,7 +42,7 @@ Route::prefix('missions')->middleware(['auth'])->group(function () {
         Route::get('initial_missions/{params}/show/{id}/details', 'show')->name('missions.show');
 
         // Add to payment
-        Route::post('/missions/payment-total', 'paymentTotal')->name('missions.paymentTotal');
+        Route::post('/missions/payment-total/{params}', 'paymentTotal')->name('missions.paymentTotal');
         Route::post(
             'initial_missions/{params}/update-payment-status',
             'updatePaymentStatus'

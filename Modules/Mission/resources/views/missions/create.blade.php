@@ -1377,7 +1377,17 @@
                 if (!row) {
                     return;
                 }
-
+                /* |-------------------------------------------------------------------------- | Get all employee rows |-------------------------------------------------------------------------- */
+                // const rows = $(
+                //     '#employeeRows .employee-row'
+                // ); /* |-------------------------------------------------------------------------- | Get current row index |-------------------------------------------------------------------------- */
+                // const rowIndex = rows.index(
+                //     row
+                // ); /* |-------------------------------------------------------------------------- | Prevent deleting FIRST row (index 0) |-------------------------------------------------------------------------- */
+                // if (rowIndex === 0) {
+                //     toastr.warning('មិនអាចលុបបុគ្គលិកជួរទី ១ បានទេ។');
+                //     return;
+                // }
                 /*
                 |--------------------------------------------------------------------------
                 | Check whether the removed row was the leader
@@ -1453,16 +1463,26 @@
 
                 const rows = $('.employee-row');
 
-                if (rows.length <= 1) {
+                // if (rows.length <= 1) {
 
-                    rows.find('.btn-remove-row')
-                        .prop('disabled', true);
+                //     rows.find('.btn-remove-row')
+                //         .prop('disabled', true);
 
-                } else {
+                // } else {
 
-                    rows.find('.btn-remove-row')
-                        .prop('disabled', false);
-                }
+                //     rows.find('.btn-remove-row')
+                //         .prop('disabled', false);
+                // }
+                rows.each(function(index) {
+                    const removeButton = $(this).find('.btn-remove-row');
+                    if (index === 0) {
+                        // Hide remove icon/button for first row
+                        removeButton.hide();
+                    } else {
+                        // Show remove icon/button for other rows
+                        removeButton.show();
+                    }
+                });
             }
 
 
@@ -1504,19 +1524,6 @@
 
         }
     </script>
-
-    {{-- <script>
-        $(document).on('change', '.assign-budget', function() {
-
-            $('.assign-budget').not(this).prop('checked', false);
-            $('.assign-budget-value').val(0);
-
-            const row = $(this).closest('.employee-row');
-            const hiddenInput = row.find('.assign-budget-value');
-
-            hiddenInput.val(this.checked ? 1 : 0);
-        });
-    </script> --}}
 
     <script>
         // Handle assign budget checkbox for each employee row 

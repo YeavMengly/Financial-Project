@@ -64,7 +64,7 @@
                             <li class="breadcrumb-item active"><a
                                     href="javascript: void(0);">{{ __('menus.content.missions') }}</a>
                             </li>
-                            <li class="breadcrumb-item active">{{ __('buttons.create') }}</li>
+                            <li class="breadcrumb-item active">{{ __('buttons.edit') }}</li>
                         </ol>
                     </div>
                 </div>

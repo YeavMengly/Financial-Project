@@ -27,14 +27,18 @@ class MissionDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->addColumn('select', function ($row) {
-                // Already paid
                 if ((int) $row->payment_is_archived === 2) {
                     return '';
                 }
-                // Not paid yet
+
                 return '
-                    <input type="checkbox" class="form-check-input mission-checkbox" value="' . e($row->id) . '">
-                ';
+            <input
+                type="checkbox"
+                class="form-check-input mission-checkbox"
+                name="cboId[]"
+                value="' . e($row->id) . '"
+            >
+        ';
             })
             ->editColumn('soft_delete', function ($row) {
 
@@ -415,18 +419,18 @@ class MissionDataTable extends DataTable
 
             Column::computed('select')
                 ->title('
-                <input
-                    type="checkbox"
-                    class="form-check-input"
-                    id="checkAllMissions"
-                >')
+        <input
+            type="checkbox"
+            class="form-check-input"
+            id="checkAllMissions"
+        >
+    ')
                 ->exportable(false)
                 ->printable(false)
                 ->orderable(false)
                 ->searchable(false)
                 ->addClass('text-center align-middle')
                 ->width(50),
-
             Column::computed('payment_status')
                 ->title(__('Task'))
                 ->width(60)
