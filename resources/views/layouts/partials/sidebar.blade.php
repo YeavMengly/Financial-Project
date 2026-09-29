@@ -148,7 +148,7 @@
                     $missionActive = Request::routeIs('initialMission.*') || Request::routeIs('missions.*');
                 @endphp
 
-                @if (hasPermission('initialMission.index'))
+                {{-- @if (hasPermission('initialMission.index'))
                     <li>
                         <a href="{{ route('initialMission.index') }}"
                             class="{{ Request::routeIs('initialMission.*') ? 'active' : '' }}">
@@ -159,7 +159,7 @@
                             </span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
                 {{-- Material --}}
                 <li class="menu-title" data-key="t-inventory">{{ __('menus.material') }}</li>

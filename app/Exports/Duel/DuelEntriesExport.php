@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+use Illuminate\Support\Facades\File;
+
 class DuelEntriesExport
 {
     protected $data;
@@ -36,7 +38,7 @@ class DuelEntriesExport
             ->get();
         $first   = $entries->first();
 
-        $templatePath = storage_path('excel/template/duel_entries_template.xlsx');
+        $templatePath = storage_path('app/excel/template/duel_entries_template.xlsx');
         $spreadsheet  = IOFactory::load($templatePath);
         $sheet        = $spreadsheet->getActiveSheet();
 
@@ -241,15 +243,36 @@ class DuelEntriesExport
         | Output file
         |--------------------------------------------------------
         */
-        $fileName = 'duel_entries_template.xlsx';
+        // $fileName = 'duel_entries_template.xlsx';
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            'Cache-Control'       => 'max-age=0',
-        ]);
+        // return response()->streamDownload(function () use ($spreadsheet) {
+        //     $writer = new Xlsx($spreadsheet);
+        //     $writer->save('php://output');
+        // }, $fileName, [
+        //     'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        //     'Cache-Control'       => 'max-age=0',
+        // ]);
+        $exportDirectory = storage_path('app/excel/export');
+
+        if (!File::exists($exportDirectory)) {
+            File::makeDirectory($exportDirectory, 0755, true);
+        }
+
+        $fileName = 'duel_entries.xlsx';
+
+        $outputPath = $exportDirectory . '/' . $fileName;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($outputPath);
+
+        return response()->download(
+            $outputPath,
+            $fileName,
+            [
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
     }
 }

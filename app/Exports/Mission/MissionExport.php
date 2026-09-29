@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Http\Request;
 use OpenSpout\Common\Entity\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Illuminate\Support\Facades\File;
 
 class MissionExport
 {
@@ -32,7 +33,7 @@ class MissionExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = storage_path('excel/template/template_mission.xlsx');
+        $templatePath = storage_path('app/excel/template/template_mission.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -353,17 +354,39 @@ class MissionExport
             // Next mission
             $missionNumber++;
         }
+        $exportDirectory = storage_path('app/excel/export');
 
-        $fileName = 'template_mission.xlsx';
+        if (!File::exists($exportDirectory)) {
+            File::makeDirectory($exportDirectory, 0755, true);
+        }
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            'Cache-Control' => 'max-age=0',
-        ]);
+        $fileName = 'mission.xlsx';
+
+        $outputPath = $exportDirectory . '/' . $fileName;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($outputPath);
+
+        return response()->download(
+            $outputPath,
+            $fileName,
+            [
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
+
+
+        // $fileName = 'template_mission.xlsx';
+
+        // return response()->streamDownload(function () use ($spreadsheet) {
+        //     $writer = new Xlsx($spreadsheet);
+        //     $writer->save('php://output');
+        // }, $fileName, [
+        //     'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        //     'Cache-Control' => 'max-age=0',
+        // ]);
         // 1. Define temporary file path on disk
         // $fileName = 'budget_report_' . time() . '.xlsx';
         // $directory = 'app/exports';
