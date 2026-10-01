@@ -291,7 +291,7 @@
                                         </div>
                                     </div> --}}
 
-                                    {{-- <div class="col-lg-2 col-md-3">
+                                    <div class="col-lg-2 col-md-3">
                                         <div class="form-group mb-3">
                                             <label for="cboSubAccount" class="form-label text-muted">
                                                 {{ __('forms.sub.account') }}
@@ -310,7 +310,7 @@
                                                 <div class="pristine-error text-help">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                    </div> --}}
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -363,7 +363,8 @@
                                                                     </option>
 
                                                                     @foreach ($employees as $emp)
-                                                                        <option value="{{ $emp->id }}">
+                                                                        <option value="{{ $emp->id }}"
+                                                                            data-account-number="{{ $emp->account_number }}">
                                                                             {{ $emp->name_kh }} - {{ $emp->name_latin }}
                                                                         </option>
                                                                     @endforeach
@@ -422,7 +423,7 @@
                                                         </div> --}}
 
                                                         <!-- Leader -->
-                                                        <div class="col-lg-2 col-md-4">
+                                                        {{-- <div class="col-lg-2 col-md-4">
                                                             <div class="form-group mb-3">
 
                                                                 <label class="form-label font-size-13 text-muted d-block">
@@ -442,10 +443,79 @@
                                                                 </div>
 
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
 
-                                                        {{-- Assign Budget --}}
+                                                        {{-- Own Account Number --}}
                                                         <div class="col-lg-2 col-md-4">
+                                                            <div class="form-group mb-3"> <label
+                                                                    class="form-label font-size-13 text-muted">
+                                                                    {{ __('forms.account.number') }} </label> <input
+                                                                    type="text"
+                                                                    class="form-control employee-account-number"
+                                                                    name="account_number[]" value="" readonly>
+                                                            </div>
+                                                        </div>
+                                                        {{-- Payment Account --}}
+                                                        <div class="col-lg-2 col-md-4">
+                                                            <div class="form-group mb-3"> <label
+                                                                    class="form-label font-size-13 text-muted">
+                                                                    {{ __('forms.payment.account') }} </label> <select
+                                                                    class="form-select payment-account-employee"
+                                                                    name="payment_account_employee_id[]">
+                                                                    <option value=""> {{ __('forms.search...') }}
+                                                                    </option>
+                                                                </select>
+                                                                {{-- <small class="text-muted payment-account-number">
+                                                                </small> --}}
+                                                            </div>
+                                                        </div>
+                                                        <!-- Leader + Assign Budget -->
+                                                        <div class="col-lg-2 col-md-4">
+                                                            <div class="form-group mb-3">
+
+                                                                <label class="form-label font-size-13 text-muted d-block">
+                                                                    {{ __('forms.leader') }} / {{ __('forms.assign') }}
+                                                                </label>
+
+                                                                <div class="d-flex align-items-center gap-4">
+
+                                                                    {{-- Leader --}}
+                                                                    <div class="form-check mb-0">
+                                                                        <input type="radio"
+                                                                            class="form-check-input employee-leader"
+                                                                            name="leader_index" value="0"
+                                                                            style="width:22px;height:22px;cursor:pointer;">
+
+                                                                        <label class="form-check-label ms-2"
+                                                                            style="padding-top:3px;cursor:pointer;">
+                                                                            {{ __('forms.leader') }}
+                                                                        </label>
+                                                                    </div>
+
+                                                                    {{-- Assign Budget --}}
+                                                                    <div class="form-check mb-0">
+
+                                                                        <input type="hidden" class="assign-budget-value"
+                                                                            name="assign_budget[]" value="0">
+
+                                                                        <input type="checkbox"
+                                                                            class="form-check-input assign-budget"
+                                                                            name="assign_budget_checkbox[]"
+                                                                            style="width:22px;height:22px;cursor:pointer;">
+
+                                                                        <label class="form-check-label ms-2"
+                                                                            style="padding-top:3px;cursor:pointer;">
+                                                                            {{ __('forms.assign') }}
+                                                                        </label>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        {{-- Assign Budget --}}
+                                                        {{-- <div class="col-lg-2 col-md-4">
                                                             <div class="form-group mb-3">
 
                                                                 <label class="form-label font-size-13 text-muted d-block">
@@ -470,7 +540,7 @@
                                                                 </div>
 
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
 
                                                         {{-- Remove --}}
                                                         <div class="col-lg-2 col-md-4">
@@ -656,6 +726,18 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboDocument');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false,
+
+            });
+        });
+
+         document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboSubAccount');
             const choices = new Choices(element, {
                 searchEnabled: true,
                 itemSelectText: '',
@@ -1025,6 +1107,378 @@
             }
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Get all employees currently selected in the mission
+            |--------------------------------------------------------------------------
+            */
+            function getMissionEmployees() {
+
+                const employees = [];
+
+                document
+                    .querySelectorAll('#employeeRows .employee-row')
+                    .forEach(function(row) {
+
+                        const employeeSelect =
+                            row.querySelector('.employee-name');
+
+                        if (!employeeSelect) {
+                            return;
+                        }
+
+                        const employeeId =
+                            employeeSelect.value;
+
+                        if (!employeeId) {
+                            return;
+                        }
+
+                        const selectedOption =
+                            employeeSelect.options[
+                                employeeSelect.selectedIndex
+                            ];
+
+                        const employeeName =
+                            selectedOption?.textContent.trim() || '';
+
+                        const accountInput =
+                            row.querySelector(
+                                '.employee-account-number'
+                            );
+
+                        const accountNumber =
+                            accountInput?.value ||
+                            selectedOption?.getAttribute(
+                                'data-account-number'
+                            ) ||
+                            '';
+
+                        employees.push({
+                            id: String(employeeId),
+                            name: employeeName,
+                            account_number: accountNumber
+                        });
+
+                    });
+
+                return employees;
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update employee's OWN account number
+            |--------------------------------------------------------------------------
+            */
+            function updateEmployeeAccount(row) {
+
+                const employeeSelect =
+                    row.querySelector('.employee-name');
+
+                const accountInput =
+                    row.querySelector(
+                        '.employee-account-number'
+                    );
+
+                if (!employeeSelect || !accountInput) {
+                    return;
+                }
+
+                const selectedOption =
+                    employeeSelect.options[
+                        employeeSelect.selectedIndex
+                    ];
+
+                if (!selectedOption) {
+                    accountInput.value = '';
+                    return;
+                }
+
+                accountInput.value =
+                    selectedOption.getAttribute(
+                        'data-account-number'
+                    ) || '';
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update Payment Account options
+            |--------------------------------------------------------------------------
+            |
+            | Example:
+            |
+            | Person 1 -> Person 2 / ACC-002
+            | Person 2 -> Person 2 / ACC-002
+            | Person 3 -> Person 3 / ACC-003
+            |
+            |--------------------------------------------------------------------------
+            */
+            function updatePaymentAccountOptions() {
+
+                const employees =
+                    getMissionEmployees();
+
+
+                document
+                    .querySelectorAll(
+                        '#employeeRows .employee-row'
+                    )
+                    .forEach(function(row) {
+
+                        const employeeSelect =
+                            row.querySelector('.employee-name');
+
+                        const paymentSelect =
+                            row.querySelector(
+                                '.payment-account-employee'
+                            );
+
+                        if (!employeeSelect || !paymentSelect) {
+                            return;
+                        }
+
+                        const currentEmployeeId =
+                            String(
+                                employeeSelect.value || ''
+                            );
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Remember existing payment account
+                        |--------------------------------------------------------------------------
+                        */
+                        const oldValue =
+                            paymentSelect.value;
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Get Choices instance
+                        |--------------------------------------------------------------------------
+                        */
+                        const paymentChoices =
+                            choicesInstances.get(
+                                paymentSelect
+                            );
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Build Choices options
+                        |--------------------------------------------------------------------------
+                        */
+                        const choiceItems = [
+
+                            {
+                                value: '',
+                                label: '{{ __('forms.search...') }}',
+                                disabled: false
+                            }
+
+                        ];
+
+
+                        employees.forEach(function(employee) {
+
+                            choiceItems.push({
+
+                                value: employee.id,
+
+                                label: employee.name +
+                                    ' - ' +
+                                    employee.account_number,
+
+                                customProperties: {
+                                    account_number: employee.account_number
+                                }
+
+                            });
+
+                        });
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Update Choices
+                        |--------------------------------------------------------------------------
+                        */
+                        if (paymentChoices) {
+
+                            paymentChoices.clearChoices();
+
+                            paymentChoices.setChoices(
+                                choiceItems,
+                                'value',
+                                'label',
+                                true
+                            );
+
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Keep old payment account if still valid
+                            |--------------------------------------------------------------------------
+                            */
+                            const oldValueExists =
+                                employees.some(function(employee) {
+
+                                    return employee.id ===
+                                        String(oldValue);
+
+                                });
+
+
+                            if (
+                                oldValue &&
+                                oldValueExists
+                            ) {
+
+                                paymentChoices
+                                    .setChoiceByValue(
+                                        String(oldValue)
+                                    );
+
+                            }
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Default = employee's own account
+                            |--------------------------------------------------------------------------
+                            */
+                            else if (currentEmployeeId) {
+
+                                paymentChoices
+                                    .setChoiceByValue(
+                                        currentEmployeeId
+                                    );
+
+                            }
+
+                        } else {
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | Fallback if Choices isn't initialized
+                            |--------------------------------------------------------------------------
+                            */
+                            paymentSelect.innerHTML = `
+                            <option value="">
+                                {{ __('forms.search...') }}
+                            </option>
+                        `;
+
+
+                            employees.forEach(function(employee) {
+
+                                const option =
+                                    document.createElement('option');
+
+                                option.value =
+                                    employee.id;
+
+                                option.textContent =
+                                    employee.name +
+                                    ' - ' +
+                                    employee.account_number;
+
+                                option.setAttribute(
+                                    'data-account-number',
+                                    employee.account_number
+                                );
+
+                                paymentSelect.appendChild(option);
+
+                            });
+
+
+                            if (oldValue) {
+
+                                paymentSelect.value =
+                                    oldValue;
+
+                            } else if (currentEmployeeId) {
+
+                                paymentSelect.value =
+                                    currentEmployeeId;
+
+                            }
+                        }
+
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Display payment account number
+                        |--------------------------------------------------------------------------
+                        */
+                        updatePaymentAccountNumber(row);
+
+                    });
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Display selected Payment Account Number
+            |--------------------------------------------------------------------------
+            */
+            function updatePaymentAccountNumber(row) {
+
+                const paymentSelect =
+                    row.querySelector(
+                        '.payment-account-employee'
+                    );
+
+                const display =
+                    row.querySelector(
+                        '.payment-account-number'
+                    );
+
+                if (!paymentSelect || !display) {
+                    return;
+                }
+
+
+                const selectedValue =
+                    paymentSelect.value;
+
+                if (!selectedValue) {
+
+                    display.textContent = '';
+
+                    return;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Find employee from current mission
+                |--------------------------------------------------------------------------
+                */
+                const employees =
+                    getMissionEmployees();
+
+                const selectedEmployee =
+                    employees.find(function(employee) {
+
+                        return employee.id ===
+                            String(selectedValue);
+
+                    });
+
+
+                if (selectedEmployee) {
+
+                    display.textContent =
+                        'Account: ' +
+                        selectedEmployee.account_number;
+
+                } else {
+
+                    display.textContent = '';
+                }
+            }
+
 
             /*
             |--------------------------------------------------------------------------
@@ -1033,23 +1487,59 @@
             */
             function initEmployeeRow(row) {
 
-                const employeeSelect = row.querySelector('.employee-name');
-                const positionSelect = row.querySelector('.employee-position');
-                const levelSelect = row.querySelector('.employee-level');
+                const employeeSelect =
+                    row.querySelector('.employee-name');
 
-                initChoices(employeeSelect);
-                initChoices(positionSelect);
-                initChoices(levelSelect);
+                const positionSelect =
+                    row.querySelector('.employee-position');
+
+                const levelSelect =
+                    row.querySelector('.employee-level');
+
+                const paymentAccountSelect =
+                    row.querySelector(
+                        '.payment-account-employee'
+                    );
+
 
                 /*
                 |--------------------------------------------------------------------------
-                | Employee validation
+                | Initialize Choices
                 |--------------------------------------------------------------------------
                 */
-                employeeSelect?.addEventListener('change', function() {
+                initChoices(employeeSelect);
 
-                    updateValidation(this);
-                });
+                initChoices(positionSelect);
+
+                initChoices(levelSelect);
+
+                initChoices(paymentAccountSelect);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Employee validation + Account
+                |--------------------------------------------------------------------------
+                */
+                employeeSelect?.addEventListener(
+                    'change',
+                    function() {
+
+                        updateValidation(this);
+
+                        /*
+                         * Update own account number.
+                         */
+                        updateEmployeeAccount(row);
+
+                        /*
+                         * Update payment accounts
+                         * for every employee.
+                         */
+                        updatePaymentAccountOptions();
+
+                    }
+                );
 
 
                 /*
@@ -1057,14 +1547,22 @@
                 | Position -> Level AJAX
                 |--------------------------------------------------------------------------
                 */
-                positionSelect?.addEventListener('change', function() {
+                positionSelect?.addEventListener(
+                    'change',
+                    function() {
 
-                    updateValidation(this);
+                        updateValidation(this);
 
-                    const positionId = this.value;
+                        const positionId =
+                            this.value;
 
-                    loadLevel(row, positionId);
-                });
+                        loadLevel(
+                            row,
+                            positionId
+                        );
+
+                    }
+                );
 
 
                 /*
@@ -1072,10 +1570,31 @@
                 | Level validation
                 |--------------------------------------------------------------------------
                 */
-                levelSelect?.addEventListener('change', function() {
+                levelSelect?.addEventListener(
+                    'change',
+                    function() {
 
-                    updateValidation(this);
-                });
+                        updateValidation(this);
+
+                    }
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Payment Account changed
+                |--------------------------------------------------------------------------
+                */
+                paymentAccountSelect?.addEventListener(
+                    'change',
+                    function() {
+
+                        updateValidation(this);
+
+                        updatePaymentAccountNumber(row);
+
+                    }
+                );
 
 
                 /*
@@ -1083,13 +1602,34 @@
                 | Assign budget
                 |--------------------------------------------------------------------------
                 */
-                const checkbox = row.querySelector('.assign-budget');
-                const hiddenValue = row.querySelector('.assign-budget-value');
+                const checkbox =
+                    row.querySelector('.assign-budget');
 
-                checkbox?.addEventListener('change', function() {
+                const hiddenValue =
+                    row.querySelector('.assign-budget-value');
 
-                    hiddenValue.value = this.checked ? '1' : '0';
-                });
+                checkbox?.addEventListener(
+                    'change',
+                    function() {
+
+                        if (hiddenValue) {
+
+                            hiddenValue.value =
+                                this.checked ? '1' : '0';
+
+                        }
+
+                    }
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Initialize existing employee account
+                |--------------------------------------------------------------------------
+                */
+                updateEmployeeAccount(row);
+
             }
 
 
@@ -1104,7 +1644,8 @@
                     return;
                 }
 
-                const choicesContainer = select.closest('.choices');
+                const choicesContainer =
+                    select.closest('.choices');
 
                 if (!choicesContainer) {
                     return;
@@ -1112,13 +1653,23 @@
 
                 if (select.value) {
 
-                    choicesContainer.classList.remove('is-invalid');
-                    choicesContainer.classList.add('is-valid');
+                    choicesContainer.classList.remove(
+                        'is-invalid'
+                    );
+
+                    choicesContainer.classList.add(
+                        'is-valid'
+                    );
 
                 } else {
 
-                    choicesContainer.classList.remove('is-valid');
-                    choicesContainer.classList.add('is-invalid');
+                    choicesContainer.classList.remove(
+                        'is-valid'
+                    );
+
+                    choicesContainer.classList.add(
+                        'is-invalid'
+                    );
                 }
             }
 
@@ -1128,38 +1679,57 @@
             | Load Level
             |--------------------------------------------------------------------------
             */
-            function loadLevel(row, positionId, selectedLevel = null) {
+            function loadLevel(
+                row,
+                positionId,
+                selectedLevel = null
+            ) {
 
-                const levelSelect = row.querySelector('.employee-level');
+                const levelSelect =
+                    row.querySelector('.employee-level');
 
                 if (!levelSelect) {
                     return;
                 }
 
-                const levelChoices = choicesInstances.get(levelSelect);
+                const levelChoices =
+                    choicesInstances.get(
+                        levelSelect
+                    );
 
                 if (!levelChoices) {
                     return;
                 }
 
+
                 levelChoices.clearStore();
 
                 levelChoices.setChoices([{
+
                     value: '',
+
                     label: '{{ __('forms.loading') }}...',
+
                     disabled: true
+
                 }], 'value', 'label', true);
 
+
                 levelChoices.disable();
+
 
                 if (!positionId) {
 
                     levelChoices.clearStore();
 
                     levelChoices.setChoices([{
+
                         value: '',
+
                         label: '{{ __('forms.search...') }}',
+
                         disabled: true
+
                     }], 'value', 'label', true);
 
                     levelChoices.disable();
@@ -1167,9 +1737,13 @@
                     return;
                 }
 
+
                 $.ajax({
+
                     url: "{{ route('missions.by.level') }}",
+
                     type: "GET",
+
                     data: {
                         level_id: positionId
                     },
@@ -1178,24 +1752,46 @@
 
                         levelChoices.clearStore();
 
-                        if (response && response.length > 0) {
 
-                            const choices = response.map(function(level) {
+                        if (
+                            response &&
+                            response.length > 0
+                        ) {
 
-                                return {
-                                    value: String(level.id),
-                                    label: level.name,
-                                    selected: selectedLevel &&
-                                        String(level.id) === String(selectedLevel)
-                                };
+                            const choices =
+                                response.map(
+                                    function(level) {
 
-                            });
+                                        return {
+
+                                            value: String(
+                                                level.id
+                                            ),
+
+                                            label: level.name,
+
+                                            selected: selectedLevel &&
+                                                String(level.id) ===
+                                                String(
+                                                    selectedLevel
+                                                )
+
+                                        };
+
+                                    }
+                                );
+
 
                             levelChoices.setChoices(
+
                                 choices,
+
                                 'value',
+
                                 'label',
+
                                 true
+
                             );
 
                             levelChoices.enable();
@@ -1203,14 +1799,19 @@
                         } else {
 
                             levelChoices.setChoices([{
+
                                 value: '',
+
                                 label: '{{ __('messages.no_data') }}',
+
                                 disabled: true
+
                             }], 'value', 'label', true);
 
                             levelChoices.disable();
                         }
                     },
+
 
                     error: function(xhr) {
 
@@ -1219,13 +1820,19 @@
                         levelChoices.clearStore();
 
                         levelChoices.setChoices([{
+
                             value: '',
+
                             label: '{{ __('messages.error') }}',
+
                             disabled: true
+
                         }], 'value', 'label', true);
 
                         levelChoices.disable();
+
                     }
+
                 });
             }
 
@@ -1235,134 +1842,234 @@
             | Add employee row
             |--------------------------------------------------------------------------
             */
-            $('#btnAddRow').on('click', function() {
+            $('#btnAddRow').on(
+                'click',
+                function() {
 
-                /*
-                |--------------------------------------------------------------------------
-                | Clone FIRST row before Choices changes it
-                |--------------------------------------------------------------------------
-                */
-                const firstRow = $('.employee-row:first')[0];
-
-                /*
-                | We create a clean row manually instead of cloning
-                | the Choices-generated HTML.
-                */
-                const row = $(`
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Create clean row
+                    |--------------------------------------------------------------------------
+                    */
+                    const row = $(`
                     <div class="employee-row border rounded p-3 mb-3">
 
                         <div class="row align-items-end">
 
+                            {{-- Employee --}}
                             <div class="col-lg-2 col-md-4">
+
                                 <div class="form-group mb-3">
 
                                     <label class="form-label font-size-13 text-muted">
                                         {{ __('forms.name') }}
                                     </label>
 
-                                    <select class="form-select employee-name"
-                                            name="cboName[]"
-                                            required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                    <select
+                                        class="form-select employee-name"
+                                        name="cboName[]"
+                                        required
+                                        data-pristine-required-message="{{ __('messages.required') }}">
 
                                         <option value="">
                                             {{ __('forms.search...') }}
                                         </option>
 
                                         @foreach ($employees as $emp)
-                                            <option value="{{ $emp->id }}">
-                                                {{ $emp->name_kh }} - {{ $emp->name_latin }}
+
+                                            <option
+                                                value="{{ $emp->id }}"
+                                                data-account-number="{{ $emp->account_number }}">
+
+                                                {{ $emp->name_kh }}
+                                                -
+                                                {{ $emp->name_latin }}
+
                                             </option>
+
                                         @endforeach
 
                                     </select>
 
                                 </div>
+
                             </div>
 
+
+                            {{-- Position --}}
                             <div class="col-lg-2 col-md-4">
+
                                 <div class="form-group mb-3">
 
                                     <label class="form-label font-size-13 text-muted">
                                         {{ __('forms.position') }}
                                     </label>
 
-                                    <select class="form-select employee-position"
-                                            name="cboPosition[]"
-                                            required
-                                            data-pristine-required-message="{{ __('messages.required') }}">
+                                    <select
+                                        class="form-select employee-position"
+                                        name="cboPosition[]"
+                                        required
+                                        data-pristine-required-message="{{ __('messages.required') }}">
 
                                         <option value="">
                                             {{ __('forms.search...') }}
                                         </option>
 
                                         @foreach ($positions as $pos)
+
                                             <option value="{{ $pos->id }}">
                                                 {{ $pos->name }}
                                             </option>
+
                                         @endforeach
 
                                     </select>
 
                                 </div>
+
                             </div>
 
-                             <div class="col-lg-2 col-md-4">
-                                <div class="form-group mb-3">
-
-                                </div>
-                            </div>
-
+                            {{-- Own Account Number --}}
                             <div class="col-lg-2 col-md-4">
+
                                 <div class="form-group mb-3">
 
-                                    <label class="form-label font-size-13 text-muted d-block">
-                                        {{ __('forms.assign') }}
+                                    <label class="form-label font-size-13 text-muted">
+                                        {{ __('forms.account.number') }}
                                     </label>
 
-                                    <input type="hidden"
+                                    <input
+                                        type="text"
+                                        class="form-control employee-account-number"
+                                        name="account_number[]"
+                                        value=""
+                                        readonly>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Payment Account --}}
+                            <div class="col-lg-2 col-md-4">
+
+                                <div class="form-group mb-3">
+
+                                    <label class="form-label font-size-13 text-muted">
+                                        {{ __('forms.payment.account') }}
+                                    </label>
+
+                                    <select
+                                        class="form-select payment-account-employee"
+                                        name="payment_account_employee_id[]">
+
+                                        <option value="">
+                                            {{ __('forms.search...') }}
+                                        </option>
+
+                                    </select>
+
+                                   
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Assign Budget --}}
+                            <div class="col-lg-2 col-md-4">
+
+                                <div class="form-group mb-3">
+
+                                    <label
+                                        class="form-label font-size-13 text-muted d-block">
+
+                                        {{ __('forms.assign') }}
+
+                                    </label>
+
+                                    <input
+                                        type="hidden"
                                         class="assign-budget-value"
                                         name="assign_budget[]"
                                         value="0">
 
                                     <div class="form-check">
 
-                                        <input type="checkbox"
+                                        <input
+                                            type="checkbox"
                                             class="form-check-input assign-budget"
                                             name="assign_budget_checkbox[]"
                                             style="width:22px;height:22px;cursor:pointer;">
 
-                                        <label class="form-check-label ms-2"
+                                        <label
+                                            class="form-check-label ms-2"
                                             style="padding-top:3px;cursor:pointer;">
+
                                             {{ __('forms.assign') }}
+
                                         </label>
 
                                     </div>
+
                                 </div>
+
                             </div>
 
-                           <div class="col-lg-2 col-md-4">
-                                <button type="button"
-                                    class="btn btn-danger btn-remove-row"
-                                    >
+
+                            {{-- Remove --}}
+                            <div class="col">
+
+                                <button
+                                    type="button"
+                                    class="btn btn-danger btn-remove-row">
+
                                     <i class="bx bx-trash"></i>
+
                                 </button>
+
                             </div>
+
                         </div>
+
                     </div>
                 `);
 
-                $('#employeeRows').append(row);
 
-                /*
-                |--------------------------------------------------------------------------
-                | Initialize Choices on new row
-                |--------------------------------------------------------------------------
-                */
-                initEmployeeRow(row[0]);
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Add row to DOM
+                    |--------------------------------------------------------------------------
+                    */
+                    $('#employeeRows').append(row);
 
-                updateRemoveButtons();
-            });
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Initialize Choices
+                    |--------------------------------------------------------------------------
+                    */
+                    initEmployeeRow(row[0]);
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | IMPORTANT:
+                    | Update payment accounts after new row exists
+                    |--------------------------------------------------------------------------
+                    */
+                    updatePaymentAccountOptions();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Update remove buttons
+                    |--------------------------------------------------------------------------
+                    */
+                    updateRemoveButtons();
+
+                }
+            );
 
 
             /*
@@ -1370,88 +2077,266 @@
             | Remove employee row
             |--------------------------------------------------------------------------
             */
-            $(document).on('click', '.btn-remove-row', function() {
+            // $(document).on(
+            //     'click',
+            //     '.btn-remove-row',
+            //     function() {
 
-                const row = $(this).closest('.employee-row')[0];
+            //         const row =
+            //             $(this).closest(
+            //                 '.employee-row'
+            //             )[0];
 
-                if (!row) {
-                    return;
-                }
-                /* |-------------------------------------------------------------------------- | Get all employee rows |-------------------------------------------------------------------------- */
-                // const rows = $(
-                //     '#employeeRows .employee-row'
-                // ); /* |-------------------------------------------------------------------------- | Get current row index |-------------------------------------------------------------------------- */
-                // const rowIndex = rows.index(
-                //     row
-                // ); /* |-------------------------------------------------------------------------- | Prevent deleting FIRST row (index 0) |-------------------------------------------------------------------------- */
-                // if (rowIndex === 0) {
-                //     toastr.warning('មិនអាចលុបបុគ្គលិកជួរទី ១ បានទេ។');
-                //     return;
-                // }
-                /*
-                |--------------------------------------------------------------------------
-                | Check whether the removed row was the leader
-                |--------------------------------------------------------------------------
-                */
-                const wasLeader = row.querySelector('.employee-leader')?.checked ?? false;
+            //         if (!row) {
+            //             return;
+            //         }
 
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Destroy Choices before removing
-                |--------------------------------------------------------------------------
-                */
-                row.querySelectorAll('select').forEach(function(select) {
-                    destroyChoices(select);
-                });
-
-                /*
-                |--------------------------------------------------------------------------
-                | Remove employee row
-                |--------------------------------------------------------------------------
-                */
-                row.remove();
-
-                /*
-                |--------------------------------------------------------------------------
-                | Update leader radio indexes
-                |--------------------------------------------------------------------------
-                */
-                updateLeaderIndexes();
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | Check whether removed row was leader
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         const wasLeader =
+            //             row.querySelector(
+            //                 '.employee-leader'
+            //             )?.checked ?? false;
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | If the leader was removed, select the first employee as leader
-                |--------------------------------------------------------------------------
-                */
-                if (wasLeader) {
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | Destroy Choices before removing
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         row
+            //             .querySelectorAll('select')
+            //             .forEach(function(select) {
 
-                    const firstRow = document.querySelector(
-                        '#employeeRows .employee-row:first-child'
-                    );
+            //                 destroyChoices(select);
 
-                    if (firstRow) {
+            //             });
 
-                        const firstLeader = firstRow.querySelector(
-                            '.employee-leader'
-                        );
 
-                        if (firstLeader) {
-                            firstLeader.checked = true;
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | Remove row
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         row.remove();
+
+
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | Update leader indexes
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         updateLeaderIndexes();
+
+
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | If leader removed,
+            //         | make first employee leader
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         if (wasLeader) {
+
+            //             const firstRow =
+            //                 document.querySelector(
+            //                     '#employeeRows .employee-row:first-child'
+            //                 );
+
+
+            //             if (firstRow) {
+
+            //                 const firstLeader =
+            //                     firstRow.querySelector(
+            //                         '.employee-leader'
+            //                     );
+
+
+            //                 if (firstLeader) {
+
+            //                     firstLeader.checked =
+            //                         true;
+
+            //                 }
+
+            //             }
+
+            //         }
+
+
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | IMPORTANT:
+            //         | Rebuild payment accounts after removing employee.
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         updatePaymentAccountOptions();
+
+
+            //         /*
+            //         |--------------------------------------------------------------------------
+            //         | Update remove buttons
+            //         |--------------------------------------------------------------------------
+            //         */
+            //         updateRemoveButtons();
+
+            //     }
+            // );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Update remove buttons
+            |--------------------------------------------------------------------------
+            */
+            // function updateRemoveButtons() {
+
+            //     const rows =
+            //         $('.employee-row');
+
+
+            //     rows.each(function(index) {
+
+            //         const removeButton =
+            //             $(this).find(
+            //                 '.btn-remove-row'
+            //             );
+
+
+            //         if (index === 0) {
+
+            //             removeButton.hide();
+
+            //         } else {
+
+            //             removeButton.show();
+
+            //         }
+
+            //     });
+            // }
+            /*
+            |--------------------------------------------------------------------------
+            | Remove employee row
+            |--------------------------------------------------------------------------
+            */
+            $(document).on(
+                'click',
+                '.btn-remove-row',
+                function() {
+
+                    const row = $(this).closest('.employee-row')[0];
+
+                    if (!row) {
+                        return;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Check whether removed row was leader
+                    |--------------------------------------------------------------------------
+                    */
+                    const wasLeader =
+                        row.querySelector('.employee-leader')?.checked ?? false;
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Get employee ID being removed
+                    |--------------------------------------------------------------------------
+                    */
+                    const removedEmployeeSelect =
+                        row.querySelector('.employee-name');
+
+                    const removedEmployeeId =
+                        removedEmployeeSelect?.value ?
+                        String(removedEmployeeSelect.value) :
+                        null;
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Destroy Choices before removing
+                    |--------------------------------------------------------------------------
+                    */
+                    row
+                        .querySelectorAll('select')
+                        .forEach(function(select) {
+
+                            destroyChoices(select);
+
+                        });
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Remove row
+                    |--------------------------------------------------------------------------
+                    */
+                    row.remove();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Update leader indexes
+                    |--------------------------------------------------------------------------
+                    */
+                    updateLeaderIndexes();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | If leader was removed,
+                    | make first employee leader
+                    |--------------------------------------------------------------------------
+                    */
+                    if (wasLeader) {
+
+                        const firstRow =
+                            document.querySelector(
+                                '#employeeRows .employee-row:first-child'
+                            );
+
+                        if (firstRow) {
+
+                            const firstLeader =
+                                firstRow.querySelector(
+                                    '.employee-leader'
+                                );
+
+                            if (firstLeader) {
+
+                                firstLeader.checked = true;
+
+                            }
+
                         }
 
                     }
 
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | IMPORTANT:
+                    | Rebuild payment-account employee options
+                    |--------------------------------------------------------------------------
+                    */
+                    updatePaymentAccountOptions();
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Remove buttons
+                    |--------------------------------------------------------------------------
+                    */
+                    updateRemoveButtons();
+
                 }
-                /*
-                   |--------------------------------------------------------------------------
-                   | Update remove buttons
-                   |--------------------------------------------------------------------------
-                   */
-                updateRemoveButtons();
-            });
+            );
 
 
             /*
@@ -1463,65 +2348,86 @@
 
                 const rows = $('.employee-row');
 
-                // if (rows.length <= 1) {
-
-                //     rows.find('.btn-remove-row')
-                //         .prop('disabled', true);
-
-                // } else {
-
-                //     rows.find('.btn-remove-row')
-                //         .prop('disabled', false);
-                // }
                 rows.each(function(index) {
-                    const removeButton = $(this).find('.btn-remove-row');
+
+                    const removeButton =
+                        $(this).find('.btn-remove-row');
+
                     if (index === 0) {
-                        // Hide remove icon/button for first row
+
                         removeButton.hide();
+
                     } else {
-                        // Show remove icon/button for other rows
+
                         removeButton.show();
+
                     }
+
                 });
+
             }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Initialize first rows
+            |--------------------------------------------------------------------------
+            */
+            document
+                .querySelectorAll('.employee-row')
+                .forEach(function(row) {
+
+                    initEmployeeRow(row);
+
+                });
 
 
             /*
             |--------------------------------------------------------------------------
-            | Initialize first row
+            | IMPORTANT:
+            | Build payment account options
+            | after all initial rows are initialized.
             |--------------------------------------------------------------------------
             */
-            document.querySelectorAll('.employee-row').forEach(function(row) {
+            updatePaymentAccountOptions();
 
-                initEmployeeRow(row);
 
-            });
-
+            /*
+            |--------------------------------------------------------------------------
+            | Update remove buttons
+            |--------------------------------------------------------------------------
+            */
             updateRemoveButtons();
 
         });
 
+
         /*
-           |--------------------------------------------------------------------------
-           | Update leader indexes
-           |--------------------------------------------------------------------------
-           */
+        |--------------------------------------------------------------------------
+        | Update leader indexes
+        |--------------------------------------------------------------------------
+        */
         function updateLeaderIndexes() {
 
             document
-                .querySelectorAll('#employeeRows .employee-row')
+                .querySelectorAll(
+                    '#employeeRows .employee-row'
+                )
                 .forEach(function(row, index) {
 
-                    const leaderRadio = row.querySelector(
-                        '.employee-leader'
-                    );
+                    const leaderRadio =
+                        row.querySelector(
+                            '.employee-leader'
+                        );
+
 
                     if (leaderRadio) {
-                        leaderRadio.value = index;
+
+                        leaderRadio.value =
+                            index;
+
                     }
 
                 });
-
         }
     </script>
 
@@ -1772,5 +2678,296 @@
             });
 
         });
+    </script>
+
+    {{-- Keep this code --}}
+    {{-- <script>
+        /**
+         * Build the list of employees currently selected
+         * in this mission.
+         */
+        function getMissionEmployees() {
+
+            const employees = [];
+
+            $('.employee-row').each(function() {
+
+                const row = $(this);
+
+                const employeeSelect =
+                    row.find('.employee-name');
+
+                const employeeId =
+                    employeeSelect.val();
+
+                if (!employeeId) {
+                    return;
+                }
+
+                const selectedOption =
+                    employeeSelect.find('option:selected');
+
+                const employeeName =
+                    selectedOption.text().trim();
+
+                const accountNumber =
+                    row.find('.employee-account-number').val() ||
+                    selectedOption.data('account-number') ||
+                    '';
+
+                employees.push({
+                    id: String(employeeId),
+                    name: employeeName,
+                    account_number: accountNumber
+                });
+            });
+
+            return employees;
+        }
+
+
+        /**
+         * Update payment-account dropdowns
+         * for all mission employee rows.
+         */
+        function updatePaymentAccountOptions() {
+
+            const employees = getMissionEmployees();
+
+            $('.employee-row').each(function() {
+
+                const row = $(this);
+
+                const employeeSelect =
+                    row.find('.employee-name');
+
+                const currentEmployeeId =
+                    employeeSelect.val();
+
+                const paymentSelect =
+                    row.find('.payment-account-employee');
+
+                /*
+                 * Remember current payment account.
+                 */
+                const oldValue =
+                    paymentSelect.val();
+
+                /*
+                 * Rebuild options.
+                 */
+                paymentSelect.empty();
+
+                paymentSelect.append(`
+                <option value="">
+                    {{ __('forms.search...') }}
+                </option>
+            `);
+
+                employees.forEach(function(employee) {
+
+                    paymentSelect.append(`
+                    <option
+                        value="${employee.id}"
+                        data-account-number="${employee.account_number}">
+                        ${employee.name} - ${employee.account_number}
+                    </option>
+                `);
+
+                });
+
+                /*
+                 * Keep the previous payment account
+                 * if that employee still exists.
+                 */
+                const oldValueStillExists =
+                    employees.some(function(employee) {
+                        return employee.id === String(oldValue);
+                    });
+
+                if (oldValue && oldValueStillExists) {
+
+                    paymentSelect.val(oldValue);
+
+                }
+                /*
+                 * Otherwise use this person's own account.
+                 */
+                else if (currentEmployeeId) {
+
+                    paymentSelect.val(currentEmployeeId);
+
+                } else {
+
+                    paymentSelect.val('');
+                }
+
+                updatePaymentAccountNumber(row);
+            });
+        }
+
+
+        /**
+         * Display the selected payment account number.
+         */
+        function updatePaymentAccountNumber(row) {
+
+            const paymentSelect =
+                row.find('.payment-account-employee');
+
+            const selectedOption =
+                paymentSelect.find('option:selected');
+
+            const accountNumber =
+                selectedOption.attr('data-account-number') || '';
+
+            const display =
+                row.find('.payment-account-number');
+
+            if (accountNumber) {
+
+                display.text(
+                    'Account: ' + accountNumber
+                );
+
+            } else {
+
+                display.text('');
+            }
+        }
+
+
+        /**
+         * Payment account changed.
+         */
+        $(document).on(
+            'change',
+            '.payment-account-employee',
+            function() {
+
+                const row =
+                    $(this).closest('.employee-row');
+
+                updatePaymentAccountNumber(row);
+            }
+        );
+
+
+        /**
+         * Employee changed.
+         */
+        $(document).on(
+            'change',
+            '.employee-name',
+            function() {
+
+                const row =
+                    $(this).closest('.employee-row');
+
+                const selectedOption =
+                    $(this).find('option:selected');
+
+                const accountNumber =
+                    selectedOption.attr('data-account-number') || '';
+
+                /*
+                 * Show employee's own account.
+                 */
+                row.find('.employee-account-number')
+                    .val(accountNumber);
+
+                /*
+                 * Rebuild payment account options.
+                 */
+                updatePaymentAccountOptions();
+            }
+        );
+
+
+        /**
+         * Run once when page loads.
+         *
+         * Useful for edit pages where employees
+         * already exist.
+         */
+        $(document).ready(function() {
+
+            $('.employee-row').each(function() {
+
+                const row = $(this);
+
+                const employeeSelect =
+                    row.find('.employee-name');
+
+                const selectedOption =
+                    employeeSelect.find('option:selected');
+
+                const accountNumber =
+                    selectedOption.attr('data-account-number') || '';
+
+                row.find('.employee-account-number')
+                    .val(accountNumber);
+            });
+
+            updatePaymentAccountOptions();
+        });
+    </script> --}}
+    <script>
+        function getPaymentAccount(row) {
+
+            const paymentSelect =
+                row.find('.payment-account-employee');
+
+            const paymentEmployeeId =
+                paymentSelect.val();
+
+            const accountDisplay =
+                row.find('.payment-account-number');
+
+            if (!paymentEmployeeId) {
+
+                accountDisplay.text('');
+
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('missions.paymentAccount') }}",
+                type: "GET",
+
+                data: {
+                    payment_account_employee_id: paymentEmployeeId
+                },
+
+                success: function(response) {
+
+                    if (
+                        response.success &&
+                        response.employee
+                    ) {
+
+                        accountDisplay.text(
+                            'Account: ' +
+                            response.employee.account_number
+                        );
+
+                    } else {
+
+                        accountDisplay.text('');
+
+                    }
+                },
+
+                error: function(xhr) {
+
+                    console.error(
+                        'Payment account error:',
+                        xhr.responseText
+                    );
+
+                    accountDisplay.text('');
+                }
+            });
+        }
     </script>
 @endsection

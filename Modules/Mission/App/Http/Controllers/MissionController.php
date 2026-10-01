@@ -6,6 +6,7 @@ use App\DataTables\Mission\InitialMissionDataTable;
 use App\DataTables\Mission\MissionDataTable;
 use App\Exports\Mission\MissionExport;
 use App\Http\Controllers\Controller;
+use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\Content\Cluster;
 use App\Models\Content\Levels;
@@ -245,7 +246,7 @@ class MissionController extends Controller
             ->get();
         $document = Document::all();
         $program   = Program::where('ministry_id', $ministry->id)->orderBy('no')->get();
-        // $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
 
         return view('mission::missions.create')
@@ -256,8 +257,7 @@ class MissionController extends Controller
             ->with('params', $params)
             ->with('document', $document)
             ->with('program', $program)
-            // ->with('accountSub', $accountSub)
-        ;
+            ->with('accountSub', $accountSub);
     }
 
     /**
@@ -300,7 +300,15 @@ class MissionController extends Controller
             'cboProgramSub'  => 'nullable|integer',
             'cboCluster'     => 'nullable|integer',
             // 'cboAgency'           => 'nullable|integer',
-            // 'cboSubAccount'       => 'nullable|integer',
+            'cboSubAccount'       => 'nullable|integer',
+            'account_number' => ['required', 'array'],
+            'account_number.*' => ['required', 'string'],
+            'payment_account_employee_id' => ['required', 'array'],
+            'payment_account_employee_id.*' => [
+                'required',
+                'integer',
+                'exists:employees,id',
+            ],
         ]);
         // dd($validated);
         $id = decode_params($params);
@@ -325,6 +333,7 @@ class MissionController extends Controller
             $nightsCount = max($daysCount - 1, 0);
 
             $province = Province::where('id', $validated['cboProvince'])->first();
+            $accountSub = AccountSub::where('ministry_id', $ministry->id)->first();
 
             /*
             |--------------------------------------------------------------------------
@@ -381,21 +390,65 @@ class MissionController extends Controller
                 'program_id'          => $validated['cboProgram'],
                 'program_sub_id'      => $validated['cboProgramSub'],
                 'cluster_id'          => $validated['cboCluster'],
-                // 'account_sub_id'      => $validated['cboSubAccount'],
+                'chapter_id'     => substr($accountSub->no, 0, 2),
+                'account_id'     => substr($accountSub->no, 0, 4),
+                'account_sub_id' => $accountSub->no,
             ]);
 
             foreach ($validated['cboName'] as $index => $employeeId) {
 
                 $positionId = $validated['cboPosition'][$index] ?? null;
-                $assignBudget = (int) ($validated['assign_budget'][$index] ?? 0);
 
-                $position = Positions::where('id', $positionId)->first();
-                // ទាញយក Level តាមរយៈ $levelId របស់ជួរដេកនីមួយៗ
-                $level = Levels::where('id', $position->level_id)->first();
-                // ការពារករណីរកមិនឃើញ Level
-                // if (!$level) {
-                //     throw new \Exception("Level ID {$levelId} not found.");
-                // }
+                $assignBudget = (int) (
+                    $validated['assign_budget'][$index] ?? 0
+                );
+
+                // Employee's own account
+                $accountNumber =
+                    $validated['account_number'][$index] ?? null;
+
+                // Employee who should receive the payment
+                $paymentAccountEmployeeId =
+                    $validated['payment_account_employee_id'][$index] ?? null;
+                /*
+                |--------------------------------------------------------------------------
+                | Payment employee
+                |--------------------------------------------------------------------------
+                */
+                $paymentEmployee = Employee::findOrFail(
+                    $paymentAccountEmployeeId
+                );
+
+                // Get their account number
+                $paymentAccountNumber = $paymentEmployee->account_number;
+                /*
+                |--------------------------------------------------------------------------
+                | Position
+                |--------------------------------------------------------------------------
+                */
+                $position = Positions::findOrFail($positionId);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Level
+                |--------------------------------------------------------------------------
+                */
+                $level = Levels::findOrFail($position->level_id);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Employee
+                |--------------------------------------------------------------------------
+                */
+                $employee = Employee::findOrFail($employeeId);
+
+                /*
+                |--------------------------------------------------------------------------
+                | Money calculation
+                |--------------------------------------------------------------------------
+                */
                 $pocketMoney = $level->pocket_money;
                 $totalPocketMoney = $pocketMoney * $daysCount;
 
@@ -403,31 +456,71 @@ class MissionController extends Controller
                 $totalMealMoney = $mealMoney * $daysCount;
 
                 $accommodationMoney = $level->accommodation_money;
-                $totalAccommodationMoney = $accommodationMoney * $nightsCount;
+                $totalAccommodationMoney =
+                    $accommodationMoney * $nightsCount;
 
-                // Condition assign budget
+
+                /*
+                |--------------------------------------------------------------------------
+                | Condition assign budget
+                |--------------------------------------------------------------------------
+                */
                 if ($assignBudget === 1) {
-                    $travelAllowance = $province->budget ?? 0;
-                    $total = $travelAllowance + $totalPocketMoney + $totalMealMoney + $totalAccommodationMoney;
+
+                    $travelAllowance =
+                        $province->budget ?? 0;
+
+                    $total =
+                        $travelAllowance +
+                        $totalPocketMoney +
+                        $totalMealMoney +
+                        $totalAccommodationMoney;
                 } else {
+
                     $travelAllowance = 0;
-                    $total = $totalPocketMoney + $totalMealMoney + $totalAccommodationMoney; // កែសម្រួលបន្ថែមតាមតម្រូវការគណនាសរុប
+
+                    $total =
+                        $totalPocketMoney +
+                        $totalMealMoney +
+                        $totalAccommodationMoney;
                 }
 
-                $usedDays = Mission::whereHas('missionEmployees', function ($query) use ($employeeId) {
-                    $query->where('employee_id', $employeeId);
-                })
+
+                /*
+                |--------------------------------------------------------------------------
+                | Check monthly mission days
+                |--------------------------------------------------------------------------
+                */
+                $usedDays = Mission::whereHas(
+                    'missionEmployees',
+                    function ($query) use ($employeeId) {
+
+                        $query->where(
+                            'employee_id',
+                            $employeeId
+                        );
+                    }
+                )
                     ->where(function ($query) use ($startDate) {
-                        $query->whereYear('start_date', $startDate->year)
-                            ->whereMonth('start_date', $startDate->month);
+
+                        $query
+                            ->whereYear(
+                                'start_date',
+                                $startDate->year
+                            )
+                            ->whereMonth(
+                                'start_date',
+                                $startDate->month
+                            );
                     })
                     ->sum('days_count');
 
-                $totalDays = $usedDays + $daysCount;
+
+                $totalDays =
+                    $usedDays + $daysCount;
+
 
                 if ($totalDays > 10) {
-
-                    $employee = Employee::find($employeeId);
 
                     throw new \Exception(
                         'បុគ្គលិក ' .
@@ -441,21 +534,73 @@ class MissionController extends Controller
                     );
                 }
 
+                /*
+                |--------------------------------------------------------------------------
+                | Create Mission Employee
+                |--------------------------------------------------------------------------
+                */
                 MissionEmployee::create([
-                    'ministry_id' => $ministry->id,
-                    'mission_id' => $mission->id,
-                    'employee_id' => $employeeId,
-                    'position_id' => $positionId,
-                    'level_name' => $level->name,
-                    'travel_allowance' => $travelAllowance,
-                    'pocket_money' => $pocketMoney,
-                    'total_pocket_money' => $totalPocketMoney,
-                    'meal_money' => $mealMoney,
-                    'total_meal_money' => $totalMealMoney,
-                    'accommodation_money' => $accommodationMoney,
-                    'total_accommodation_money' => $totalAccommodationMoney,
-                    'total' => $total,
-                    'assign_budget' => $assignBudget // ប្រើអញ្ញាតដែលបានបំលែងជា int រួច
+
+                    'ministry_id' =>
+                    $ministry->id,
+
+                    'mission_id' =>
+                    $mission->id,
+
+                    'employee_id' =>
+                    $employeeId,
+
+                    'position_id' =>
+                    $positionId,
+
+                    'level_name' =>
+                    $level->name,
+
+                    'travel_allowance' =>
+                    $travelAllowance,
+
+                    'pocket_money' =>
+                    $pocketMoney,
+
+                    'total_pocket_money' =>
+                    $totalPocketMoney,
+
+                    'meal_money' =>
+                    $mealMoney,
+
+                    'total_meal_money' =>
+                    $totalMealMoney,
+
+                    'accommodation_money' =>
+                    $accommodationMoney,
+
+                    'total_accommodation_money' =>
+                    $totalAccommodationMoney,
+
+                    'total' =>
+                    $total,
+
+                    'assign_budget' =>
+                    $assignBudget,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Employee's OWN account
+                    |--------------------------------------------------------------------------
+                    */
+                    'account_number' =>
+                    $accountNumber,
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Employee who RECEIVES payment
+                    |--------------------------------------------------------------------------
+                    */
+                    // Employee ID receiving payment
+                    'payment_account_employee_id' => $paymentAccountEmployeeId,
+
+                    // If you have a column for the payment account number:
+                    'payment_account_number' => $paymentAccountNumber,
                 ]);
             }
             DB::commit();
@@ -533,11 +678,12 @@ class MissionController extends Controller
                 'mission_employees.total_accommodation_money',
                 'mission_employees.assign_budget',
                 'mission_employees.total',
+                'mission_employees.account_number',
 
                 'employees.id as employee_id',
                 'employees.name_kh',
                 'employees.name_latin',
-                'employees.account_number',
+                'employees.account_number as payment_account_employee_id',
                 'employees.id_number',
 
                 'mission_employees.level_name',
@@ -939,11 +1085,6 @@ class MissionController extends Controller
         } catch (\Throwable $e) {
 
             DB::rollBack();
-            dd(
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine()
-            );
             Log::error(
                 'Mission update failed',
                 [
@@ -979,20 +1120,6 @@ class MissionController extends Controller
         try {
 
             $ministry = Ministry::where('id', decode_params($params))->first();
-
-            // Locate active budget voucher record
-            // $module = Mission::where('id', $id)
-            //     ->where('ministry_id', $ministry->id)
-            //     ->where('payment_is_archived', 1)
-            //     ->first();
-
-            // Return warning flash if voucher record is not found or processed
-            // if (!$module) {
-            //     flash()->translate('en')->option('timeout', 2000)
-            //         ->warning('ទិន្ន័យបានបញ្ចប់', 'Task')->flash();
-            //     return back()->withInput();
-            // }
-
             $mission = Mission::where('id', decode_params($id))
                 ->where('ministry_id', $ministry->id)
                 ->where('payment_is_archived', 1)
@@ -1576,5 +1703,95 @@ class MissionController extends Controller
                     $params
                 );
         }
+    }
+
+    public function getPaymentAccount(Request $request)
+    {
+        $request->validate([
+            'payment_account_employee_id' => [
+                'required',
+                'integer',
+                'exists:employees,id',
+            ],
+        ]);
+
+        $employee = Employee::query()
+            ->select([
+                'id',
+                'name_kh',
+                'name_latin',
+                'account_number',
+            ])
+            ->findOrFail(
+                $request->payment_account_employee_id
+            );
+
+        return response()->json([
+            'success' => true,
+            'employee' => [
+                'id' => $employee->id,
+                'name_kh' => $employee->name_kh,
+                'name_latin' => $employee->name_latin,
+                'account_number' => $employee->account_number,
+            ],
+        ]);
+    }
+    private function resolvePaymentAccount(MissionEmployee $missionEmployee): array
+    {
+        $paymentEmployee =
+            $missionEmployee->paymentAccountEmployee;
+
+        if (!$paymentEmployee) {
+
+            $paymentEmployee =
+                $missionEmployee->employee;
+        }
+
+        return [
+            'employee_id' => $paymentEmployee?->id,
+            'employee_name' => $paymentEmployee?->name_kh,
+            'account_number' => $paymentEmployee?->account_number,
+        ];
+    }
+    public function getMissionPaymentAccounts($missionId)
+    {
+        $missionEmployees = MissionEmployee::with([
+            'employee:id,name_kh,name_latin,account_number',
+            'paymentAccountEmployee:id,name_kh,name_latin,account_number',
+        ])
+            ->where('mission_id', $missionId)
+            ->get();
+
+        $payments = $missionEmployees->map(function ($missionEmployee) {
+
+            $receiver =
+                $missionEmployee->paymentAccountEmployee
+                ?? $missionEmployee->employee;
+
+            return [
+                'employee_id' =>
+                $missionEmployee->employee_id,
+
+                'employee_name' =>
+                $missionEmployee->employee?->name_kh,
+
+                'own_account' =>
+                $missionEmployee->account_number,
+
+                'payment_account_employee_id' =>
+                $receiver?->id,
+
+                'payment_employee_name' =>
+                $receiver?->name_kh,
+
+                'payment_account_number' =>
+                $receiver?->account_number,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'payments' => $payments,
+        ]);
     }
 }

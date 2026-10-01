@@ -129,5 +129,6 @@ return [
 
     'mission.description' => 'កម្មវត្តុនៃការចុះបេសកកម្ម',
     'assign' => 'អ្នកទទួលប្រាក់សោហ៊ុយ',
-
+    'account.number' => 'លេខគណនី',
+    'payment.account' => 'ផ្ទេរទៅកាន់លេខគណនី'
 ];

@@ -13,22 +13,16 @@ return new class extends Migration
     {
         Schema::create('missions', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('ច')->constrained('ministries')->cascadeOnDelete();
-
             $table->unsignedBigInteger('ministry_id');
-            // $table->integer('program_id', 4)->default(0);
-            // $table->integer('program_sub_id', 4)->default(0);
-            // $table->integer('cluster_id', 4)->default(0);
             $table->unsignedBigInteger('program_id')->nullable();
             $table->unsignedBigInteger('program_sub_id')->nullable();
             $table->unsignedBigInteger('cluster_id')->nullable();
-
-            // $table->integer('account_sub_id', 4)->default(0);
+            $table->unsignedBigInteger('chapter_id')->nullable();
+            $table->unsignedBigInteger('account_id')->nullable();
+            $table->unsignedBigInteger('account_sub_id')->nullable();
             $table->unsignedBigInteger('document_id');
             $table->integer('leader_id')->default(0);
-
             $table->unsignedBigInteger('province_id');
-            // $table->foreignId('province_id')->nullable()->constrained('provinces')->nullOnDelete();
             $table->string('legal_number');
             $table->date('legal_date');
             $table->text('description')->nullable();
