@@ -13,20 +13,10 @@ return new class extends Migration
     {
         Schema::create('mission_employees', function (Blueprint $table) {
             $table->id();
-            // $table->foreignId('ministry_id')->constrained('ministries')->cascadeOnDelete();
-
-            // Link to main mission
-            // $table->foreignId('mission_id')->constrained('missions')->cascadeOnDelete();
-            // Employee information
-            // $table->foreignId('employee_id')->constrained('employees')->restrictOnDelete();
-            // $table->foreignId('position_id')->constrained('positions')->restrictOnDelete();
-
-
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('mission_id');
             $table->unsignedBigInteger('employee_id');
             $table->unsignedBigInteger('position_id');
-
             $table->string('level_name', 5);
             // Allowances
             $table->decimal('travel_allowance', 15, 0)->default(0);
@@ -40,6 +30,9 @@ return new class extends Migration
             // Assign budget checkbox
             $table->boolean('assign_budget')
                 ->default(false);
+            $table->string('account_number', 15)->nullable();
+            $table->unsignedBigInteger('payment_account_employee_id', 5)->nullable();
+            $table->string('payment_account_number', 15)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

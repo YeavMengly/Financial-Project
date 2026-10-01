@@ -41,7 +41,9 @@ class Mission extends Model
         'program_id',
         'program_sub_id',
         'cluster_id',
-        // 'account_sub_id',
+        'chapter_id',
+        'account_id',
+        'account_sub_id',
     ];
 
     protected $casts = [

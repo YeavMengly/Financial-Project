@@ -54,3 +54,7 @@ Route::delete(
     'initial_mission/{params}/employee/{id}',
     [MissionController::class, 'destroyEmployee']
 )->name('missions.employee.destroy');
+Route::get(
+    'missions/payment-account',
+    [MissionController::class, 'getPaymentAccount']
+)->name('missions.paymentAccount');
