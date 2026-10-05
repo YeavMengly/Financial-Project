@@ -15,14 +15,17 @@ class EditFileProject extends Component
     use WithFileUploads;
 
     public $doc_id = 0;
-    public $params = "";
-    public $documentFile = "";
-    public $documentOldFile = "";
+    public $params;
+    public $documentFile;
+    public $documentOldFile;
 
-    public function mount($id)
+    public function mount($params, $id)
     {
+        $this->params = $params;
         $id = decode_params($id);
-        $project = Projects::where("id", $id)->first();
+        $project = Projects::where("id", $id)
+            ->where("ministry_id", decode_params($params))
+            ->first();
         $this->doc_id = $project->id;
         $this->documentOldFile = $project->file;
     }
@@ -34,12 +37,12 @@ class EditFileProject extends Component
 
     public function save()
     {
-        $validated = $this->validate([
+        $this->validate([
             'documentFile' => 'required|file|max:51200',
         ], [
             "documentFile" => [
                 "required" => "ជ្រើសរើស File ឯកសារ",
-                "max" => "File ឯកសារត្រូវតែតូចជាងទំហំ 10MB"
+                "max" => "File ឯកសារត្រូវតែតូចជាងទំហំ 10MB",
             ]
         ], [
             "documentFile" => __("forms.document.file")
@@ -57,14 +60,6 @@ class EditFileProject extends Component
         DB::beginTransaction();
 
         try {
-            // $last_file = $this->documentFile->store($path_store, 'uploads');
-
-            // if (!empty($this->documentOldFile) && trim($this->documentOldFile) !== '') {
-            //     $oldFileClean = trim($this->documentOldFile);
-            //     if (Storage::disk('uploads')->exists($oldFileClean)) {
-            //         Storage::disk('uploads')->delete($oldFileClean);
-            //     }
-            // }
 
             $updateDoc = Projects::findOrFail($this->doc_id);
             $updateDoc->update([
