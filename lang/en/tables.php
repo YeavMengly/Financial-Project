@@ -74,6 +74,10 @@ return [
   'th.remaining_credit' => 'ឥណទាននៅសល់',
   'th.deadline_balance' => 'សមតុល្យចុងគ្រា',
   'th.header.expense.type' => 'ឧបសម្ព័ន្ធ',
+  'th.advance.payment.royalty' => 'រជ្ជទេយ្យបុរេប្រទាន',
+  'th.direct.payment' => 'ទូទាត់ត្រង់',
+  'th.pre.financing' => 'បើកផ្តល់សាច់ប្រាក់មុន',
+  'th.pre' => 'លទ្ធកម្មសាធារណៈ',
 
   'th.internal' => 'កើនផ្ទៃក្នុង',
   'th.unexpected'  => 'មិនបានគ្រោងទុក',

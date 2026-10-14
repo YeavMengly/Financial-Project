@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\BeginCredit\BeginVoucher;
 use App\Models\BudgetAllocation;
 use App\Models\BudgetPlan\BudgetMandate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -26,9 +27,9 @@ class HeaderExpenseType extends Model
     /**
      * Get the beginVoucher under this ministry.
      */
-    // public function budgetMandate()
+    // public function beginvoucher()
     // {
-    //     return $this->hasMany(BudgetMandate::class, 'expense_type_id', 'id');
+    //     return $this->hasMany(BeginVoucher::class, 'header_expense_type_id', 'id');
     // }
 
     /**

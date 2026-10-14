@@ -68,6 +68,7 @@ return [
     'direct.payment' => 'ទូទាត់ត្រង់',
     'expense.record.book' => 'សលកបត្រកត់ត្រាចំណាយ',
     'payment.deadline' => 'អាណត្ដិបើកប្រាក់',
+    'advance.payment.royalty' => 'បុរេប្រទានរជ្ជទេយ្យ',
 
     'library' => 'Media Library',
     'setting' => 'ការកំណត់',
@@ -143,6 +144,7 @@ return [
     'cost.implement.program' => 'ការអនុវត្តចំណាយតាមកម្មវិធី',
     'cost.implement.chapter' => 'ការអនុវត្តចំណាយតាមជំពូក',
     'cost.implement.importants' => 'ការអនុវត្តមុខចំណាយសំខាន់ៗ',
+    'cost.implement.header.expense.type' => 'របាយការណ៍ទិន្នន័យឧបសម្ព័ន',
 
     'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 

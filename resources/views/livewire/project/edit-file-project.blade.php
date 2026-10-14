@@ -2,63 +2,114 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">{{ __('menus.document') }}</h4>
+                <h4 class="mb-sm-0 font-size-18">
+                    {{ __('menus.document') }}
+                </h4>
 
                 <div class="page-title-right">
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.document') }}</a></li>
-                            <li class="breadcrumb-item active">{{ __('buttons.edit.doc') }}</li>
-                        </ol>
-                    </div>
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item">
+                            <a href="javascript: void(0);">
+                                {{ __('menus.document') }}
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">
+                            {{ __('buttons.edit.doc') }}
+                        </li>
+                    </ol>
                 </div>
-
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-3"></div>
+
         <div class="col-6">
             <div class="card">
                 <div class="card-body">
                     <form wire:submit="save">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <a download href="{{ asset($this->documentOldFile) }}"
-                                        class="btn btn-primary waves-effect waves-light"><i
-                                            class="bx bx-download font-size-16 align-middle me-2"></i>
-                                        {{ __('buttons.download') }}</a>
-                                </div>
+                        <div class="form-group">
+                            <label> Upload  {{ __('menus.document') }}</label>
+                            <input type="file" id="documentFile" class="form-control" wire:model="newDocumentFile">
+                            <div wire:loading wire:target="newDocumentFile" class="text-info mt-1">
+                                Uploading file, please wait...
                             </div>
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label class="form-label"
-                                        for="validationCategory">{{ __('forms.document.file') }}</label>
-                                    <input type="file" class="form-control" wire:model.live="documentFile" accept=".pdf,.doc,.docx," />
-
-                                    <div wire:loading wire:target="documentFile" class="text-primary font-size-13 mt-1">
-                                        <i class="fas fa-spinner fa-spin me-1"></i> កំពុងផ្ទុយ file...
-                                    </div>
-
-                                    @error('documentFile')
-                                        <div class="pristine-error text-help text-danger mt-1">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn btn-primary" type="submit" name="submit" value="save">
-                                    <span wire:loading.remove wire:target="save">{{ __('buttons.save') }}</span>
-                                    <span wire:loading wire:target="save">
-                                        <i class="fas fa-spinner fa-spin me-1"></i> កំពុងរក្សាទុក...
-                                    </span>
-                                </button>
-                            </div>
+                            @error('newDocumentFile')
+                                <span class="text-danger d-block mt-1">
+                                    {{ $message }}
+                                </span>
+                            @enderror
                         </div>
+
+                        <button type="submit" class="btn btn-primary mt-3" wire:loading.attr="disabled"
+                            wire:target="newDocumentFile" type="submit" name="submit" value="save">
+                            <span wire:loading.remove wire:target="save">{{ __('buttons.save') }}</span>
+                            <span wire:loading wire:target="save">
+                                <i class="fas fa-spinner fa-spin me-1"></i> Saving...
+                            </span>
+                        </button>
+
                     </form>
+
                 </div>
             </div>
         </div>
+
         <div class="col-3"></div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('livewire:init', () => {
+
+        const input = document.getElementById('documentFile');
+
+        if (!input) {
+            return;
+        }
+
+        input.addEventListener('change', function() {
+
+            const file = this.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            // Get extension
+            const extension = file.name.includes('.') ?
+                file.name.substring(file.name.lastIndexOf('.')).toLowerCase() :
+                '';
+
+            // Generate short filename
+            const shortName =
+                Date.now() +
+                '_' +
+                Math.random().toString(36).substring(2, 10) +
+                extension;
+
+            // Create a new File with a short filename
+            const renamedFile = new File(
+                [file],
+                shortName, {
+                    type: file.type,
+                    lastModified: file.lastModified
+                }
+            );
+
+            // Replace the selected file
+            const dataTransfer = new DataTransfer();
+
+            dataTransfer.items.add(renamedFile);
+
+            this.files = dataTransfer.files;
+
+            // Trigger Livewire upload
+            this.dispatchEvent(new Event('change', {
+                bubbles: true
+            }));
+        });
+
+    });
+</script>
