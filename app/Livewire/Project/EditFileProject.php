@@ -20,8 +20,9 @@ class EditFileProject extends Component
     public $newDocumentFile = null;
     public $documentOldFile = "";
 
-    public function mount($id)
+    public function mount($params, $id)
     {
+        $this->params = $params;
         $id = decode_params($id);
         $project = Projects::where("id", $id)->first();
         if ($project) {

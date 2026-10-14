@@ -47,14 +47,7 @@
         }
     </style>
 @endsection
-{{-- @section('css')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="{{ asset('assets/libs/summernote/summernote.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/dropzone/min/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
-@endsection --}}
+
 @section('content')
     <!-- start page title -->
     <div class="row">
@@ -400,51 +393,6 @@
 
                                                             </div>
                                                         </div>
-
-                                                        {{-- Level --}}
-                                                        {{-- <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
-                                                                <label class="form-label font-size-13 text-muted">
-                                                                    {{ __('forms.level') }}
-                                                                </label>
-
-                                                                <select class="form-select employee-level"
-                                                                    name="cboLevel[]" required disabled
-                                                                    data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                                    <option value="">
-                                                                        {{ __('forms.search...') }}
-                                                                    </option>
-
-                                                                </select>
-
-                                                            </div>
-                                                        </div> --}}
-
-                                                        <!-- Leader -->
-                                                        {{-- <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
-                                                                <label class="form-label font-size-13 text-muted d-block">
-                                                                    {{ __('forms.leader') }}
-                                                                </label>
-
-                                                                <div class="form-check">
-                                                                    <input type="radio"
-                                                                        class="form-check-input employee-leader"
-                                                                        name="leader_index" value="0"
-                                                                        style="width:22px;height:22px;cursor:pointer;">
-
-                                                                    <label class="form-check-label ms-2"
-                                                                        style="padding-top:3px;cursor:pointer;">
-                                                                        {{ __('forms.leader') }}
-                                                                    </label>
-                                                                </div>
-
-                                                            </div>
-                                                        </div> --}}
-
                                                         {{-- Own Account Number --}}
                                                         <div class="col-lg-2 col-md-4">
                                                             <div class="form-group mb-3"> <label
@@ -469,31 +417,32 @@
                                                                 </small> --}}
                                                             </div>
                                                         </div>
+
                                                         <!-- Leader + Assign Budget -->
-                                                        <div class="col-lg-2 col-md-4">
+                                                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                                             <div class="form-group mb-3">
 
                                                                 <label class="form-label font-size-13 text-muted d-block">
                                                                     {{ __('forms.leader') }} / {{ __('forms.assign') }}
                                                                 </label>
 
-                                                                <div class="d-flex align-items-center gap-4">
+                                                                <div class="d-flex align-items-center flex-wrap gap-3">
 
                                                                     {{-- Leader --}}
-                                                                    <div class="form-check mb-0">
+                                                                    <div class="form-check mb-0 d-flex align-items-center">
                                                                         <input type="radio"
                                                                             class="form-check-input employee-leader"
                                                                             name="leader_index" value="0"
-                                                                            style="width:22px;height:22px;cursor:pointer;">
+                                                                            style="width:20px;height:20px;cursor:pointer;">
 
                                                                         <label class="form-check-label ms-2"
-                                                                            style="padding-top:3px;cursor:pointer;">
+                                                                            style="cursor:pointer;">
                                                                             {{ __('forms.leader') }}
                                                                         </label>
                                                                     </div>
 
                                                                     {{-- Assign Budget --}}
-                                                                    <div class="form-check mb-0">
+                                                                    <div class="form-check mb-0 d-flex align-items-center">
 
                                                                         <input type="hidden" class="assign-budget-value"
                                                                             name="assign_budget[]" value="0">
@@ -501,46 +450,18 @@
                                                                         <input type="checkbox"
                                                                             class="form-check-input assign-budget"
                                                                             name="assign_budget_checkbox[]"
-                                                                            style="width:22px;height:22px;cursor:pointer;">
+                                                                            style="width:20px;height:20px;cursor:pointer;">
 
                                                                         <label class="form-check-label ms-2"
-                                                                            style="padding-top:3px;cursor:pointer;">
+                                                                            style="cursor:pointer;">
                                                                             {{ __('forms.assign') }}
                                                                         </label>
 
                                                                     </div>
 
                                                                 </div>
-
                                                             </div>
                                                         </div>
-                                                        {{-- Assign Budget --}}
-                                                        {{-- <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
-                                                                <label class="form-label font-size-13 text-muted d-block">
-                                                                    {{ __('forms.assign') }}
-                                                                </label>
-
-                                                                <input type="hidden" class="assign-budget-value"
-                                                                    name="assign_budget[]" value="0">
-
-                                                                <div class="form-check">
-
-                                                                    <input type="checkbox"
-                                                                        class="form-check-input assign-budget"
-                                                                        name="assign_budget_checkbox[]"
-                                                                        style="width:22px;height:22px;cursor:pointer;">
-
-                                                                    <label class="form-check-label ms-2"
-                                                                        style="padding-top:3px;cursor:pointer;">
-                                                                        {{ __('forms.assign') }}
-                                                                    </label>
-
-                                                                </div>
-
-                                                            </div>
-                                                        </div> --}}
 
                                                         {{-- Remove --}}
                                                         <div class="col-lg-2 col-md-4">
@@ -682,7 +603,7 @@
     </script>
 
     {{-- Alert message that's leader in employee-row  --}}
-    <script>
+    {{-- <script>
         $(document).ready(function() {
 
             $('#pristine-valid-example').on('submit', function(event) {
@@ -720,6 +641,62 @@
             });
 
         });
+    </script> --}}
+    <script>
+        $(document).ready(function() {
+            /* |-------------------------------------------------------------------------- | Keep hidden assign_budget[] value synchronized |-------------------------------------------------------------------------- | | Checked => 1 | Unchecked => 0 | */
+            $(document).on('change', '#employeeRows .assign-budget', function() {
+                const checkbox = $(this);
+                const hiddenInput = checkbox.closest('.employee-row').find('.assign-budget-value');
+                hiddenInput.val(checkbox.is(':checked') ? 1 : 0);
+            }); /* |-------------------------------------------------------------------------- | Form Submit Validation |-------------------------------------------------------------------------- */
+            $('#pristine-valid-example').on('submit', function(event) {
+                /* |-------------------------------------------------------------------------- | Get all employee rows |-------------------------------------------------------------------------- */
+                const employeeRows = document.querySelectorAll('#employeeRows .employee-row');
+                const rowCount = employeeRows
+                .length; /* |-------------------------------------------------------------------------- | 1. Check Leader |-------------------------------------------------------------------------- */
+                const leader = document.querySelector(
+                '#employeeRows .employee-leader:checked'); /* |-------------------------------------------------------------------------- | Leader is required |-------------------------------------------------------------------------- */
+                if (!leader) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'សូមជ្រើសរើសប្រធាន',
+                        text: 'សូមជ្រើសរើសបុគ្គលិកម្នាក់ជាប្រធានបេសកកម្មជាមុនសិន។',
+                        confirmButtonText: 'យល់ព្រម',
+                        confirmButtonColor: '#dc3545',
+                        allowOutsideClick: false
+                    });
+                    return false;
+                } /* |-------------------------------------------------------------------------- | 2. Check Assign Budget |-------------------------------------------------------------------------- | | If only ONE employee: | Assign Budget is not required. | | If MORE THAN ONE employee: | At least ONE Assign Budget must be selected. | */
+                if (rowCount > 1) {
+                    const assignBudget = document.querySelector(
+                    '#employeeRows .assign-budget:checked'); /* |-------------------------------------------------------------------------- | Assign Budget is required |-------------------------------------------------------------------------- */
+                    if (!assignBudget) {
+                        event.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'សូមជ្រើសរើសអ្នកបែងចែកថវិកា',
+                            text: 'សូមជ្រើសរើសបុគ្គលិកយ៉ាងហោចណាស់ម្នាក់សម្រាប់បែងចែកថវិកា។',
+                            confirmButtonText: 'យល់ព្រម',
+                            confirmButtonColor: '#dc3545',
+                            allowOutsideClick: false
+                        });
+                        return false;
+                    }
+                } /* |-------------------------------------------------------------------------- | 3. Synchronize all Assign Budget values before submit |-------------------------------------------------------------------------- */
+                $('#employeeRows .employee-row').each(function() {
+                    const checkbox = $(this).find('.assign-budget');
+                    const hiddenInput = $(this).find('.assign-budget-value');
+                    if (checkbox.is(':checked')) {
+                        hiddenInput.val(1);
+                    } else {
+                        hiddenInput.val(0);
+                    }
+                }); /* |-------------------------------------------------------------------------- | Validation passed |-------------------------------------------------------------------------- */
+                return true;
+            });
+        });
     </script>
 
     {{-- UI Searching Dropdown  --}}
@@ -736,7 +713,7 @@
             });
         });
 
-         document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboSubAccount');
             const choices = new Choices(element, {
                 searchEnabled: true,
@@ -794,91 +771,6 @@
             });
         }
     </script>
-
-    {{-- Filter Dropdown  --}}
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboName');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-
-            const cboNamePicker = preloader('#cboLevel', {
-                url: "{{ route('missions.by.level') }}",
-                method: 'GET',
-                data: {},
-                success: function(html) {
-                    $('#cboLevel').html(html);
-                    choices.setChoices($('#cboLevel option').map(function() {
-                        return {
-                            value: $(this).val(),
-                            label: $(this).text()
-                        };
-                    }).get(), 'value', 'label', true);
-                },
-                error: function() {
-                    // optional: keep empty if error
-                    $('#cboLevel').html('<option value="">{{ __('forms.search...') }}</option>');
-                }
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboPosition');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
-    </script> --}}
-    {{-- <script>
-        $(document).on('change', '.employee-position', function() {
-            const positionId = $(this).val();
-
-            if (!positionId) {
-                return;
-            }
-
-            $.ajax({
-                url: "{{ route('missions.by.level') }}",
-                type: "GET",
-                data: {
-                    position_id: positionId
-                },
-                dataType: "json",
-
-                beforeSend: function() {
-                    console.log('Loading levels...');
-                },
-
-                success: function(response) {
-                    if (response.success) {
-                        console.log('Levels:', response.data);
-
-                        $.each(response.data, function(index, level) {
-                            console.log(
-                                'Level ID:',
-                                level.id,
-                                'Level Name:',
-                                level.name
-                            );
-                        });
-                    }
-                },
-
-                error: function(xhr) {
-                    console.error('AJAX Error:', xhr.responseText);
-                }
-            });
-        });
-    </script> --}}
 
     {{-- Filter Date Lock --}}
     <script>
@@ -2071,153 +1963,6 @@
                 }
             );
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | Remove employee row
-            |--------------------------------------------------------------------------
-            */
-            // $(document).on(
-            //     'click',
-            //     '.btn-remove-row',
-            //     function() {
-
-            //         const row =
-            //             $(this).closest(
-            //                 '.employee-row'
-            //             )[0];
-
-            //         if (!row) {
-            //             return;
-            //         }
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | Check whether removed row was leader
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         const wasLeader =
-            //             row.querySelector(
-            //                 '.employee-leader'
-            //             )?.checked ?? false;
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | Destroy Choices before removing
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         row
-            //             .querySelectorAll('select')
-            //             .forEach(function(select) {
-
-            //                 destroyChoices(select);
-
-            //             });
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | Remove row
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         row.remove();
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | Update leader indexes
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         updateLeaderIndexes();
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | If leader removed,
-            //         | make first employee leader
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         if (wasLeader) {
-
-            //             const firstRow =
-            //                 document.querySelector(
-            //                     '#employeeRows .employee-row:first-child'
-            //                 );
-
-
-            //             if (firstRow) {
-
-            //                 const firstLeader =
-            //                     firstRow.querySelector(
-            //                         '.employee-leader'
-            //                     );
-
-
-            //                 if (firstLeader) {
-
-            //                     firstLeader.checked =
-            //                         true;
-
-            //                 }
-
-            //             }
-
-            //         }
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | IMPORTANT:
-            //         | Rebuild payment accounts after removing employee.
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         updatePaymentAccountOptions();
-
-
-            //         /*
-            //         |--------------------------------------------------------------------------
-            //         | Update remove buttons
-            //         |--------------------------------------------------------------------------
-            //         */
-            //         updateRemoveButtons();
-
-            //     }
-            // );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Update remove buttons
-            |--------------------------------------------------------------------------
-            */
-            // function updateRemoveButtons() {
-
-            //     const rows =
-            //         $('.employee-row');
-
-
-            //     rows.each(function(index) {
-
-            //         const removeButton =
-            //             $(this).find(
-            //                 '.btn-remove-row'
-            //             );
-
-
-            //         if (index === 0) {
-
-            //             removeButton.hide();
-
-            //         } else {
-
-            //             removeButton.show();
-
-            //         }
-
-            //     });
-            // }
             /*
             |--------------------------------------------------------------------------
             | Remove employee row
@@ -2453,6 +2198,7 @@
         });
     </script>
 
+    {{-- Assign Budget --}}
     <script>
         $(document).on('change', '.employee-name', function() {
 
@@ -2680,238 +2426,7 @@
         });
     </script>
 
-    {{-- Keep this code --}}
-    {{-- <script>
-        /**
-         * Build the list of employees currently selected
-         * in this mission.
-         */
-        function getMissionEmployees() {
-
-            const employees = [];
-
-            $('.employee-row').each(function() {
-
-                const row = $(this);
-
-                const employeeSelect =
-                    row.find('.employee-name');
-
-                const employeeId =
-                    employeeSelect.val();
-
-                if (!employeeId) {
-                    return;
-                }
-
-                const selectedOption =
-                    employeeSelect.find('option:selected');
-
-                const employeeName =
-                    selectedOption.text().trim();
-
-                const accountNumber =
-                    row.find('.employee-account-number').val() ||
-                    selectedOption.data('account-number') ||
-                    '';
-
-                employees.push({
-                    id: String(employeeId),
-                    name: employeeName,
-                    account_number: accountNumber
-                });
-            });
-
-            return employees;
-        }
-
-
-        /**
-         * Update payment-account dropdowns
-         * for all mission employee rows.
-         */
-        function updatePaymentAccountOptions() {
-
-            const employees = getMissionEmployees();
-
-            $('.employee-row').each(function() {
-
-                const row = $(this);
-
-                const employeeSelect =
-                    row.find('.employee-name');
-
-                const currentEmployeeId =
-                    employeeSelect.val();
-
-                const paymentSelect =
-                    row.find('.payment-account-employee');
-
-                /*
-                 * Remember current payment account.
-                 */
-                const oldValue =
-                    paymentSelect.val();
-
-                /*
-                 * Rebuild options.
-                 */
-                paymentSelect.empty();
-
-                paymentSelect.append(`
-                <option value="">
-                    {{ __('forms.search...') }}
-                </option>
-            `);
-
-                employees.forEach(function(employee) {
-
-                    paymentSelect.append(`
-                    <option
-                        value="${employee.id}"
-                        data-account-number="${employee.account_number}">
-                        ${employee.name} - ${employee.account_number}
-                    </option>
-                `);
-
-                });
-
-                /*
-                 * Keep the previous payment account
-                 * if that employee still exists.
-                 */
-                const oldValueStillExists =
-                    employees.some(function(employee) {
-                        return employee.id === String(oldValue);
-                    });
-
-                if (oldValue && oldValueStillExists) {
-
-                    paymentSelect.val(oldValue);
-
-                }
-                /*
-                 * Otherwise use this person's own account.
-                 */
-                else if (currentEmployeeId) {
-
-                    paymentSelect.val(currentEmployeeId);
-
-                } else {
-
-                    paymentSelect.val('');
-                }
-
-                updatePaymentAccountNumber(row);
-            });
-        }
-
-
-        /**
-         * Display the selected payment account number.
-         */
-        function updatePaymentAccountNumber(row) {
-
-            const paymentSelect =
-                row.find('.payment-account-employee');
-
-            const selectedOption =
-                paymentSelect.find('option:selected');
-
-            const accountNumber =
-                selectedOption.attr('data-account-number') || '';
-
-            const display =
-                row.find('.payment-account-number');
-
-            if (accountNumber) {
-
-                display.text(
-                    'Account: ' + accountNumber
-                );
-
-            } else {
-
-                display.text('');
-            }
-        }
-
-
-        /**
-         * Payment account changed.
-         */
-        $(document).on(
-            'change',
-            '.payment-account-employee',
-            function() {
-
-                const row =
-                    $(this).closest('.employee-row');
-
-                updatePaymentAccountNumber(row);
-            }
-        );
-
-
-        /**
-         * Employee changed.
-         */
-        $(document).on(
-            'change',
-            '.employee-name',
-            function() {
-
-                const row =
-                    $(this).closest('.employee-row');
-
-                const selectedOption =
-                    $(this).find('option:selected');
-
-                const accountNumber =
-                    selectedOption.attr('data-account-number') || '';
-
-                /*
-                 * Show employee's own account.
-                 */
-                row.find('.employee-account-number')
-                    .val(accountNumber);
-
-                /*
-                 * Rebuild payment account options.
-                 */
-                updatePaymentAccountOptions();
-            }
-        );
-
-
-        /**
-         * Run once when page loads.
-         *
-         * Useful for edit pages where employees
-         * already exist.
-         */
-        $(document).ready(function() {
-
-            $('.employee-row').each(function() {
-
-                const row = $(this);
-
-                const employeeSelect =
-                    row.find('.employee-name');
-
-                const selectedOption =
-                    employeeSelect.find('option:selected');
-
-                const accountNumber =
-                    selectedOption.attr('data-account-number') || '';
-
-                row.find('.employee-account-number')
-                    .val(accountNumber);
-            });
-
-            updatePaymentAccountOptions();
-        });
-    </script> --}}
+    {{-- Load Payment Account --}}
     <script>
         function getPaymentAccount(row) {
 

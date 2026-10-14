@@ -720,7 +720,8 @@ class MissionController extends Controller
                 ->warning('ទិន្ន័យបានបញ្ចប់', 'Task')->flash();
             return back()->withInput();
         }
-        $missionEmployees = MissionEmployee::where('mission_id', $mission->id)
+        $missionEmployees = MissionEmployee::with('employee')
+            ->where('mission_id', $mission->id)
             ->get();
 
         $positions = Positions::all();

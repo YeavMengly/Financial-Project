@@ -221,7 +221,7 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.payment_voucher_number as pvn',
             'budget_mandates.day_of_number',
             'budget_mandates.is_archived',
-            'header_expenses_type.name_kh AS hx',k
+            'header_expenses_type.name_kh AS hx',
             'budget_mandates.header_expense_type_id',
             'budget_mandates.expense_type_id',
             'expense_types.name_kh',
