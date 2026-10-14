@@ -45,6 +45,16 @@
             font-size: 0.875rem;
             color: #dc3545;
         }
+
+        .employee-account-number.is-invalid,
+        .payment-account-number.is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .employee-account-number.is-valid,
+        .payment-account-number.is-valid {
+            border-color: #198754 !important;
+        }
     </style>
 @endsection
 @section('content')
@@ -480,57 +490,66 @@
                                                                 </div>
                                                             </div>
 
-
-                                                            {{-- Level --}}
-                                                            {{-- <div class="col-lg-2 col-md-4">
+                                                            {{-- Own Account Number --}}
+                                                            <div class="col-lg-2 col-md-4">
                                                                 <div class="form-group mb-3">
 
                                                                     <label class="form-label font-size-13 text-muted">
-                                                                        {{ __('forms.level') }}
+                                                                        {{ __('forms.account.number') }}
+                                                                        <span class="text-danger">*</span>
                                                                     </label>
 
-                                                                    <select class="form-select employee-level"
-                                                                        name="cboLevel[]" required disabled
-                                                                        data-selected-level="{{ $missionEmployee->level_id ?? '' }}"
+                                                                    <input type="text"
+                                                                        class="form-control employee-account-number"
+                                                                        name="account_number[]"
+                                                                        value="{{ $missionEmployee->employee->account_number ?? '' }}"
+                                                                        readonly required
                                                                         data-pristine-required-message="{{ __('messages.required') }}">
 
+                                                                </div>
+                                                            </div>
+
+                                                            {{-- Payment Account --}}
+                                                            <div class="col-lg-2 col-md-4">
+                                                                <div class="form-group mb-3">
+
+                                                                    <label class="form-label font-size-13 text-muted">
+                                                                        {{ __('forms.payment.account') }}
+                                                                        <span class="text-danger">*</span>
+                                                                    </label>
+
+                                                                    {{-- <select class="form-select payment-account-employee"
+                                                                        name="payment_account_employee_id[]" required
+                                                                        data-pristine-required-message="{{ __('messages.required') }}">
                                                                         <option value="">
                                                                             {{ __('forms.search...') }}
                                                                         </option>
+                                                                    </select> --}}
 
+                                                                    <select class="form-select payment-account-employee"
+                                                                        name="payment_account_employee_id[]"
+                                                                        data-selected-payment-account="{{ $missionEmployee->payment_account_employee_id ?? '' }}">
+                                                                        <option value="">
+                                                                            {{ __('forms.search...') }} </option>
+                                                                        @foreach ($employees as $emp)
+                                                                            <option value="{{ $emp->id }}"
+                                                                                data-account-number="{{ $emp->account_number }}"
+                                                                                {{ ($missionEmployee->payment_account_employee_id ?? '') == $emp->id ? 'selected' : '' }}>
+                                                                                {{ $emp->name_kh }} -
+                                                                                {{ $emp->name_latin }} -
+                                                                                {{ $emp->account_number }} </option>
+                                                                        @endforeach
                                                                     </select>
-
+                                                                    {{-- Payment account number --}}
+                                                                    <small class="text-muted payment-account-number">
+                                                                        @if ($missionEmployee->paymentAccountEmployee)
+                                                                            Account:
+                                                                            {{ $missionEmployee->paymentAccountEmployee->account_number }}
+                                                                        @endif
+                                                                    </small>
                                                                 </div>
-                                                            </div> --}}
+                                                            </div>
 
-
-                                                            {{-- Leader --}}
-                                                            {{-- <div class="col-lg-2 col-md-4">
-                                                                <div class="form-group mb-3">
-
-                                                                    <label
-                                                                        class="form-label font-size-13 text-muted d-block">
-                                                                        {{ __('forms.leader') }}
-                                                                    </label>
-
-                                                                    <div class="form-check">
-
-                                                                        <input type="radio"
-                                                                            class="form-check-input employee-leader"
-                                                                            name="leader_index"
-                                                                            value="{{ $index }}"
-                                                                            style="width:22px;height:22px;cursor:pointer;"
-                                                                            {{ $mission->leader_id == $missionEmployee->employee_id ? 'checked' : '' }}>
-
-                                                                        <label class="form-check-label ms-2"
-                                                                            style="padding-top:3px;cursor:pointer;">
-                                                                            {{ __('forms.leader') }}
-                                                                        </label>
-
-                                                                    </div>
-
-                                                                </div>
-                                                            </div> --}}
                                                             <div class="col-lg-2 col-md-4">
                                                                 <div class="form-group mb-3">
 
@@ -1093,7 +1112,37 @@
                 }
             }
 
+            function updateEmployeeAccount(row) {
 
+                // your existing logic...
+
+                const accountInput =
+                    row.querySelector(
+                        '.employee-account-number'
+                    );
+
+                // after setting the account number
+
+                updateInputValidation(
+                    accountInput
+                );
+            }
+
+            function updatePaymentAccountNumber(row) {
+
+                // your existing AJAX / account logic...
+
+                const accountInput =
+                    row.querySelector(
+                        '.payment-account-number'
+                    );
+
+                // after setting the account number
+
+                updateInputValidation(
+                    accountInput
+                );
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -1105,6 +1154,15 @@
                 const employeeSelect = row.querySelector('.employee-name');
                 const positionSelect = row.querySelector('.employee-position');
                 const levelSelect = row.querySelector('.employee-level');
+                const employeeAccountInput =
+                    row.querySelector(
+                        '.employee-account-number'
+                    );
+
+                const paymentAccountNumberInput =
+                    row.querySelector(
+                        '.payment-account-number'
+                    );
 
                 initChoices(employeeSelect);
                 initChoices(positionSelect);
@@ -1146,6 +1204,35 @@
                     updateValidation(this);
                 });
 
+                employeeSelect?.addEventListener(
+                    'change',
+                    function() {
+
+                        updateValidation(this);
+
+                        updateEmployeeAccount(row);
+
+                        updateInputValidation(
+                            employeeAccountInput
+                        );
+
+                        updatePaymentAccountOptions();
+                    }
+                );
+
+                paymentAccountSelect?.addEventListener(
+                    'change',
+                    function() {
+
+                        updateValidation(this);
+
+                        updatePaymentAccountNumber(row);
+
+                        updateInputValidation(
+                            paymentAccountNumberInput
+                        );
+                    }
+                );
 
                 /*
                 |--------------------------------------------------------------------------
@@ -1161,6 +1248,50 @@
                 });
             }
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Input validation border
+            |--------------------------------------------------------------------------
+            */
+            function updateInputValidation(input) {
+
+                if (!input) {
+                    return false;
+                }
+
+                const value =
+                    input.value ?
+                    input.value.trim() :
+                    '';
+
+                const isValid =
+                    value !== '';
+
+
+                if (isValid) {
+
+                    input.classList.remove(
+                        'is-invalid'
+                    );
+
+                    input.classList.add(
+                        'is-valid'
+                    );
+
+                } else {
+
+                    input.classList.remove(
+                        'is-valid'
+                    );
+
+                    input.classList.add(
+                        'is-invalid'
+                    );
+                }
+
+                return isValid;
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -1890,25 +2021,6 @@
                     }
                 });
             }
-
-            // ========= Script 2: Program -> Agency =========
-            // function handleProgramChangeForAgency(programId) {
-            //     resetSelect('#cboAgency');
-            //     agencyChoices = resetChoices('#cboAgency', agencyChoices);
-
-            //     if (!programId) return;
-
-            //     loadOptions({
-            //         url: "{{ route('missions.by.agency') }}",
-            //         data: {
-            //             program_id: programId
-            //         },
-            //         targetSelect: '#cboAgency',
-            //         instanceRefSetter: () => {
-            //             agencyChoices = resetChoices('#cboAgency', agencyChoices);
-            //         }
-            //     });
-            // }
 
             // ========= Script 3: ProgramSub -> Cluster =========
             function handleProgramSubChangeForCluster(programSubId) {
