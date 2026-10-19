@@ -28,7 +28,15 @@ class MissionDataTable extends DataTable
             ->addIndexColumn()
             ->addColumn('select', function ($row) {
                 if ((int) $row->payment_is_archived === 2) {
-                    return '';
+                    // return '';
+                     return '
+            <input
+                type="checkbox"
+                class="form-check-input mission-checkbox"
+                name="cboId[]"
+                value="' . e($row->id) . '"
+            >
+        ';
                 }
 
                 return '
@@ -419,12 +427,12 @@ class MissionDataTable extends DataTable
 
             Column::computed('select')
                 ->title('
-        <input
-            type="checkbox"
-            class="form-check-input"
-            id="checkAllMissions"
-        >
-    ')
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        id="checkAllMissions"
+                    >
+                ')
                 ->exportable(false)
                 ->printable(false)
                 ->orderable(false)

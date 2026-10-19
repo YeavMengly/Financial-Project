@@ -654,9 +654,10 @@
                 /* |-------------------------------------------------------------------------- | Get all employee rows |-------------------------------------------------------------------------- */
                 const employeeRows = document.querySelectorAll('#employeeRows .employee-row');
                 const rowCount = employeeRows
-                .length; /* |-------------------------------------------------------------------------- | 1. Check Leader |-------------------------------------------------------------------------- */
+                    .length; /* |-------------------------------------------------------------------------- | 1. Check Leader |-------------------------------------------------------------------------- */
                 const leader = document.querySelector(
-                '#employeeRows .employee-leader:checked'); /* |-------------------------------------------------------------------------- | Leader is required |-------------------------------------------------------------------------- */
+                    '#employeeRows .employee-leader:checked'
+                ); /* |-------------------------------------------------------------------------- | Leader is required |-------------------------------------------------------------------------- */
                 if (!leader) {
                     event.preventDefault();
                     Swal.fire({
@@ -671,7 +672,8 @@
                 } /* |-------------------------------------------------------------------------- | 2. Check Assign Budget |-------------------------------------------------------------------------- | | If only ONE employee: | Assign Budget is not required. | | If MORE THAN ONE employee: | At least ONE Assign Budget must be selected. | */
                 if (rowCount > 1) {
                     const assignBudget = document.querySelector(
-                    '#employeeRows .assign-budget:checked'); /* |-------------------------------------------------------------------------- | Assign Budget is required |-------------------------------------------------------------------------- */
+                        '#employeeRows .assign-budget:checked'
+                    ); /* |-------------------------------------------------------------------------- | Assign Budget is required |-------------------------------------------------------------------------- */
                     if (!assignBudget) {
                         event.preventDefault();
                         Swal.fire({
@@ -1056,7 +1058,6 @@
 
                 return employees;
             }
-
 
             /*
             |--------------------------------------------------------------------------
@@ -1866,7 +1867,6 @@
                                 </div>
 
                             </div>
-
 
                             {{-- Assign Budget --}}
                             <div class="col-lg-2 col-md-4">
