@@ -421,6 +421,7 @@ class MissionController extends Controller
 
                 // Get their account number
                 $paymentAccountNumber = $paymentEmployee->account_number;
+
                 /*
                 |--------------------------------------------------------------------------
                 | Position
@@ -745,6 +746,7 @@ class MissionController extends Controller
         $program = Program::where('ministry_id', $ministry->id)
             ->orderBy('no')
             ->get();
+        $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
         return view('mission::missions.edit')
             ->with('ministry', $ministry)
@@ -755,6 +757,7 @@ class MissionController extends Controller
             ->with('params', $params)
             ->with('document', $document)
             ->with('program', $program)
+            ->with('accountSub', $accountSub)
             ->with('missionEmployees', $missionEmployees);
     }
 
@@ -799,10 +802,19 @@ class MissionController extends Controller
             'cboProgram' => 'nullable|integer',
             'cboProgramSub' => 'nullable|integer',
             'cboCluster' => 'nullable|integer',
+            'cboSubAccount'       => 'nullable|integer',
+            'account_number' => ['required', 'array'],
+            'account_number.*' => ['required', 'string'],
+            'payment_account_employee_id' => ['required', 'array'],
+            'payment_account_employee_id.*' => [
+                'required',
+                'integer',
+                'exists:employees,id',
+            ],
 
             'submit' => 'required|in:save,save_create',
         ]);
-
+        // dd($validated);
         DB::beginTransaction();
 
         try {
@@ -937,6 +949,25 @@ class MissionController extends Controller
                     $validated['assign_budget'][$index] ?? 0
                 );
 
+                // Employee's own account
+                $accountNumber =
+                    $validated['account_number'][$index] ?? null;
+
+                // Employee who should receive the payment
+                $paymentAccountEmployeeId =
+                    $validated['payment_account_employee_id'][$index] ?? null;
+                /*
+                |--------------------------------------------------------------------------
+                | Payment employee
+                |--------------------------------------------------------------------------
+                */
+                $paymentEmployee = Employee::findOrFail(
+                    $paymentAccountEmployeeId
+                );
+
+                // Get their account number
+                $paymentAccountNumber = $paymentEmployee->account_number;
+
                 if (!$positionId) {
                     throw new \Exception(
                         "Position is missing for employee row {$index}."
@@ -1041,6 +1072,10 @@ class MissionController extends Controller
 
                     'assign_budget' =>
                     $assignBudget,
+
+                    'account_number' => $accountNumber,
+                    'payment_account_employee_id' => $paymentAccountEmployeeId,
+                    'payment_account_number' => $paymentAccountNumber,
                 ]);
             }
 
