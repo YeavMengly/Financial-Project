@@ -5,7 +5,9 @@ use Modules\Mission\App\Http\Controllers\MissionController;
 
 
 Route::middleware('PermissionCheck')->controller(MissionController::class)->group(function () {
+    // Route::get('mission/index', 'getIndex');
     Route::get('mission/', 'getIndex')->name('initialMission.index');
+
     Route::get('mission/{params}', 'index')->name('missions.index');
     Route::get('mission/{params}/create', 'create')->name('missions.create');
     Route::get(
