@@ -1223,43 +1223,125 @@ class MissionController extends Controller
         }
     }
 
+    // public function paymentTotal(Request $request, $params)
+    // {
+    //     $validated = $request->validate([
+    //         'cboId' => ['required', 'array', 'min:1'],
+    //         'cboId.*' => [
+    //             'required',
+    //             'integer',
+    //             'exists:missions,id',
+    //         ],
+    //     ]);
+
+    //     $ministryId = decode_params($params);
+
+    //     $totalAmount = DB::table('mission_employees')
+    //         ->join(
+    //             'missions',
+    //             'mission_employees.mission_id',
+    //             '=',
+    //             'missions.id'
+    //         )
+    //         ->whereIn(
+    //             'mission_employees.mission_id',
+    //             $validated['cboId']
+    //         )
+    //         ->where(
+    //             'missions.ministry_id',
+    //             $ministryId
+    //         )
+    //         ->whereNull('missions.deleted_at')
+    //         ->sum('mission_employees.total');
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'total_amount' => $totalAmount,
+    //         'mission_ids' => $validated['cboId'],
+    //     ]);
+    // }
+
     public function paymentTotal(Request $request, $params)
     {
         $validated = $request->validate([
-            'cboId' => ['required', 'array', 'min:1'],
+            'cboId' => ['sometimes', 'array'],
             'cboId.*' => [
                 'required',
                 'integer',
                 'exists:missions,id',
             ],
+            'start_id' => ['nullable', 'integer', 'min:1'],
+            'end_id' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $ministryId = decode_params($params);
 
-        $totalAmount = DB::table('mission_employees')
+        $startId = $validated['start_id'] ?? null;
+        $endId = $validated['end_id'] ?? null;
+        $selectedIds = $validated['cboId'] ?? [];
+
+        // Validate ID range
+        if (
+            $startId !== null &&
+            $endId !== null &&
+            $startId > $endId
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Start ID must be less than or equal to End ID.',
+            ], 422);
+        }
+
+        $query = DB::table('mission_employees')
             ->join(
                 'missions',
                 'mission_employees.mission_id',
                 '=',
                 'missions.id'
             )
-            ->whereIn(
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at');
+
+        // If an ID range is supplied, calculate all missions in that range.
+        if ($startId !== null || $endId !== null) {
+            if ($startId !== null) {
+                $query->where('missions.id', '>=', $startId);
+            }
+
+            if ($endId !== null) {
+                $query->where('missions.id', '<=', $endId);
+            }
+        } else {
+            // Otherwise, calculate only selected missions.
+            if (empty($selectedIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select missions or enter an ID range.',
+                ], 422);
+            }
+
+            $query->whereIn(
                 'mission_employees.mission_id',
-                $validated['cboId']
-            )
-            ->where(
-                'missions.ministry_id',
-                $ministryId
-            )
-            ->whereNull('missions.deleted_at')
-            ->sum('mission_employees.total');
+                $selectedIds
+            );
+        }
+
+        // Get the mission IDs included in the calculation.
+        $missionIds = (clone $query)
+            ->distinct()
+            ->pluck('mission_employees.mission_id')
+            ->values()
+            ->all();
+
+        $totalAmount = $query->sum('mission_employees.total');
 
         return response()->json([
             'success' => true,
             'total_amount' => $totalAmount,
-            'mission_ids' => $validated['cboId'],
+            'mission_ids' => $missionIds,
         ]);
     }
+
 
     public function updatePaymentStatus(Request $request, $params)
     {

@@ -29,7 +29,7 @@ class MissionDataTable extends DataTable
             ->addColumn('select', function ($row) {
                 if ((int) $row->payment_is_archived === 2) {
                     // return '';
-                     return '
+                    return '
             <input
                 type="checkbox"
                 class="form-check-input mission-checkbox"
@@ -248,6 +248,22 @@ class MissionDataTable extends DataTable
             );
         }
 
+        $startIndex = (int) $request->input('start_index', 1);
+        $endIndex = (int) $request->input('end_index', 0);
+
+        if ($request->filled('start_index') || $request->filled('end_index')) {
+            $model->orderBy('missions.id');
+
+            $results = $model->get();
+
+            $start = max(0, $startIndex - 1);
+            $length = $endIndex > 0
+                ? max(0, $endIndex - $start + 1)
+                : $results->count() - $start;
+
+            $results = $results->slice($start, $length)->values();
+        }
+
         // ===== Ministry Filter =====
 
         $model->where(
@@ -355,6 +371,8 @@ class MissionDataTable extends DataTable
                 d.cboProvince    = $("#cboProvince").val();
                 d.start_date     = $("#start_date").val();
                 d.end_date       = $("#end_date").val();
+                d.start_index    = $("#start_index").val();
+                d.end_index      = $("#end_index").val();
 
             }',
             ])

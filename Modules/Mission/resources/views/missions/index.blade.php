@@ -206,7 +206,7 @@
                             <a class="btn btn-dark"
                                 href="{{ route('initialMissions.index') }}">{{ __('buttons.back') }}</a>
                         </div> --}}
-                        <div class="mb-4 d-flex flex-wrap gap-2">
+                        {{-- <div class="mb-4 d-flex flex-wrap gap-2">
 
                             @if (hasPermission('missions.create') && $ministry->is_archived != 2)
                                 <a class="btn btn-light waves-effect waves-light"
@@ -224,6 +224,52 @@
                             <a class="btn btn-dark" href="{{ route('initialMission.index') }}">
                                 {{ __('buttons.back') }}
                             </a>
+                        </div> --}}
+
+                        <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-2">
+
+                            {{-- Flex-start: Create, Payment, and ID filters --}}
+                            <div class="d-flex flex-wrap align-items-end gap-2">
+
+                                @if (hasPermission('missions.create') && $ministry->is_archived != 2)
+                                    <a class="btn btn-light waves-effect waves-light"
+                                        href="{{ route('missions.create', $params) }}">
+                                        <i class="bx bx-plus me-1"></i>
+                                        {{ __('buttons.create') }}
+                                    </a>
+                                @endif
+
+                                <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
+                                    <i class="bx bx-money me-1"></i>
+                                    ទូទាត់
+                                </button>
+                                <a class="btn btn-dark" href="{{ route('initialMission.index') }}">
+                                    {{ __('buttons.back') }}
+                                </a>
+                            </div>
+
+                            {{-- Flex-end: Back button --}}
+                            {{-- <div class="ms-auto d-flex flex-wrap align-items-end gap-2">
+                                <div style="width: 120px;">
+                                    <label for="start_id" class="form-label mb-1">ID ចាប់ពី</label>
+                                    <input type="number" id="start_index" class="form-control" min="1"
+                                        placeholder="Start ID">
+                                </div>
+
+                                <div style="width: 120px;">
+                                    <label for="end_id" class="form-label mb-1">ID ដល់</label>
+                                    <input type="number" id="end_index" class="form-control" min="1"
+                                        placeholder="End ID">
+                                </div>
+
+                                <button type="button" class="btn btn-primary" id="btnSearchIdRange">
+                                    <i class="bx bx-search me-1"></i> ស្វែងរក
+                                </button>
+
+                                <button type="button" class="btn btn-secondary" id="btnResetIdRange">
+                                    <i class="bx bx-reset"></i>
+                                </button>
+                            </div> --}}
 
                         </div>
                     </div>
@@ -358,7 +404,7 @@
         });
     </script>
     <script>
-        $('#cboTodo, #cboStatus, #cboMissionType, #cboName ,#cboPosition, #cboLevel, #cboProvince, #start_date, #end_date')
+        $('#cboTodo, #cboStatus, #cboMissionType, #cboName ,#cboPosition, #cboLevel, #cboProvince, #start_date, #end_date,#start_index, #end_index')
             .on(
                 'change keyup',
                 function() {
@@ -492,11 +538,12 @@
             // 1. Get selected mission IDs
             // ==========================================================
 
-            let cboId = $('.mission-checkbox:checked')
-                .map(function() {
-                    return $(this).val();
-                })
-                .get();
+            // let cboId = $('.mission-checkbox:checked')
+            //     .map(function() {
+            //         return $(this).val();
+            //     })
+            //     .get();
+            let cboId = getSelectedMissionIds();
 
             // Remove duplicate IDs
             cboId = [...new Set(cboId)];
@@ -966,5 +1013,244 @@
             });
 
         });
+    </script>
+
+    <script>
+        // =====================================================
+        // 1. Persistent selection storage
+        // =====================================================
+        window.selectedMissionIds = window.selectedMissionIds || new Set();
+
+        // =====================================================
+        // 2. Save selection immediately when clicked
+        // =====================================================
+        $(document).on('change', '#mission-table .mission-checkbox', function() {
+            const id = String($(this).val());
+
+            if (this.checked) {
+                window.selectedMissionIds.add(id);
+            } else {
+                window.selectedMissionIds.delete(id);
+            }
+
+            console.log(
+                'Saved Mission IDs:',
+                Array.from(window.selectedMissionIds)
+            );
+
+            updateCheckAllState();
+        });
+
+        // =====================================================
+        // 3. Select all rows on the current page
+        // =====================================================
+        $(document).on('change', '#checkAllMissions', function() {
+            const checked = this.checked;
+
+            $('#mission-table .mission-checkbox').each(function() {
+                const id = String($(this).val());
+
+                $(this).prop('checked', checked);
+
+                if (checked) {
+                    window.selectedMissionIds.add(id);
+                } else {
+                    window.selectedMissionIds.delete(id);
+                }
+            });
+
+            updateCheckAllState();
+
+            console.log(
+                'Saved Mission IDs:',
+                Array.from(window.selectedMissionIds)
+            );
+        });
+
+        // =====================================================
+        // 4. Restore selection after DataTable pagination
+        // =====================================================
+        $('#mission-table').on('draw.dt', function() {
+            $('#mission-table .mission-checkbox').each(function() {
+                const id = String($(this).val());
+
+                $(this).prop(
+                    'checked',
+                    window.selectedMissionIds.has(id)
+                );
+            });
+
+            updateCheckAllState();
+
+            console.log(
+                'Restored Mission IDs:',
+                Array.from(window.selectedMissionIds)
+            );
+        });
+
+        // =====================================================
+        // 5. Update header checkbox
+        // =====================================================
+        function updateCheckAllState() {
+            const $checkboxes = $('#mission-table .mission-checkbox');
+            const total = $checkboxes.length;
+            const checked = $checkboxes.filter(':checked').length;
+
+            $('#checkAllMissions')
+                .prop('checked', total > 0 && checked === total)
+                .prop(
+                    'indeterminate',
+                    checked > 0 && checked < total
+                );
+        }
+
+        // =====================================================
+        // 6. Get ALL selected IDs, including other pages
+        // =====================================================
+        function getSelectedMissionIds() {
+            return Array.from(window.selectedMissionIds);
+        }
+    </script>
+
+    {{-- <script>
+        $('#btnSearchIdRange').on('click', function() {
+            const start = $('#start_id').val();
+            const end = $('#end_id').val();
+
+            if (start && end && Number(start) > Number(end)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid ID range',
+                    text: 'Start ID must be less than or equal to End ID.'
+                });
+                return;
+            }
+
+            $('#mission-table').DataTable().ajax.reload();
+        });
+
+        $('#btnResetIdRange').on('click', function() {
+            $('#start_id').val('');
+            $('#end_id').val('');
+
+            $('#mission-table').DataTable().ajax.reload();
+        });
+    </script> --}}
+    {{-- <script>
+        $('#btnSearchIdRange').on('click', function() {
+            const start = Number($('#start_index').val());
+            const end = Number($('#end_index').val());
+
+            if (start && end && start > end) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid index range',
+                    text: 'Start index must be less than or equal to End index.'
+                });
+                return;
+            }
+
+            $('#mission-table').DataTable().ajax.reload();
+        });
+
+        $('#btnResetIdRange').on('click', function() {
+            $('#start_index, #end_index').val('');
+            $('#mission-table').DataTable().ajax.reload();
+        });
+    </script> --}}
+    <script>
+        // Search by Mission ID range and calculate payment
+        $('#btnSearchIdRange').on('click', function() {
+            const start = $('#start_index').val();
+            const end = $('#end_index').val();
+
+            if (start && end && Number(start) > Number(end)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid index range',
+                    text: 'Start index must be less than or equal to End index.'
+                });
+                return;
+            }
+
+            // Reload the DataTable with the ID range
+            $('#mission-table').DataTable().ajax.reload();
+
+            // Calculate payment total for the ID range
+            calculatePaymentByIdRange();
+        });
+
+        // Reset ID range and reload table
+        $('#btnResetIdRange').on('click', function() {
+            $('#start_index').val('');
+            $('#end_index').val('');
+
+            $('#mission-table').DataTable().ajax.reload();
+
+            // Return to calculation using the selected checkboxes
+            calculatePaymentBySelectedIds();
+        });
+
+        // Calculate payment using the ID range
+        function calculatePaymentByIdRange() {
+            const start = $('#start_id').val();
+            const end = $('#end_id').val();
+
+            $.ajax({
+                url: "{{ route('missions.paymentTotal', $params) }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    start_id: start,
+                    end_id: end,
+                    cboId: []
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Payment Total',
+                        html: `
+                        <p>Mission ID: ${start || 'Minimum'} - ${end || 'Maximum'}</p>
+                        <h3>${Number(response.total || 0).toLocaleString()} ៛</h3>
+                    `,
+                        confirmButtonText: 'OK'
+                    });
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Unable to calculate payment total.'
+                    });
+                }
+            });
+        }
+
+        // Calculate payment using selected checkboxes after reset
+        function calculatePaymentBySelectedIds() {
+            const ids = window.selectedMissionIds ?
+                Array.from(window.selectedMissionIds) : [];
+
+            if (ids.length === 0) {
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('missions.paymentTotal', $params) }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    cboId: ids
+                },
+                success: function(response) {
+                    console.log('Selected payment total:', response.total);
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                }
+            });
+        }
     </script>
 @endsection

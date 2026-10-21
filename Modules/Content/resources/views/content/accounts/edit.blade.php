@@ -36,7 +36,7 @@
             <div class="card">
                 <div class="card-body">
                     <form id="pristine-valid-example" novalidate method="POST"
-                        action="{{ route('accounts.update', ['params' => $params, 'chId' => $chId, 'id' => $module->id]) }}"
+                        action="{{ route('accounts.update', ['params' => $params, 'chId' => $chId, 'id' => $account->id]) }}"
                         autocomplete="off">
                         @csrf
 
