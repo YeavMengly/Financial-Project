@@ -40,14 +40,16 @@
 
                             <!-- Filter Year -->
                             <select id="ministryFilter" class="form-select">
+                               
                                 @foreach ($ministries as $ministry)
-                                    <option value="{{ $ministry->id }}">
+                                    <option value="{{ $ministry->year }}"
+                                        {{ $ministry->year == date('Y') ? 'selected' : '' }}>
                                         {{ __('menus.annual.data') }} {{ $ministry->year }}
                                     </option>
                                 @endforeach
                             </select>
                             <!-- SEARCH -->
-                            <div class="position-relative">
+                            {{-- <div class="position-relative">
 
                                 <input type="text" id="customSearch-agency" class="form-control ps-5"
                                     placeholder="{{ __('forms.search...') }}" style="min-width:250px;">
@@ -56,7 +58,7 @@
 
                             </div>
 
-                            @include('report::report.cost_implement.agency.dropdown')
+                            @include('report::report.cost_implement.agency.dropdown') --}}
 
                         </div>
                     </div>
@@ -91,7 +93,7 @@
             let table = $('#costimplementheaderexpensetype-table').DataTable();
 
             /**
-             * GLOBAL SEARCH (optional if you use it)
+             * GLOBAL SEARCH
              */
             $('#customSearch-agency').on('keyup', function() {
                 table.search(this.value).draw();
@@ -160,7 +162,7 @@
     </script>
 
     <script>
-        $('#yearFilter, #ministryFilter, #customSearch-agency').on('change keyup', function() {
+        $('#ministryFilter, #customSearch-agency').on('change keyup', function() {
             $('#costimplementheaderexpensetype-table').DataTable().ajax.reload();
         });
     </script>

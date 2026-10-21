@@ -171,12 +171,6 @@ class DuelReleaseController extends Controller
             ->unique('project_id')
             ->values();
 
-        //  $data = DuelEntry::distinct()->pluck('project_id');
-
-        //  $duelEntry = DuelEntry::where('project_id', $data)->get();
-
-        // dd($duelEntry);
-
         return view('duel::duelRelease.create')
             ->with('ministry', $ministry)
             ->with('duelType', $duelType)
