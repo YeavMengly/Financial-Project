@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Models\BeginCredit;
+namespace App\Models\Revenue;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RevenueExecutionAgency extends Model
+class RevenueAllocationSub extends Model
 {
     use HasFactory;
     protected $fillable = [
+        'revenue_allocation_id',
         'code',
         'name',
-        'nick_name',
+        'description',
     ];
 }

@@ -40,27 +40,7 @@
 
                             <div class="row">
                                 <div class="row">
-                                    {{-- <div class="col-lg-3 col-md-4">
-                                        <div class="form-group mb-3">
-                                            <label for="stock_number" class="form-label font-size-13 text-muted">
-                                                {{ __('forms.stock.number') }}
-                                            </label>
-                                            <select class="form-control" data-trigger id="dropStockNumber"
-                                                name="stock_number" required tabindex="1"
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-                                                <option value="">{{ __('forms.search...') }}</option>
-                                                @foreach ($duelEntry as $item)
-                                                    <option value="{{ $item->project_id }}">
-                                                        {{ $item->stock_number }} - {{ $item->stock_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                            @error('stock_number')
-                                                <div class="pristine-error text-help">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div> --}}
+                                    
                                     <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
 
@@ -105,15 +85,7 @@
                                                 {{ __('forms.item.name') }}
                                             </label>
 
-                                            {{-- <select id="cboDuel" class="form-select" name="item_name" required
-                                                tabindex="2"
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                <option value="">
-                                                    {{ __('forms.search...') }}
-                                                </option>
-
-                                            </select> --}}
+                                           
                                             <select id="cboDuel" name="item_name" required
                                                 data-pristine-choicesrequired-message="{{ __('messages.required') }}">
 
@@ -136,21 +108,7 @@
                                         </div>
                                     </div>
 
-                                    {{-- <div class="col-lg-3 col-md-4">
-                                        <div class="form-group mb-3">
-                                            <label for="item_name" class="form-label font-size-13 text-muted">
-                                                {{ __('forms.item.name') }}
-                                            </label>
-                                            <select id="cboDuel" class="form-select" name="item_name" required
-                                                tabindex="2"
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-                                                <option value="">{{ __('forms.search...') }}</option>
-                                            </select>
-                                            @error('item_name')
-                                                <div class="pristine-error text-help">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div> --}}
+                                   
 
                                     <div class="col-xl-3 col-md-4">
                                         <div class="form-group mb-3">
