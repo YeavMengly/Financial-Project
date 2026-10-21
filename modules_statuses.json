@@ -19,5 +19,6 @@
     "Electric": true,
     "Content": true,
     "Report": true,
-    "Mission": true
+    "Mission": true,
+    "Revenue": true
 }
