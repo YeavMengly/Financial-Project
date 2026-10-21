@@ -21,7 +21,7 @@
                     @endif
                 @endif
 
-                @if (hasPermission('missions.show'))
+                @if (hasPermission('missions.index'))
                     <a href="{{ route('missions.show', [
                         'params' => encode_params($module->ministry_id),
                         'id' => encode_params($module->id),

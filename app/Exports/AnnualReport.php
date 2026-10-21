@@ -17,6 +17,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class AnnualReport
 {
@@ -34,7 +35,7 @@ class AnnualReport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = storage_path('excel/template/template_annual_report.xlsx');
+        $templatePath = storage_path('app/excel/template/template_annual_report.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->getStyle("A1:EX4")->applyFromArray([
@@ -482,7 +483,7 @@ class AnnualReport
                                             $rowValues[$key] = 0;
                                         }
                                         // $rowValues[$key] += (float) $item->fin_law;
-                                        $rowValues[$key] += ( $item->fin_law) / 1000000;
+                                        $rowValues[$key] += ($item->fin_law) / 1000000;
                                     }
                                 }
                             }
@@ -716,16 +717,37 @@ class AnnualReport
             }
         }
 
+        $exportDirectory = storage_path('app/excel/export');
 
-        $fileName = 'template_annual_report.xlsx';
+        if (!File::exists($exportDirectory)) {
+            File::makeDirectory($exportDirectory, 0755, true);
+        }
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            'Cache-Control' => 'max-age=0',
-        ]);
+        $fileName = 'annual_report.xlsx';
+
+        $outputPath = $exportDirectory . '/' . $fileName;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($outputPath);
+
+        return response()->download(
+            $outputPath,
+            $fileName,
+            [
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
+
+        // $fileName = 'template_annual_report.xlsx';
+
+        // return response()->streamDownload(function () use ($spreadsheet) {
+        //     $writer = new Xlsx($spreadsheet);
+        //     $writer->save('php://output');
+        // }, $fileName, [
+        //     'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        //     'Cache-Control' => 'max-age=0',
+        // ]);
     }
 }

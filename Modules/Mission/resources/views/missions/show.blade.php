@@ -261,14 +261,33 @@
 
                             <tr class="table-light fw-bold">
 
-                                <td colspan="12" class="text-end">
+                                <td colspan="5" class="text-end">
                                     សរុបរួម
                                 </td>
-
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('travel_allowance')) }} ៛
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('pocket_money')) }} ៛
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('total_pocket_money')) }} ៛
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('meal_money')) }} ៛
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('total_meal_money')) }} ៛
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('accommodation_money')) }} ៛
+                                </td>
+                                <td class="text-end">
+                                    {{ number_format($mission->sum('total_accommodation_money')) }} ៛
+                                </td>
                                 <td class="text-end">
                                     {{ number_format($mission->sum('total')) }} ៛
                                 </td>
-
                                 <td></td>
 
                             </tr>

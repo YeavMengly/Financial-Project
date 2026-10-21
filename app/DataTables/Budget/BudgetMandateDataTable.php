@@ -233,6 +233,7 @@ class BudgetMandateDataTable extends DataTable
             'budget_mandates.deleted_at'
         ]);
 
+        $model->orderBy('budget_mandates.created_at', 'asc');
         // ==========================================
         // Sorting Logic
         // ==========================================

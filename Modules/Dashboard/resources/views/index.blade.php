@@ -2257,14 +2257,14 @@
                     height: 260
                 },
                 series: [
-                    {{ round($percent_advance_Payment, 2) }},
-                    {{ round($percent_Payment, 2) }},
-                    {{ round($percent_expense_record, 2) }},
-                    {{ round($percent_Payment_Deadline, 2) }},
-                    {{ round($percent_expenditure_Guarantee, 2) }},
-                    {{ round($percent_direct_Payment, 2) }},
-                    {{ round($percent_procurement, 2) }},
-                    {{ round($percent_expenditure_Procurement, 2) }},
+                    {{ round($percent_advance_Payment, 4) }},
+                    {{ round($percent_Payment, 4) }},
+                    {{ round($percent_expense_record, 4) }},
+                    {{ round($percent_Payment_Deadline, 4) }},
+                    {{ round($percent_expenditure_Guarantee, 4) }},
+                    {{ round($percent_direct_Payment, 4) }},
+                    {{ round($percent_procurement, 4) }},
+                    {{ round($percent_expenditure_Procurement, 4) }},
                 ],
                 labels: [
                     "{{ __('menus.advance.payment') }}",

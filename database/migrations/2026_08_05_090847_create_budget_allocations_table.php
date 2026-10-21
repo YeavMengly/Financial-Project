@@ -18,14 +18,6 @@ return new class extends Migration
             $table->unsignedBigInteger('budget_begin_voucher_id');
             $table->unsignedBigInteger('budget_header_expense_type_id');
 
-            // $table->foreignId('budget_begin_voucher_id')
-            //     ->constrained('begin_vouchers')
-            //     ->cascadeOnDelete();
-
-            // $table->foreignId('budget_expense_type_id')
-            //     ->constrained('expense_types')
-            //     ->cascadeOnDelete();
-
             $table->decimal('amount', 18, 2)->default(0);
             $table->integer('rounds')->nullable();
 

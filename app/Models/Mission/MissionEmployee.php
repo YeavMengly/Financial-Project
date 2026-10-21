@@ -28,6 +28,9 @@ class MissionEmployee extends Model
         'total_accommodation_money',
         'total',
         'assign_budget',
+        'account_number',
+        'payment_account_employee_id', 
+        'payment_account_number'
     ];
 
     protected $casts = [
@@ -60,5 +63,12 @@ class MissionEmployee extends Model
     public function level()
     {
         return $this->belongsTo(Levels::class);
+    }
+    public function paymentAccountEmployee()
+    {
+        return $this->belongsTo(
+            Employee::class,
+            'payment_account_employee_id'
+        );
     }
 }

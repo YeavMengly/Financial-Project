@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employee_position_histories', function (Blueprint $table) {
             $table->id();
-            
+
             $table->foreignId('employee_id')
                 ->constrained('employees')
                 ->restrictOnDelete();
