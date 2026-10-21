@@ -50,6 +50,7 @@ return [
   'th.budget' => 'ថវិកា',
   'th.voucher.budgeted' => 'ថវិកាបញ្ជាក់(បានទូទាត់)',
   'th.type' => 'ប្រភេទ',
+  'th.sub.type' => 'ប្រភេទផ្នែក',
   'th.expense.type' => 'ប្រភេទចំណាយ',
   'th.date' => 'កាលបរិច្ឆេទ',
   'th.date.transaction' => 'កាលបរិច្ឆេទកិច្ចបញ្ជីការ',

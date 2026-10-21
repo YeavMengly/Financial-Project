@@ -37,10 +37,8 @@
                         <form id="forms" action="{{ route('duelRelease.store', $params) }}" method="POST"
                             enctype="multipart/form-data" novalidate>
                             @csrf
-
                             <div class="row">
                                 <div class="row">
-                                    
                                     <div class="col-lg-3 col-md-4">
                                         <div class="form-group mb-3">
 
@@ -85,7 +83,6 @@
                                                 {{ __('forms.item.name') }}
                                             </label>
 
-                                           
                                             <select id="cboDuel" name="item_name" required
                                                 data-pristine-choicesrequired-message="{{ __('messages.required') }}">
 
@@ -107,8 +104,6 @@
 
                                         </div>
                                     </div>
-
-                                   
 
                                     <div class="col-xl-3 col-md-4">
                                         <div class="form-group mb-3">

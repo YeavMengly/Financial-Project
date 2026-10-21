@@ -84,30 +84,39 @@
 
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="subType[]"
-                                            value="មូលនិធិទ្រទ្រង់ថវិកា" id="type1"
-                                            {{ in_array('មូលនិធិទ្រទ្រង់ថវិកា', $selectedTypes) ? 'checked' : '' }}>
+                                            value="ចំណាយចរន្ត" id="type1"
+                                            {{ in_array('ចំណាយចរន្ត', $selectedTypes) ? 'checked' : '' }}>
                                         <label class="form-check-label" for="type1">
+                                            ចំណាយចរន្ត
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subType[]"
+                                            value="មូលនិធិទ្រទ្រង់ថវិកា" id="type2"
+                                            {{ in_array('មូលនិធិទ្រទ្រង់ថវិកា', $selectedTypes) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="type2">
                                             មូលនិធិទ្រទ្រង់ថវិកា
                                         </label>
                                     </div>
 
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="subType[]" value="បដិភាគ"
-                                            id="type2" {{ in_array('បដិភាគ', $selectedTypes) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="type2">
+                                            id="type3" {{ in_array('បដិភាគ', $selectedTypes) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="type3">
                                             បដិភាគ
                                         </label>
                                     </div>
 
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" name="subType[]"
-                                            value="គម្រោងវិនិយោគផ្ទាល់" id="type3"
+                                            value="គម្រោងវិនិយោគផ្ទាល់" id="type4"
                                             {{ in_array('គម្រោងវិនិយោគផ្ទាល់', $selectedTypes) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="type3">
+                                        <label class="form-check-label" for="type4">
                                             គម្រោងវិនិយោគផ្ទាល់
                                         </label>
                                     </div>
-                                    
+
                                     @error('subType')
                                         <div class="pristine-error text-danger">{{ $message }}</div>
                                     @enderror
