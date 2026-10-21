@@ -103,6 +103,40 @@ class DuelReleaseController extends Controller
 
         return response('<option value="">' . __('forms.search...') . '</option>');
     }
+
+
+    public function editByStockID(Request $request, $params)
+    {
+        if ($request->stock_number) {
+            $ministryId = decode_params($params);
+            $selectedId = $request->selected_id ?? null;
+
+            // Fetch all master fuel types for edit mode
+            $fuelTypes = DuelType::orderBy('id', 'asc')->get();
+
+            $options = '<option value="">'
+                . __('forms.search...')
+                . '</option>';
+
+            foreach ($fuelTypes as $type) {
+                $selected = ((string) $selectedId === (string) $type->id)
+                    ? 'selected'
+                    : '';
+
+                $options .= '<option value="' . $type->id . '" '
+                    . $selected . '>'
+                    . e($type->name_km)
+                    . '</option>';
+            }
+
+            return response($options);
+        }
+
+        return response(
+            '<option value="">' . __('forms.search...') . '</option>'
+        );
+    }
+
     public function getByAgencyId(Request $request)
     {
         if ($request->agency_id) {
