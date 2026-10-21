@@ -163,7 +163,7 @@
                         @endif
                 </li>
                 {{-- Reneue --}}
-                @if (hasPermission('initialRevenue.index'))
+                {{-- @if (hasPermission('initialRevenue.index'))
                     <li>
                         <a href="{{ route('initialRevenue.index') }}"
                             class="{{ Request::routeIs('revenue.*') ? 'active' : '' }}">
@@ -171,7 +171,7 @@
                             <span data-key="t-duel-entry">ចំណូល</span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
             </ul>
 

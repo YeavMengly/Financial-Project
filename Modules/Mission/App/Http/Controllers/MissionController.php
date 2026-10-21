@@ -271,6 +271,9 @@ class MissionController extends Controller
             'legal_number'     => 'required|string',
             'legal_date'  => 'required|date',
 
+            'cboTitle'    => 'required|array',
+            'cboTitle.*'  => 'required|string',
+
             'cboName'             => 'required|array|min:1',
             'cboName.*'             => 'required|integer|exists:employees,id',
 
@@ -445,6 +448,8 @@ class MissionController extends Controller
                 */
                 $employee = Employee::findOrFail($employeeId);
 
+                $employeeTitle = $validated['cboTitle'][$index] ?? null;
+
                 /*
                 |--------------------------------------------------------------------------
                 | Money calculation
@@ -547,6 +552,8 @@ class MissionController extends Controller
 
                     'mission_id' =>
                     $mission->id,
+
+                    'employee_title' => $employeeTitle,
 
                     'employee_id' =>
                     $employeeId,
@@ -668,7 +675,7 @@ class MissionController extends Controller
                 'missions.*',
 
                 'provinces.name as province_name',
-
+                'mission_employees.employee_title',
                 'mission_employees.employee_id as mission_employee_id',
                 'mission_employees.travel_allowance',
                 'mission_employees.pocket_money',
@@ -682,6 +689,7 @@ class MissionController extends Controller
                 'mission_employees.account_number',
 
                 'employees.id as employee_id',
+
                 'employees.name_kh',
                 'employees.name_latin',
                 'employees.account_number as payment_account_employee_id',
@@ -1548,6 +1556,7 @@ class MissionController extends Controller
 
                     'provinces.name as province_name',
 
+                    'mission_employees.employee_title',
                     'mission_employees.employee_id as mission_employee_id',
                     'mission_employees.mission_id as mission_employee_mission_id',
                     'mission_employees.employee_id',

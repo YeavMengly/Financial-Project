@@ -80,7 +80,7 @@ class AccountSub extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.content.subaccounts'))
+            ->useLogName(trans('menus.content.sub.accounts'))
             ->logOnly(['ministry_id', 'chapter_id', 'account_id', 'no', 'name'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -94,7 +94,7 @@ class AccountSub extends Model
     {
         $agent = new Agent();
         $activity->default_field = "{$this->no}";
-        $activity->log_name = trans('menus.content.subaccounts');
+        $activity->log_name = trans('menus.content.sub.accounts');
         $activity->ip_address = request()->ip();
         $activity->platform = $agent->platform();
         $activity->device = $agent->device();

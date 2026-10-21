@@ -16,6 +16,7 @@ class MissionEmployee extends Model
     protected $fillable = [
         'ministry_id',
         'mission_id',
+        'employee_title',
         'employee_id',
         'position_id',
         'level_name',
