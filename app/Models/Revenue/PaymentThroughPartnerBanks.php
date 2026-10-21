@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Models\BeginCredit;
+namespace App\Models\Revenue;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RevenueSource extends Model
+class PaymentThroughPartnerBanks extends Model
 {
     use HasFactory;
     protected $fillable = [
         'code',
-        'name',
+        'name_kh',
+        'name_en',
         'description',
     ];
 }
