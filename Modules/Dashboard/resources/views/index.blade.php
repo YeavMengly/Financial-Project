@@ -4,7 +4,6 @@
     {{-- Plugin CSS (only if used on this page) --}}
     <link href="{{ asset('assets/libs/admin-resources/jquery.vectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet"
         type="text/css" />
-
     <link href="{{ asset('assets/libs/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"
         type="text/css" />
@@ -92,6 +91,40 @@
         .cardhover:hover {
             background-color: #fdf9f9;
         }
+
+        .tooltip-btn {
+            position: relative;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        /* Tooltip container element */
+        .tooltip-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            /* Position above the button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+
+            /* Hidden by default */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Show on hover */
+        .tooltip-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
     </style>
 @endsection
 
@@ -101,17 +134,14 @@
         <div class="col-12">
             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                 <h4 class="mb-sm-0 font-size-18">{{ __('menus.dashboard') }}</h4>
-
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <li class="breadcrumb-item"><a href="javascript: void(0);">{{ __('menus.dashboard') }}</a></li>
-                        {{-- <li class="breadcrumb-item active">{{ __('menus.dashboard') }}</li> --}}
                     </ol>
                 </div>
             </div>
         </div>
     </div>
-
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -122,7 +152,6 @@
                             <label for="year" class="form-label font-size-13 text-muted">
                                 {{ __('forms.year') }}
                             </label>
-
                             <select class="form-control" name="year" id="year">
                                 <option value="">{{ __('forms.search...') }}</option>
                                 @foreach ($ministries as $item)
@@ -161,7 +190,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_fin_law }}">
@@ -169,12 +197,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart1" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap mt-2">
                         <span class="badge bg-success-subtle text-success">
                             {{ number_format($total_fin_law) }}
@@ -198,7 +224,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_total_increase }}">
@@ -206,12 +231,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap">
                         <span class="badge bg-success-subtle text-success">
                             {{ number_format($total_total_increase) }}
@@ -220,6 +243,180 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.decrease') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $decreaseCount }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_decrease }}">
+                                    {{ number_format($total_decrease) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_decrease) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-6">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="d-flex flex-wrap align-items-center mb-4 w-100">
+                            <span class="text-muted lh-4 d-block text-truncate">
+                                {{ __('tables.th.editorial') }}
+                            </span>
+                            <div class="ms-auto">
+                                <button type="button" class="btn btn-soft-primary btn-sm">
+                                    {{ $editorialCount }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <span class="mb-3">
+                                <span class="counter-value" data-target="{{ $total_editorial }}">
+                                    {{ number_format($total_editorial) }} <span>រៀល</span>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="col-6">
+                            <div id="mini-chart2" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
+                        </div>
+                    </div>
+                    <div class="text-nowrap">
+                        <span class="badge bg-success-subtle text-success">
+                            {{ number_format($total_editorial) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- @props([
+            'titleOne' => __('tables.th.decrease'),
+            'countOne' => $decreaseCount,
+            'totalOne' => $total_decrease,
+            'chartIdOne' => 'mini-chart-1',
+            'titleTwo' => __('tables.th.editorial'),
+            'countTwo' => $editorialCount,
+            'totalTwo' => $total_editorial,
+            'chartIdTwo' => 'mini-chart-2',
+            'unit' => 'រៀល',
+            'colClass' => 'col-xl-3 col-md-6',
+        ]) --}}
+
+        {{-- <div class="{{ $colClass }}">
+            <div class="card card-h-100">
+                <div class="card-body">
+                    <!-- Segmented Pill Switcher -->
+                    <ul class="nav nav-pills nav-justified bg-light rounded p-1 mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active btn-sm py-1 font-size-13 fw-semibold" data-bs-toggle="pill"
+                                data-bs-target="#pane-{{ $chartIdOne }}" type="button" role="tab">
+                                {{ $titleOne }}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link btn-sm py-1 font-size-13 fw-semibold" data-bs-toggle="pill"
+                                data-bs-target="#pane-{{ $chartIdTwo }}" type="button" role="tab">
+                                {{ $titleTwo }}
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Option 1: Decrease Pane -->
+                        <div class="tab-pane fade show active" id="pane-{{ $chartIdOne }}" role="tabpanel">
+                            <div class="row align-items-center">
+                                <div class="d-flex flex-wrap align-items-center mb-3 w-100">
+                                    <span class="text-muted lh-4 d-block text-truncate">
+                                        {{ $titleOne }}
+                                    </span>
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-soft-primary btn-sm">
+                                            {{ is_numeric($countOne) ? number_format($countOne) : $countOne }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <span class="mb-3 d-block">
+                                        <span class="counter-value font-size-18 fw-semibold"
+                                            data-target="{{ $totalOne }}">
+                                            {{ is_numeric($totalOne) ? number_format($totalOne) : $totalOne }}
+                                        </span> <span class="font-size-12 text-muted">{{ $unit }}</span>
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <div id="{{ $chartIdOne }}" data-colors='["#5156be"]' class="apex-charts mb-2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-nowrap">
+                                <span class="badge bg-success-subtle text-success">
+                                    {{ is_numeric($totalOne) ? number_format($totalOne) : $totalOne }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Editorial Pane -->
+                        <div class="tab-pane fade" id="pane-{{ $chartIdTwo }}" role="tabpanel">
+                            <div class="row align-items-center">
+                                <div class="d-flex flex-wrap align-items-center mb-3 w-100">
+                                    <span class="text-muted lh-4 d-block text-truncate">
+                                        {{ $titleTwo }}
+                                    </span>
+                                    <div class="ms-auto">
+                                        <button type="button" class="btn btn-soft-primary btn-sm">
+                                            {{ is_numeric($countTwo) ? number_format($countTwo) : $countTwo }}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <span class="mb-3 d-block">
+                                        <span class="counter-value font-size-18 fw-semibold"
+                                            data-target="{{ $totalTwo }}">
+                                            {{ is_numeric($totalTwo) ? number_format($totalTwo) : $totalTwo }}
+                                        </span> <span class="font-size-12 text-muted">{{ $unit }}</span>
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <div id="{{ $chartIdTwo }}" data-colors='["#5156be"]' class="apex-charts mb-2">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-nowrap">
+                                <span class="badge bg-success-subtle text-success">
+                                    {{ is_numeric($totalTwo) ? number_format($totalTwo) : $totalTwo }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div> --}}
+
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -234,7 +431,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_new_credit_status }}">
@@ -242,12 +438,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart9" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap">
                         <span class="badge bg-success-subtle text-success">
                             {{ number_format($total_total_increase) }}
@@ -256,7 +450,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -271,7 +464,6 @@
                                 </button>
                             </div>
                         </div>
-
                         <div class="col-6">
                             <span class="mb-3">
                                 <span class="counter-value" data-target="{{ $total_deadline_balance }}">
@@ -279,12 +471,10 @@
                                 </span>
                             </span>
                         </div>
-
                         <div class="col-6">
                             <div id="mini-chart3" data-colors='["#5156be"]' class="apex-charts mb-2"></div>
                         </div>
                     </div>
-
                     <div class="text-nowrap">
                         <span class="badge bg-danger-subtle text-danger">
                             {{ number_format($total_deadline_balance) }}
@@ -293,7 +483,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-xl-2 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
@@ -314,7 +503,6 @@
                                     </span>
                                 </div>
                             </div>
-
                             <div class="col-12">
                                 <span class="text-muted lh-4 d-block text-truncate">
                                     {{ __('tables.th.law_correction') }}
@@ -332,7 +520,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-6 text-nowrap d-flex">
                         <div class="col-12">
                             <span class="badge bg-success-subtle text-success">
@@ -363,26 +550,6 @@
             <div class="card card-h-100">
                 <!-- card body -->
                 <div class="card-body">
-                    {{-- <div class="d-flex flex-wrap align-items-center mb-4">
-                        <h5 class="card-title me-2">{{ __('labels.begin.budget') }}</h5>
-                        <div class="ms-auto">
-                            <div>
-                                <button type="button" class="btn btn-soft-secondary btn-sm">
-                                    ALL
-                                </button>
-                                <button type="button" class="btn btn-soft-primary btn-sm">
-                                    1M
-                                </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm">
-                                    6M
-                                </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm">
-                                    1Y
-                                </button>
-                            </div>
-                        </div>
-                    </div> --}}
-
                     <div class="row align-items-center">
                         <div class="col-sm">
                             <div id="wallet-balance" data-colors='["#310ef5","#fae605","#d91b1b" ]' class="apex-charts">
@@ -442,7 +609,7 @@
                 <!-- card body -->
                 <div class="card-body">
                     <div class="row align-items-center text-center">
-                        {{-- pre_Financing --}}
+                        {{-- Advance Payment --}}
                         <div class="col-sm align-self-center ">
                             <div class="mt-4 mt-sm-0">
                                 <div>
@@ -450,31 +617,15 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#1fad12"></i>
                                         <span class="me-3">{{ __('menus.advance.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                            data-tooltip="ស្នើរសុំ">
                                             {{ $totalCountAdvance }}
                                         </button>
-                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                        {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountPayment }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </button>
+                                        </button> --}}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -487,28 +638,9 @@
                                         <i class="mdi mdi-circle align-middle font-size-12 me-3"
                                             style="color:#f6ff00"></i>
                                         <span class="me-3">{{ __('menus.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountPayment }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown w-100">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalPayment) }}
-                                                            រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -526,31 +658,15 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#fa2314"></i>
                                             <span class="me-3">{{ __('menus.direct.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                            <button type="button"
+                                                class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                                data-tooltip="ស្នើរសុំ">
                                                 {{ $totalCountExpenseR }}
                                             </button>
-                                            <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                            {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountPaymentD }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
-                                            </button>
+                                            </button> --}}
                                         </p>
                                         <h6>
                                             <span class="text-muted font-size-14 fw-normal">
@@ -563,27 +679,9 @@
                                             <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                                 style="color:#00fff2"></i>
                                             <span class="me-3">{{ __('menus.payment') }}</span>
-                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
                                                 {{ $totalCountPaymentD }}
-                                            </button>
-                                            <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                                type="button">
-                                                <span class="dropdown w-100">
-                                                    <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                        data-bs-toggle="dropdown" aria-haspopup="true">
-                                                        នៅសល់
-                                                    </a>
-                                                    <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                        style="min-width:250px;">
-                                                        <div
-                                                            class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                            <i class="mdi mdi-circle"
-                                                                style="color:#c0341e; font-size:10px;"></i>
-                                                            <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                                {{ number_format($totalDirPayment) }} រៀល</h6>
-                                                        </div>
-                                                    </div>
-                                                </span>
                                             </button>
                                         </p>
                                         <h6>
@@ -595,13 +693,13 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-sm">
                             <div id="Expense-Type"
-                                data-colors='["#1fad12" ,"#f6ff00","#fa2314","#00fff2","#faad14","#2200ff"]'
+                                data-colors='["#1fad12" ,"#f6ff00","#fa2314","#00fff2","#faad14","#2200ff","#fa14fa","#65203e"]'
                                 class="apex-charts">
                             </div>
                         </div>
+                        {{-- Guarantee --}}
                         <div class="col-sm align-self-center">
                             <div class="mt-4 mt-sm-0">
                                 <div>
@@ -609,31 +707,15 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#faad14"></i>
                                         <span class="me-3">{{ __('menus.expenditure.guarantee') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm first-letter: mb-3">
+                                        <button type="button"
+                                            class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                            data-tooltip="ស្នើរសុំ">
                                             {{ $totalCountArch }}
                                         </button>
-                                        <button type="button" class="btn btn-soft-danger btn-sm mb-3">
+                                        {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountDir }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1 ml-4"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalFinLaw) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                        </button>
+                                        </button> --}}
                                     </p>
                                     <h6>
                                         <span class="text-muted font-size-14 fw-normal">
@@ -646,27 +728,9 @@
                                         <i class="mdi mdi-circle align-middle font-size-10 me-3"
                                             style="color:#2200ff"></i>
                                         <span class="me-3">{{ __('menus.payment') }}</span>
-                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3">
+                                        <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                            data-tooltip="ទូទាត់">
                                             {{ $totalCountDir }}
-                                        </button>
-                                        <button class="flex-shrink-0 text-end btn btn-soft-info btn-sm mb-3"
-                                            type="button">
-                                            <span class="dropdown w-100">
-                                                <a class="text-muted dropdown-toggle font-size-14" role="button"
-                                                    data-bs-toggle="dropdown" aria-haspopup="true">
-                                                    នៅសល់
-                                                </a>
-                                                <div class="dropdown-menu dropdown-menu-end cardhover mt-1"
-                                                    style="min-width:250px;">
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center gap-2 py-2">
-                                                        <i class="mdi mdi-circle"
-                                                            style="color:#c0341e; font-size:10px;"></i>
-                                                        <h6 class="mb-0 text-muted font-size-14 fw-normal">
-                                                            {{ number_format($totalDir) }} រៀល</h6>
-                                                    </div>
-                                                </div>
-                                            </span>
                                         </button>
                                     </p>
                                     <h6>
@@ -676,6 +740,48 @@
                                     </h6>
                                 </div>
                             </div>
+                            {{-- procurement --}}
+                            <div class="col-sm align-self-center mt-5">
+                                <div class="mt-4 mt-sm-0">
+                                    <div>
+                                        <p class="mb-2">
+                                            <i class="mdi mdi-circle align-middle font-size-10 me-3"
+                                                style="color:#fa14fa"></i>
+                                            <span class="me-3">{{ __('menus.expenditure.procurement') }}</span>
+                                            <button type="button"
+                                                class="btn btn-soft-primary btn-sm first-letter: mb-3 tooltip-btn"
+                                                data-tooltip="ស្នើរសុំ">
+                                                {{ $totalCountPro }}
+                                            </button>
+                                            {{-- <button type="button" class="btn btn-soft-danger btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
+                                                {{ $totalCountExp }}
+                                            </button> --}}
+                                        </p>
+                                        <h6>
+                                            <span class="text-muted font-size-14 fw-normal">
+                                                {{ number_format($procurement) }} រៀល
+                                            </span>
+                                        </h6>
+                                    </div>
+                                    <div class="mt-10 pt-2">
+                                        <p class="mb-2">
+                                            <i class="mdi mdi-circle align-middle font-size-10 me-3"
+                                                style="color:#65203e"></i>
+                                            <span class="me-3">{{ __('menus.payment') }}</span>
+                                            <button type="button" class="btn btn-soft-primary btn-sm mb-3 tooltip-btn"
+                                                data-tooltip="ទូទាត់">
+                                                {{ $totalCountExp }}
+                                            </button>
+                                        </p>
+                                        <h6>
+                                            <span class="text-muted font-size-14 fw-normal">
+                                                {{ number_format($expenditure_Procurement) }} រៀល
+                                            </span>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -683,7 +789,6 @@
             <!-- end card -->
         </div>
     </div>
-
     {{-- Program Data Info --}}
     <div class="row">
         @foreach ($programs as $program)
@@ -702,11 +807,13 @@
                                 <button type="button" class="btn btn-soft-info btn-sm js-count-btn">
                                     {{ $program->total_records }}
                                 </button>
-                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn">
-                                    {{ $program->total_record_mandate }}
-                                </button>
-                                <button type="button" class="btn btn-soft-danger btn-sm">
+                                <button type="button" class="btn btn-soft-primary btn-sm js-count-btn tooltip-btn"
+                                    data-tooltip="ស្នើរសុំ">
                                     {{ $program->total_record_voucher }}
+                                </button>
+                                <button type="button" class="btn btn-soft-danger btn-sm tooltip-btn"
+                                    data-tooltip="ទូទាត់">
+                                    {{ $program->total_record_mandate }}
                                 </button>
                             </div>
                         </div>
@@ -767,6 +874,7 @@
                                     <th>{{ __('tables.th.fin_law') }}</th>
                                     <th>{{ __('tables.th.deadline_balance') }}</th>
                                     <th>{{ __('tables.th.remaining_credit') }}</th>
+                                    <th>ភាគរយ %</th>
                                     <th>បន្ថែម</th>
                                 </tr>
                             </thead>
@@ -777,6 +885,7 @@
                                         <td class="text-end">{{ number_format($acc->fin_law) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->deadline_balance) }} ៛</td>
                                         <td class="text-end">{{ number_format($acc->credit) }} ៛</td>
+                                        <td class="text-end">{{ number_format($acc->percent, 2) }} %</td>
                                         <td>
                                             <div class="dropdown text-center account-card"
                                                 data-account-id="{{ $acc->id }}"
@@ -804,33 +913,18 @@
         </div>
         <!-- end card -->
     </div>
-
+    {{-- Duel :fual and oil --}}
     <div class="row">
         @php
             $qtyFuelRemain = max(($qtyFuel ?? 0) - ($qtyFuelRelease ?? 0), 0);
         @endphp
 
-        <div class="col-xl-3 col-md-6">
+        {{-- <div class="col-xl-3 col-md-6">
             <div class="card card-h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងសាំង</span>
                         <div class="ms-auto d-flex align-items-center gap-1">
-                            {{-- <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
-                                @foreach (request()->except('item_name') as $k => $v)
-                                    <input type="hidden" name="{{ $k }}" value="{{ $v }}">
-                                @endforeach
-
-                                <select name="item_name" class="form-select form-select-sm"
-                                    onchange="this.form.submit()">
-                                    @foreach ($itemOptions as $opt)
-                                        <option value="{{ $opt }}"
-                                            {{ ($itemName ?? '') === $opt ? 'selected' : '' }}>
-                                            {{ $opt }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </form> --}}
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalFuel }}
                             </button>
@@ -881,8 +975,299 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
+        <div class="col-xl-3 col-md-6">
 
+            <div class="card card-h-100" style="cursor: pointer;" data-bs-toggle="modal"
+                data-bs-target="#fuelDetailModal">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+
+                        <span class="text-muted lh-4 d-block text-truncate">
+                            ប្រេងសាំង
+                        </span>
+
+                        <div class="ms-auto d-flex align-items-center gap-1">
+
+                            <button type="button" class="btn btn-soft-primary btn-sm mb-3"
+                                onclick="event.stopPropagation()">
+                                {{ $totalFuel }}
+                            </button>
+
+                            <button type="button" class="btn btn-soft-danger btn-sm mb-3"
+                                onclick="event.stopPropagation()">
+                                {{ $totalFuelRelease }}
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row align-items-center">
+
+                        <div class="col-12">
+
+                            <div class="row g-2">
+
+                                <div class="col-6">
+
+                                    <div class="p-2 rounded bg-success-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.entry') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuel ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-6">
+
+                                    <div class="p-2 rounded bg-danger-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.release') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuelRelease ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-12">
+
+                                    <div class="p-2 rounded bg-primary-subtle">
+
+                                        <small class="text-muted d-block">
+                                            {{ __('menus.remain') }}
+                                        </small>
+
+                                        <div class="fw-semibold">
+
+                                            {{ number_format($qtyFuelRemain ?? 0) }}
+
+                                            <span class="text-muted">
+                                                លីត្រ
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="text-nowrap mt-3">
+
+                        <span class="badge bg-info-subtle text-info">
+                            Entry vs Release
+                        </span>
+
+                        <span class="ms-1 text-muted font-size-13">
+                            {{-- {{ $year }} --}}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <div class="modal fade" id="fuelDetailModal" tabindex="-1" aria-labelledby="fuelDetailModalLabel"
+            aria-hidden="true">
+
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+                <div class="modal-content">
+
+                    {{-- Header --}}
+                    <div class="modal-header bg-light">
+
+                        <div>
+
+                            <h5 class="modal-title fw-semibold" id="fuelDetailModalLabel">
+
+                                <i class="ri-oil-line align-middle me-1 text-primary"></i>
+
+                                របាយការណ៍ការបញ្ចេញប្រេងសាំង
+
+                            </h5>
+
+                            <small class="text-muted">
+                                បញ្ជី Duel Release ប្រចាំឆ្នាំ
+                                {{-- {{ $year }} --}}
+                            </small>
+
+                        </div>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+
+                    {{-- Body --}}
+                    <div class="modal-body">
+
+                        {{-- Summary --}}
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-success-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            ចំនួនឯកសារ Entry
+                                        </div>
+
+                                        <h4 class="mb-0 text-success">
+
+                                            {{ number_format($totalFuel) }}
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-danger-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            សរុបបញ្ចេញ
+                                        </div>
+
+                                        <h4 class="mb-0 text-danger">
+
+                                            {{ number_format($qtyFuelRelease) }}
+
+                                            <span class="fs-6">
+                                                លីត្រ
+                                            </span>
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <div class="card bg-primary-subtle border-0 mb-0">
+
+                                    <div class="card-body py-3">
+
+                                        <div class="text-muted small">
+                                            សល់
+                                        </div>
+
+                                        <h4 class="mb-0 text-primary">
+
+                                            {{ number_format($qtyFuelRemain) }}
+
+                                            <span class="fs-6">
+                                                លីត្រ
+                                            </span>
+
+                                        </h4>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {{-- Chart --}}
+                        <div class="card border shadow-none">
+
+                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <h5 class="card-title mb-1">
+                                        <i class="ri-bar-chart-2-line text-primary me-1"></i>
+                                        ក្រាបការបញ្ចេញប្រេងសាំង
+                                    </h5>
+
+                                    <small class="text-muted">
+                                        ប្រៀបធៀប បរិមាណសរុប / បញ្ចេញ / សល់
+                                    </small>
+                                </div>
+
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {{-- {{ $year }} --}}
+                                </span>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div id="fuelReleaseChart" style="min-height: 380px;"></div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Footer --}}
+                    <div class="modal-footer bg-light">
+
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+
+                            <i class="ri-close-line me-1"></i>
+
+                            បិទ
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
         @php
             $qtyDieselRemain = max(($qtyDiesel ?? 0) - ($qtyDieselRelease ?? 0), 0);
         @endphp
@@ -893,17 +1278,6 @@
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate">ប្រេងម៉ាស៊ូត</span>
                         <div class="ms-auto d-flex align-items-center gap-1">
-                            {{-- <span>
-                                <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
-                                    <input type="hidden" name=" " value=" ">
-                                    <select name="item_name" class="form-select form-select-sm"
-                                        onchange="this.form.submit()">
-                                        <option value="">
-                                            ប្រភេទ
-                                        </option>
-                                    </select>
-                                </form>
-                            </span> --}}
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalDiesel }}
                             </button>
@@ -962,17 +1336,6 @@
                     <div class="d-flex flex-wrap align-items-center mb-3 w-100">
                         <span class="text-muted lh-4 d-block text-truncate"> ប្រេងម៉ាស៊ីន</span>
                         <div class="ms-auto d-flex align-items-center gap-1">
-                            {{-- <span>
-                                <form id="itemFilterForm" method="GET" action="{{ url()->current() }}">
-                                    <input type="hidden" name=" " value=" ">
-                                    <select name="item_name" class="form-select form-select-sm"
-                                        onchange="this.form.submit()">
-                                        <option value="">
-                                            ប្រភេទ
-                                        </option>
-                                    </select>
-                                </form>
-                            </span> --}}
                             <button type="button" class="btn btn-soft-primary btn-sm mb-3">
                                 {{ $totalOil }}
                             </button>
@@ -1022,6 +1385,7 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xl-2 col-md-6">
             <!-- card -->
             <div class="card card-h-100">
@@ -1055,11 +1419,30 @@
             </div><!-- end card -->
         </div>
     </div>
+    {{-- ំMaterial --}}
+    <div class="row card">
+        <div class="card-body">
 
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <div class="card-title mb-1">
+                        {{ __('menus.material') }}
+                    </div>
+                    <p class="text-muted mb-0">
+                        Entry vs Release
+                    </p>
+                </div>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="materialMovementChart"></canvas>
+            </div>
+
+        </div>
+    </div>
     {{-- Modal Program Sub --}}
     <div class="modal fade" id="programSubModal" tabindex="-1" aria-labelledby="programSubModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="programSubModalLabel">Program Sub List</h5>
@@ -1071,7 +1454,6 @@
             </div>
         </div>
     </div>
-
     {{-- Modal Cluster --}}
     <div class="modal fade" id="clusterModal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
@@ -1094,8 +1476,8 @@
     {{-- Modal Sub-Account --}}
     <div class="modal fade" id="accountSubModal" tabindex="-1" aria-labelledby="accountSubModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" style="height:70vh;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="accountSubModalLabel">Account Sub List</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1107,7 +1489,6 @@
         </div>
     </div>
 @endsection
-
 @section('script')
     <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/dashboard.init.js') }}"></script>
@@ -1117,7 +1498,6 @@
     <script src="{{ asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }}"></script>
     <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js') }}"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('year');
@@ -1140,7 +1520,239 @@
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
+            const labels = @json($chartLabels);
+
+            const entryQty = @json($entryQty);
+            const releaseQty = @json($releaseQty);
+
+            const entryTotalQ = @json($entryTotalQ);
+            const releaseTotalQ = @json($releaseTotalQ);
+
+            const entryPrice = @json($entryPrice);
+            const releasePrice = @json($releasePrice);
+
+
+            const ctx = document
+                .getElementById('materialMovementChart')
+                .getContext('2d');
+
+
+            new Chart(ctx, {
+
+                type: 'bar',
+
+                data: {
+                    labels: labels,
+
+                    datasets: [
+
+                        // ==========================
+                        // ENTRY
+                        // ==========================
+                        {
+                            label: 'បញ្ចូល',
+
+                            data: entryQty,
+
+                            backgroundColor: '#3b82f6',
+
+                            borderRadius: 1,
+
+                            barPercentage: 0.75,
+
+                            categoryPercentage: 0.65,
+                            totalQ: entryTotalQ,
+
+                            // Save price for tooltip
+                            totalPrice: entryPrice
+                        },
+
+
+                        // ==========================
+                        // RELEASE
+                        // ==========================
+                        {
+                            label: 'បញ្ចេញ',
+
+                            data: releaseQty,
+
+                            backgroundColor: '#ef4444',
+
+                            borderRadius: 1,
+
+                            barPercentage: 0.75,
+
+                            categoryPercentage: 0.65,
+                            totalQ: releaseTotalQ,
+
+                            // Save price for tooltip
+                            totalPrice: releasePrice
+                        }
+
+                    ]
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+
+                    plugins: {
+
+                        legend: {
+                            position: 'top',
+
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                title: function(tooltipItems) {
+
+                                    return tooltipItems[0].label;
+
+                                },
+
+
+                                label: function(context) {
+
+                                    const dataset = context.dataset;
+
+                                    const index = context.dataIndex;
+
+                                    const qty = context.raw;
+                                    const qtytotal = dataset.totalQ[index] ?? 0;
+
+                                    const price = dataset.totalPrice[index] ?? 0;
+
+                                    return [
+                                        `${dataset.label}ផលិតផល: ${Number(qty).toLocaleString()} ប្រភេទ`,
+                                        `${dataset.label}ចំនួនសរុប: ${Number(qtytotal).toLocaleString()}`,
+                                        `ថ្លៃសរុប: ៛​ ${Number(price).toLocaleString()}`
+                                    ];
+
+                                }
+
+                            }
+
+                        },
+
+
+                        // Show quantity above every bar
+                        datalabels: false
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+
+                        },
+
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            title: {
+                                display: true,
+                                text: 'Quantity'
+                            },
+
+                            ticks: {
+
+                                callback: function(value) {
+                                    return Number(value).toLocaleString();
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+
+                plugins: [
+
+                    {
+
+                        id: 'valueLabels',
+
+                        afterDatasetsDraw(chart) {
+
+                            const {
+                                ctx
+                            } = chart;
+
+                            chart.data.datasets.forEach((dataset, datasetIndex) => {
+
+                                const meta = chart.getDatasetMeta(datasetIndex);
+
+                                meta.data.forEach((bar, index) => {
+
+                                    const value = dataset.data[index];
+
+                                    if (value === 0) {
+                                        return;
+                                    }
+
+                                    ctx.save();
+
+                                    ctx.fillStyle = '#1f2937';
+
+                                    ctx.font = 'bold 12px Arial';
+
+                                    ctx.textAlign = 'center';
+
+                                    ctx.textBaseline = 'bottom';
+
+                                    ctx.fillText(
+                                        Number(value).toLocaleString(),
+                                        bar.x,
+                                        bar.y - 5
+                                    );
+
+                                    ctx.restore();
+
+                                });
+
+                            });
+
+                        }
+
+                    }
+
+                ]
+
+            });
+
+        });
+    </script>
+    {{-- mini cahart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1206,10 +1818,8 @@
 
             var chart = new ApexCharts(document.querySelector("#mini-chart9"), options);
             chart.render();
-
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1219,7 +1829,6 @@
                 var colors = document.getElementById(id).getAttribute("data-colors");
                 return JSON.parse(colors);
             }
-
             var options = {
                 chart: {
                     type: 'line',
@@ -1244,7 +1853,6 @@
 
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1279,7 +1887,6 @@
 
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1314,7 +1921,6 @@
 
         });
     </script>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1349,7 +1955,6 @@
 
         });
     </script>
-
     {{-- Search Auth Sticky --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1370,7 +1975,7 @@
             });
         });
     </script>
-
+    {{-- program --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.program-card');
@@ -1379,10 +1984,8 @@
                 card.addEventListener('click', function() {
                     const programId = this.dataset.programId;
                     const programTitle = this.dataset.programTitle;
-
                     // Set modal title
                     document.getElementById('programSubModalLabel').innerText = programTitle;
-
                     // Show modal immediately with loading spinner
                     const modalElement = document.getElementById('programSubModal');
                     document.getElementById('programSubContent').innerHTML = `
@@ -1404,10 +2007,6 @@
                                     '<p class="text-center">មិនមានអនុកម្មវិធីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
-                            // else {
-                            //     console.log(data)
-                            // }
-
                             // Build HTML grid
                             let html = '<div class="row g-2">';
                             data.forEach(sub => {
@@ -1434,11 +2033,11 @@
                                             <button type="button" class="btn btn-soft-info btn-sm">
                                                 ${sub.total_records ?? 0}
                                             </button>
-                                             <button type="button" class="btn btn-soft-primary btn-sm">
-                                                ${sub.total_record_sub_mandate ?? 0}
-                                            </button>
-                                             <button type="button" class="btn btn-soft-danger btn-sm">
+                                             <button type="button" class="btn btn-soft-primary btn-sm tooltip-btn" data-tooltip="ស្នើរសុំ">
                                                 ${sub.total_record_sub_voucher ?? 0}
+                                            </button>
+                                             <button type="button" class="btn btn-soft-danger btn-sm tooltip-btn" data-tooltip="ទូទាត់">
+                                                ${sub.total_record_sub_mandate ?? 0}
                                             </button>
                                         </div>
                                     </div>
@@ -1495,7 +2094,7 @@
             });
         });
     </script>
-
+    {{-- program sub --}}
     <script>
         document.addEventListener('click', function(e) {
             const card = e.target.closest('.program-sub-card');
@@ -1553,7 +2152,13 @@
                                             </div>
                                         </div>
                                     </div>
-
+                                    <!-- Percent -->
+                                    <div class="mt-3 text-center">
+                                        <small class="text-muted d-block">
+                                            អនុវត្ត:
+                                            <strong>${Number(cluster.percent ?? 0).toFixed(2)}%</strong>
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1575,11 +2180,9 @@
 
             const clusterId = cluster.dataset.clusterId;
             console.log('Load vouchers for cluster:', clusterId);
-
-            // fetch(`/dashboard/cluster/${clusterId}/vouchers`)
         });
     </script>
-
+    {{-- wallet-balance --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -1654,12 +2257,14 @@
                     height: 260
                 },
                 series: [
-                    {{ round($percent_advance_Payment, 2) }},
-                    {{ round($percent_Payment, 2) }},
-                    {{ round($percent_expense_record, 2) }},
-                    {{ round($percent_Payment_Deadline, 2) }},
-                    {{ round($percent_expenditure_Guarantee, 2) }},
-                    {{ round($percent_direct_Payment, 2) }},
+                    {{ round($percent_advance_Payment, 4) }},
+                    {{ round($percent_Payment, 4) }},
+                    {{ round($percent_expense_record, 4) }},
+                    {{ round($percent_Payment_Deadline, 4) }},
+                    {{ round($percent_expenditure_Guarantee, 4) }},
+                    {{ round($percent_direct_Payment, 4) }},
+                    {{ round($percent_procurement, 4) }},
+                    {{ round($percent_expenditure_Procurement, 4) }},
                 ],
                 labels: [
                     "{{ __('menus.advance.payment') }}",
@@ -1667,6 +2272,8 @@
                     "{{ __('menus.direct.payment') }}",
                     "{{ __('menus.payment') }}",
                     "{{ __('menus.expenditure.guarantee') }}",
+                    "{{ __('menus.payment') }}",
+                    "{{ __('menus.expenditure.procurement') }}",
                     "{{ __('menus.payment') }}",
                 ],
                 colors: colors,
@@ -1712,11 +2319,9 @@
     {{-- barchart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-
             function formatCurrency(value) {
                 return new Intl.NumberFormat('en-US').format(value) + " ៛";
             }
-
             const el = document.querySelector("#bar_chart");
             const colors = JSON.parse(el.getAttribute("data-colors"));
 
@@ -1724,7 +2329,6 @@
             let finLawData = @json($finLawData);
             let remainData = @json($remainData);
             let deadlineData = @json($deadlineData);
-
             // combine data
             let combined = chapterLabels.map((label, index) => ({
                 label: label,
@@ -1732,16 +2336,13 @@
                 remain: remainData[index],
                 deadline: deadlineData[index]
             }));
-
             // sort big → small by chapter label
             combined.sort((a, b) => b.label - a.label);
-
             // rebuild arrays after sorting
             const label = combined.map(item => 'ជំពូក' + item.label);
             const sortedFinLaw = combined.map(item => item.finLaw);
             const sortedRemain = combined.map(item => item.remain);
             const sortedDeadline = combined.map(item => item.deadline);
-
             const options = {
                 chart: {
                     type: "bar",
@@ -1791,64 +2392,7 @@
                         }
                     }
                 },
-                // responsive for mobile
-                responsive: [{
-                    breakpoint: 992,
-                    options: {
-                        chart: {
-                            height: 300
-                        },
-                        plotOptions: {
-                            bar: {
-                                columnWidth: "60%"
-                            }
-                        }
-                    }
-                }, {
-                    breakpoint: 768,
-                    options: {
-                        chart: {
-                            height: 280
-                        },
-                        xaxis: {
-                            labels: {
-                                rotate: -45,
-                                style: {
-                                    fontSize: "10px"
-                                }
-                            }
-                        }
-                    }
-                }, {
-                    breakpoint: 480,
-                    options: {
-                        chart: {
-                            height: 260
-                        },
-                        plotOptions: {
-                            bar: {
-                                columnWidth: "70%"
-                            }
-                        },
-                        xaxis: {
-                            labels: {
-                                rotate: -45,
-                                style: {
-                                    fontSize: "9px"
-                                }
-                            }
-                        },
-                        yaxis: {
-                            labels: {
-                                style: {
-                                    fontSize: "9px"
-                                }
-                            }
-                        }
-                    }
-                }]
             };
-
             new ApexCharts(el, options).render();
         });
     </script>
@@ -1898,7 +2442,7 @@
                 card.addEventListener('click', function() {
                     const accountId = this.dataset.accountId;
                     const accountTitle = this.dataset.accountTitle;
-
+                    const year = document.getElementById('year').value;
                     // Set modal title
                     document.getElementById('accountSubModalLabel').innerText = accountTitle;
 
@@ -1913,23 +2457,20 @@
                     `;
                     const modal = new bootstrap.Modal(modalElement);
                     modal.show();
-
                     // Fetch programSubs via AJAX
-                    fetch(`/dashboard/account/${accountId}/subs`)
+                    fetch(`/dashboard/account/${accountId}/subs?year=${year}`)
                         .then(res => res.json())
                         .then(data => {
-                            // console.log(data);
                             if (data.length === 0) {
                                 document.getElementById('accountSubContent').innerHTML =
                                     '<p class="text-center">មិនមានអនុគណនីដែលអាចបង្ហាញបាន។</p>';
                                 return;
                             }
-
                             // Build HTML grid
                             let html = `
                                 <div class="card-body">
-                                    <div data-simplebar style="max-height: 380px;">
-                                        <div class="table-responsive table-scroll">
+                                    <div data-simplebar style="height:60vh;">
+                                        <div class="table-responsive" style="height:50vh;">
                                             <table class="table table-bordered table-striped table-hover align-middle">
                                                 <thead class="text-center table-light sticky-header">
                                                     <tr>
@@ -1937,6 +2478,7 @@
                                                         <th>ច្បាប់ហិរញ្ញវត្ថុ</th>
                                                         <th>អនុវត្ត</th>
                                                         <th>នៅសល់</th>
+                                                        <th>ភាគរយ %</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -1946,8 +2488,9 @@
                                     <tr data-subs-id="${subs.id}" data-subs-no="${subs.no}" class="text-end font-size-14">
                                         <td class="text-center">${subs.no}</td>
                                         <td>${Number(subs.fin_law ?? 0).toLocaleString()} ៛</td>
-                                        <td>${Number(subs.apply ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.deadline_balance ?? 0).toLocaleString()} ៛</td>
                                         <td>${Number(subs.credit ?? 0).toLocaleString()} ៛</td>
+                                        <td>${Number(subs.percent ?? 0).toFixed(2)} %</td>
                                     </tr>
                                 `;
                             });
@@ -1959,7 +2502,6 @@
                                     </div>
                                 </div>
                             `;
-
                             document.getElementById('accountSubContent').innerHTML = html;
                         })
                         .catch(err => {
@@ -1971,3 +2513,559 @@
             });
         });
     </script>
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Update dropdown button text and active class when an item is picked
+            document.querySelectorAll('.dropdown-tab-switch').forEach(item => {
+                item.addEventListener('show.bs.tab', function(e) {
+                    // Find the parent dropdown button and update its label text
+                    const dropdown = this.closest('.dropdown');
+                    const labelSpan = dropdown.querySelector('.dropdown-label');
+                    if (labelSpan) {
+                        labelSpan.textContent = this.getAttribute('data-label');
+                    }
+
+                    // Remove 'active' styling from all siblings, add to the selected one
+                    dropdown.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+
+                    // 2. CRITICAL: Force window resize so hidden ApexCharts render at 100% width
+                    window.dispatchEvent(new Event('resize'));
+                });
+            });
+        });
+    </script> --}}
+
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const fuelReleases = @json($fuelReleases);
+            const dieselReleases = @json($dieselReleases);
+            const oilReleases = @json($oilReleases);
+
+
+            const modal = document.getElementById('duelReleaseModal');
+
+            if (!modal) {
+                return;
+            }
+
+
+            modal.addEventListener('show.bs.modal', function(event) {
+
+                const card = event.relatedTarget;
+
+                if (!card) {
+                    return;
+                }
+
+
+                const item = card.dataset.item;
+                const title = card.dataset.title;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Select Data
+                |--------------------------------------------------------------------------
+                */
+
+                let releases = [];
+
+                if (item === '1') {
+
+                    releases = fuelReleases;
+
+                } else if (item === '2') {
+
+                    releases = dieselReleases;
+
+                } else if (item === '3') {
+
+                    releases = oilReleases;
+
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Modal Title
+                |--------------------------------------------------------------------------
+                */
+
+                document.getElementById(
+                    'duelReleaseTitle'
+                ).innerText = title;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Summary
+                |--------------------------------------------------------------------------
+                */
+
+                const totalRelease = releases.reduce(
+                    function(total, row) {
+
+                        return total +
+                            Number(row.quantity_request || 0);
+
+                    },
+                    0
+                );
+
+
+                const lastRow =
+                    releases.length > 0 ?
+                    releases[releases.length - 1] :
+                    null;
+
+
+                const remaining =
+                    lastRow ?
+                    Number(lastRow.quantity_remain || 0) :
+                    0;
+
+
+                document.getElementById(
+                    'modalEntryCount'
+                ).innerText = releases.length.toLocaleString();
+
+
+                document.getElementById(
+                        'modalReleaseQuantity'
+                    ).innerText =
+                    numberFormat(totalRelease) + ' លីត្រ';
+
+
+                document.getElementById(
+                        'modalRemainQuantity'
+                    ).innerText =
+                    numberFormat(remaining) + ' លីត្រ';
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Table
+                |--------------------------------------------------------------------------
+                */
+
+                renderReleaseTable(releases);
+
+            });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Render Table
+            |--------------------------------------------------------------------------
+            */
+
+            function renderReleaseTable(releases) {
+
+                const tbody =
+                    document.getElementById(
+                        'duelReleaseModalTable'
+                    );
+
+
+                tbody.innerHTML = '';
+
+
+                if (!releases.length) {
+
+                    tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        class="text-center text-muted py-5">
+
+                        <i class="ri-database-2-line fs-2 d-block mb-2"></i>
+
+                        មិនមានទិន្នន័យ
+
+                    </td>
+                </tr>
+            `;
+
+                    return;
+                }
+
+
+                releases.forEach(function(row, index) {
+
+                    const date = row.date_release ?
+                        formatDate(row.date_release) :
+                        '-';
+
+
+                    tbody.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+                    <td>
+                        <span class="fw-semibold">
+                            ${row.receipt_number ?? '-'}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${date}
+                    </td>
+
+                    <td class="text-end">
+
+                        ${numberFormat(row.quantity_total)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                    <td class="text-end text-danger fw-semibold">
+
+                        ${numberFormat(row.quantity_request)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                    <td class="text-end text-primary fw-semibold">
+
+                        ${numberFormat(row.quantity_remain)}
+
+                        <span class="text-muted">
+                            លីត្រ
+                        </span>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+                });
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Number Format
+            |--------------------------------------------------------------------------
+            */
+
+            function numberFormat(value) {
+
+                return Number(value || 0).toLocaleString(
+                    'en-US', {
+                        maximumFractionDigits: 2
+                    }
+                );
+
+            }
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Date Format
+            |--------------------------------------------------------------------------
+            */
+
+            function formatDate(value) {
+
+                const date = new Date(value);
+
+                if (isNaN(date.getTime())) {
+                    return value;
+                }
+
+                const day =
+                    String(date.getDate()).padStart(2, '0');
+
+                const month =
+                    String(date.getMonth() + 1).padStart(2, '0');
+
+                const year =
+                    date.getFullYear();
+
+
+                return `${day}/${month}/${year}`;
+
+            }
+
+        });
+    </script> --}}
+    {{-- <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const fuelReleases = @json($fuelReleases);
+
+            const dates = fuelReleases.map(function(item) {
+                return item.date_release ?
+                    formatDate(item.date_release) :
+                    '-';
+            });
+
+            const quantityTotal = fuelReleases.map(function(item) {
+                return Number(item.quantity_total ?? 0);
+            });
+
+            const quantityRequest = fuelReleases.map(function(item) {
+                return Number(item.quantity_request ?? 0);
+            });
+
+            const quantityRemain = fuelReleases.map(function(item) {
+                return Number(item.quantity_remain ?? 0);
+            });
+
+
+            // ==========================================
+            // Fuel Release Chart
+            // ==========================================
+
+            const chartElement = document.querySelector('#fuelReleaseChart');
+
+            if (!chartElement) {
+                return;
+            }
+
+            const options = {
+
+                chart: {
+                    type: 'line',
+                    height: 380,
+                    toolbar: {
+                        show: true
+                    },
+                    zoom: {
+                        enabled: true
+                    }
+                },
+
+                series: [{
+                        name: 'បរិមាណសរុប',
+                        data: quantityTotal
+                    },
+                    {
+                        name: 'បញ្ចេញ',
+                        data: quantityRequest
+                    },
+                    {
+                        name: 'សល់',
+                        data: quantityRemain
+                    }
+                ],
+
+                xaxis: {
+                    categories: dates,
+                    title: {
+                        text: 'កាលបរិច្ឆេទ'
+                    },
+                    labels: {
+                        rotate: -45
+                    }
+                },
+
+                yaxis: {
+                    title: {
+                        text: 'បរិមាណ (លីត្រ)'
+                    },
+
+                    labels: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString();
+                        }
+                    }
+                },
+
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+
+                markers: {
+                    size: 5,
+                    hover: {
+                        size: 7
+                    }
+                },
+
+                dataLabels: {
+                    enabled: false
+                },
+
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+
+                    y: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString() + ' លីត្រ';
+                        }
+                    }
+                },
+
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center'
+                },
+
+                grid: {
+                    strokeDashArray: 4
+                },
+
+                noData: {
+                    text: 'មិនមានទិន្នន័យ'
+                }
+            };
+
+
+            const fuelChart = new ApexCharts(
+                chartElement,
+                options
+            );
+
+            fuelChart.render();
+
+
+            // ==========================================
+            // Format Date
+            // ==========================================
+
+            function formatDate(value) {
+
+                const date = new Date(value);
+
+                if (isNaN(date.getTime())) {
+                    return value;
+                }
+
+                const day = String(date.getDate()).padStart(2, '0');
+
+                const month = String(
+                    date.getMonth() + 1
+                ).padStart(2, '0');
+
+                const year = date.getFullYear();
+
+                return `${day}/${month}/${year}`;
+            }
+
+        });
+    </script> --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const chartLabels = @json($chartLabels);
+
+    const entryQty = @json($fuelEntryQty);
+
+    const releaseQty = @json($fuelReleaseQty);
+
+    const remainQty = @json($fuelRemainQty);
+
+
+    const chartElement = document.querySelector('#fuelReleaseChart');
+
+    if (!chartElement) {
+        return;
+    }
+
+
+    const options = {
+
+        chart: {
+            type: 'line',
+            height: 400,
+            toolbar: {
+                show: true
+            }
+        },
+
+        series: [
+            {
+                name: 'Entry',
+                data: entryQty
+            },
+            {
+                name: 'Release',
+                data: releaseQty
+            },
+            {
+                name: 'Remain',
+                data: remainQty
+            }
+        ],
+
+        xaxis: {
+            categories: chartLabels,
+
+            title: {
+                text: 'Month'
+            }
+        },
+
+        yaxis: {
+            title: {
+                text: 'Quantity (Liter)'
+            },
+
+            labels: {
+                formatter: function (value) {
+                    return Number(value).toLocaleString();
+                }
+            }
+        },
+
+        stroke: {
+            curve: 'smooth',
+            width: 3
+        },
+
+        markers: {
+            size: 5
+        },
+
+        tooltip: {
+            shared: true,
+            intersect: false,
+
+            y: {
+                formatter: function (value) {
+                    return Number(value).toLocaleString() + ' លីត្រ';
+                }
+            }
+        },
+
+        legend: {
+            position: 'top',
+            horizontalAlign: 'center'
+        },
+
+        grid: {
+            strokeDashArray: 4
+        },
+
+        noData: {
+            text: 'មិនមានទិន្នន័យ'
+        }
+    };
+
+
+    const fuelChart = new ApexCharts(
+        chartElement,
+        options
+    );
+
+    fuelChart.render();
+
+});
+</script>

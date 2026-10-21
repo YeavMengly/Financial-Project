@@ -84,7 +84,40 @@
                                     @enderror
                                 </div>
                             </div>
-                            
+
+                            <div class="col-md-12">
+                                <div class="form-group mb-3">
+                                    <label>ប្រភេទ</label>
+
+                                    <div>
+                                        <input class="form-check-input" type="checkbox" name="subType[]"
+                                            value="មូលនិធិទ្រទ្រង់ថវិកា"
+                                            {{ in_array('មូលនិធិទ្រទ្រង់ថវិកា', $chapter->sub_type ?? []) ? 'checked' : '' }}>
+                                        <label>មូលនិធិទ្រទ្រង់ថវិកា</label>
+                                    </div>
+
+                                    <div>
+                                        <input class="form-check-input" type="checkbox" name="subType[]" value="បដិភាគ"
+                                            {{ in_array('បដិភាគ', $chapter->sub_type ?? []) ? 'checked' : '' }}>
+                                        <label>បដិភាគ</label>
+                                    </div>
+
+                                    <div>
+                                        <input class="form-check-input" type="checkbox" name="subType[]"
+                                            value="គម្រោងវិនិយោគផ្ទាល់"
+                                            {{ in_array('គម្រោងវិនិយោគផ្ទាល់', $chapter->sub_type ?? []) ? 'checked' : '' }}>
+                                        <label>គម្រោងវិនិយោគផ្ទាល់</label>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            @error('subType')
+                                <div class="pristine-error text-danger">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>

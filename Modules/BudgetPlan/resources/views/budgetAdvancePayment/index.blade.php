@@ -84,12 +84,19 @@
                             </select>
                         </div>
 
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="CboPaymentVoucherNumber">{{ __('menus.voucher') }}</label>
+                            <input type="text" id="CboPaymentVoucherNumber" name="CboPaymentVoucherNumber"
+                                class="form-control" placeholder="{{ __('menus.voucher') }}"
+                                value="{{ request('CboPaymentVoucherNumber') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
-                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" 
-                                value="{{ request('start_date') }}"
+                                placeholder="ចាប់ផ្ដើម {{ __('forms.select_date') }}" value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
@@ -97,8 +104,7 @@
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
-                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}"  
-                                value="{{ request('end_date') }}"
+                                placeholder="បញ្ចប់ {{ __('forms.select_date') }}" value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
@@ -276,9 +282,10 @@
     </script>
 
     <script>
-        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date').on('change keyup', function() {
-            $('#budgetadvancepayment-table').DataTable().ajax.reload();
-        });
+        $('#cboProgram, #subAccountNumber, #agency, #no, #cboTodo, #cboStatus,#start_date,#end_date, #CboPaymentVoucherNumber')
+            .on('change keyup', function() {
+                $('#budgetadvancepayment-table').DataTable().ajax.reload();
+            });
     </script>
 
     <script>

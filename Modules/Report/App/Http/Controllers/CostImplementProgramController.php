@@ -3,6 +3,7 @@
 namespace Modules\Report\App\Http\Controllers;
 
 use App\DataTables\Report\CostImplementProgramDataTable;
+use App\DataTables\Report\CostlmplementProgramMandateDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Ministry;
 use Illuminate\Http\RedirectResponse;
@@ -21,15 +22,38 @@ class CostImplementProgramController extends Controller
             ->select('id', 'no', 'year', 'title', 'refer', 'name')
             ->orderBy('year', 'desc')
             ->get();
-        $defaultYear = $ministries->first()->year ?? date('Y');
-        $year = $request->filled('year') ? $request->input('year') : $defaultYear;
 
-        return $dataTable->render('report::report.cost_implement.program.index', [
+        $defaultYear = $ministries->first()->year ?? date('Y');
+
+        // Support both 'year' and 'yearFilter' inputs
+        $year = $request->input('yearFilter', $request->input('year', $defaultYear));
+        $ministryId = $request->input('ministry_id');
+
+        return $dataTable->render('report::report.cost_implement.program.voucher.index', [
             'ministries' => $ministries,
             'selectedYear' => $year,
+            'selectedMinistry' => $ministryId,
         ]);
     }
+    public function indexMandate(CostlmplementProgramMandateDataTable $dataTable, Request $request)
+    {
+        $ministries = DB::table('ministries')
+            ->select('id', 'no', 'year', 'title', 'refer', 'name')
+            ->orderBy('year', 'desc')
+            ->get();
 
+        $defaultYear = $ministries->first()->year ?? date('Y');
+
+        // Support both 'year' and 'yearFilter' inputs
+        $year = $request->input('yearFilter', $request->input('year', $defaultYear));
+        $ministryId = $request->input('ministry_id');
+
+        return $dataTable->render('report::report.cost_implement.program.mandate.index', [
+            'ministries' => $ministries,
+            'selectedYear' => $year,
+            'selectedMinistry' => $ministryId,
+        ]);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -42,10 +66,10 @@ class CostImplementProgramController extends Controller
     /** 
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
-    {
-        //
-    }
+    // public function store(Request $request): RedirectResponse
+    // {
+    //     //
+    // }
 
     /**
      * Show the specified resource.
@@ -66,10 +90,10 @@ class CostImplementProgramController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id): RedirectResponse
-    {
-        //
-    }
+    // public function update(Request $request, $id): RedirectResponse
+    // {
+    //     //
+    // }
 
     /**
      * Remove the specified resource from storage.

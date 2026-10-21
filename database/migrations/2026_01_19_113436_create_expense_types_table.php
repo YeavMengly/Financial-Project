@@ -26,6 +26,14 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Schema::dropIfExists('expense_types');
+        // 1. Temporarily disable foreign key checks
+        Schema::disableForeignKeyConstraints();
+
+        // 2. Safely drop the table
         Schema::dropIfExists('expense_types');
+
+        // 3. Re-enable foreign key checks
+        Schema::enableForeignKeyConstraints();
     }
 };

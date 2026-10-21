@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('type_id');
             $table->string('no');
             $table->string('name');
+            $table->string('sub_type')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

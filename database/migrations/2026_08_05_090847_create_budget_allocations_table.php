@@ -1,0 +1,43 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('budget_allocations', function (Blueprint $table) {
+            $table->id();
+
+            $table->unsignedBigInteger('ministry_id');
+            $table->unsignedBigInteger('budget_begin_voucher_id');
+            $table->unsignedBigInteger('budget_header_expense_type_id');
+
+            $table->decimal('amount', 18, 2)->default(0);
+            $table->integer('rounds')->nullable();
+
+            $table->timestamps();
+
+            $table->unique([
+                'budget_begin_voucher_id',
+                'budget_header_expense_type_id',
+                'rounds'
+            ]);
+
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('budget_allocations');
+    }
+};

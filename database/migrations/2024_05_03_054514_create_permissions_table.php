@@ -42,6 +42,17 @@ return new class extends Migration
             ],
 
             /**
+             *   Begin Credit allocation
+             */
+
+            'budget.allocation'                  => [
+                'view'   => 'budgetAllocation.index',
+                'create' => 'budgetAllocation.create',
+                'edit'   => 'budgetAllocation.edit',
+                'delete' => 'budgetAllocation.destroy',
+            ],
+
+            /**
              *   Payment
              */
             'expenditure.guarantee'                  => [
@@ -50,6 +61,14 @@ return new class extends Migration
                 'create' => 'budgetMandate.create',
                 'edit'   => 'budgetMandate.edit',
                 'delete' => 'budgetMandate.destroy',
+            ],
+
+            'expenditure.procurement'                  => [
+                'show'   => 'initialProcurement.index',
+                'view'   => 'budgetProcurement.index',
+                'create' => 'budgetProcurement.create',
+                'edit'   => 'budgetProcurement.edit',
+                'delete' => 'budgetProcurement.destroy',
             ],
 
             'advance.payment'                  => [
@@ -82,6 +101,34 @@ return new class extends Migration
                 'create' => 'budgetDirectPayment.paymentDeadline.create',
                 'edit'   => 'budgetDirectPayment.paymentDeadline.edit',
                 'delete' => 'budgetDirectPayment.paymentDeadline.destroy',
+            ],
+
+            // Royalty
+
+            'royalty.voucher'                  => [
+                'show'   => 'initialRoyaltyVoucher.index',
+                'view'   => 'royaltyVoucher.index',
+                'create' => 'royaltyVoucher.create',
+                'edit'   => 'royaltyVoucher.edit',
+                'delete' => 'royaltyVoucher.destroy',
+            ],
+
+            'royalty.mandate'                  => [
+                'show'   => 'initialRoyaltyMandate.index',
+                'view'   => 'royaltyMandate.index',
+                'create' => 'royaltyMandate.create',
+                'edit'   => 'royaltyMandate.edit',
+                'delete' => 'royaltyMandate.destroy',
+            ],
+
+            // Training
+
+            'training'                  => [
+                'show'   => 'initialTraining.index',
+                'view'   => 'training.index',
+                'create' => 'training.create',
+                'edit'   => 'training.edit',
+                'delete' => 'training.destroy',
             ],
 
             // Duel
@@ -205,6 +252,33 @@ return new class extends Migration
                 'create' => 'expenseType.create',
                 'edit'   => 'expenseType.edit',
                 'delete' => 'expenseType.destroy',
+            ],
+
+            'content.employee'                  => [
+                'view'   => 'employees.index',
+                'create' => 'employees.create',
+                'edit'   => 'employees.edit',
+                'delete' => 'employees.destroy',
+                // 'import' => 'employees.import'
+            ],
+
+            // Project
+            'project'                  => [
+                'show'   => 'initialProject.index',
+                'view'   => 'project.index',
+                'create' => 'project.create',
+                'edit'   => 'project.edit',
+                'delete' => 'project.destroy',
+
+            ],
+
+            // Missions
+            'missions'                  => [
+                'show'   => 'initialMission.index',
+                'view'   => 'missions.index',
+                'create' => 'missions.create',
+                'edit'   => 'missions.edit',
+                'delete' => 'missions.destroy',
             ],
         ];
 

@@ -41,8 +41,6 @@
             <div class="card">
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
-
-
                         <!-- Start Date -->
                         <div class="col-sm-3">
                             <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
@@ -58,6 +56,49 @@
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboNumber">{{ __('menus.receipt.number') }}</label>
+                            <input type="text" id="cboNumber" name="cboNumber" class="form-control"
+                                placeholder="{{ __('menus.receipt.number') }}" value="{{ request('cboNumber') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboUserRequest">{{ __('menus.user.request') }}</label>
+                            <input type="text" id="cboUserRequest" name="cboUserRequest" class="form-control"
+                                placeholder="{{ __('menus.user.request') }}" value="{{ request('cboUserRequest') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
+                        <div class="col-sm-3">
+                            <label class="visually-hidden" for="cboDuelType">{{ __('menus.item.name') }}</label>
+                            <select id="cboDuelType" name="cboDuelType" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">{{ __('menus.item.name') }}</option>
+                                @foreach ($duelType as $type)
+                                    <option value="{{ $type->id }}"
+                                        {{ request('cboDuelType') == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name_km }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- <div class="col-sm-3">
+                            <label class="visually-hidden"
+                                for="cboExecutiveUnit">{{ __('menus.content.agency.executive.unit') }}</label>
+                            <select id="cboExecutiveUnit" name="cboExecutiveUnit" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">{{ __('menus.content.agency.executive.unit') }}</option>
+                                @foreach ($executiveUnits as $executiveUnit)
+                                    <option value="{{ $executiveUnit->id }}"
+                                        {{ request('cboExecutiveUnit') == $executiveUnit->id ? 'selected' : '' }}>
+                                        {{ $executiveUnit->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div> --}}
+
                         <div class="col-sm-3 d-flex align-items-center gap-2">
 
                             {{-- Search --}}
@@ -71,7 +112,7 @@
                             </a>
 
                             {{-- Export --}}
-                            <a href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
+                            <a id="btnExport" href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
@@ -176,6 +217,31 @@
             $('#filter')[0].reset();
 
             $('#duelrelease-table').DataTable().ajax.reload();
+        });
+    </script>
+    <script>
+        $('#cboNumber, #cboUserRequest, #cboDuelType, #cboExecutiveUnit, #start_date, #end_date').on('change keyup',
+            function() {
+                $('#duelrelease-table').DataTable().ajax.reload();
+            });
+    </script>
+    <script>
+        $('#btnExport').on('click', function(e) {
+            e.preventDefault();
+
+            let baseUrl = "{{ route('duelRelease.export', ['params' => $params]) }}";
+
+            let params = new URLSearchParams({
+                cboNumber: $('#cboNumber').val(),
+                cboUserRequest: $('#cboUserRequest').val(),
+                cboDuelType: $('#cboDuelType').val(),
+                cboExecutiveUnit: $('#cboExecutiveUnit').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val(),
+            });
+
+            // ✅ Redirect with correct query string
+            window.location.href = baseUrl + '?' + params.toString();
         });
     </script>
 

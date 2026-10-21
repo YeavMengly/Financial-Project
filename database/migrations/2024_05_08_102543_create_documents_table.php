@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
-            $table->unsignedBigInteger("cate_id");
-            $table->unsignedBigInteger("sub_id");
-            $table->unsignedBigInteger("year");
-            $table->string("title");
-            $table->text("description");
-            $table->string("fileName");
+            $table->integer('id_order');
+            $table->string('name');
+            $table->string('name_kh');
+            $table->string('doc_type');
+            $table->string('description');
             $table->timestamps();
             $table->softDeletes();
         });

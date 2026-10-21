@@ -32,6 +32,9 @@ class BudgetAdvancePaymentDataTable extends DataTable
             ->editColumn('budget', function ($row) {
                 return number_format($row->budget ?? 0) . ' ៛';
             })
+            ->editColumn('voucher_budget', function ($row) {
+                return number_format($row->voucher_budget ?? 0) . ' ៛';
+            })
             ->editColumn('transaction_date', function ($row) {
                 $active =  Carbon::parse($row->transaction_date)->format('Y-m-d');
 
@@ -140,6 +143,10 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 $model->whereDate('budget_mandates.request_date', '<=', $request->end_date);
             }
         }
+        if ($request->filled('CboPaymentVoucherNumber')) {
+            $model->where('budget_mandates.payment_voucher_number', $request->CboPaymentVoucherNumber);
+        }
+
         // if ($request->filled('agency')) {
         //     $model->where('agencies.no', 'like', '%' . $request->agency . '%');
         // }
@@ -173,6 +180,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
 
         $model->leftJoin('agencies', 'budget_mandates.agency_id', '=', 'agencies.id');
         $model->leftJoin('expense_types', 'budget_mandates.expense_type_id', '=', 'expense_types.id');
+        $model->crossJoin('budget_vouchers', 'budget_mandates.no', '=', 'budget_vouchers.no');
 
         // ===== FIXED CONDITION =====
         $model->where('budget_mandates.ministry_id', $id);
@@ -200,7 +208,8 @@ class BudgetAdvancePaymentDataTable extends DataTable
             'budget_mandates.request_date',
             'budget_mandates.legal_date',
             'budget_mandates.created_at',
-            'budget_mandates.deleted_at'
+            'budget_mandates.deleted_at',
+            // 'budget_vouchers.budget AS voucher_budget',
         ]);
 
         $model->orderByDesc('budget_mandates.created_at');
@@ -223,6 +232,7 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 'data' => 'function(d) {
                 d.agency     = $("#agency").val();
                 d.cboProgram    = $("#cboProgram").val();
+                d.CboPaymentVoucherNumber = $("#CboPaymentVoucherNumber").val();
                 d.subAccountNumber = $("#subAccountNumber").val();
                 d.cboTodo = $("#cboTodo").val();
                 d.cboStatus = $("#cboStatus").val();
@@ -251,19 +261,20 @@ class BudgetAdvancePaymentDataTable extends DataTable
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
             Column::computed('is_archived')->title(__('Task'))->width(100)->addClass('text-center align-middle'),
 
-            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
             Column::make('pvn')->title(__('tables.th.pvn'))->width(90)->addClass('align-middle'),
-            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
-            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
-            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
             Column::make('account_sub_no')->title(__('tables.th.sub.account'))->width(30)->addClass('align-middle'),
             Column::make('no')->title(__('tables.th.program'))->width(60)->addClass('align-middle'),
             // Column::make('name_kh')->title(__('tables.th.type'))->width(60)->addClass('align-middle'),
             Column::make('budget')->title(__('tables.th.budget'))->width(80)->addClass('align-middle'),
+            // Column::make('voucher_budget')->title(__('tables.th.voucher.budgeted'))->width(80)->addClass('align-middle'),
+
             Column::make('transaction_date')->title(__('tables.th.date.transaction'))->width(80)->addClass('align-middle'),
             Column::make('request_date')->title(__('tables.th.date.request'))->width(80)->addClass('align-middle'),
             Column::make('legal_date')->title(__('tables.th.date.legal'))->width(80)->addClass('align-middle'),
-
+            Column::make('agency')->title(__('tables.th.agency'))->width(90)->addClass('align-middle'),
+            Column::make('legal_id')->title(__('tables.th.legal.id'))->width(30)->addClass('align-middle'),
+            Column::make('legal_number')->title(__('tables.th.legal.number'))->width(90)->addClass('align-middle'),
+            Column::make('legal_name')->title(__('tables.th.legal.name'))->width(90)->addClass('align-middle'),
             Column::make('description')->title(__('tables.th.description'))->addClass('align-middle'),
             Column::make('attachments')->title(__('tables.th.document.title'))->width(200)->addClass('align-middle'),
 

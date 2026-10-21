@@ -168,7 +168,7 @@
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('pristine-valid-example');
             var pristine = new Pristine(form);
@@ -177,6 +177,49 @@
                 var valid = pristine.validate();
                 if (!valid) {
                     e.preventDefault();
+                }
+            });
+        });
+    </script> --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('pristine-valid-example');
+            var pristine = new Pristine(form);
+
+            // Track which button was clicked
+            var clickedButton = null;
+            var submitButtons = form.querySelectorAll('button[type="submit"]');
+
+            submitButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    clickedButton = this;
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                var valid = pristine.validate();
+
+                if (!valid) {
+                    // Form is invalid, stop submission
+                    e.preventDefault();
+                } else {
+                    // Form is valid, prevent multiple clicks
+                    submitButtons.forEach(function(button) {
+                        button.disabled = true;
+                        // Optional: add a small loading text
+                        if (button === clickedButton) {
+                            button.innerHTML += '...';
+                        }
+                    });
+
+                    // Append the clicked button's name and value so Laravel receives it
+                    if (clickedButton && clickedButton.name) {
+                        var hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = clickedButton.name;
+                        hiddenInput.value = clickedButton.value;
+                        form.appendChild(hiddenInput);
+                    }
                 }
             });
         });

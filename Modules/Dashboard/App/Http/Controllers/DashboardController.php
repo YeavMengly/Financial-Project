@@ -11,6 +11,10 @@ use App\Models\Content\ExpenseType;
 use App\Models\Content\ProgramSub;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Material\MaterialEntry;
+use App\Models\Material\MaterialRelease;
+use Carbon\Carbon;
+
 
 class DashboardController extends Controller
 {
@@ -71,15 +75,10 @@ class DashboardController extends Controller
         $total_credit       = $beginReport->sum('credit');
         $chartDataCredit     = $beginReport->pluck('credit')->toArray();
         // $totalBeginVoucher   = $beginReport->count();
-
         $percent_credit = $total_fin_law > 0 ? ($total_credit / $total_fin_law) * 100 : 0;
         $percent_deadline_balance = $total_fin_law > 0 ? ($total_deadline_balance / $total_fin_law) * 100 : 0;
         $percent_fin_law = $total_fin_law > 0 ? 100 : 0;
 
-        // remaining percent so donut works correctly
-        // $percent_remaining = max(0, 100 - ($percent_credit + $percent_deadline_balance));
-
-        // dd($percent_fin_law);
         $law_average_sum     = $beginReport->sum('law_average');
         $law_correction_sum  = $beginReport->sum('law_correction');
         $law_average_percent    = $law_average_sum / 100;
@@ -87,7 +86,6 @@ class DashboardController extends Controller
 
         $chartAvg        = $beginReport->pluck('law_average')->toArray();
         $chartAvgCorrect = $beginReport->pluck('law_correction')->toArray();
-
         // LOANS
         $loanReport = DB::table('budget_voucher_loans')
             ->join('ministries', 'budget_voucher_loans.ministry_id', '=', 'ministries.id')
@@ -98,6 +96,26 @@ class DashboardController extends Controller
         $total_total_increase = $loanReport->sum('total_increase');
         $chartTotalIncrease   = $loanReport->pluck('total_increase')->toArray();
         $loanCount            = $loanReport->count();
+
+        $total_decrease = $loanReport->sum('decrease');
+        $chartTotalDecrease = $loanReport->pluck('decrease')->toArray();
+        $decreaseCount = $loanReport->where('decrease', '>', 0)->count();
+
+        $total_editorial = $loanReport->sum('editorial');
+        $chartTotalEditorial = $loanReport->pluck('editorial')->toArray();
+        $editorialCount = $loanReport->where('editorial', '>', 0)->count();
+
+        // dd(
+        //     $total_total_increase,s
+        //     $chartTotalIncrease,
+        //     $loanCount,
+        //     $total_decrease,
+        //     $chartTotalDecrease,
+        //     $decreaseCount,
+        //     $total_editorial,
+        //     $chartTotalEditorial,
+        //     $editorialCount
+        // );
 
         // DUEL Entry
         $duelEntries = DB::table('duel_entries')
@@ -143,8 +161,46 @@ class DashboardController extends Controller
         $totalDieselRelease = $duelReleases->where('item_name', 2)->count();
         $totalOilRelease    = $duelReleases->where('item_name', 3)->count();
 
+        /*
+    |--------------------------------------------------------------------------
+    | Remaining
+    |--------------------------------------------------------------------------
+    */
+
+        $qtyFuelRemain = max(
+            $qtyFuel - $qtyFuelRelease,
+            0
+        );
+
+        $qtyDieselRemain = max(
+            $qtyDiesel - $qtyDieselRelease,
+            0
+        );
+
+        $qtyOilRemain = max(
+            $qtyOil - $qtyOilRelease,
+            0
+        );
 
         $totalEntry   = $duelEntries->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Release Lists For Modal
+    |--------------------------------------------------------------------------
+    */
+
+        $fuelReleases = $duelReleases
+            ->where('item_name', 1)
+            ->values();
+
+        $dieselReleases = $duelReleases
+            ->where('item_name', 2)
+            ->values();
+
+        $oilReleases = $duelReleases
+            ->where('item_name', 3)
+            ->values();
         $itemOptions = ['ប្រេងសាំង', 'ប្រេងម៉ាស៊ូត', 'ប្រេងម៉ាស៊ីន'];
         // MATERIAL
         $materialQuery = DB::table('material_entries')
@@ -179,8 +235,8 @@ class DashboardController extends Controller
             ->get();
         // total count pro
         $totalProgaramVoucher = DB::table('budget_vouchers')
-            ->where('budget_vouchers.is_archived', 2)
-            ->where('budget_vouchers.status', 'done')
+            ->where('budget_vouchers.is_archived', 1)
+            ->where('budget_vouchers.status', 'todo')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_id')
             ->selectRaw('
@@ -190,10 +246,9 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('program_id');
 
-        // dd($totalProgaramVoucher);
         $totalProgaramMandate = DB::table('budget_mandates')
-            ->where('budget_mandates.is_archived', 1)
-            ->where('budget_mandates.status', 'todo')
+            ->where('budget_mandates.is_archived', 2)
+            ->where('budget_mandates.status', 'done')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_id')
             ->selectRaw('
@@ -202,7 +257,6 @@ class DashboardController extends Controller
     ')
             ->get()
             ->keyBy('program_id');
-        //  dd($totalProgaramMandate,$totalProgaramVoucher);
         $programs = $data->map(function ($data) use ($programTotals, $totalProgaramVoucher, $totalProgaramMandate) {
             $total = $programTotals[$data->id] ?? null;
             $totalVoucher = $totalProgaramVoucher[$data->id] ?? null;
@@ -219,14 +273,11 @@ class DashboardController extends Controller
             return $data;
         });
 
-        // dd($programs);
-
         $chapters = Chapter::where('ministries.year', $year)
             ->join('ministries', 'chapters.ministry_id', '=', 'ministries.id')
             ->select('chapters.*')
             ->orderBy('no')
             ->get();
-        // dd($chapters);
         $chapterTotals = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->where('ministries.year', $year)
@@ -245,15 +296,12 @@ class DashboardController extends Controller
         $chapters = $chapters->map(function ($chapter) use ($chapterTotals) {
 
             $total = $chapterTotals[$chapter->no] ?? null;
-
-
             $chapter->fin_law       = $total->fin_law ?? 0;
             $chapter->apply         = $total->apply ?? 0;
             $chapter->remain        = $total->remain ?? 0;
             $chapter->credit        = $total->credit ?? 0;
             $chapter->deadline_balance        = $total->deadline_balance ?? 0;
             $chapter->total_records = $total->total_records ?? 0;
-
             // example percentage
             $chapter->percent_apply = $chapter->fin_law > 0
                 ? round(($chapter->apply / $chapter->fin_law) * 100, 2)
@@ -263,7 +311,6 @@ class DashboardController extends Controller
         });
 
         $chapterLabels = $chapters->pluck('no')->map(fn($n) => " $n");
-        //  dd($chapters);
         $finLawData    = $chapters->pluck('fin_law');
         $remainData    = $chapters->pluck('remain');
         $deadlineData    = $chapters->pluck('credit');
@@ -289,127 +336,251 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('account_id');
         $accounts = $account->map(function ($account) use ($accountTotal) {
-
             $total = $accountTotal[$account->no] ?? null;
-
-
-            $account->fin_law       = $total->fin_law ?? 0;
-
-            $account->deadline_balance        = $total->deadline_balance ?? 0;
+            $account->fin_law  = $total->fin_law ?? 0;
+            $account->deadline_balance  = $total->deadline_balance ?? 0;
             $account->credit        = $total->credit ?? 0;
-
-
-            // example percentage
-            // $account->percent_apply = $account->fin_law > 0
-            //     ? round(($account->apply / $account->fin_law) * 100, 2)
-            //     : 0;
-
+            $account->percent       = $account->fin_law > 0
+                ? ($account->deadline_balance / $account->fin_law) * 100
+                : 0;
             return $account;
         });
-
         // expense Type donut chart
-        //exp_directPayment
+        // Fetch datasets
         $budgetVouchers = DB::table('budget_vouchers')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('budget_vouchers.is_archived', 1)
+            ->where('budget_vouchers.status', 'todo')
             ->select('budget_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
-        //exp_guarantee
+
         $budgetMandate = DB::table('budget_mandates')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
+            ->where('budget_mandates.is_archived', 2)
+            ->where('budget_mandates.status', 'done')
+            ->whereNull('budget_mandates.deleted_at')
             ->select('budget_mandates.*')
             ->where('ministries.year', $year)
-            ->where('budget_mandates.deleted_at', null)
             ->get();
-        $expenditure_Guarantee = $budgetMandate->where('expense_type_id', '1')->pluck('budget');
-        $advance_Payment = $budgetMandate->where('expense_type_id', '2')->pluck('budget');
-        $expense_Record = $budgetMandate->where('expense_type_id', '3')->pluck('budget');
 
-        $direct_Payment = $budgetVouchers->where('expense_type_id', '1')->pluck('budget');
-        $payment = $budgetVouchers->where('expense_type_id', '2')->pluck('budget');
-        $payment_Deadline = $budgetVouchers->where('expense_type_id', '3')->pluck('budget');
-        // $procurement = $budgetVouchers->where('expense_type_id', '4')->pluck('budget');
-        // $pre_Financing = $budgetMandate->where('expense_type_id', '5')->pluck('budget');     
-        $expenditure_Guarantee = round($budgetMandate->where('expense_type_id', '1')->sum('budget'), 2);
-        $advance_Payment = round($budgetMandate->where('expense_type_id', '2')->sum('budget'), 2);
-        $expense_Record = round($budgetMandate->where('expense_type_id', '3')->sum('budget'), 2);
-        $direct_Payment = round($budgetVouchers->where('expense_type_id', '1')->sum('budget'), 2);
-        $payment = round($budgetVouchers->where('expense_type_id', '2')->sum('budget'), 2);
-        $payment_Deadline = round($budgetVouchers->where('expense_type_id', '3')->sum('budget'), 2);
-        // $procurement = round($budgetVouchers->where('expeonse_type_id', '4')->sum('budget'), 2);
-        //$pre_Financing = round($budgetMandate->where('expense_type_id', '5')->sum('budget'), 2);
+        // Calculate sums (casting expense_type_id to integer)
+        $expenditure_Guarantee   = (float) $budgetVouchers->where('expense_type_id', 1)->sum('budget');
+        $advance_Payment         = (float) $budgetVouchers->where('expense_type_id', 2)->sum('budget');
+        $expense_Record          = (float) $budgetVouchers->where('expense_type_id', 3)->sum('budget');
+        $procurement             = (float) $budgetVouchers->where('expense_type_id', 4)->sum('budget');
 
-        $totalCountArch = $budgetMandate->where('expense_type_id', '1')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountDir = $budgetVouchers->where('expense_type_id', '1')->where('is_archived', '2')->where('status', 'done')->count();
-        $totalCountAdvance   = $budgetMandate->where('expense_type_id', '2')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPayment   = $budgetVouchers->where('expense_type_id', '2')->where('is_archived', ' 2')->where('status', 'done')->count();
-        $totalCountExpenseR   = $budgetMandate->where('expense_type_id', '3')->where('is_archived', '1')->where('status', 'todo')->count();
-        $totalCountPaymentD   = $budgetVouchers->where('expense_type_id', '3')->where('is_archived', ' 2')->where('status', 'done')->count();
+        $direct_Payment          = (float) $budgetMandate->where('expense_type_id', 1)->sum('budget');
+        $payment                 = (float) $budgetMandate->where('expense_type_id', 2)->sum('budget');
+        $payment_Deadline        = (float) $budgetMandate->where('expense_type_id', 3)->sum('budget');
+        $expenditure_Procurement = (float) $budgetMandate->where('expense_type_id', 4)->sum('budget');
 
+        // Corrected counts (removed spaces from '2')
+        $totalCountArch     = $budgetVouchers->where('expense_type_id', 1)->count();
+        $totalCountAdvance  = $budgetVouchers->where('expense_type_id', 2)->count();
+        $totalCountExpenseR = $budgetVouchers->where('expense_type_id', 3)->count();
+        $totalCountPro      = $budgetVouchers->where('expense_type_id', 4)->count();
+
+        $totalCountDir      = $budgetMandate->where('expense_type_id', 1)->count();
+        $totalCountPayment  = $budgetMandate->where('expense_type_id', 2)->count();
+        $totalCountPaymentD = $budgetMandate->where('expense_type_id', 3)->count();
+        $totalCountExp      = $budgetMandate->where('expense_type_id', 4)->count();
+
+        // Calculate Total Expenses across all categories
         $budgetReport = DB::table('begin_vouchers')
             ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
             ->select('begin_vouchers.*')
             ->where('ministries.year', $year)
             ->get();
 
-        $total_fin_law       = $budgetReport->sum('fin_law');
-        $percent_expenditure_Guarantee = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
-        $percent_expense_record = $total_fin_law > 0 ? ($expense_Record / $total_fin_law) * 100 : 0;
-        $percent_advance_Payment = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
-        $percent_direct_Payment = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
-        $percent_Payment = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
-        $percent_Payment_Deadline = $total_fin_law > 0 ? ($payment_Deadline / $total_fin_law) * 100 : 0;
-        // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
-        //$percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
+        // 1. Get total baseline budget (float)
+        $total_fin_law = (float) $budgetReport->sum('fin_law');
 
-        // dd($totalCountArch);
-        // $percent_procurement = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
-        // $percent_pre_Financing = $total_fin_law > 0 ? ($pre_Financing / $total_fin_law) * 100 : 0;
-        //$totalExpend = $total_fin_law > 0 ? $total_fin_law - $expenditure_Guarantee : 0;
+        // 2. Compute percentages relative to $total_fin_law
+        $percent_expenditure_Guarantee   = $total_fin_law > 0 ? ($expenditure_Guarantee / $total_fin_law) * 100 : 0;
+        $percent_advance_Payment         = $total_fin_law > 0 ? ($advance_Payment / $total_fin_law) * 100 : 0;
+        $percent_expense_record          = $total_fin_law > 0 ? ($expense_Record / $total_fin_law) * 100 : 0;
+        $percent_procurement             = $total_fin_law > 0 ? ($procurement / $total_fin_law) * 100 : 0;
+
+        $percent_direct_Payment          = $total_fin_law > 0 ? ($direct_Payment / $total_fin_law) * 100 : 0;
+        $percent_Payment                 = $total_fin_law > 0 ? ($payment / $total_fin_law) * 100 : 0;
+        $percent_Payment_Deadline        = $total_fin_law > 0 ? ($payment_Deadline / $total_fin_law) * 100 : 0;
+        $percent_expenditure_Procurement = $total_fin_law > 0 ? ($expenditure_Procurement / $total_fin_law) * 100 : 0;
+
         $totalDir = $expenditure_Guarantee > 0 ? $expenditure_Guarantee - $direct_Payment : 0;
-        //$totalAdvanPayment = $total_fin_law > 0 ? $total_fin_law - $advance_Payment : 0;
         $totalPayment = $advance_Payment > 0 ? $advance_Payment - $payment : 0;
         $totalDirPayment = $expense_Record > 0 ? $expense_Record - $payment_Deadline : 0;
-        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record) : 0;
+        $totalExpenditureProcurement = $procurement > 0 ? $procurement - $expenditure_Procurement : 0;
+        $totalFinLaw = $total_fin_law > 0 ? $total_fin_law - ($expenditure_Guarantee + $advance_Payment + $expense_Record + $procurement) : 0;
 
-        //   dd($total_fin_law );
+        // =========================
+        // MATERIAL ENTRY
+        // =========================
+        $materialEntry = MaterialEntry::query()
+            ->select(
+                DB::raw('MONTH(updated_at) as month'),
+                DB::raw('COUNT(DISTINCT p_name) as total_product'),
+                DB::raw('SUM(qty) as total_qty'),
+                DB::raw('SUM(total_price) as total_price')
+            )
+            ->whereYear('updated_at', now()->year)
+            ->groupBy(DB::raw('MONTH(updated_at)'))
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+
+        // =========================
+        // MATERIAL RELEASE
+        // =========================
+        $materialRelease = MaterialRelease::query()
+            ->select(
+                DB::raw('MONTH(updated_at) as month'),
+                DB::raw('COUNT(DISTINCT p_name) as total_product'),
+                DB::raw('SUM(quantity_request) as total_qty'),
+                DB::raw('SUM(total_price) as total_price')
+            )
+            ->whereYear('updated_at', now()->year)
+            ->groupBy(DB::raw('MONTH(updated_at)'))
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+
+        // =========================
+        // MONTHLY DATA
+        // =========================
+        $months = [
+            1  => 'Jan',
+            2  => 'Feb',
+            3  => 'Mar',
+            4  => 'Apr',
+            5  => 'May',
+            6  => 'Jun',
+            7  => 'Jul',
+            8  => 'Aug',
+            9  => 'Sep',
+            10 => 'Oct',
+            11 => 'Nov',
+            12 => 'Dec',
+        ];
+
+        $chartLabels = [];
+        $entryQty = [];
+        $releaseQty = [];
+        $entryPrice = [];
+        $releasePrice = [];
+        $entryTotalQ = [];
+        $releaseTotalQ = [];
+
+        foreach ($months as $monthNumber => $monthName) {
+
+            $chartLabels[] = $monthName;
+
+            $entry = $materialEntry->get($monthNumber);
+            $release = $materialRelease->get($monthNumber);
+
+            $entryQty[] = (float) ($entry->total_product ?? 0);
+            $releaseQty[] = (float) ($release->total_product ?? 0);
+
+            $entryTotalQ[] = (float) ($entry->total_qty ?? 0);
+            $releaseTotalQ[] = (float) ($release->total_qty ?? 0);
+
+            $entryPrice[] = (float) ($entry->total_price ?? 0);
+            $releasePrice[] = (float) ($release->total_price ?? 0);
+        }
+        // $months = [
+        //     1  => 'Jan',
+        //     2  => 'Feb',
+        //     3  => 'Mar',
+        //     4  => 'Apr',
+        //     5  => 'May',
+        //     6  => 'Jun',
+        //     7  => 'Jul',
+        //     8  => 'Aug',
+        //     9  => 'Sep',
+        //     10 => 'Oct',
+        //     11 => 'Nov',
+        //     12 => 'Dec',
+        // ];
+
+        $chartLabels = [];
+        $fuelEntryQty = [];
+        $fuelReleaseQty = [];
+        $fuelRemainQty = [];
+
+        foreach ($months as $monthNumber => $monthName) {
+
+            $chartLabels[] = $monthName;
+
+            // Duel Entry for this month
+            $entry = $duelEntries
+                ->filter(function ($row) use ($monthNumber) {
+                    return !empty($row->created_at)
+                        && \Carbon\Carbon::parse($row->created_at)->month == $monthNumber;
+                })
+                ->where('item_name', 1);
+
+            // Duel Release for this month
+            $release = $duelReleases
+                ->filter(function ($row) use ($monthNumber) {
+                    return !empty($row->date_release)
+                        && \Carbon\Carbon::parse($row->date_release)->month == $monthNumber;
+                })
+                ->where('item_name', 1);
+
+            $entryQty[] = (float) $entry->sum('quantity');
+
+            $releaseQty[] = (float) $release->sum('quantity_request');
+
+            // Remaining for that month
+            $fuelRemainQty[] = max(
+                $entry->sum('quantity') - $release->sum('quantity_request'),
+                0
+            );
+        }
         return view('dashboard::index', [
+            'chartLabels' => $chartLabels,
+            'entryQty' => $entryQty,
+            'releaseQty' => $releaseQty,
+            'entryPrice' => $entryPrice,
+            'releasePrice' => $releasePrice,
+            'entryTotalQ' => $entryTotalQ,
+            'releaseTotalQ' => $releaseTotalQ,
+
             'ministries' => $ministries,
             'selectedYear' => $year,
-
             'total_fin_law' => $total_fin_law,
             'chartDataFinLaw' => $chartDataFinLaw,
             'totalBeginVoucher' => $totalBeginVoucher,
             'total_new_credit_status' => $total_new_credit_status,
             'chartDataCreditStatus' => $chartDataCreditStatus,
-
             'total_deadline_balance' => $total_deadline_balance,
             'chartDataDeadLine' => $chartDataDeadLine,
-
             'total_credit' => $total_credit,
             'chartDataCredit' => $chartDataCredit,
-
             'law_average_percent' => $law_average_percent,
             'law_correction_percent' => $law_correction_percent,
             'chartAvg' => $chartAvg,
             'chartAvgCorrect' => $chartAvgCorrect,
-
             'total_total_increase' => $total_total_increase,
             'chartTotalIncrease' => $chartTotalIncrease,
             'loanCount' => $loanCount,
-
+            'total_decrease' => $total_decrease,
+            'chartTotalDecrease' => $chartTotalDecrease,
+            'decreaseCount' => $decreaseCount,
+            'total_editorial' => $total_editorial,
+            'chartTotalEditorial' => $chartTotalEditorial,
+            'editorialCount' => $editorialCount,
             'qtyFuel' => $qtyFuel,
             'qtyDiesel' => $qtyDiesel,
             'qtyOil' => $qtyOil,
-
             'chartDataFuel' => $chartDataFuel,
             'chartDataDiesel' => $chartDataDiesel,
             'chartDataOil' => $chartDataOil,
-
             'totalFuel' => $totalFuel,
             'totalDiesel' => $totalDiesel,
             'totalOil' => $totalOil,
-
             'qtyFuelRelease' => $qtyFuelRelease,
             'qtyDieselRelease' => $qtyDieselRelease,
             'qtyOilRelease' => $qtyOilRelease,
@@ -417,91 +588,65 @@ class DashboardController extends Controller
             'totalFuelRelease' => $totalFuelRelease,
             'totalDieselRelease' => $totalDieselRelease,
             'totalOilRelease' => $totalOilRelease,
-
             'total_quantity' => $total_quantity,
             'chartTotalquantity' => $chartTotalquantity,
             'materialCount' => $materialCount,
             'programs' => $programs,
             'programTotals' => $programTotals,
             'totalProgaramMandate' => $totalProgaramMandate,
-
             'percent_credit'           => round($percent_credit, 2),
             'percent_deadline_balance' => round($percent_deadline_balance, 2),
             'percent_fin_law'           => round($percent_fin_law, 2),
-            // 'percent_remaining'        => round($percent_remaining, 2),
-
             'chapters' => $chapters,
             'chapterLabels' => $chapterLabels,
             'finLawData' => $finLawData,
             'remainData' => $remainData,
             'deadlineData' => $deadlineData,
             'accounts' => $accounts,
-
             'expenditure_Guarantee' => $expenditure_Guarantee,
             'advance_Payment' => $advance_Payment,
+            'procurement' => $procurement,
             'direct_Payment' => $direct_Payment,
             'payment' => $payment,
             'expense_Record' => $expense_Record,
             'payment_Deadline' => $payment_Deadline,
-            // 'procurement' => $procurement,
-            // 'pre_Financing' => $pre_Financing,
+            'expenditure_Procurement' => $expenditure_Procurement,
+
             'percent_expenditure_Guarantee' => $percent_expenditure_Guarantee,
             'percent_advance_Payment' => $percent_advance_Payment,
             'percent_direct_Payment' => $percent_direct_Payment,
             'percent_Payment' => $percent_Payment,
             'percent_expense_record' => $percent_expense_record,
             'percent_Payment_Deadline' => $percent_Payment_Deadline,
-            // 'percent_procurement' => $percent_procurement,
-            //'percent_pre_Financing' => $percent_pre_Financing,
+            'percent_procurement' => $percent_procurement,
+            'percent_expenditure_Procurement' => $percent_expenditure_Procurement,
+
             'totalCountArch' => $totalCountArch,
             'totalCountDir' => $totalCountDir,
-            //'totalExpend' => $totalExpend,
             'totalDir' => $totalDir,
             'totalPayment' => $totalPayment,
             'totalDirPayment' => $totalDirPayment,
-            //'totalAdvanPayment' => $totalAdvanPayment,
             'totalCountAdvance' => $totalCountAdvance,
             'totalCountPayment' => $totalCountPayment,
             'totalCountExpenseR' => $totalCountExpenseR,
             'totalCountPaymentD' => $totalCountPaymentD,
-            'totalFinLaw' => $totalFinLaw
+            'totalCountPro' => $totalCountPro,
+            'totalCountExp' => $totalCountExp,
+            'totalExpenditureProcurement' => $totalExpenditureProcurement,
+            'totalFinLaw' => $totalFinLaw,
+
+
+            'fuelReleases' => $fuelReleases,
+            'dieselReleases' => $dieselReleases,
+            'oilReleases' => $oilReleases,
+
+            // 'chartLabels' => $chartLabels,
+            'fuelEntryQty' => $fuelEntryQty,
+            'fuelReleaseQty' => $fuelReleaseQty,
+            'fuelRemainQty' => $fuelRemainQty
         ]);
     }
-
-    // public function getProgramSubs($programId)
-    // {
-    //     // Get all programSubs for this program
-    //     $programSubs = ProgramSub::where('program_id', $programId)
-    //         ->select('id', 'no', 'decription') // adjust fields you want to show
-    //         ->get();
-
-    //     $programTotals = DB::table('begin_vouchers')
-    //         ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
-    //         ->groupBy('begin_vouchers.program_id')
-    //         ->selectRaw('
-    //     begin_vouchers.program_id,
-    //     SUM(begin_vouchers.fin_law) AS fin_law,
-    //     SUM(begin_vouchers.apply) AS apply,
-    //     SUM(begin_vouchers.deadline_balance) AS remain,
-    //     SUM(begin_vouchers.credit) AS credit,
-    //     COUNT(*) AS total_records
-    //     ')
-    //         ->get()
-    //         ->keyBy('program_id');
-
-    //     $programSubs = $programSubs->map(function ($data) use ($programTotals) {
-    //         $total = $programTotals[$data->id] ?? null;
-    //         $data->fin_law        = $total->fin_law        ?? 0;
-    //         $data->apply          = $total->apply          ?? 0;
-    //         $data->remain         = $total->remain         ?? 0;
-    //         $data->credit         = $total->credit         ?? 0;
-    //         $data->total_records  = $total->total_records  ?? 0;
-    //         $data->percent        = $data->fin_law > 0 ? ($data->apply / $data->fin_law) * 100 : 0;
-    //         return $data;
-    //     });
-
-    //     return response()->json($programSubs);
-    // }
+    // Modal Program
     public function getProgramSubs($programId)
     {
         // 1️⃣ Get program subs
@@ -523,11 +668,10 @@ class DashboardController extends Controller
         ')
             ->get()
             ->keyBy('program_sub_id');
-        // dd($programSubTotals);
         // total count pro
         $totalProSubVoucher = DB::table('budget_vouchers')
-            ->where('budget_vouchers.is_archived', 2)
-            ->where('budget_vouchers.status', 'done')
+            ->where('budget_vouchers.is_archived', 1)
+            ->where('budget_vouchers.status', 'todo')
             ->join('ministries', 'budget_vouchers.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_vouchers.program_sub_id')
             ->selectRaw('
@@ -536,11 +680,9 @@ class DashboardController extends Controller
     ')
             ->get()
             ->keyBy('program_sub_id');
-
-        //  dd($programSubTotals);
         $totalProSubMandate = DB::table('budget_mandates')
-            ->where('budget_mandates.is_archived', 1)
-            ->where('budget_mandates.status', 'todo')
+            ->where('budget_mandates.is_archived', 2)
+            ->where('budget_mandates.status', 'done')
             ->join('ministries', 'budget_mandates.ministry_id', '=', 'ministries.id')
             ->groupBy('budget_mandates.program_sub_id')
             ->selectRaw('
@@ -572,23 +714,16 @@ class DashboardController extends Controller
 
         return response()->json($programSubs);
     }
-
+    // Modal Cluster
     public function getClusters($programSubId)
     {
-        $clusters = Cluster::where('program_sub_id', $programSubId)
-            ->select(
-                'id',
-                'no',
-                'decription as description'
-            )
-            ->get();
-
-        // 2️⃣ Get totals grouped by program_sub_id
-        $clusterTotal = DB::table('begin_vouchers')
-            ->where('program_sub_id', $programSubId) // 🔥 IMPORTANT
+        $clusters = DB::table('begin_vouchers')
+            ->where('program_sub_id', $programSubId)
             ->groupBy('cluster_id')
             ->selectRaw('
-            cluster_id,
+            cluster_id AS id,
+            cluster_id AS no,
+            MAX(txtDescription) AS description,
             SUM(fin_law) AS fin_law,
             SUM(apply) AS apply,
             SUM(deadline_balance) AS remain,
@@ -596,63 +731,49 @@ class DashboardController extends Controller
             COUNT(*) AS total_records
         ')
             ->get()
-            ->keyBy('cluster_id');
-
-        // 3️⃣ Merge totals into program subs
-        $clusters = $clusters->map(function ($cluster) use ($clusterTotal) {
-            $total = $clusterTotal->get($cluster->id);
-            $cluster->fin_law       = $total->fin_law ?? 0;
-            $cluster->apply         = $total->apply ?? 0;
-            $cluster->remain        = $total->remain ?? 0;
-            $cluster->credit        = $total->credit ?? 0;
-            $cluster->total_records = $total->total_records ?? 0;
-            $cluster->percent       = $cluster->fin_law > 0
-                ? ($cluster->apply / $cluster->fin_law) * 100
-                : 0;
-            return $cluster;
-        });
+            ->map(function ($cluster) {
+                $cluster->percent = $cluster->fin_law > 0
+                    ? round(($cluster->apply / $cluster->fin_law) * 100, 2)
+                    : 0;
+                return $cluster;
+            });
 
         return response()->json($clusters);
     }
-
-    public function getAccountSubs($accountId)
+    // Modal Account Sub
+    public function getAccountSubs(Request $request, $accountId)
     {
         // 1️⃣ Get program subs
         $accountSubs = AccountSub::where('account_id', $accountId)
             ->select('id', 'no', 'name')
             ->get();
 
-        // 2️⃣ Get totals grouped by account_sub_id
+        $Year = $request->input('year');
         $accountSubTotals = DB::table('begin_vouchers')
-            ->where('account_id', $accountId) // 🔥 IMPORTANT
-            ->groupBy('account_sub_id')
-            ->selectRaw('
-            account_sub_id,
-            SUM(fin_law) AS fin_law,
-            SUM(apply) AS apply,
-            SUM(deadline_balance) AS remain,
-            SUM(credit) AS credit,
-            COUNT(*) AS total_records
-        ')
+            ->join('ministries', 'begin_vouchers.ministry_id', '=', 'ministries.id')
+            ->where('ministries.year', $Year)
+            ->whereIn('begin_vouchers.account_sub_id', $accountSubs->pluck('no'))
+            ->groupBy('begin_vouchers.account_sub_id')
+            ->selectRaw("
+        begin_vouchers.account_sub_id,
+        SUM(begin_vouchers.fin_law) AS fin_law,
+        SUM(begin_vouchers.deadline_balance) AS deadline_balance,
+        SUM(begin_vouchers.credit) AS credit
+    ")
             ->get()
             ->keyBy('account_sub_id');
 
-        // 3️⃣ Merge totals into account subs
         $accountSubs = $accountSubs->map(function ($subs) use ($accountSubTotals) {
-            $total = $accountSubTotals->get($subs->id);
+            $total = $accountSubTotals->get($subs->no); // use no instead of id
 
-            $subs->fin_law       = $total->fin_law ?? 0;
-            $subs->apply         = $total->apply ?? 0;
-            $subs->remain        = $total->remain ?? 0;
-            $subs->credit        = $total->credit ?? 0;
-            // $subs->total_records = $total->total_records ?? 0;
-            // $subs->percent       = $subs->fin_law > 0
-            //     ? ($subs->apply / $subs->fin_law) * 100
-            //     : 0;
-
+            $subs->fin_law = $total->fin_law ?? 0;
+            $subs->credit  = $total->credit ?? 0;
+            $subs->deadline_balance  = $total->deadline_balance ?? 0;
+            $subs->percent       = $subs->fin_law > 0
+                ? ($subs->deadline_balance / $subs->fin_law) * 100
+                : 0;
             return $subs;
         });
-
         return response()->json($accountSubs);
     }
 }

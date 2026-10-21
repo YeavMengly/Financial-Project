@@ -24,7 +24,6 @@ return [
     "search" => "ស្វែងរក",
     "download" => "ទាញយក ឯកសារ",
     "download.file" => "ឯកសារប្រចាំឆ្នាំ",
-
     "select" => "ជ្រើសរើស",
     'download' => 'ទាញយក',
     'credit' => 'កំណត់ឥណទាន',
@@ -40,4 +39,6 @@ return [
     'executive.units' => 'អង្គភាពប្រតិបត្តិ',
     'action' => 'សកម្មភាព',
     'back' => 'ត្រឡប់វិញ',
+
+    'budget.allocation' => 'ការបែងចែកឥណទាន'
 ];

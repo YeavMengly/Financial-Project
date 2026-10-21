@@ -3,17 +3,22 @@
 return [
 
     'dashboard' => 'ទំព័រដើម',
+    'dashboard.second' => 'ទំព័រទី២',
     'document' => 'ឯកសារ',
     'roles' => 'តួនាទី',
     'categories' => 'ប្រភេទ',
+
     // Inventory
     'budget' => 'ឥណទាន',
     'ministries' => 'កម្រងថវិកាដើមឆ្នាំ',
     'credit' => 'ឥណទានអនុម័ត',
     'begin.vouchers' => 'កំណត់ឥណទានដើមឆ្នាំ',
     'begin.mandates' => 'កំណត់ឥណទានដើមឆ្នាំ',
-
     'beginning.credit' => 'ឥណទានអនុម័ត',
+    'budget.allocation' => 'ការបែងចែកឥណទាន',
+    'inventory_item' => 'មុខទំនិញ',
+    'project' => 'គម្រោង',
+
     // Content
     'content' => 'មាតិកា',
     'content.ministries' => 'កំណត់ឆ្នាំ',
@@ -26,27 +31,44 @@ return [
     'content.program' => 'កម្មវិធី',
     'content.program.sub'  => 'អនុកម្មវិធី',
     'content.expense.type' => 'ប្រភេទចំណាយ',
+    'content.position' => 'តួនាទី',
+    'content.level' => 'ប្រភេទមុខតំណែង',
+    'content.employee' => 'មន្ត្រីរាជការ',
+    'content.province'  =>  'រាជធានី / ខេត្ត',
+    'content.missions'  =>  'បេសកកម្ម',
 
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
     'expense.type' => 'ប្រភេទចំណាយ',
+    'header.expense.type' => 'ឧបសម្ព័ន្ធ',
 
     'budget.control' => 'និយ័តថវិកា',
     'budget.plan' => 'ចុះបញ្ជី',
     'initial.voucher' => 'កម្រងសលាកបត្រ',
     'initial.mandate' => 'កម្រងអាណត្តិ',
-    'procurement' => 'លទ្ធកម្ម',
     'budget.control.voucher' => 'សលាកបត្រ',
     'budget.control.mandate' => 'អាណត្តិ',
     'voucher' => 'សលាកបត្រ',
     'mandate' => 'អាណត្តិ',
+    'number.voucher' => 'សលាកបត្រ',
+    'number.mandate' => 'អាណត្តិ',
 
     'expenditure.guarantee' => 'ធានាចំណាយ',
+    'expenditure.procurement' => 'ធានាចំណាយលទ្ធកម្ម',
     'advance.payment' => 'បុរេប្រទាន',
+    'procurement' => 'លទ្ធកម្ម',
+    'procurement.plan' => 'ផែនការលទ្ធកម្ម',
+    'pre.financing' => 'បើកផ្តល់មុន',
+    'royalty' => 'រជ្ជទេយ្យ',
+    'royalty.voucher' => 'សលាកបត្ររជ្ជទេយ្យ',
+    'royalty.mandate' => 'អាណត្តិរជ្ជទេយ្យ',
+    'missions' => 'បេសកកម្ម',
+    'training' => 'ប្រជុំ និង បណ្ដុះបណ្ដាល',
     'payment' => 'ទូទាត់',
     'direct.payment' => 'ទូទាត់ត្រង់',
     'expense.record.book' => 'សលកបត្រកត់ត្រាចំណាយ',
     'payment.deadline' => 'អាណត្ដិបើកប្រាក់',
+    'advance.payment.royalty' => 'បុរេប្រទានរជ្ជទេយ្យ',
 
     'library' => 'Media Library',
     'setting' => 'ការកំណត់',
@@ -78,28 +100,28 @@ return [
 
     // Duel
     'duel' => 'ប្រេងឥន្ធនៈ',
-    'duel.entry' => 'ប្រេងឥន្ធនៈនាំចូល',
-    'duel.release' => 'ប្រេងឥន្ធនៈនាំចេញ',
+    'duel.entry' => 'ប្រេងឥន្ធនៈបញ្ចូល',
+    'duel.release' => 'ប្រេងឥន្ធនៈបញ្ចេញ',
 
     // Material
     'material' => 'សម្ផារផ្គត់ផ្គង់',
-    'material.entry' => 'សម្ផារផ្គត់ផ្គង់នាំចូល',
-    'material.release' => 'សម្ផារផ្គត់ផ្គង់នាំចេញ',
+    'material.entry' => 'សម្ផារផ្គត់ផ្គង់បញ្ចូល',
+    'material.release' => 'សម្ផារផ្គត់ផ្គង់បញ្ចេញ',
 
     'year' => 'ឆ្នាំ',
     'create.year' => 'កំណត់ឆ្នាំ',
-    'item.name' => 'ឈ្មោះផលិតផល',
+    'item.name' => 'ឈ្មោះទំនិញ',
     'company.name' => 'ឈ្មោះក្រុមហ៊ុន',
-    'stock.number' => 'លេខស្តុក',
+    'stock.number' => 'លេខបញ្ចូលឃ្លាំង',
     'stock.name' => 'ឈ្មោះស្តុក',
     'user.entry' => 'ឈ្មោះអ្នកបញ្ចូល',
     'user.request' => 'ឈ្មោះអ្នកស្នើរសុំ',
     'receipt.number' => 'លេខបង្កាន់ដៃ',
     'agency.name' => 'ឈ្មោះអង្គភាព',
     'unit' => 'ឯកតា',
-    'quantity' => 'បរិមាណ (លីត្រ)',
-    'quantity.total' => 'បរិមាណសរុប (លីត្រ)',
-    'quantity.request' => 'បរិមាណស្នើរសុំ (លីត្រ)',
+    'quantity' => 'ចំនួន (លីត្រ)',
+    'quantity.total' => 'ចំនួនសរុប (លីត្រ)',
+    'quantity.request' => 'ចំនួនស្នើរសុំ (លីត្រ)',
     'price' => 'តម្លៃ (លីត្រ)',
     'duel.total' => 'តម្លៃសរុប',
     'note' => 'កំណត់សម្គាល់',
@@ -107,11 +129,11 @@ return [
     'date.entry' => 'កាលបរិច្ឆេទបញ្ចូល',
     'date.release' => 'កាលបរិច្ឆេទនាំចេញ',
     'file' => 'ឯកសារ',
-    'entry' => 'នាំចូល',
-    'release' => 'នាំចេញ',
+    'entry' => 'បញ្ជូល',
+    'release' => 'បញ្ចេញ',
 
 
-        // Reports
+    // Reports
     'report.program' => 'របាយការណ៍តាមកម្មវិធី',
     'report.account.sub' => 'រាយការណ៍តាមអនុគណនី',
     'report.account' => 'របាយការណ៍តាមគណនី',
@@ -120,9 +142,17 @@ return [
     'reports' => 'របាយការណ៍',
     'cost.implement.agency' => 'ការអនុវត្តចំណាយតាមអង្គភាព',
     'cost.implement.program' => 'ការអនុវត្តចំណាយតាមកម្មវិធី',
+    'cost.implement.chapter' => 'ការអនុវត្តចំណាយតាមជំពូក',
     'cost.implement.importants' => 'ការអនុវត្តមុខចំណាយសំខាន់ៗ',
+    'cost.implement.header.expense.type' => 'របាយការណ៍ទិន្នន័យឧបសម្ព័ន',
 
     'state.assets.vehicles' => 'ការគ្រប់គ្រងទ្រព្យសម្បត្តិរដ្ឋ (ទោចក្រយានយន្ត និង យានយន្ត)',
 
-    'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ'
+    'annual.data' => 'ទិន្នន័យជាប្រចាំឆ្នាំ',
+
+    'employees' => 'រាយឈ្មោះបុគ្គលិក',
+
+    // Filter
+    'start_date' => 'ថ្ងៃចាប់ផ្ដើម',
+    'end_date' => 'ថ្ងៃបញ្ចប់'
 ];

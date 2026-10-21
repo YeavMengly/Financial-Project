@@ -16,4 +16,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {
     Route::get('dashboard', fn (Request $request) => $request->user())->name('dashboard');
+    Route::get('dashboard_second', fn (Request $request) => $request->user())->name('dashboard_second');
 });

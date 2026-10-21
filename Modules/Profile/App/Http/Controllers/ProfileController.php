@@ -19,23 +19,44 @@ class ProfileController extends Controller
             ->with('role', $role);
     }
 
-    public function password() {
+    public function password()
+    {
         $role = Role::findOrFail(auth()->user()->role_id);
         return view('profile::password')
             ->with('role', $role);
     }
 
-    public function passwordChange(Request $request) {
-        $request->validate([
-            'password' => ['required', 'min:6', 'confirmed']
-        ]);
+    public function passwordChange(Request $request)
+    {
+        $user = auth()->user();
+
+        // Check if user is Admin (Adjust this check based on your app's role structure)
+        // Options: $user->role_id === 1 OR $user->hasRole('Admin') OR strtolower($user->role->name) === 'admin'
+        $isAdmin = $user->role_id === 1;
+
+        // Dynamic validation rules
+        $rules = [
+            'password' => ['required', 'min:6', 'confirmed'],
+        ];
+
+        // Require current password ONLY for non-admin users
+        if (!$isAdmin) {
+            $rules['current_password'] = ['required', 'current_password'];
+            $rules['password'][] = 'different:current_password';
+        }
+
+        $request->validate($rules);
+
         DB::beginTransaction();
         try {
-            $user = User::findOrfail(auth()->user()->id);
-            $user->update([
-                'password'  => bcrypt($request->password)
+            $userModel = User::findOrFail($user->id);
+
+            $userModel->update([
+                'password' => bcrypt($request->password)
             ]);
+
             DB::commit();
+
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
@@ -47,11 +68,13 @@ class ProfileController extends Controller
             DB::rollBack();
             $bug = $e->getMessage();
             Log::error($bug);
+
             flash()
                 ->translate('kh')
                 ->option('timeout', 2000)
                 ->error($bug, 'បញ្ហា')
                 ->flash();
+
             return redirect()->route('profile.index');
         }
     }

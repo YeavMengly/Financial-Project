@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+use Illuminate\Support\Facades\File;
+
 class DuelEntriesExport
 {
     protected $data;
@@ -36,7 +38,7 @@ class DuelEntriesExport
             ->get();
         $first   = $entries->first();
 
-        $templatePath = public_path('duel_entries_template.xlsx');
+        $templatePath = storage_path('app/excel/template/duel_entries_template.xlsx');
         $spreadsheet  = IOFactory::load($templatePath);
         $sheet        = $spreadsheet->getActiveSheet();
 
@@ -112,7 +114,7 @@ class DuelEntriesExport
         |     C → unit
         |     D → quantity
         |     E → price
-        |     F → duel_total
+        |     F → total_price
         |     G → source
         |     H → note/blank
         |--------------------------------------------------------
@@ -126,11 +128,11 @@ class DuelEntriesExport
             $sheet->setCellValue("C{$row}", $item->name);
             $sheet->setCellValue("D{$row}", $item->quantity);
             $sheet->setCellValue("E{$row}", $item->price);
-            $sheet->setCellValue("F{$row}", $item->duel_total);
+            $sheet->setCellValue("F{$row}", $item->total_price);
             $sheet->setCellValue("G{$row}", $item->source ?? '');
             $sheet->setCellValue("H{$row}", null);
 
-            $totalDuel += (float) $item->duel_total;
+            $totalDuel += (float) $item->total_price;
 
             $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
                 'font' => [
@@ -241,15 +243,36 @@ class DuelEntriesExport
         | Output file
         |--------------------------------------------------------
         */
-        $fileName = 'duel_entries_template.xlsx';
+        // $fileName = 'duel_entries_template.xlsx';
 
-        return response()->streamDownload(function () use ($spreadsheet) {
-            $writer = new Xlsx($spreadsheet);
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-            'Cache-Control'       => 'max-age=0',
-        ]);
+        // return response()->streamDownload(function () use ($spreadsheet) {
+        //     $writer = new Xlsx($spreadsheet);
+        //     $writer->save('php://output');
+        // }, $fileName, [
+        //     'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        //     'Cache-Control'       => 'max-age=0',
+        // ]);
+        $exportDirectory = storage_path('app/excel/export');
+
+        if (!File::exists($exportDirectory)) {
+            File::makeDirectory($exportDirectory, 0755, true);
+        }
+
+        $fileName = 'duel_entries.xlsx';
+
+        $outputPath = $exportDirectory . '/' . $fileName;
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($outputPath);
+
+        return response()->download(
+            $outputPath,
+            $fileName,
+            [
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
+        );
     }
 }

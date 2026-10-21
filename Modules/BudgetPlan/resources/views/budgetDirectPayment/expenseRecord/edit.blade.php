@@ -61,12 +61,12 @@
 
                                 <div class="col-lg-4 col-md-6">
                                     <div class="form-group mb-3">
-                                        <label>{{ __('forms.payment.voucher') }}</label>
+                                        <label>{{ __('forms.th.code') }}</label>
                                         <input required data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" min="1" type="number"
                                             value="{{ old('paymentVoucher', $module->payment_voucher_number) }}"
-                                            class="form-control" placeholder="{{ __('forms.payment.voucher.number') }}"
+                                            class="form-control" placeholder="{{ __('forms.th.code') }}"
                                             name="paymentVoucher" tabindex="2" />
                                     </div>
                                 </div>
@@ -341,7 +341,7 @@
         }
     </script>
 
-    {{-- <script>
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
 
             const cboProgram = document.getElementById('cboProgram');
@@ -383,125 +383,15 @@
                 setText('applying', apply);
                 setText('remaining_credit', Math.max(credit - apply, 0));
                 setText('deadline_balance', Math.max(deadline - apply, 0));
-            }
 
-            function getSelections() {
-                return {
-                    programId: cboProgram?.value || '',
-                    programSubId: cboProgramSub?.value || '',
-                    clusterId: cboCluster?.value || '',
-                    accountSubId: cboSubAccount?.value || ''
-                };
-            }
-
-            async function loadBalances() {
-                const {
-                    programId,
-                    programSubId,
-                    clusterId,
-                    accountSubId
-                } = getSelections();
-
-                if (!programId || !programSubId || !clusterId || !accountSubId) {
-                    resetBalances();
-                    return;
-                }
-
-                try {
-                    const url = new URL(ENDPOINT, window.location.origin);
-                    url.searchParams.set('program_id', programId);
-                    url.searchParams.set('program_sub_id', programSubId);
-                    url.searchParams.set('cluster_id', clusterId);
-                    url.searchParams.set('account_sub_id', accountSubId);
-
-                    const res = await fetch(url.toString(), {
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
-                    const data = await res.json();
-                    if (!res.ok) throw new Error(data?.message || 'Failed to load balances');
-
-                    // Update table
-                    setText('fin_law', data.fin_law);
-                    setText('credit_movement', data.credit_movement);
-                    setText('new_credit_status', data.new_credit_status);
-                    setText('credit', data.credit);
-                    setText('deadline_balance', data.deadline_balance);
-
-                    recomputeRemaining();
-
-                } catch (err) {
-                    console.error(err);
-                    resetBalances();
-                }
-            }
-
-            // Load table on page load
-            loadBalances();
-
-            // Optional: reload table if user changes any dropdown
-            [cboProgram, cboProgramSub, cboCluster, cboSubAccount].forEach(el => {
-                el?.addEventListener('change', loadBalances);
-            });
-
-            // Update remaining budget live
-            budgetInput?.addEventListener('input', recomputeRemaining);
-
-        });
-    </script> --}}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            const cboProgram = document.getElementById('cboProgram');
-            const cboProgramSub = document.getElementById('cboProgramSub');
-            const cboCluster = document.getElementById('cboCluster');
-            const cboSubAccount = document.getElementById('cboSubAccount');
-            const budgetInput = document.getElementById('budget');
-
-            const ENDPOINT = "{{ route('budgetAdvancePayment.editEarlyBalance', ['params' => $params]) }}";
-
-            function toNumber(v) {
-                v = (v || '').toString().replace(/,/g, '');
-                return isNaN(parseFloat(v)) ? 0 : parseFloat(v);
-            }
-
-            function formatNumber(v) {
-                return toNumber(v).toLocaleString('en-US', {
-                    maximumFractionDigits: 2
-                });
-            }
-
-            function setText(id, val) {
-                const el = document.getElementById(id);
-                if (el) el.textContent = formatNumber(val);
-            }
-
-            function resetBalances() {
-                ['fin_law', 'credit_movement', 'new_credit_status', 'credit', 'deadline_balance', 'applying',
-                    'remaining_credit'
-                ]
-                .forEach(id => setText(id, 0));
-            }
-
-            function recomputeRemaining() {
-                const apply = toNumber(budgetInput?.value);
-                const credit = toNumber(document.getElementById('credit')?.textContent);
-                const deadline = toNumber(document.getElementById('deadline_balance')?.textContent);
-
+                // setText('deadline_balance', Math.max(deadline, 0));
                 // setText('applying', apply);
-                // setText('remaining_credit', Math.max(credit - apply, 0));
-                // setText('deadline_balance', Math.max(deadline - apply, 0));
 
-                setText('deadline_balance', Math.max(deadline, 0));
-                setText('applying', apply);
-
-                if (apply == budgetInput) {
-                    setText('remaining_credit', Math.max(credit, 0));
-                } else {
-                    setText('remaining_credit', Math.max(credit - apply, 0));
-                }
+                // if (apply == budgetInput) {
+                //     setText('remaining_credit', Math.max(credit, 0));
+                // } else {
+                //     setText('remaining_credit', Math.max(credit - apply, 0));
+                // }
             }
 
             function getSelections() {
@@ -557,7 +447,10 @@
             }
 
             // Load table on page load
-            loadBalances();
+            // loadBalances();
+            window.addEventListener('load', function() {
+                loadBalances();
+            });
 
             // Optional: reload table if user changes any dropdown
             [cboProgram, cboProgramSub, cboCluster, cboSubAccount].forEach(el => {
@@ -568,6 +461,10 @@
             budgetInput?.addEventListener('input', recomputeRemaining);
 
         });
+        $('#cboProgram').val(program_id).trigger('change');
+        $('#cboProgramSub').val(program_sub_id).trigger('change');
+        $('#cboCluster').val(cluster_id).trigger('change');
+        $('#cboSubAccount').val(account_sub_id).trigger('change');
     </script>
 
     <script>
@@ -679,7 +576,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetAdvancePayment.edit.program_sub') }}",
+                    url: "{{ route('budgetDirectPayment.expenseRecord.edit.program_sub') }}",
                     data: {
                         program_id: programId,
                         selected_id: selectedId
@@ -698,7 +595,7 @@
                 if (!programId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetAdvancePayment.edit.agency') }}",
+                    url: "{{ route('budgetDirectPayment.expenseRecord.edit.agency') }}",
                     data: {
                         program_id: programId,
                         selected_id: selectedId
@@ -717,7 +614,7 @@
                 if (!programSubId) return;
 
                 loadOptions({
-                    url: "{{ route('budgetAdvancePayment.edit.cluster') }}",
+                    url: "{{ route('budgetDirectPayment.expenseRecord.edit.cluster') }}",
                     data: {
                         program_sub_id: programSubId,
                         selected_id: selectedId

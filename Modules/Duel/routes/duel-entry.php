@@ -14,5 +14,7 @@ Route::middleware('PermissionCheck')->controller(DuelEntryController::class)->gr
 Route::controller(DuelEntryController::class)->group(function () {
     Route::post('duel/entry/{params}/store', 'store')->name('duelEntry.store');
     Route::post('duel/entry/{params}/update/{id}', 'update')->name('duelEntry.update');
+    Route::get('duel/entry/{params}/restore/{id}', 'restore')->name('duelEntry.restore');
+
     Route::get('duel/entry/{params}/export', 'export')->name('duelEntry.export');
 });

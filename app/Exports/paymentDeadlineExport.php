@@ -14,7 +14,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Illuminate\Http\Request;
 
-class paymentDeadlineExport
+class PaymentDeadlineExport
 {
     protected $data;
     protected $ministryId;
@@ -30,7 +30,7 @@ class paymentDeadlineExport
         $params =  $request->params;
         $id = decode_params($params);
 
-        $templatePath = public_path('template_payment_deadline.xlsx');
+        $templatePath = storage_path('excel/template/template_payment_deadline.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 

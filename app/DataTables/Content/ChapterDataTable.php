@@ -23,6 +23,12 @@ class ChapterDataTable extends DataTable
 
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->editColumn('type', function ($row) {
+                return '<strong>' . $row->number_type  . '</strong><br/><hr/>' . $row->type_name;
+            })
+            ->editColumn('sub_type', function ($row) {
+                return collect($row->sub_type ?? [])->implode('<br>');
+            })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __("buttons.active") . '</span>' : '<span class="badge bg-danger">' . __("buttons.deleted") . '</span>';
                 return $active;
@@ -33,7 +39,7 @@ class ChapterDataTable extends DataTable
             ->addColumn('action', function ($module) {
                 return view('content::content.chapters.action', ['module' => $module]);
             })
-            ->rawColumns(['soft_delete', 'action']);
+            ->rawColumns(['soft_delete', 'action', 'type', 'sub_type']);
     }
 
     /**
@@ -63,8 +69,10 @@ class ChapterDataTable extends DataTable
                 'chapters.no',
                 'chapters.name',
                 'chapters.type_id',
+                'chapters.sub_type',
                 'chapters.created_at',
                 'chapters.deleted_at',
+                'types.number_type',
                 'types.name as type_name',
                 'ministries.is_archived'
             ])
@@ -108,10 +116,11 @@ class ChapterDataTable extends DataTable
         return [
             Column::computed('DT_RowIndex', __('tables.th.no'))
                 ->width(30)->addClass('text-center align-middle')->orderable(false),
-            Column::make('type_name')->title(__('tables.th.type'))->addClass('align-middle'),
 
             Column::make('no')->title(__('tables.th.chapter'))->addClass('align-middle'),
             Column::make('name')->title(__('tables.th.txtChapter'))->addClass('align-middle'),
+            Column::make('type')->title(__('tables.th.type'))->addClass('align-middle'),
+            Column::make('sub_type')->title(__('tables.th.sub.type'))->addClass('align-middle'),
             Column::make('dateTime')->title(__('tables.th.createdAt'))->width(200),
             Column::computed('soft_delete')->title(__('tables.th.status'))->width(100)->addClass('text-center'),
 

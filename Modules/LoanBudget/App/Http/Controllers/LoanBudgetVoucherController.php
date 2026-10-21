@@ -5,6 +5,7 @@ namespace Modules\LoanBudget\App\Http\Controllers;
 use App\DataTables\BudgetLoans\BudgetVoucherLoanDataTable;
 use App\DataTables\BudgetLoans\InitialVoucherLoanDataTable;
 use App\Http\Controllers\Controller;
+use App\Models\BeginCredit\BeginMandate;
 use App\Models\Content\AccountSub;
 use App\Models\Content\Agency;
 use App\Models\Content\Content;
@@ -15,6 +16,7 @@ use App\Models\BudgetPlan\BudgetVoucher;
 use App\Models\Content\Cluster;
 use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
+use App\Models\Loans\BudgetMandateLoan;
 use App\Models\Loans\BudgetVoucherLoan;
 use App\Models\Loans\LoanBudget;
 use Illuminate\Http\Request;
@@ -248,13 +250,19 @@ class LoanBudgetVoucherController extends Controller
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('agency_id', $validatedData['cboAgency'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
-            if (!$beginVoucher) {
+            $beginMandate = BeginMandate::where('program_id', $validatedData['cboProgram'])
+                ->where('program_sub_id', $validatedData['cboProgramSub'])
+                ->where('cluster_id', $validatedData['cboCluster'])
+                ->where('account_sub_id', $validatedData['cboSubAccount'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
+            if (!$beginVoucher && !$beginMandate) {
                 flash()->translate('en')->option('timeout', 2000)
-                    ->error('មិនមានទិន្ន័យ', 'បញ្ហា')->flash();
+                    ->error('មិនមានទិន្ន័យឥណទាន', 'បញ្ហា')->flash();
                 return back()->withInput();
             }
 
@@ -279,12 +287,28 @@ class LoanBudgetVoucherController extends Controller
                 'txtDescription'      => strip_tags($validatedData['txtDescription']),
             ]);
 
+            BudgetMandateLoan::create([
+                'ministry_id'        => $ministry->id,
+                'agency_id'          => $validatedData['cboAgency'],
+                'program_id'          => $validatedData['cboProgram'],
+                'program_sub_id'      => $validatedData['cboProgramSub'],
+                'cluster_id'          => $validatedData['cboCluster'],
+                'account_sub_id'     => $validatedData['cboSubAccount'],
+                'no'                  => $valueNo,
+                'internal_increase'  => $validatedData['internal_increase'],
+                'unexpected_increase' => $validatedData['unexpected_increase'],
+                'additional_increase' => $validatedData['additional_increase'],
+                'decrease'           => $validatedData['decrease'],
+                'editorial'          => $validatedData['editorial'],
+                'total_increase'     => $total_increase,
+                'txtDescription'     => strip_tags($validatedData['txtDescription']),
+            ]);
+
             $agg = BudgetVoucherLoan::query()
                 ->where('ministry_id', $ministry->id)
                 ->where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
-                ->where('agency_id', $validatedData['cboAgency'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->selectRaw('
                 COALESCE(SUM(internal_increase),0)   AS internal_increase_sum,
@@ -294,36 +318,73 @@ class LoanBudgetVoucherController extends Controller
                 COALESCE(SUM(editorial),0)           AS editorial_sum
             ')->first();
 
+            $agg = BudgetMandateLoan::query()
+                ->where('ministry_id', $ministry->id)
+                ->where('program_id', $validatedData['cboProgram'])
+                ->where('program_sub_id', $validatedData['cboProgramSub'])
+                ->where('cluster_id', $validatedData['cboCluster'])
+                ->where('account_sub_id', $validatedData['cboSubAccount'])
+                ->selectRaw('
+                COALESCE(SUM(internal_increase),0)   AS internal_increase_sum,
+                COALESCE(SUM(unexpected_increase),0) AS unexpected_increase_sum,
+                COALESCE(SUM(additional_increase),0) AS additional_increase_sum,
+                COALESCE(SUM(decrease),0)            AS decrease_sum,
+                COALESCE(SUM(editorial),0)           AS editorial_sum
+            ')
+                ->first();
+
+            $validatedData['editorial'] = $validatedData['editorial'] ?? 0;
+            $validatedData['decrease'] = $validatedData['decrease'] ?? 0;
+
             $totalIncreaseSum = (float)$agg->internal_increase_sum
                 + (float)$agg->unexpected_increase_sum
                 + (float)$agg->additional_increase_sum;
 
-            $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
-                ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('agency_id', $validatedData['cboAgency'])
-                ->where('ministry_id', $ministry->id)
-                ->sum('budget');
-
-            $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
-            $deadline_balance = $early_balance + $currentApplyTotal;
-
-            $new_credit_status = $beginVoucher->current_loan
+            $new_credit_status_voucher = $beginVoucher->current_loan
+                + $totalIncreaseSum
+                - ((float)$agg->decrease_sum + (float)$agg->editorial_sum);
+            $new_credit_status_mandate = $beginMandate->current_loan
                 + $totalIncreaseSum
                 - ((float)$agg->decrease_sum + (float)$agg->editorial_sum);
 
-            $credit        = $new_credit_status - $deadline_balance;
-            $law_average   = $beginVoucher->fin_law ? ($deadline_balance / $beginVoucher->fin_law) * 100 : 0;
-            $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
+            $early_balance_voucher    = $beginVoucher->early_balance ?? 0;
+            $early_balance_mandate    = $beginMandate->early_balance ?? 0;
+
+            $deadline_balance_voucher = $early_balance_voucher + $beginVoucher->apply;
+            $deadline_balance_mandate = $early_balance_mandate + $beginMandate->apply;
+
+            $credit_voucher        = $new_credit_status_voucher - $deadline_balance_voucher;
+            $credit_mandate = $new_credit_status_mandate - $deadline_balance_mandate;
+
+            $law_average   = $beginVoucher->fin_law ? ($deadline_balance_voucher / $beginVoucher->current_loan) * 100 : 0;
+            $law_average_mandate = $beginMandate->fin_law ? ($deadline_balance_mandate / $beginMandate->current_loan) * 100 : 0;
+
+            $law_correction = $new_credit_status_voucher ? ($deadline_balance_voucher / $new_credit_status_voucher) * 100 : 0;
+            $law_correction_mandate = $new_credit_status_mandate ? ($deadline_balance_mandate / $new_credit_status_mandate) * 100 : 0;
 
             $beginVoucher->update([
                 'current_loan'     => $beginVoucher->current_loan,
-                'new_credit_status' => $new_credit_status,
-                'apply'            => $currentApplyTotal,
-                'deadline_balance' => $deadline_balance,
-                'credit'           => $credit,
+                'new_credit_status' => $new_credit_status_voucher,
+                // 'apply'            => $currentApplyTotal,
+                // 'deadline_balance' => $deadline_balance,
+                'credit'           => $credit_voucher,
                 'law_average'      => $law_average,
                 'law_correction'   => $law_correction,
             ]);
+
+            $beginMandate->update([
+                'current_loan'     => $beginMandate->current_loan,
+                'new_credit_status' => $new_credit_status_mandate,
+                // 'early_balance'    => $early_balance,
+                // 'apply'            => $currentApplyTotal,
+                // 'deadline_balance' => $deadline_balance,
+                'credit'           => $credit_mandate,
+                'law_average'      => $law_average_mandate,
+                'law_correction'   => $law_correction_mandate,
+            ]);
+
+            $beginVoucher->save();
+            $beginMandate->save();
 
             DB::commit();
             flash()->translate('en')->option('timeout', 2000)
@@ -358,6 +419,9 @@ class LoanBudgetVoucherController extends Controller
         $ministry = Ministry::where('id', decode_params($params))->first();
 
         $module = BudgetVoucherLoan::where('id', $id)
+            ->where('ministry_id', $ministry->id)
+            ->first();
+        $module = BudgetMandateLoan::where('id', $id)
             ->where('ministry_id', $ministry->id)
             ->first();
 
@@ -423,15 +487,25 @@ class LoanBudgetVoucherController extends Controller
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
+            $mandateLoan = BudgetMandateLoan::where('id', $id)
+                ->where('ministry_id', $ministry->id)
+                ->first();
+
             $beginVoucher = BeginVoucher::where('program_id', $validatedData['cboProgram'])
                 ->where('program_sub_id', $validatedData['cboProgramSub'])
                 ->where('cluster_id', $validatedData['cboCluster'])
                 ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('agency_id', $validatedData['cboAgency'])
+                ->where('ministry_id', $ministry->id)
+                ->first();
+            $beginMandate = BeginMandate::where('program_id', $validatedData['cboProgram'])
+                ->where('program_sub_id', $validatedData['cboProgramSub'])
+                ->where('cluster_id', $validatedData['cboCluster'])
+                ->where('account_sub_id', $validatedData['cboSubAccount'])
                 ->where('ministry_id', $ministry->id)
                 ->first();
 
-            if (!$beginVoucher) {
+
+            if (!$beginVoucher && !$beginMandate) {
                 flash()->translate('en')->option('timeout', 2000)
                     ->error('មិនមានទិន្ន័យត្រឹមត្រូវ', 'បញ្ហា')->flash();
                 return back()->withInput();
@@ -440,21 +514,37 @@ class LoanBudgetVoucherController extends Controller
             $fin_law = $beginVoucher->fin_law;
             $current_loan = $beginVoucher->current_loan;
 
-            $total_increase = $validatedData['internal_increase'] + $validatedData['unexpected_increase'] + $validatedData['additional_increase'];
-            $new_credit_status = $current_loan + $total_increase - $validatedData['decrease'] - $validatedData['editorial'];
+            $fin_law = $beginMandate->fin_law;
+            $current_loan = $beginMandate->current_loan;
 
-            $valueNo = $ministry->no . $program->no .  $programSub->no . $cluster->no;
+            $validatedData['internal_increase'] = $validatedData['internal_increase'] ?? 0;
+            $validatedData['unexpected_increase'] = $validatedData['unexpected_increase'] ?? 0;
+            $validatedData['additional_increase'] = $validatedData['additional_increase'] ?? 0;
+            $validatedData['editorial'] = $validatedData['editorial'] ?? 0;
+            $validatedData['decrease'] = $validatedData['decrease'] ?? 0;
 
-            $currentApplyTotal = BudgetVoucher::where('no', $valueNo)
-                ->where('account_sub_id', $validatedData['cboSubAccount'])
-                ->where('ministry_id', $ministry->id)
-                ->sum('budget');
+            $totalIncreaseSum = $validatedData['internal_increase'] + $validatedData['unexpected_increase'] + $validatedData['additional_increase'];
+            $new_credit_status_voucher = $beginVoucher->current_loan
+                + $totalIncreaseSum
+                - $validatedData['decrease'] - $validatedData['editorial'];
+            $new_credit_status_mandate = $beginMandate->current_loan
+                + $totalIncreaseSum
+                - $validatedData['decrease'] - $validatedData['editorial'];
 
-            $deadline_balance = $currentApplyTotal;
-            $credit = $new_credit_status - $deadline_balance;
+            $early_balance_voucher    = $beginVoucher->early_balance ?? 0;
+            $early_balance_mandate    = $beginMandate->early_balance ?? 0;
 
-            $law_average = $fin_law ? ($deadline_balance / $fin_law) * 100 : 0;
-            $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
+            $deadline_balance_voucher = $early_balance_voucher + $beginVoucher->apply;
+            $deadline_balance_mandate = $early_balance_mandate + $beginMandate->apply;
+
+            $credit_voucher        = $new_credit_status_voucher - $deadline_balance_voucher;
+            $credit_mandate = $new_credit_status_mandate - $deadline_balance_mandate;
+
+            $law_average   = $beginVoucher->fin_law ? ($deadline_balance_voucher / $beginVoucher->current_loan) * 100 : 0;
+            $law_average_mandate = $beginMandate->fin_law ? ($deadline_balance_mandate / $beginMandate->current_loan) * 100 : 0;
+
+            $law_correction = $new_credit_status_voucher ? ($deadline_balance_voucher / $new_credit_status_voucher) * 100 : 0;
+            $law_correction_mandate = $new_credit_status_mandate ? ($deadline_balance_mandate / $new_credit_status_mandate) * 100 : 0;
 
             $voucherLoan->update([
                 'agency_id' => $validatedData['cboAgency'],
@@ -462,25 +552,55 @@ class LoanBudgetVoucherController extends Controller
                 'program_sub_id'      => $validatedData['cboProgramSub'],
                 'cluster_id'          => $validatedData['cboCluster'],
                 'account_sub_id' => $validatedData['cboSubAccount'],
-                'no' => $valueNo,
+                'no' => $beginVoucher->no,
                 'internal_increase' => $validatedData['internal_increase'],
                 'unexpected_increase' => $validatedData['unexpected_increase'],
                 'additional_increase' => $validatedData['additional_increase'],
                 'decrease' => $validatedData['decrease'],
                 'editorial' => $validatedData['editorial'],
-                'total_increase' => $total_increase,
+                'total_increase' => $totalIncreaseSum,
                 'txtDescription' => strip_tags($validatedData['txtDescription']),
             ]);
+            $voucherLoan->save();
+
+            $mandateLoan->update([
+                'agency_id' => $validatedData['cboAgency'],
+                'program_id'          => $validatedData['cboProgram'],
+                'program_sub_id'      => $validatedData['cboProgramSub'],
+                'cluster_id'          => $validatedData['cboCluster'],
+                'account_sub_id' => $validatedData['cboSubAccount'],
+                'no' => $beginMandate->no,
+                'internal_increase' => $validatedData['internal_increase'],
+                'unexpected_increase' => $validatedData['unexpected_increase'],
+                'additional_increase' => $validatedData['additional_increase'],
+                'decrease' => $validatedData['decrease'],
+                'editorial' => $validatedData['editorial'],
+                'total_increase' => $totalIncreaseSum,
+                'txtDescription' => strip_tags($validatedData['txtDescription']),
+            ]);
+            $mandateLoan->save();
 
             $beginVoucher->update([
                 'current_loan' => $beginVoucher->current_loan,
-                'new_credit_status' => $new_credit_status,
-                'apply' => $currentApplyTotal,
-                'deadline_balance' => $deadline_balance,
-                'credit' => $credit,
+                'new_credit_status' => $new_credit_status_voucher,
+                'apply' => $beginVoucher->apply,
+                'deadline_balance' => $deadline_balance_voucher,
+                'credit' => $credit_voucher,
                 'law_average' => $law_average,
                 'law_correction' => $law_correction,
             ]);
+            $beginVoucher->save();
+
+            $beginMandate->update([
+                'current_loan' => $beginMandate->current_loan,
+                'new_credit_status' => $new_credit_status_mandate,
+                'apply' => $beginMandate->apply,
+                'deadline_balance' => $deadline_balance_mandate,
+                'credit' => $credit_mandate,
+                'law_average' => $law_average_mandate,
+                'law_correction' => $law_correction_mandate,
+            ]);
+            $beginMandate->save();
 
             DB::commit();
             flash()
@@ -514,20 +634,22 @@ class LoanBudgetVoucherController extends Controller
             $id   = decode_params($id);
             $ministry = Ministry::where('id', decode_params($params))->first();
             $voucherLoan = BudgetVoucherLoan::where('id', $id)->first();
+            $voucherLoan->delete();
+            $mandateLoan = BudgetMandateLoan::where('id', $id)->first();
+            $mandateLoan->delete();
 
-            $beginVoucher = BeginVoucher::query()
-                ->where('no', $voucherLoan->no)
+            $beginVoucher = BeginVoucher::where('no', $voucherLoan->no)
                 ->where('account_sub_id', $voucherLoan->account_sub_id)
-                ->where('agency_id',     $voucherLoan->agency_id)
                 ->where('ministry_id',   $ministry->id)
                 ->first();
-
-            $voucherLoan->delete();
+            $beginMandate = BeginMandate::where('no', $mandateLoan->no)
+                ->where('account_sub_id', $mandateLoan->account_sub_id)
+                ->where('ministry_id',   $ministry->id)
+                ->first();
 
             if ($beginVoucher) {
                 $bvl = BudgetVoucherLoan::query()
                     ->where('ministry_id',   $ministry->id)
-                    ->where('agency_id',     $beginVoucher->agency_id)
                     ->where('account_sub_id', $beginVoucher->account_sub_id)
                     ->where('no',            $beginVoucher->no)
                     ->selectRaw('
@@ -541,38 +663,67 @@ class LoanBudgetVoucherController extends Controller
                 $totalIncreaseSum = (float)$bvl->internal_increase_sum
                     + (float)$bvl->unexpected_increase_sum
                     + (float)$bvl->additional_increase_sum;
-
-                $currentApplyTotal = BudgetVoucher::query()
-                    ->where('no',            $beginVoucher->no)
-                    ->where('account_sub_id', $beginVoucher->account_sub_id)
-                    ->where('agency_id',     $beginVoucher->agency_id)
-                    ->where('ministry_id',   $ministry->id)
-                    ->sum('budget');
-
-                $early_balance    = $currentApplyTotal > 0 ? $currentApplyTotal : 0;
-                $deadline_balance = $early_balance + $currentApplyTotal;
-
                 $new_credit_status = $beginVoucher->current_loan
                     + $totalIncreaseSum
                     - ((float)$bvl->decrease_sum + (float)$bvl->editorial_sum);
 
+                $deadline_balance = $beginVoucher->early_balance + $beginVoucher->apply;
                 $credit         = $new_credit_status - $deadline_balance;
                 $law_average    = $beginVoucher->fin_law ? ($deadline_balance / $beginVoucher->fin_law) * 100 : 0;
                 $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
 
                 $beginVoucher->update([
                     'new_credit_status' => $new_credit_status,
-                    'apply'             => $currentApplyTotal,
                     'deadline_balance'  => $deadline_balance,
                     'credit'            => $credit,
                     'law_average'       => $law_average,
                     'law_correction'    => $law_correction,
                 ]);
+                $beginVoucher->save();
+            }
+
+            if ($beginMandate) {
+                $bvl = BudgetMandateLoan::query()
+                    ->where('ministry_id',   $ministry->id)
+                    ->where('account_sub_id', $beginMandate->account_sub_id)
+                    ->where('no',            $beginMandate->no)
+                    ->selectRaw('
+                    COALESCE(SUM(internal_increase),0)   AS internal_increase_sum,
+                    COALESCE(SUM(unexpected_increase),0) AS unexpected_increase_sum,
+                    COALESCE(SUM(additional_increase),0) AS additional_increase_sum,
+                    COALESCE(SUM(decrease),0)            AS decrease_sum,
+                    COALESCE(SUM(editorial),0)           AS editorial_sum
+                ')->first();
+
+                $totalIncreaseSum = (float)$bvl->internal_increase_sum
+                    + (float)$bvl->unexpected_increase_sum
+                    + (float)$bvl->additional_increase_sum;
+                $new_credit_status = $beginMandate->current_loan
+                    + $totalIncreaseSum
+                    - ((float)$bvl->decrease_sum + (float)$bvl->editorial_sum);
+
+                $deadline_balance = $beginMandate->early_balance + $beginMandate->apply;
+                $credit         = $new_credit_status - $deadline_balance;
+                $law_average    = $beginMandate->fin_law ? ($deadline_balance / $beginMandate->fin_law) * 100 : 0;
+                $law_correction = $new_credit_status ? ($deadline_balance / $new_credit_status) * 100 : 0;
+
+                $beginMandate->update([
+                    'new_credit_status' => $new_credit_status,
+                    'deadline_balance'  => $deadline_balance,
+                    'credit'            => $credit,
+                    'law_average'       => $law_average,
+                    'law_correction'    => $law_correction,
+                ]);
+                $beginMandate->save();
             }
 
             DB::commit();
-            flash()->translate('en')->option('timeout', 2000)
-                ->success('success_msg', 'successful')->flash();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('delete_msg', 'delete')
+                ->flash();
 
             return redirect()->route('voucher.index', $params);
         } catch (\Throwable $e) {
