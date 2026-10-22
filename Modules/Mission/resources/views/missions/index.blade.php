@@ -226,9 +226,8 @@
                             </a>
                         </div> --}}
 
-                        <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-2">
+                        {{-- <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-2">
 
-                            {{-- Flex-start: Create, Payment, and ID filters --}}
                             <div class="d-flex flex-wrap align-items-end gap-2">
 
                                 @if (hasPermission('missions.create') && $ministry->is_archived != 2)
@@ -248,8 +247,7 @@
                                 </a>
                             </div>
 
-                            {{-- Flex-end: Back button --}}
-                            {{-- <div class="ms-auto d-flex flex-wrap align-items-end gap-2">
+                            <div class="ms-auto d-flex flex-wrap align-items-end gap-2">
                                 <div style="width: 120px;">
                                     <label for="start_id" class="form-label mb-1">ID ចាប់ពី</label>
                                     <input type="number" id="start_index" class="form-control" min="1"
@@ -269,10 +267,398 @@
                                 <button type="button" class="btn btn-secondary" id="btnResetIdRange">
                                     <i class="bx bx-reset"></i>
                                 </button>
-                            </div> --}}
+                            </div>
 
+                        </div> --}}
+
+                        <div class="mb-4 d-flex flex-column gap-3">
+
+                            {{-- Top toolbar --}}
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+                                {{-- Left: Main actions --}}
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+
+                                    @if (hasPermission('missions.create') && $ministry->is_archived != 2)
+                                        <a class="btn btn-light waves-effect waves-light"
+                                            href="{{ route('missions.create', $params) }}">
+                                            <i class="bx bx-plus me-1"></i>
+                                            {{ __('buttons.create') }}
+                                        </a>
+                                    @endif
+
+                                    {{-- Payment --}}
+                                    <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
+                                        <i class="bx bx-money me-1"></i>
+                                        ទូទាត់
+                                    </button>
+
+                                    {{-- Payment Drafts --}}
+                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                        data-bs-target="#paymentDraftModal">
+                                        <i class="bx bx-file me-1"></i>
+                                        Payment Drafts
+                                        <span class="badge bg-light text-dark ms-1">
+                                            {{ $paymentDrafts->count() ?? 0 }}
+                                        </span>
+                                    </button>
+
+                                    {{-- Approval Records --}}
+                                    <button type="button" class="btn btn-info" data-bs-toggle="modal"
+                                        data-bs-target="#paymentApprovalModal">
+                                        <i class="bx bx-check-shield me-1"></i>
+                                        Approval Records
+                                    </button>
+
+                                    {{-- Export History --}}
+                                    <button type="button" class="btn btn-dark" data-bs-toggle="modal"
+                                        data-bs-target="#paymentExportHistoryModal">
+                                        <i class="bx bx-history me-1"></i>
+                                        Export History
+                                    </button>
+
+                                    <a class="btn btn-outline-secondary" href="{{ route('initialMission.index') }}">
+                                        <i class="bx bx-arrow-back me-1"></i>
+                                        {{ __('buttons.back') }}
+                                    </a>
+
+                                </div>
+
+                                {{-- Right: Search by Mission ID --}}
+                                <div class="d-flex flex-wrap align-items-end gap-2">
+
+                                    <div style="width: 120px;">
+                                        <label for="start_index" class="form-label mb-1">
+                                            ID ចាប់ពី
+                                        </label>
+                                        <input type="number" id="start_index" class="form-control" min="1"
+                                            placeholder="Start ID">
+                                    </div>
+
+                                    <div style="width: 120px;">
+                                        <label for="end_index" class="form-label mb-1">
+                                            ID ដល់
+                                        </label>
+                                        <input type="number" id="end_index" class="form-control" min="1"
+                                            placeholder="End ID">
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary" id="btnSearchIdRange">
+                                        <i class="bx bx-search me-1"></i>
+                                        ស្វែងរក
+                                    </button>
+
+                                    <button type="button" class="btn btn-secondary" id="btnResetIdRange"
+                                        title="Reset ID search">
+                                        <i class="bx bx-reset"></i>
+                                    </button>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    {{-- Payment Drafts Modal --}}
+                    <div class="modal fade" id="paymentDraftModal" tabindex="-1"
+                        aria-labelledby="paymentDraftModalLabel" aria-hidden="true">
+
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-warning-subtle">
+                                    <h5 class="modal-title" id="paymentDraftModalLabel">
+                                        <i class="bx bx-file me-1"></i>
+                                        Payment Drafts
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div
+                                        class="d-flex flex-wrap justify-content-between
+                            align-items-center gap-2 mb-3">
+
+                                        <div>
+                                            <h6 class="mb-1">Saved payment drafts</h6>
+                                            <small class="text-muted">
+                                                Continue editing a draft or add existing records.
+                                            </small>
+                                        </div>
+
+                                        <button type="button" class="btn btn-primary" id="btnCreatePaymentDraft">
+                                            <i class="bx bx-plus me-1"></i>
+                                            Create Draft from Selected Records
+                                        </button>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table table-bordered table-hover
+                                  align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th width="40">#</th>
+                                                    <th>Mission ID</th>
+                                                    <th>Mission Description</th>
+                                                    <th>Draft Saved At</th>
+                                                    <th>Status</th>
+                                                    <th width="120">Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @forelse ($paymentDrafts as $draft)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $draft->id }}</td>
+                                                        <td>{{ $draft->description ?? '-' }}</td>
+                                                        <td>
+                                                            {{ $draft->payment_draft_saved_at ? $draft->payment_draft_saved_at->format('d/m/Y H:i:s') : '-' }}
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge bg-warning text-dark">
+                                                                {{ $draft->payment_approval_status }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ route('missions.edit', [
+                                                                'params' => $params,
+                                                                'id' => $draft->id,
+                                                            ]) }}"
+                                                                class="btn btn-sm btn-primary">
+                                                                <i class="bx bx-edit"></i>
+                                                                Open
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted py-4">
+                                                            No payment drafts found.
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <hr>
+
+                                    <h6>Available records to add to a draft</h6>
+                                    <p class="text-muted small">
+                                        Select eligible mission records that have not already
+                                        been paid. The server must validate each selected record.
+                                    </p>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th width="40">
+                                                        <input type="checkbox" id="selectAllDraftRecords">
+                                                    </th>
+                                                    <th>Mission ID</th>
+                                                    <th>Description</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Payment Status</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="availableDraftRecords">
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        Load eligible records from the server here.
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
+
+
+                    {{-- Payment Approval Modal --}}
+                    <div class="modal fade" id="paymentApprovalModal" tabindex="-1" aria-hidden="true">
+
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-info-subtle">
+                                    <h5 class="modal-title">
+                                        <i class="bx bx-check-shield me-1"></i>
+                                        Payment Approval Records
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Approval Status</label>
+                                            <select class="form-select" id="filterApprovalStatus">
+                                                <option value="">All statuses</option>
+                                                <option value="draft">Draft</option>
+                                                <option value="pending">Pending Approval</option>
+                                                <option value="approved">Approved</option>
+                                                <option value="rejected">Rejected</option>
+                                                <option value="paid">Paid</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Mission ID</th>
+                                                    <th>Description</th>
+                                                    <th>Status</th>
+                                                    <th>Submitted At</th>
+                                                    <th>Approved At</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @forelse ($approvalRecords as $record)
+                                                    <tr data-approval-status="{{ $record->payment_approval_status }}">
+                                                        <td>{{ $record->id }}</td>
+                                                        <td>{{ $record->description ?? '-' }}</td>
+                                                        <td>
+                                                            {{ ucfirst($record->payment_approval_status) }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $record->payment_submitted_at ? $record->payment_submitted_at->format('d/m/Y H:i') : '-' }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $record->payment_approved_at ? $record->payment_approved_at->format('d/m/Y H:i') : '-' }}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ route('missions.edit', [
+                                                                'params' => $params,
+                                                                'id' => $record->id,
+                                                            ]) }}"
+                                                                class="btn btn-sm btn-outline-primary">
+                                                                View
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted py-4">
+                                                            No approval records found.
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {{-- Payment Export History Modal --}}
+                    <div class="modal fade" id="paymentExportHistoryModal" tabindex="-1" aria-hidden="true">
+
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-dark text-white">
+                                    <h5 class="modal-title">
+                                        <i class="bx bx-history me-1"></i>
+                                        Payment Export History
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"></button>
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <p class="text-muted">
+                                        Review previous exports or generate a new copy.
+                                        Each export should create a new history entry.
+                                    </p>
+
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table table-bordered table-hover
+                                  align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Mission ID</th>
+                                                    <th>File Name</th>
+                                                    <th>Exported By</th>
+                                                    <th>Exported At</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @forelse ($exportLogs as $log)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $log->mission_id }}</td>
+                                                        <td>{{ $log->file_name ?? '-' }}</td>
+                                                        <td>
+                                                            {{ $log->exporter?->name ?? 'Deleted User' }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $log->exported_at ? $log->exported_at->format('d/m/Y H:i:s') : '-' }}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{{ route('missions.edit', [
+                                                                'params' => $params,
+                                                                'id' => $log->mission_id,
+                                                            ]) }}"
+                                                                class="btn btn-sm btn-outline-primary">
+                                                                <i class="bx bx-show"></i>
+                                                                Open
+                                                            </a>
+
+                                                            {{-- Connect this button to your existing export route. --}}
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-success btn-export-again"
+                                                                data-mission-id="{{ $log->mission_id }}">
+                                                                <i class="bx bx-export"></i>
+                                                                Export Again
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted py-4">
+                                                            No export history found.
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- @endif --}}
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
@@ -1252,5 +1638,68 @@
                 }
             });
         }
+    </script>
+
+    <script>
+        $(document).on('change', '#filterApprovalStatus', function() {
+            const status = $(this).val();
+
+            $('#paymentApprovalModal tbody tr[data-approval-status]').each(function() {
+                const rowStatus = $(this).data('approval-status');
+
+                $(this).toggle(!status || rowStatus === status);
+            });
+        });
+    </script>
+
+    <script>
+        /**
+         * 11. Final export URL and save payment-status export history
+         */
+
+        const finalExportUrl =
+            exportUrl + '?' + exportParams.toString();
+
+        const selectedIds = Array.from(
+            document.querySelectorAll('.mission-checkbox:checked')
+        ).map(checkbox => Number(checkbox.value));
+
+        const csrfToken = document.querySelector(
+            'meta[name="csrf-token"]'
+        )?.content;
+
+        const startId = document.getElementById('start_index')?.value;
+        const endId = document.getElementById('end_index')?.value;
+
+        fetch(@json(route('missions.payment-status.export-history', ['params' => $params])), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    export_url: finalExportUrl,
+                    file_name: 'payment_status_export.xlsx',
+                    mission_ids: selectedIds,
+                    start_id: startId || null,
+                    end_id: endId || null,
+                    filters: Object.fromEntries(exportParams.entries())
+                })
+            })
+            .then(async response => {
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Failed to save export history.');
+                }
+
+                // Download only after the history has been saved.
+                window.location.href = finalExportUrl;
+            })
+            .catch(error => {
+                console.error(error);
+                alert(error.message || 'Unable to save export history.');
+            });
     </script>
 @endsection

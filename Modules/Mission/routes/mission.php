@@ -60,3 +60,7 @@ Route::get(
     'missions/payment-account',
     [MissionController::class, 'getPaymentAccount']
 )->name('missions.paymentAccount');
+Route::post(
+    '/missions/{params}/payment-status/export-history',
+    [MissionController::class, 'savePaymentStatusExportHistory']
+)->name('missions.payment-status.export-history');
