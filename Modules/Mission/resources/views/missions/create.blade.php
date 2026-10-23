@@ -335,14 +335,32 @@
                                             <div id="employeeRows">
 
                                                 {{-- First row --}}
-                                                <div class="employee-row border rounded p-3 mb-3">
 
-                                                    <div class="row align-items-end">
+                                                <div class="employee-row border rounded p-3 mb-3">
+                                                    <div class="row align-items-end g-2">
+
+                                                        {{-- Employee Title --}}
+                                                        <div class="col-lg-1 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label font-size-13 text-muted">
+                                                                    គោរមងារ
+                                                                </label>
+
+                                                                <select class="form-select employee-title"
+                                                                    name="cboTitle[]">
+                                                                    <option value="">{{ __('forms.search...') }}
+                                                                    </option>
+                                                                    <option value="ឯកឧត្តម">ឯកឧត្តម</option>
+                                                                    <option value="លោកជំទាវ">លោកជំទាវ</option>
+                                                                    <option value="លោក">លោក</option>
+                                                                    <option value="លោកស្រី">លោកស្រី</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
 
                                                         {{-- Employee --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
+                                                        <div class="col-lg-2 col-md-5 col-6">
+                                                            <div class="form-group mb-2">
                                                                 <label class="form-label font-size-13 text-muted">
                                                                     {{ __('forms.name') }}
                                                                 </label>
@@ -350,9 +368,7 @@
                                                                 <select class="form-select employee-name" name="cboName[]"
                                                                     required
                                                                     data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                                    <option value="">
-                                                                        {{ __('forms.search...') }}
+                                                                    <option value="">{{ __('forms.search...') }}
                                                                     </option>
 
                                                                     @foreach ($employees as $emp)
@@ -361,16 +377,13 @@
                                                                             {{ $emp->name_kh }} - {{ $emp->name_latin }}
                                                                         </option>
                                                                     @endforeach
-
                                                                 </select>
-
                                                             </div>
                                                         </div>
 
                                                         {{-- Position --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
+                                                        <div class="col-lg-2 col-md-4 col-6">
+                                                            <div class="form-group mb-2">
                                                                 <label class="form-label font-size-13 text-muted">
                                                                     {{ __('forms.position') }}
                                                                 </label>
@@ -378,9 +391,7 @@
                                                                 <select class="form-select employee-position"
                                                                     name="cboPosition[]" required
                                                                     data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                                    <option value="">
-                                                                        {{ __('forms.search...') }}
+                                                                    <option value="">{{ __('forms.search...') }}
                                                                     </option>
 
                                                                     @foreach ($positions as $pos)
@@ -388,75 +399,68 @@
                                                                             {{ $pos->name }}
                                                                         </option>
                                                                     @endforeach
-
                                                                 </select>
+                                                            </div>
+                                                        </div>
 
-                                                            </div>
-                                                        </div>
                                                         {{-- Own Account Number --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3"> <label
-                                                                    class="form-label font-size-13 text-muted">
-                                                                    {{ __('forms.account.number') }} </label> <input
-                                                                    type="text"
+                                                        <div class="col-lg-2 col-md-4 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label font-size-13 text-muted">
+                                                                    {{ __('forms.account.number') }}
+                                                                </label>
+
+                                                                <input type="text"
                                                                     class="form-control employee-account-number"
-                                                                    name="account_number[]" value="" readonly>
+                                                                    name="account_number[]" readonly>
                                                             </div>
                                                         </div>
+
                                                         {{-- Payment Account --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3"> <label
-                                                                    class="form-label font-size-13 text-muted">
-                                                                    {{ __('forms.payment.account') }} </label> <select
-                                                                    class="form-select payment-account-employee"
+                                                        <div class="col-lg-2 col-md-4 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label font-size-13 text-muted">
+                                                                    {{ __('forms.payment.account') }}
+                                                                </label>
+
+                                                                <select class="form-select payment-account-employee"
                                                                     name="payment_account_employee_id[]">
-                                                                    <option value=""> {{ __('forms.search...') }}
+                                                                    <option value="">{{ __('forms.search...') }}
                                                                     </option>
                                                                 </select>
-                                                                {{-- <small class="text-muted payment-account-number">
-                                                                </small> --}}
                                                             </div>
                                                         </div>
 
-                                                        <!-- Leader + Assign Budget -->
-                                                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                                            <div class="form-group mb-3">
-
+                                                        {{-- Leader + Assign Budget --}}
+                                                        <div class="col-lg-2 col-md-5 col-8">
+                                                            <div class="form-group mb-2">
                                                                 <label class="form-label font-size-13 text-muted d-block">
                                                                     {{ __('forms.leader') }} / {{ __('forms.assign') }}
                                                                 </label>
 
-                                                                <div class="d-flex align-items-center flex-wrap gap-3">
+                                                                <div class="d-flex align-items-center flex-wrap gap-2">
 
-                                                                    {{-- Leader --}}
-                                                                    <div class="form-check mb-0 d-flex align-items-center">
+                                                                    <div class="form-check mb-0">
                                                                         <input type="radio"
                                                                             class="form-check-input employee-leader"
-                                                                            name="leader_index" value="0"
-                                                                            style="width:20px;height:20px;cursor:pointer;">
+                                                                            name="leader_index" value="0">
 
-                                                                        <label class="form-check-label ms-2"
-                                                                            style="cursor:pointer;">
+                                                                        <label class="form-check-label">
                                                                             {{ __('forms.leader') }}
                                                                         </label>
                                                                     </div>
 
-                                                                    {{-- Assign Budget --}}
-                                                                    <div class="form-check mb-0 d-flex align-items-center">
-
+                                                                    <div class="form-check mb-0">
                                                                         <input type="hidden" class="assign-budget-value"
                                                                             name="assign_budget[]" value="0">
 
                                                                         <input type="checkbox"
                                                                             class="form-check-input assign-budget"
-                                                                            name="assign_budget_checkbox[]"
-                                                                            style="width:20px;height:20px;cursor:pointer;">
+                                                                            name="assign_budget_checkbox[]">
 
-                                                                        <label class="form-check-label ms-2"
-                                                                            style="cursor:pointer;">
+                                                                        <label class="form-check-label">
                                                                             {{ __('forms.assign') }}
                                                                         </label>
-
                                                                     </div>
 
                                                                 </div>
@@ -464,15 +468,18 @@
                                                         </div>
 
                                                         {{-- Remove --}}
-                                                        <div class="col-lg-2 col-md-4">
-
-                                                            <button type="button" class="btn btn-danger btn-remove-row"
-                                                                disabled>
-                                                                <i class="bx bx-trash"></i>
-                                                            </button>
+                                                        <div class="col-lg-1 col-md-2 col-4">
+                                                            <div class="form-group mb-2">
+                                                                <button type="button"
+                                                                    class="btn btn-danger btn-remove-row w-100" disabled>
+                                                                    <i class="bx bx-trash"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
+
                                                     </div>
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -602,46 +609,6 @@
         });
     </script>
 
-    {{-- Alert message that's leader in employee-row  --}}
-    {{-- <script>
-        $(document).ready(function() {
-
-            $('#pristine-valid-example').on('submit', function(event) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Check selected leader
-                |--------------------------------------------------------------------------
-                */
-                const leader = document.querySelector(
-                    '#employeeRows .employee-leader:checked'
-                );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Require leader before submit
-                |--------------------------------------------------------------------------
-                */
-                if (!leader) {
-
-                    event.preventDefault();
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'សូមជ្រើសរើសប្រធាន',
-                        text: 'សូមជ្រើសរើសបុគ្គលិកម្នាក់ជាប្រធានបេសកកម្មជាមុនសិន។',
-                        confirmButtonText: 'យល់ព្រម',
-                        confirmButtonColor: '#dc3545',
-                        allowOutsideClick: false
-                    });
-
-                    return false;
-                }
-
-            });
-
-        });
-    </script> --}}
     <script>
         $(document).ready(function() {
             /* |-------------------------------------------------------------------------- | Keep hidden assign_budget[] value synchronized |-------------------------------------------------------------------------- | | Checked => 1 | Unchecked => 0 | */
@@ -1471,8 +1438,6 @@
 
                     }
                 );
-
-
                 /*
                 |--------------------------------------------------------------------------
                 | Payment Account changed
@@ -1488,7 +1453,6 @@
 
                     }
                 );
-
 
                 /*
                 |--------------------------------------------------------------------------
@@ -1514,17 +1478,13 @@
 
                     }
                 );
-
-
                 /*
                 |--------------------------------------------------------------------------
                 | Initialize existing employee account
                 |--------------------------------------------------------------------------
                 */
                 updateEmployeeAccount(row);
-
             }
-
 
             /*
             |--------------------------------------------------------------------------
@@ -1565,7 +1525,6 @@
                     );
                 }
             }
-
 
             /*
             |--------------------------------------------------------------------------
@@ -1729,7 +1688,6 @@
                 });
             }
 
-
             /*
             |--------------------------------------------------------------------------
             | Add employee row
@@ -1744,172 +1702,150 @@
                     | Create clean row
                     |--------------------------------------------------------------------------
                     */
+
                     const row = $(`
-                    <div class="employee-row border rounded p-3 mb-3">
+                        <div class="employee-row border rounded p-3 mb-3">
+                            <div class="row align-items-end g-2">
 
-                        <div class="row align-items-end">
-
-                            {{-- Employee --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.name') }}
-                                    </label>
-
-                                    <select
-                                        class="form-select employee-name"
-                                        name="cboName[]"
-                                        required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-
-                                        <option value="">
-                                            {{ __('forms.search...') }}
-                                        </option>
-
-                                        @foreach ($employees as $emp)
-
-                                            <option
-                                                value="{{ $emp->id }}"
-                                                data-account-number="{{ $emp->account_number }}">
-
-                                                {{ $emp->name_kh }}
-                                                -
-                                                {{ $emp->name_latin }}
-
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Position --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.position') }}
-                                    </label>
-
-                                    <select
-                                        class="form-select employee-position"
-                                        name="cboPosition[]"
-                                        required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-
-                                        <option value="">
-                                            {{ __('forms.search...') }}
-                                        </option>
-
-                                        @foreach ($positions as $pos)
-
-                                            <option value="{{ $pos->id }}">
-                                                {{ $pos->name }}
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-                            {{-- Own Account Number --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.account.number') }}
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        class="form-control employee-account-number"
-                                        name="account_number[]"
-                                        value=""
-                                        readonly>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Payment Account --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.payment.account') }}
-                                    </label>
-
-                                    <select
-                                        class="form-select payment-account-employee"
-                                        name="payment_account_employee_id[]">
-
-                                        <option value="">
-                                            {{ __('forms.search...') }}
-                                        </option>
-
-                                    </select>
-
-                                   
-
-                                </div>
-
-                            </div>
-
-                            {{-- Assign Budget --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label
-                                        class="form-label font-size-13 text-muted d-block">
-
-                                        {{ __('forms.assign') }}
-
-                                    </label>
-
-                                    <input
-                                        type="hidden"
-                                        class="assign-budget-value"
-                                        name="assign_budget[]"
-                                        value="0">
-
-                                    <div class="form-check">
-
-                                        <input
-                                            type="checkbox"
-                                            class="form-check-input assign-budget"
-                                            name="assign_budget_checkbox[]"
-                                            style="width:22px;height:22px;cursor:pointer;">
-
-                                        <label
-                                            class="form-check-label ms-2"
-                                            style="padding-top:3px;cursor:pointer;">
-
-                                            {{ __('forms.assign') }}
-
+                                {{-- Employee Title --}}
+                                <div class="col-lg-1 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            គោរមងារ
                                         </label>
 
+                                        <select class="form-select employee-title"
+                                            name="cboTitle[]">
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+                                            <option value="ឯកឧត្តម">ឯកឧត្តម</option>
+                                            <option value="លោកជំទាវ">លោកជំទាវ</option>
+                                            <option value="លោក">លោក</option>
+                                            <option value="លោកស្រី">លោកស្រី</option>
+                                        </select>
                                     </div>
-
                                 </div>
 
-                            </div>
+                                {{-- Employee --}}
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.name') }}
+                                        </label>
 
+                                        <select
+                                            class="form-select employee-name"
+                                            name="cboName[]"
+                                            required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
 
-                            {{-- Remove --}}
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+
+                                            @foreach ($employees as $emp)
+                                                <option
+                                                    value="{{ $emp->id }}"
+                                                    data-account-number="{{ $emp->account_number }}">
+                                                    {{ $emp->name_kh }} - {{ $emp->name_latin }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Position --}}
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.position') }}
+                                        </label>
+
+                                        <select
+                                            class="form-select employee-position"
+                                            name="cboPosition[]"
+                                            required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+
+                                            @foreach ($positions as $pos)
+                                                <option value="{{ $pos->id }}">
+                                                    {{ $pos->name }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Own Account Number --}}
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.account.number') }}
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            class="form-control employee-account-number"
+                                            name="account_number[]"
+                                            value=""
+                                            readonly>
+                                    </div>
+                                </div>
+
+                                {{-- Payment Account --}}
+                                <div class="col-lg-2 col-md-6 col-12">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.payment.account') }}
+                                        </label>
+
+                                        <select
+                                            class="form-select payment-account-employee"
+                                            name="payment_account_employee_id[]">
+
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Assign Budget --}}
+                                <div class="col-lg-2 col-md-6 col-8">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted d-block">
+                                            {{ __('forms.assign') }}
+                                        </label>
+
+                                        <input
+                                            type="hidden"
+                                            class="assign-budget-value"
+                                            name="assign_budget[]"
+                                            value="0">
+
+                                        <div class="form-check d-flex align-items-center gap-2">
+                                            <input
+                                                type="checkbox"
+                                                class="form-check-input assign-budget m-0"
+                                                name="assign_budget_checkbox[]"
+                                                style="width:20px;height:20px;cursor:pointer;">
+
+                                            <label class="form-check-label" style="cursor:pointer;">
+                                                {{ __('forms.assign') }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Remove --}}
                             <div class="col">
 
                                 <button
@@ -1922,10 +1858,10 @@
 
                             </div>
 
-                        </div>
 
-                    </div>
-                `);
+                            </div>
+                        </div>
+                    `);
 
 
                     /*

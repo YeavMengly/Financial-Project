@@ -42,36 +42,58 @@
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
                         <!-- Start Date -->
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="start_date">{{ __('menus.start_date') }}</label>
+                        <div class="col-sm-2">
+                            {{-- <label for="cboTodo" class="form-label font-size-13 text-muted">ជ្រើសរើស
+                                    ស្ថានភាពបង់ប្រាក់</label> --}}
+                            <label class="form-label font-size-13 text-muted"
+                                for="start_date">{{ __('menus.start_date') }}</label>
                             <input type="text" id="start_date" name="start_date" class="form-control"
                                 placeholder="{{ __('forms.select_date') }}" value="{{ request('start_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="end_date">{{ __('menus.end_date') }}</label>
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
                                 placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboNumber">{{ __('menus.receipt.number') }}</label>
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboNumber">{{ __('menus.receipt.number') }}</label>
                             <input type="text" id="cboNumber" name="cboNumber" class="form-control"
                                 placeholder="{{ __('menus.receipt.number') }}" value="{{ request('cboNumber') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboUserRequest">{{ __('menus.user.request') }}</label>
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboUserRequest">{{ __('menus.user.request') }}</label>
                             <input type="text" id="cboUserRequest" name="cboUserRequest" class="form-control"
                                 placeholder="{{ __('menus.user.request') }}" value="{{ request('cboUserRequest') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <div class="col-sm-3">
-                            <label class="visually-hidden" for="cboDuelType">{{ __('menus.item.name') }}</label>
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboAgency">{{ __('menus.content.agency') }}</label>
+                            <select id="cboAgency" name="cboAgency" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">{{ __('menus.content.agency') }}</option>
+                                @foreach ($duelRelease as $item)
+                                    <option value="{{ $item->agency }}"
+                                        {{ request('cboAgency') == $item->agency ? 'selected' : '' }}>
+                                        {{ $item->agency }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboDuelType">{{ __('menus.item.name') }}</label>
                             <select id="cboDuelType" name="cboDuelType" class="form-select"
                                 data-pristine-required-message="{{ __('messages.required') }}">
                                 <option value="">{{ __('menus.item.name') }}</option>
@@ -99,7 +121,7 @@
                             </select>
                         </div> --}}
 
-                        <div class="col-sm-3 d-flex align-items-center gap-2">
+                        <div class="col-sm-2 d-flex align-items-center gap-2">
 
                             {{-- Search --}}
                             <button type="submit" class="btn btn-primary d-flex align-items-center px-3">
@@ -112,7 +134,8 @@
                             </a>
 
                             {{-- Export --}}
-                            <a id="btnExport" href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
+                            <a id="btnExport"
+                                href="{{ route('duelRelease.export', array_merge(['params' => $params])) }}"
                                 class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
@@ -220,12 +243,12 @@
         });
     </script>
     <script>
-        $('#cboNumber, #cboUserRequest, #cboDuelType, #cboExecutiveUnit, #start_date, #end_date').on('change keyup',
+        $('#cboNumber, #cboUserRequest, #cboDuelType, #cboAgency, #start_date, #end_date').on('change keyup',
             function() {
                 $('#duelrelease-table').DataTable().ajax.reload();
             });
     </script>
-    <script>
+    {{-- <script>
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
 
@@ -235,13 +258,43 @@
                 cboNumber: $('#cboNumber').val(),
                 cboUserRequest: $('#cboUserRequest').val(),
                 cboDuelType: $('#cboDuelType').val(),
-                cboExecutiveUnit: $('#cboExecutiveUnit').val(),
+                cboAgency: $('#cboAgency').val(),
                 start_date: $('#start_date').val(),
                 end_date: $('#end_date').val(),
             });
 
             // ✅ Redirect with correct query string
             window.location.href = baseUrl + '?' + params.toString();
+        });
+    </script> --}}
+    <script>
+        $('#btnExport').on('click', function(e) {
+            e.preventDefault();
+
+            const baseUrl = "{{ route('duelRelease.export', ['params' => $params]) }}";
+
+            const params = new URLSearchParams();
+
+            [
+                'cboNumber',
+                'cboUserRequest',
+                'cboDuelType',
+                'cboAgency',
+                'start_date',
+                'end_date'
+            ].forEach(function(field) {
+                const value = $('#' + field).val();
+
+                if (value !== null && value !== '') {
+                    params.append(field, value);
+                }
+            });
+
+            const queryString = params.toString();
+
+            window.location.href = queryString ?
+                baseUrl + '?' + queryString :
+                baseUrl;
         });
     </script>
 

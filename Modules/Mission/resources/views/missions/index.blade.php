@@ -50,22 +50,11 @@
                                 <select class="form-select" id="cboTodo" name="cboTodo">
                                     <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
                                     <option value="2" selected>1. មិនទាន់ទូទាត់ - Unpaid</option>
-                                    <option value="3">2. បានទូទាត់រួចរាល់ - Paid</option>
+                                    <option value="3">2. រក្សាទុកទូទាត់ - Pending</option>
+                                    <option value="4">3. បានទូទាត់រួចរាល់ - Paid</option>
                                 </select>
                             </div>
                         </div>
-
-                        {{-- <div class="col-sm-2">
-                            <div class="form-group mb-3">
-                                <label for="cboStatus" class="form-label font-size-13 text-muted">ជ្រើសរើស ស្ថានភាព</label>
-                               
-                                <select class="form-select" id="cboStatus" name="cboStatus">
-                                    <option value="1">ជ្រើសរើស ស្ថានភាព</option>
-                                    <option value="2" selected>សកម្ម</option>
-                                    <option value="3">លុប</option>
-                                </select>
-                            </div>
-                        </div> --}}
 
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
@@ -95,38 +84,6 @@
                                 </select>
                             </div>
                         </div>
-
-                        {{-- <div class="col-sm-2">
-                            <div class="form-group mb-3">
-                                <label for="cboPosition"
-                                    class="form-label font-size-13 text-muted">{{ __('menus.content.position') }}</label>
-                                <select class="form-control" name="cboPosition" id="cboPosition">
-                                    <option value="">{{ __('forms.search...') }}</option>
-                                    @foreach ($position as $p)
-                                        <option value="{{ $p->id }}"
-                                            {{ request('cboPosition') == $p->id ? 'selected' : '' }}>
-                                            {{ $p->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div> --}}
-
-                        {{-- <div class="col-sm-2">
-                            <div class="form-group mb-3">
-                                <label for="cboLevel"
-                                    class="form-label font-size-13 text-muted">{{ __('menus.content.level') }}</label>
-                                <select class="form-control" name="cboLevel" id="cboLevel">
-                                    <option value="">{{ __('forms.search...') }}</option>
-                                    @foreach ($level as $l)
-                                        <option value="{{ $l->id }}"
-                                            {{ request('cboLevel') == $l->id ? 'selected' : '' }}>
-                                            {{ $l->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div> --}}
 
                         <div class="col-sm-2">
                             <div class="form-group mb-3">
@@ -226,9 +183,8 @@
                             </a>
                         </div> --}}
 
-                        <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-2">
+                        {{-- <div class="mb-4 d-flex flex-wrap align-items-end justify-content-between gap-2">
 
-                            {{-- Flex-start: Create, Payment, and ID filters --}}
                             <div class="d-flex flex-wrap align-items-end gap-2">
 
                                 @if (hasPermission('missions.create') && $ministry->is_archived != 2)
@@ -248,8 +204,7 @@
                                 </a>
                             </div>
 
-                            {{-- Flex-end: Back button --}}
-                            {{-- <div class="ms-auto d-flex flex-wrap align-items-end gap-2">
+                            <div class="ms-auto d-flex flex-wrap align-items-end gap-2">
                                 <div style="width: 120px;">
                                     <label for="start_id" class="form-label mb-1">ID ចាប់ពី</label>
                                     <input type="number" id="start_index" class="form-control" min="1"
@@ -269,10 +224,181 @@
                                 <button type="button" class="btn btn-secondary" id="btnResetIdRange">
                                     <i class="bx bx-reset"></i>
                                 </button>
-                            </div> --}}
+                            </div>
 
+                        </div> --}}
+
+                        <div class="mb-4 d-flex flex-column gap-3">
+
+                            {{-- Top toolbar --}}
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+
+                                {{-- Left: Main actions --}}
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+
+                                    @if (hasPermission('missions.create') && $ministry->is_archived != 2)
+                                        <a class="btn btn-light waves-effect waves-light"
+                                            href="{{ route('missions.create', $params) }}">
+                                            <i class="bx bx-plus me-1"></i>
+                                            {{ __('buttons.create') }}
+                                        </a>
+                                    @endif
+
+                                    {{-- Payment --}}
+                                    <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
+                                        <i class="bx bx-money me-1"></i>
+                                        ទូទាត់
+                                    </button>
+
+                                    {{-- Save Payment Draft --}}
+                                    <button type="button" class="btn btn-warning" id="btnSavePaymentDraft">
+                                        <i class="bx bx-save me-1"></i>
+                                        រក្សាទុកទូទាត់
+                                        <span class="badge bg-danger ms-1" id="pendingMissionCount">
+                                            {{ $pendingMissionCount }}
+                                        </span>
+                                    </button>
+
+                                    {{-- Export History --}}
+                                    {{-- <button type="button" class="btn btn-dark" data-bs-toggle="modal"
+                                        data-bs-target="#paymentExportHistoryModal">
+                                        <i class="bx bx-history me-1"></i>
+                                        Export History
+                                    </button> --}}
+                                    <button type="button" class="btn btn-dark" data-bs-toggle="modal"
+                                        data-bs-target="#paymentExportHistoryModal">
+                                        <i class="bx bx-history me-1"></i>
+                                        Export History
+                                    </button>
+
+                                    <a class="btn btn-outline-secondary" href="{{ route('initialMission.index') }}">
+                                        <i class="bx bx-arrow-back me-1"></i>
+                                        {{ __('buttons.back') }}
+                                    </a>
+
+                                </div>
+
+                                {{-- Right: Search by Mission ID --}}
+                                {{-- <div class="d-flex flex-wrap align-items-end gap-2">
+
+                                    <div style="width: 120px;">
+                                        <label for="start_index" class="form-label mb-1">
+                                            ID ចាប់ពី
+                                        </label>
+                                        <input type="number" id="start_index" class="form-control" min="1"
+                                            placeholder="Start ID">
+                                    </div>
+
+                                    <div style="width: 120px;">
+                                        <label for="end_index" class="form-label mb-1">
+                                            ID ដល់
+                                        </label>
+                                        <input type="number" id="end_index" class="form-control" min="1"
+                                            placeholder="End ID">
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary" id="btnSearchIdRange">
+                                        <i class="bx bx-search me-1"></i>
+                                        ស្វែងរក
+                                    </button>
+
+                                    <button type="button" class="btn btn-secondary" id="btnResetIdRange"
+                                        title="Reset ID search">
+                                        <i class="bx bx-reset"></i>
+                                    </button>
+
+                                </div> --}}
+                            </div>
                         </div>
                     </div>
+
+                    {{-- Payment Export History Modal --}}
+
+                    {{-- Payment Export History Modal --}}
+                    <div class="modal fade" id="paymentExportHistoryModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+
+                                <div class="modal-header bg-dark text-white">
+                                    <h5 class="modal-title">
+                                        <i class="bx bx-history me-1"></i>
+                                        Payment Export History
+                                    </h5>
+
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                                    </button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <p class="text-muted">
+                                        List of paid missions. Each mission appears only once.
+                                    </p>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-hover align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Payment Status</th>
+                                                    <th>Paid At</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                @forelse ($exportLogs as $mission)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+
+                                                        <td>
+                                                            <span class="badge bg-success">
+                                                                {{ ucfirst($mission->payment_status) }}
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            {{ $mission->paid_at ? \Carbon\Carbon::parse($mission->paid_at)->format('d/m/Y H:i:s') : '-' }}
+                                                        </td>
+                                                        <td>
+                                                            {{-- <a href="{{ route('missions.edit', [
+                                                                'params' => $params,
+                                                                'id' => $mission->id,
+                                                            ]) }}"
+                                                                class="btn btn-sm btn-outline-primary">
+                                                                <i class="bx bx-show"></i>
+                                                                Open
+                                                            </a> --}}
+
+                                                            {{-- <button type="button"
+                                                                class="btn btn-sm btn-success btn-export-again"
+                                                                data-mission-id="{{ $mission->id }}">
+                                                                <i class="bx bx-export"></i>
+                                                                Export Again
+                                                            </button> --}}
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-success btn-export-again"
+                                                                data-paid-at="{{ $mission->paid_at }}">
+                                                                <i class="bx bx-export"></i>
+                                                                Export Again
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="6" class="text-center text-muted py-4">
+                                                            No paid missions found.
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
                     {{-- @endif --}}
                     <div class="table-responsive">
                         {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
@@ -1158,6 +1284,7 @@
             $('#mission-table').DataTable().ajax.reload();
         });
     </script> --}}
+
     <script>
         // Search by Mission ID range and calculate payment
         $('#btnSearchIdRange').on('click', function() {
@@ -1252,5 +1379,476 @@
                 }
             });
         }
+    </script>
+
+    <script>
+        $(document).on('change', '#filterApprovalStatus', function() {
+            const status = $(this).val();
+
+            $('#paymentApprovalModal tbody tr[data-approval-status]').each(function() {
+                const rowStatus = $(this).data('approval-status');
+
+                $(this).toggle(!status || rowStatus === status);
+            });
+        });
+    </script>
+
+    {{-- Save Payment Draft --}}
+    {{-- Save Payment Draft --}}
+    {{-- <script>
+        $(document).on('click', '#btnSavePaymentDraft', function() {
+            const $button = $(this);
+
+            // Get selected IDs and remove duplicates.
+            const cboId = [...new Set(
+                getSelectedMissionIds().map(Number)
+            )].filter(id => Number.isInteger(id) && id > 0);
+
+            if (cboId.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'បញ្ជាក់',
+                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។'
+                });
+
+                return;
+            }
+
+            Swal.fire({
+                title: 'Save Draft Payment?',
+                text: `Save ${cboId.length} selected missions for payment later?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Save Draft',
+                cancelButtonText: 'Cancel'
+            }).then(function(result) {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                $button.prop('disabled', true);
+
+                $.ajax({
+                    url: @json(route('missions.savePaymentDraft', [
+                            'params' => $params,
+                        ])),
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        cboId: cboId
+                    },
+
+                    success: function(response) {
+                        if (!response.success) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Unable to save draft',
+                                text: response.message || 'Please try again.'
+                            });
+
+                            return;
+                        }
+
+                        const amount = Number(response.total_amount || 0)
+                            .toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            });
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Draft Saved Successfully',
+                            html: `
+                            <div class="text-start">
+                                <p>
+                                    Draft ID:
+                                    <strong>${response.draft_id}</strong>
+                                </p>
+
+                                <p>
+                                    Number of missions:
+                                    <strong>${response.mission_count}</strong>
+                                </p>
+
+                                <p>
+                                    Total payment:
+                                    <strong>${amount}</strong>
+                                </p>
+
+                                <p>
+                                    Saved date:
+                                    <strong>${response.created_at || ''}</strong>
+                                </p>
+
+                                <p class="text-success mb-0">
+                                    <i class="bx bx-check-circle"></i>
+                                    No missions have been marked as paid.
+                                </p>
+                            </div>
+                        `,
+                            confirmButtonText: 'OK'
+                        }).then(function() {
+                            // Optional: reload the page if it displays a
+                            // server-rendered list of saved drafts.
+                            // Remove this line if you do not want a reload.
+                            // location.reload();
+                        });
+
+                        // If you have a saved-drafts table on this page,
+                        // refresh that table here to show the new draft.
+                    },
+
+                    error: function(xhr) {
+                        let message = 'Failed to save payment draft.';
+
+                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
+                            message = Object.values(xhr.responseJSON.errors)
+                                .flat()
+                                .join('\n');
+                        } else if (xhr.responseJSON?.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: message
+                        });
+                    },
+
+                    complete: function() {
+                        $button.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script> --}}
+    {{-- <script>
+        $(document).on('click', '#btnSavePaymentDraft', function() {
+            const selectedIds = [];
+
+            $('.mission-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+
+            if (selectedIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'មិនទាន់ជ្រើសរើសបេសកកម្ម',
+                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។',
+                    confirmButtonText: 'យល់ព្រម'
+                });
+                return;
+            }
+
+            const $button = $(this);
+            $button.prop('disabled', true);
+
+            $.ajax({
+                url: "{{ route('missions.paymentDraft.calculateTotal', ['params' => $params]) }}",
+                type: 'POST',
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    cboId: selectedIds
+                },
+                success: function(response) {
+                    if (!response.success) {
+                        Swal.fire(
+                            'មានបញ្ហា',
+                            'មិនអាចគណនាចំនួនទឹកប្រាក់ទូទាត់បានទេ។',
+                            'error'
+                        );
+                        return;
+                    }
+
+                    const total = Number(response.total_amount || 0);
+
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'បញ្ជាក់ការរក្សាទុកសេចក្តីព្រាងទូទាត់',
+                        html: `
+                        <p>ចំនួនបេសកកម្មដែលបានជ្រើសរើស៖
+                            <strong>${response.mission_ids.length}</strong>
+                        </p>
+
+                        <p>ទឹកប្រាក់បេសកកម្មដែលមានស្រាប់៖
+                            <strong>${Number(response.existing_total).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })}</strong>
+                        </p>
+
+                        <p>ទឹកប្រាក់បេសកកម្មថ្មី៖
+                            <strong>${Number(response.new_total).toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })}</strong>
+                        </p>
+
+                        <hr>
+
+                        <p>ទឹកប្រាក់សរុប៖
+                            <strong>${total.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })}</strong>
+                        </p>
+                    `,
+                        showCancelButton: true,
+                        confirmButtonText: 'បញ្ជាក់ និងរក្សាទុក',
+                        cancelButtonText: 'បោះបង់'
+                    }).then(function(result) {
+                        if (result.isConfirmed) {
+                            // ហៅមុខងារ savePaymentDraft ដើម្បីរក្សាទុកសេចក្តីព្រាងទូទាត់។
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'ការគណនាបានបញ្ចប់',
+                                text: 'សូមភ្ជាប់មុខងាររក្សាទុកសេចក្តីព្រាងទូទាត់។',
+                                confirmButtonText: 'យល់ព្រម'
+                            });
+                        }
+                    });
+                },
+                error: function(xhr) {
+                    const message = xhr.responseJSON?.message ||
+                        'Failed to calculate payment total.';
+
+                    Swal.fire('Error', message, 'error');
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+    </script> --}}
+
+    <script>
+        $(document).on('click', '#btnSavePaymentDraft', function() {
+
+            const $button = $(this);
+
+            // 1. Get selected IDs, including selections from other pages.
+            let selectedIds = getSelectedMissionIds();
+
+            selectedIds = [...new Set(selectedIds.map(String))];
+
+            // 2. Validate selection.
+            if (selectedIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'មិនទាន់ជ្រើសរើសបេសកកម្ម',
+                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។',
+                    confirmButtonText: 'យល់ព្រម'
+                });
+                return;
+            }
+
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            // 3. Disable button.
+            $button.prop('disabled', true);
+
+            // 4. Calculate total.
+            $.ajax({
+                url: "{{ route('missions.paymentDraft.calculateTotal', ['params' => $params]) }}",
+                type: 'POST',
+                data: {
+                    _token: csrfToken,
+                    cboId: selectedIds
+                },
+
+                success: function(response) {
+
+                    if (!response.success) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'មានបញ្ហា',
+                            text: response.message ||
+                                'មិនអាចគណនាចំនួនទឹកប្រាក់ទូទាត់បានទេ។',
+                            confirmButtonText: 'យល់ព្រម'
+                        });
+                        return;
+                    }
+
+                    const money = value =>
+                        Number(value || 0).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+
+                    const total = Number(response.total_amount || 0);
+
+                    // 5. Confirm payment draft.
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'បញ្ជាក់ការរក្សាទុកសេចក្តីព្រាងទូទាត់',
+
+                        html: `
+                        <div class="text-start">
+                            <p>
+                                ចំនួនបេសកកម្មដែលបានជ្រើសរើស៖
+                                <strong>${selectedIds.length}</strong>
+                            </p>
+
+                            <p>
+                                ទឹកប្រាក់បេសកកម្មដែលមានស្រាប់៖
+                                <strong>${money(response.existing_total)}</strong>
+                            </p>
+
+                            <p>
+                                ទឹកប្រាក់បេសកកម្មថ្មី៖
+                                <strong>${money(response.new_total)}</strong>
+                            </p>
+
+                            <hr>
+
+                            <p>
+                                ទឹកប្រាក់សរុប៖
+                                <strong class="text-primary fs-5">
+                                    ${money(total)}
+                                </strong>
+                            </p>
+                        </div>
+                    `,
+
+                        showCancelButton: true,
+                        confirmButtonText: 'បញ្ជាក់ និងរក្សាទុក',
+                        cancelButtonText: 'បោះបង់',
+                        reverseButtons: true
+                    }).then(function(result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        // 6. Save the selected missions.
+                        $.ajax({
+                            url: "{{ route('missions.paymentDraft.save', ['params' => $params]) }}",
+                            type: 'POST',
+                            data: {
+                                _token: csrfToken,
+                                cboId: selectedIds
+                            },
+
+                            success: function(saveResponse) {
+
+                                if (!saveResponse.success) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'មានបញ្ហា',
+                                        text: saveResponse.message ||
+                                            'មិនអាចរក្សាទុកសេចក្តីព្រាងទូទាត់បានទេ។',
+                                        confirmButtonText: 'យល់ព្រម'
+                                    });
+                                    return;
+                                }
+
+                                // 7. Clear persistent selection.
+                                window.selectedMissionIds.clear();
+
+                                $('#checkAllMissions')
+                                    .prop('checked', false)
+                                    .prop('indeterminate', false);
+
+                                // 8. Show success and refresh DataTable.
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'រក្សាទុកបានជោគជ័យ',
+                                    text: saveResponse.message ||
+                                        'បានរក្សាទុកសេចក្តីព្រាងទូទាត់ដោយជោគជ័យ។',
+                                    confirmButtonText: 'យល់ព្រម'
+                                }).then(function() {
+                                    $('#mission-table')
+                                        .DataTable()
+                                        .ajax.reload(null, false);
+                                });
+                            },
+
+                            error: function(xhr) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'មានបញ្ហា',
+                                    text: xhr.responseJSON?.message ||
+                                        'មានបញ្ហាក្នុងការរក្សាទុកសេចក្តីព្រាងទូទាត់។',
+                                    confirmButtonText: 'យល់ព្រម'
+                                });
+                            },
+
+                            complete: function() {
+                                $button.prop('disabled', false);
+                            }
+                        });
+                    });
+                },
+
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'មានបញ្ហា',
+                        text: xhr.responseJSON?.message ||
+                            'មិនអាចគណនាចំនួនទឹកប្រាក់ទូទាត់បានទេ។',
+                        confirmButtonText: 'យល់ព្រម'
+                    });
+                },
+
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).on('click', '.btn-export-again', function () {
+    const paidAt = $(this).attr('data-paid-at');
+    const $button = $(this);
+
+    $button.prop('disabled', true);
+
+    $.ajax({
+        url: @json(route('missions.exportIds', ['params' => $params])),
+        type: 'GET',
+        dataType: 'json',
+        data: {
+            paid_at: paidAt
+        },
+
+        success: function (response) {
+            if (!response.success || !response.mission_ids.length) {
+                Swal.fire(
+                    'មិនមានទិន្នន័យ',
+                    response.message || 'រកមិនឃើញបេសកកម្មដែលបានទូទាត់ទេ។',
+                    'warning'
+                );
+                return;
+            }
+
+            // Use the existing GET export route.
+            const exportUrl = new URL(
+                @json(route('missions.export', ['params' => $params])),
+                window.location.origin
+            );
+
+            response.mission_ids.forEach(function (id) {
+                exportUrl.searchParams.append('cboId[]', id);
+            });
+
+            window.location.href = exportUrl.toString();
+        },
+
+        error: function (xhr) {
+            Swal.fire(
+                'មានបញ្ហា',
+                xhr.responseJSON?.message || 'មិនអាចទាញយកទិន្នន័យបានទេ។',
+                'error'
+            );
+        },
+
+        complete: function () {
+            $button.prop('disabled', false);
+        }
+    });
+});
     </script>
 @endsection

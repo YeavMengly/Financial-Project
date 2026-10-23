@@ -396,7 +396,6 @@
                                     </div>
                                 </div>
 
-
                                 {{-- Description --}}
                                 <div class="row">
 
@@ -1138,51 +1137,53 @@
 
                 const employees = [];
 
-                // document
-                //     .querySelectorAll('#employeeRows .employee-row')
-                //     .forEach(function(row) {
+                document
+                    .querySelectorAll('#employeeRows .employee-row')
+                    .forEach(function(row) {
 
-                //         const employeeSelect =
-                //             row.querySelector('.employee-name');
+                        const employeeSelect =
+                            row.querySelector('.employee-name');
 
-                //         if (!employeeSelect) {
-                //             return;
-                //         }
+                        if (!employeeSelect) {
+                            return;
+                        }
 
-                //         const employeeId =
-                //             employeeSelect.value;
+                        const employeeId =
+                            employeeSelect.value;
 
-                //         if (!employeeId) {
-                //             return;
-                //         }
+                        if (!employeeId) {
+                            return;
+                        }
 
-                //         const selectedOption =
-                //             employeeSelect.options[
-                //                 employeeSelect.selectedIndex
-                //             ];
+                        const selectedOption =
+                            employeeSelect.options[
+                                employeeSelect.selectedIndex
+                            ];
 
-                //         const employeeName =
-                //             selectedOption?.textContent.trim() || '';
+                        const employeeName =
+                            selectedOption?.textContent.trim() || '';
 
-                //         const accountInput =
-                //             row.querySelector(
-                //                 '.employee-account-number'
-                //             );
+                        const accountInput =
+                            row.querySelector(
+                                '.employee-account-number'
+                            );
 
-                //         const accountNumber =
-                //             accountInput?.value ||
-                //             selectedOption?.getAttribute(
-                //                 'data-account-number'
-                //             ) ||
-                //             '';
+                        const accountNumber =
+                            accountInput?.value ||
+                            selectedOption?.getAttribute(
+                                'data-account-number'
+                            ) ||
+                            '';
 
-                //         employees.push({
-                //             id: String(employeeId),
-                //             name: employeeName,
-                //             account_number: accountNumber
-                //         });
+                        employees.push({
+                            id: String(employeeId),
+                            name: employeeName,
+                            account_number: accountNumber
+                        });
 
-                //     });
+                    });
+                return employees;
+
                 document.querySelectorAll('.employee-row').forEach(function(row) {
                     const employeeSelect = row.querySelector('.employee-name');
                     const accountInput = row.querySelector('.employee-account-number');
@@ -1216,7 +1217,7 @@
                     row.querySelector('.employee-account-number').value =
                         selectedOption?.dataset.accountNumber || '';
                 });
-                // return employees;
+
             }
 
 
