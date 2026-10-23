@@ -56,19 +56,30 @@ class DuelReleaseDataTable extends DataTable
                 if (!$row->file) {
                     return '<span class="text-muted">-</span>';
                 }
-                $files = json_decode($row->file, true);
-                if (is_array($files)) {
-                    $html = '<ul class="list-unstyled m-0">';
-                    foreach ($files as $file) {
-                        $url = asset('storage/uploads/' . $file);
-                        $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-                    }
-                    $html .= '</ul>';
-                    return $html;
-                }
-                $url = asset('storage/uploads/' . $row->file);
-                return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
+                $url = asset('storage/' . $row->file);
+                $filename = basename($row->file);
+
+                return "<a href='{$url}' target='_blank' class='text-primary'>
+                <i class='fas fa-file-alt me-1'></i>Preview
+            </a>";
             })
+            // ->editColumn('file', function ($row) {
+            //     if (!$row->file) {
+            //         return '<span class="text-muted">-</span>';
+            //     }
+            //     $files = json_decode($row->file, true);
+            //     if (is_array($files)) {
+            //         $html = '<ul class="list-unstyled m-0">';
+            //         foreach ($files as $file) {
+            //             $url = asset('storage/uploads/' . $file);
+            //             $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
+            //         }
+            //         $html .= '</ul>';
+            //         return $html;
+            //     }
+            //     $url = asset('storage/uploads/' . $row->file);
+            //     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
+            // })
             ->rawColumns(['note', 'refer', 'file', 'soft_delete']);
     }
 
@@ -207,8 +218,8 @@ class DuelReleaseDataTable extends DataTable
         if ($request->filled('cboDuelType')) {
             $query->where('duel_releases.item_name', $request->cboDuelType);
         }
-        if ($request->filled('cboExecutiveUnit')) {
-            $query->where('duel_releases.executive_unit', $request->cboExecutiveUnit);
+        if ($request->filled('cboAgency')) {
+            $query->where('duel_releases.agency', $request->cboAgency);
         }
 
 
@@ -320,7 +331,7 @@ class DuelReleaseDataTable extends DataTable
                     d.end_date = $("#end_date").val();
                     d.cboUserRequest = $("#cboUserRequest").val();
                     d.cboDuelType = $("#cboDuelType").val();
-                    d.cboExecutiveUnit = $("#cboExecutiveUnit").val();
+                    d.cboAgency = $("#cboAgency").val();
                 }',
             ])
             ->initComplete('function () {

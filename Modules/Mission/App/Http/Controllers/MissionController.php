@@ -45,20 +45,26 @@ class MissionController extends Controller
         $provinces = Province::all();
         $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
 
-        $paymentDrafts = Mission::where('payment_approval_status', 'draft')
+        // $paymentDrafts = Mission::where('payment_approval_status', 'draft')
+        //     ->get();
+
+        // $approvalRecords = Mission::whereIn('payment_approval_status', [
+        //     'pending',
+        //     'approved',
+        //     'rejected',
+        //     'paid',
+        // ])->get();
+        $pendingMissionCount = Mission::where('payment_is_archived', 2)->count();
+
+        $exportLogs = Mission::query()
+            ->where('ministry_id', decode_params($params))
+            ->where('payment_status', 'paid')
+            ->whereNull('deleted_at')
+            ->select('paid_at')
+            ->distinct()
+            ->orderByDesc('paid_at')
             ->get();
 
-        $approvalRecords = Mission::whereIn('payment_approval_status', [
-            'pending',
-            'approved',
-            'rejected',
-            'paid',
-        ])->get();
-
-        $exportLogs = DB::table('payment_export_logs')
-            // ->with('exporter')
-            ->latest('exported_at')
-            ->get();
 
         return $dataTable->render('mission::missions.index', [
             'params' => $params,
@@ -67,8 +73,10 @@ class MissionController extends Controller
             'level' => $level,
             'provinces' => $provinces,
             'employees' => $employees,
-            'paymentDrafts' => $paymentDrafts,
-            'approvalRecords' => $approvalRecords,
+            // 'paymentDrafts' => $paymentDrafts,
+            // 'approvalRecords' => $approvalRecords,
+
+            'pendingMissionCount' => $pendingMissionCount,
             'exportLogs' => $exportLogs,
         ]);
     }
@@ -1331,7 +1339,6 @@ class MissionController extends Controller
         ]);
     }
 
-
     public function updatePaymentStatus(Request $request, $params)
     {
         $validated = $request->validate([
@@ -1364,10 +1371,11 @@ class MissionController extends Controller
                     $query->where('payment_status', '!=', 'paid')
                         ->orWhereNull('payment_status');
                 })
-                ->where('payment_is_archived', '!=', 2)
+                ->where('payment_is_archived', '!=', 3)
                 ->update([
                     'payment_status' => 'paid',
-                    'payment_is_archived' => 2,
+                    'payment_is_archived' => 3,
+                    'paid_at' => now(),
                     'updated_at' => now(),
                 ]);
 
@@ -1414,6 +1422,62 @@ class MissionController extends Controller
                 'message' => 'មានបញ្ហាក្នុងការបង់ប្រាក់។',
             ], 500);
         }
+    }
+
+    public function calculatePaymentDraftTotal(Request $request, $params)
+    {
+        $validated = $request->validate([
+            'cboId' => ['required', 'array', 'min:1'],
+            'cboId.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:missions,id',
+            ],
+        ]);
+
+        $ministryId = decode_params($params);
+
+        $selectedIds = array_map('intval', $validated['cboId']);
+
+        // Existing missions already included in payment.
+        $existingTotal = DB::table('mission_employees')
+            ->join(
+                'missions',
+                'mission_employees.mission_id',
+                '=',
+                'missions.id'
+            )
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at')
+            ->where('missions.payment_is_archived', 2)
+            ->sum('mission_employees.total');
+
+        // Calculate newly selected missions.
+        // Exclude missions already included in the existing total.
+        $newTotal = DB::table('mission_employees')
+            ->join(
+                'missions',
+                'mission_employees.mission_id',
+                '=',
+                'missions.id'
+            )
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at')
+            ->whereIn('missions.id', $selectedIds)
+            ->where('missions.payment_is_archived', '!=', 2)
+            ->sum('mission_employees.total');
+
+        // Combined amount.
+        $totalAmount = $existingTotal + $newTotal;
+
+        return response()->json([
+            'success' => true,
+            'existing_total' => (float) $existingTotal,
+            'new_total' => (float) $newTotal,
+            'total_amount' => (float) $totalAmount,
+            'mission_ids' => array_values($selectedIds),
+        ]);
     }
 
     public function destroyEmployee($params, $id)
@@ -1813,6 +1877,34 @@ class MissionController extends Controller
         }
     }
 
+    public function getPaidMissionExportIds(Request $request, $params)
+    {
+        $request->validate([
+            'paid_at' => ['required', 'date'],
+        ]);
+
+        $missionIds = DB::table('missions')
+            ->where('ministry_id', decode_params($params))
+            ->where('payment_status', 'paid')
+            ->whereNull('deleted_at')
+            ->where('paid_at', $request->input('paid_at'))
+            ->distinct()
+            ->orderBy('id')
+            ->pluck('id');
+
+        if ($missionIds->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'រកមិនឃើញបេសកកម្មដែលបានទូទាត់ទេ។',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'mission_ids' => $missionIds,
+        ]);
+    }
+
     public function getPaymentAccount(Request $request)
     {
         $request->validate([
@@ -1903,81 +1995,212 @@ class MissionController extends Controller
         ]);
     }
 
+    // public function savePaymentStatusExportHistory(Request $request, $params)
+    // {
+    //     $validated = $request->validate([
+    //         'export_url' => ['required', 'string', 'max:10000'],
+    //         'file_name' => ['nullable', 'string', 'max:255'],
+    //         'filters' => ['nullable', 'array'],
+    //         'mission_ids' => ['nullable', 'array'],
+    //         'mission_ids.*' => [
+    //             'integer',
+    //             'distinct',
+    //             'exists:missions,id',
+    //         ],
+    //         'start_id' => ['nullable', 'integer', 'min:1'],
+    //         'end_id' => ['nullable', 'integer', 'min:1'],
+    //         'total_amount' => ['nullable', 'numeric'],
+    //     ]);
 
-    public function savePaymentStatusExportHistory(Request $request, $params)
+    //     $ministryId = decode_params($params);
+
+    //     $missionIds = $validated['mission_ids'] ?? [];
+
+    //     // Validate the ID range.
+    //     if (
+    //         isset($validated['start_id'], $validated['end_id']) &&
+    //         $validated['start_id'] > $validated['end_id']
+    //     ) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Start ID must be less than or equal to End ID.',
+    //         ], 422);
+    //     }
+
+    //     // Ensure selected missions belong to the current ministry.
+    //     if (!empty($missionIds)) {
+    //         $validCount = Mission::whereIn('id', $missionIds)
+    //             ->where('ministry_id', $ministryId)
+    //             ->whereNull('deleted_at')
+    //             ->count();
+
+    //         if ($validCount !== count($missionIds)) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Some selected missions are invalid.',
+    //             ], 422);
+    //         }
+    //     }
+
+    //     $filters = $validated['filters'] ?? [];
+
+    //     $filters['mission_ids'] = $missionIds;
+    //     $filters['start_id'] = $validated['start_id'] ?? null;
+    //     $filters['end_id'] = $validated['end_id'] ?? null;
+    //     $filters['total_amount'] = $validated['total_amount'] ?? null;
+    //     $filters['ministry_id'] = $ministryId;
+
+    //     $logId = DB::table('payment_export_logs')->insertGetId([
+    //         'payment_draft_id' => null,
+    //         'exported_by' => auth()->id(),
+    //         'export_type' => 'payment_status',
+    //         'file_name' => $validated['file_name']
+    //             ?? 'payment_status_export.xlsx',
+    //         'filters' => json_encode(
+    //             $filters,
+    //             JSON_UNESCAPED_UNICODE
+    //         ),
+    //         'exported_at' => now(),
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Export history saved successfully.',
+    //         'log_id' => $logId,
+    //     ]);
+    // }
+
+
+    public function savePaymentDraft(Request $request, $params)
     {
         $validated = $request->validate([
-            'export_url' => ['required', 'string', 'max:10000'],
-            'file_name' => ['nullable', 'string', 'max:255'],
-            'filters' => ['nullable', 'array'],
-            'mission_ids' => ['nullable', 'array'],
-            'mission_ids.*' => [
+            'cboId' => ['required', 'array', 'min:1'],
+            'cboId.*' => [
+                'required',
                 'integer',
                 'distinct',
                 'exists:missions,id',
             ],
-            'start_id' => ['nullable', 'integer', 'min:1'],
-            'end_id' => ['nullable', 'integer', 'min:1'],
-            'total_amount' => ['nullable', 'numeric'],
         ]);
 
-        $ministryId = decode_params($params);
+        $missionIds = array_map('intval', $validated['cboId']);
 
-        $missionIds = $validated['mission_ids'] ?? [];
+        $result = DB::transaction(function () use ($missionIds) {
 
-        // Validate the ID range.
-        if (
-            isset($validated['start_id'], $validated['end_id']) &&
-            $validated['start_id'] > $validated['end_id']
-        ) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Start ID must be less than or equal to End ID.',
-            ], 422);
-        }
+            // Find selected missions that are still drafts.
+            $missions = Mission::whereIn('id', $missionIds)
+                ->where('payment_status', 'unpaid')
+                ->lockForUpdate()
+                ->get();
 
-        // Ensure selected missions belong to the current ministry.
-        if (!empty($missionIds)) {
-            $validCount = Mission::whereIn('id', $missionIds)
-                ->where('ministry_id', $ministryId)
-                ->whereNull('deleted_at')
-                ->count();
-
-            if ($validCount !== count($missionIds)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Some selected missions are invalid.',
-                ], 422);
+            if ($missions->count() !== count($missionIds)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cboId' => 'ទិន្ន័យបានបង្កើតឡើងរួច.',
+                ]);
             }
-        }
 
-        $filters = $validated['filters'] ?? [];
+            $totalAmount = 0;
 
-        $filters['mission_ids'] = $missionIds;
-        $filters['start_id'] = $validated['start_id'] ?? null;
-        $filters['end_id'] = $validated['end_id'] ?? null;
-        $filters['total_amount'] = $validated['total_amount'] ?? null;
-        $filters['ministry_id'] = $ministryId;
+            foreach ($missions as $mission) {
 
-        $logId = DB::table('payment_export_logs')->insertGetId([
-            'payment_draft_id' => null,
-            'exported_by' => auth()->id(),
-            'export_type' => 'payment_status',
-            'file_name' => $validated['file_name']
-                ?? 'payment_status_export.xlsx',
-            'filters' => json_encode(
-                $filters,
-                JSON_UNESCAPED_UNICODE
-            ),
-            'exported_at' => now(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+                // Calculate the total employee payment for this mission.
+                $missionTotal = MissionEmployee::where(
+                    'mission_id',
+                    $mission->id
+                )->sum('total');
+
+                // Update the existing mission record.
+                $mission->update([
+                    'total_amount' => $missionTotal,
+                    'created_by' => auth()->id(),
+                    'payment_status' => 'pending',
+                    'payment_is_archived' => 2,
+                ]);
+
+                $totalAmount += $missionTotal;
+            }
+
+            return [
+                'mission_count' => $missions->count(),
+                'total_amount' => $totalAmount,
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'message' => 'Export history saved successfully.',
-            'log_id' => $logId,
+            'message' => 'ការដាក់ស្នើសេចក្តីព្រាងទូទាត់ប្រាក់បានជោគជ័យ។',
+            'mission_count' => $result['mission_count'],
+            'total_amount' => (float) $result['total_amount'],
         ]);
     }
+
+    // public function savePaymentDraft(Request $request, $params)
+    // {
+    //     $validated = $request->validate([
+    //         'cboId' => ['required', 'array', 'min:1'],
+    //         'cboId.*' => [
+    //             'required',
+    //             'integer',
+    //             'distinct',
+    //             'exists:missions,id',
+    //         ],
+    //     ]);
+
+    //     $missionIds = array_map('intval', $validated['cboId']);
+
+    //     $draft = DB::transaction(function () use ($missionIds) {
+
+    //         $totalAmount = MissionEmployee::whereIn('mission_id', $missionIds)
+    //             ->sum('total');
+
+    //         return Mission::create([
+    //             'mission_ids'  => $missionIds,
+    //             'total_amount' => $totalAmount,
+    //             'created_by'   => auth()->id(),
+    //             'status'       => 'draft',
+    //         ]);
+    //     });
+
+    //     return response()->json([
+    //         'success'       => true,
+    //         'message'       => 'Payment draft saved successfully.',
+    //         'draft_id'      => $draft->id,
+    //         'mission_count' => count($missionIds),
+    //         'total_amount'  => (float) $draft->total_amount,
+    //     ]);
+    // }
+
+    // View Draft Payment Details
+    // public function viewPaymentDraft(Request $request, $params, $id)
+    // {
+    //     $draft = MissionPaymentDraft::where('id', $id)
+    //         ->where('created_by', auth()->id())
+    //         ->where('status', 'draft')
+    //         ->firstOrFail();
+
+    //     $missionIds = $draft->mission_ids ?? [];
+
+    //     // Retrieve the saved mission records.
+    //     $missions = Mission::whereIn('id', $missionIds)
+    //         ->get();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'draft' => [
+    //             'id' => $draft->id,
+    //             'mission_ids' => $missionIds,
+    //             'mission_count' => count($missionIds),
+    //             'total_amount' => $draft->total_amount,
+    //             'created_at' => $draft->created_at?->format('Y-m-d H:i'),
+    //             'missions' => $missions->map(function ($mission) {
+    //                 return [
+    //                     'id' => $mission->id,
+    //                     'legal_number' => $mission->legal_number ?? '',
+    //                 ];
+    //             })->values(),
+    //         ],
+    //     ]);
+    // }
 }

@@ -40,8 +40,13 @@ class DuelReleaseController extends Controller
         $ministry = Ministry::where('id', $id)->first();
         $duelType = DuelType::all();
         $unitType = UnitType::where('name', 'លីត្រ')->get();
-        $duelRelease = DuelRelease::where('id', $id)
-            ->where('ministry_id', $ministry->id)->get();
+        // $duelRelease = DuelRelease::where('id', $id)
+        //     ->where('ministry_id', $ministry->id)->get();
+        $duelRelease = DuelRelease::where('ministry_id', $ministry->id)
+            ->select('agency')
+            ->distinct()
+            ->get();
+
         $executiveUnits = ExecutiveUnit::where('ministry_id', $ministry->id)->get();
 
         return $dataTable->render('duel::duelRelease.index', [
@@ -757,64 +762,221 @@ class DuelReleaseController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+    // public function export(Request $request, $params)
+    // {
+
+    //     try {
+    //         $ministryId = decode_params($params);
+    //         $query = DuelRelease::query()
+    //             ->where('duel_releases.ministry_id', $ministryId)
+
+    //             ->leftJoin('duel_entries', 'duel_releases.duel_entries_id', '=', 'duel_entries.id')
+    //             ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
+    //             ->leftJoin('projects', 'duel_releases.project_id', '=', 'projects.id')
+    //             ->select(
+    //                 'duel_releases.*',
+    //                 'duel_entries.quantity as quantity'
+    //             )
+    //             ->orderBy('duel_releases.date_release', 'ASC')
+    //             ->orderBy('duel_releases.receipt_number', 'ASC');
+
+    //         $data = $query->get();
+
+    //         if ($request->filled('cboDuelType')) {
+    //             $query->where('duel_releases.item_name', $request->cboDuelType);
+    //         }
+    //         if ($request->filled('cboAgency')) {
+    //             $query->where('duel_releases.agency', $request->cboAgency);
+    //         }
+
+    //         if ($request->filled('start_date')) {
+    //             $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+    //             $query->whereDate('duel_releases.date_release', '>=', $startDate);
+    //         }
+
+    //         if ($request->filled('end_date')) {
+    //             $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
+    //             $query->whereDate('duel_releases.date_release', '<=', $endDate);
+    //         }
+    //         if ($request->filled('start_date')) {
+
+    //             $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+
+    //             foreach ($data as $item) {
+
+    //                 $releasedBefore = DuelRelease::where('ministry_id', $ministryId)
+    //                     ->where('project_id', $item->project_id)
+    //                     ->where('item_name', $item->item_name)
+    //                     ->whereDate('date_release', '<', $startDate)
+    //                     ->sum('quantity_request');
+
+    //                 $item->opening_quantity = max(0, $item->quantity - $releasedBefore);
+    //             }
+    //         } else {
+
+    //             foreach ($data as $item) {
+    //                 $item->opening_quantity = $item->quantity;
+    //             }
+    //         }
+    //         Log::info('Exported DuelExport Count', [
+    //             'ministry_id' => $ministryId,
+    //             'count'       => $data->count(),
+    //         ]);
+
+    //         if ($data->isEmpty()) {
+    //             flash()
+    //                 ->translate('en')
+    //                 ->option('timeout', 2000)
+    //                 ->error('មិនមានទិន្នន័យសម្រាប់នាំចេញទេ!', 'បញ្ហា')
+    //                 ->flash();
+
+    //             return redirect()->route('duelRelease.index', $params);
+    //         }
+
+    //         $export = new DuelReleaseExport(
+    //             $data,
+    //             $ministryId,
+    //             $request->start_date,
+    //             $request->end_date
+    //         );
+    //         return $export->export($request);
+    //         // return view('maintenance.maintenance');
+    //     } catch (\Throwable $e) {
+    //         Log::error('Export Error: ' . $e->getMessage(), [
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+
+    //         flash()
+    //             ->translate('en')
+    //             ->option('timeout', 2000)
+    //             ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+    //             ->flash();
+
+    //         return redirect()->route('duelRelease.index', $params);
+    //     }
+    // }
     public function export(Request $request, $params)
     {
-
         try {
             $ministryId = decode_params($params);
+
+            // Build query first
             $query = DuelRelease::query()
                 ->where('duel_releases.ministry_id', $ministryId)
-
-                ->leftJoin('duel_entries', 'duel_releases.duel_entries_id', '=', 'duel_entries.id')
-                ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
-                ->leftJoin('projects', 'duel_releases.project_id', '=', 'projects.id')
+                ->leftJoin(
+                    'duel_entries',
+                    'duel_releases.duel_entries_id',
+                    '=',
+                    'duel_entries.id'
+                )
+                ->leftJoin(
+                    'duel_types',
+                    'duel_releases.item_name',
+                    '=',
+                    'duel_types.id'
+                )
+                ->leftJoin(
+                    'projects',
+                    'duel_releases.project_id',
+                    '=',
+                    'projects.id'
+                )
                 ->select(
                     'duel_releases.*',
                     'duel_entries.quantity as quantity'
-                )
-                ->orderBy('duel_releases.date_release', 'ASC')
-                ->orderBy('duel_releases.receipt_number', 'ASC');
+                );
 
-            $data = $query->get();
+            // Apply filters before get()
+            if ($request->filled('cboNumber')) {
+                $query->where(
+                    'duel_releases.receipt_number',
+                    $request->cboNumber
+                );
+            }
+
+            if ($request->filled('cboUserRequest')) {
+                $query->where(
+                    'duel_releases.user_request',
+                    $request->cboUserRequest
+                );
+            }
 
             if ($request->filled('cboDuelType')) {
-                $query->where('duel_releases.item_name', $request->cboDuelType);
+                $query->where(
+                    'duel_releases.item_name',
+                    $request->cboDuelType
+                );
             }
-            if ($request->filled('cboExecutiveUnit')) {
-                $query->where('duel_releases.agency', $request->cboExecutiveUnit);
+
+            if ($request->filled('cboAgency')) {
+                $query->where(
+                    'duel_releases.agency',
+                    $request->cboAgency
+                );
             }
+
             if ($request->filled('start_date')) {
                 $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
-                $query->whereDate('duel_releases.date_release', '>=', $startDate);
+
+                $query->whereDate(
+                    'duel_releases.date_release',
+                    '>=',
+                    $startDate
+                );
             }
 
             if ($request->filled('end_date')) {
                 $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
-                $query->whereDate('duel_releases.date_release', '<=', $endDate);
+
+                $query->whereDate(
+                    'duel_releases.date_release',
+                    '<=',
+                    $endDate
+                );
             }
-            if ($request->filled('start_date')) {
 
-                $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+            // Sort filtered records
+            $query->orderBy('duel_releases.date_release', 'ASC')
+                ->orderBy('duel_releases.receipt_number', 'ASC');
 
-                foreach ($data as $item) {
+            // Execute query after applying all filters
+            $data = $query->get();
 
-                    $releasedBefore = DuelRelease::where('ministry_id', $ministryId)
-                        ->where('stock_number', $item->stock_number)
+            // Calculate opening quantity
+            foreach ($data as $item) {
+                if ($request->filled('start_date')) {
+                    $startDate = Carbon::parse($request->start_date)
+                        ->format('Y-m-d');
+
+                    $releasedBefore = DuelRelease::where(
+                        'ministry_id',
+                        $ministryId
+                    )
+                        ->where('project_id', $item->project_id)
                         ->where('item_name', $item->item_name)
                         ->whereDate('date_release', '<', $startDate)
                         ->sum('quantity_request');
 
-                    $item->opening_quantity = max(0, $item->quantity - $releasedBefore);
-                }
-            } else {
-
-                foreach ($data as $item) {
-                    $item->opening_quantity = $item->quantity;
+                    $item->opening_quantity = max(
+                        0,
+                        (float) ($item->quantity ?? 0) - (float) $releasedBefore
+                    );
+                } else {
+                    $item->opening_quantity = (float) ($item->quantity ?? 0);
                 }
             }
-            Log::info('Exported DuelExport Count', [
+
+            Log::info('Exported DuelRelease Count', [
                 'ministry_id' => $ministryId,
-                'count'       => $data->count(),
+                'count' => $data->count(),
+                'filters' => $request->only([
+                    'cboNumber',
+                    'cboUserRequest',
+                    'cboDuelType',
+                    'cboAgency',
+                    'start_date',
+                    'end_date',
+                ]),
             ]);
 
             if ($data->isEmpty()) {
@@ -833,17 +995,20 @@ class DuelReleaseController extends Controller
                 $request->start_date,
                 $request->end_date
             );
+
             return $export->export($request);
-            // return view('maintenance.maintenance');
         } catch (\Throwable $e) {
-            Log::error('Export Error: ' . $e->getMessage(), [
+            Log::error('DuelRelease Export Error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
             ]);
 
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
-                ->error('បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(), 'បញ្ហា')
+                ->error(
+                    'បញ្ហាក្នុងការនាំចេញទិន្នន័យ: ' . $e->getMessage(),
+                    'បញ្ហា'
+                )
                 ->flash();
 
             return redirect()->route('duelRelease.index', $params);
