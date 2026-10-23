@@ -298,7 +298,7 @@
                             checkbox.checked = false;
                             // Instead of disabled = true (which breaks form posts/validation), 
                             // we uncheck them. We let the backend handle empty arrays safely.
-                            checkbox.disabled = false;
+                            checkbox.disabled = true;
                             checkbox.style.opacity = '0.5';
                         } else {
                             checkbox.style.opacity = '1';
