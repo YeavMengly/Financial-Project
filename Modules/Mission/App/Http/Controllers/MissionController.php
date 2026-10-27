@@ -44,18 +44,7 @@ class MissionController extends Controller
         $level = Levels::all();
         $provinces = Province::all();
         $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
-
-        // $paymentDrafts = Mission::where('payment_approval_status', 'draft')
-        //     ->get();
-
-        // $approvalRecords = Mission::whereIn('payment_approval_status', [
-        //     'pending',
-        //     'approved',
-        //     'rejected',
-        //     'paid',
-        // ])->get();
         $pendingMissionCount = Mission::where('payment_is_archived', 2)->count();
-
         $exportLogs = Mission::query()
             ->where('ministry_id', decode_params($params))
             ->where('payment_status', 'paid')
@@ -65,7 +54,6 @@ class MissionController extends Controller
             ->orderByDesc('paid_at')
             ->get();
 
-
         return $dataTable->render('mission::missions.index', [
             'params' => $params,
             'ministry' => $ministry,
@@ -73,9 +61,6 @@ class MissionController extends Controller
             'level' => $level,
             'provinces' => $provinces,
             'employees' => $employees,
-            // 'paymentDrafts' => $paymentDrafts,
-            // 'approvalRecords' => $approvalRecords,
-
             'pendingMissionCount' => $pendingMissionCount,
             'exportLogs' => $exportLogs,
         ]);
@@ -260,13 +245,11 @@ class MissionController extends Controller
         $ministry = Ministry::where('id', $id)->first();
         $positions = Positions::all();
         $provinces = Province::all();
-        // $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
         $employees = Employee::whereNotNull('name_kh')
             ->whereNotNull('account_number')
             ->whereIn('id', function ($query) {
                 $query->selectRaw('MIN(id)')
                     ->from('employees')
-                    // ->whereNotNull('id_number')
                     ->groupBy('name_kh', 'account_number');
             })
             ->orderBy('id')
@@ -274,7 +257,6 @@ class MissionController extends Controller
         $document = Document::all();
         $program   = Program::where('ministry_id', $ministry->id)->orderBy('no')->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-
 
         return view('mission::missions.create')
             ->with('ministry', $ministry)
@@ -319,6 +301,15 @@ class MissionController extends Controller
             'assign_budget' => 'required|array',
             'assign_budget.*' => 'required|integer',
 
+            'pocket_money' => 'required|array',
+            'pocket_money.*' => 'required|integer',
+
+            'meal_money' => 'required|array',
+            'meal_money.*' => 'required|integer',
+
+            'accommodation_money' => 'required|array',
+            'accommodation_money.*' => 'required|integer',
+
             'fileName' => [
                 'nullable',
                 'file',
@@ -329,7 +320,6 @@ class MissionController extends Controller
             'cboProgram'     => 'nullable|integer',
             'cboProgramSub'  => 'nullable|integer',
             'cboCluster'     => 'nullable|integer',
-            // 'cboAgency'           => 'nullable|integer',
             'cboSubAccount'       => 'nullable|integer',
             'account_number' => ['required', 'array'],
             'account_number.*' => ['required', 'string'],

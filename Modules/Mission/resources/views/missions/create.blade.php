@@ -45,6 +45,16 @@
             font-size: 0.875rem;
             color: #dc3545;
         }
+
+        /* .employee-options {
+                                    display: flex;
+                                    flex-direction: row;
+                                    flex-wrap: nowrap;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 12px;
+                                    white-space: nowrap;
+                                } */
     </style>
 @endsection
 
@@ -432,7 +442,7 @@
                                                         </div>
 
                                                         {{-- Leader + Assign Budget --}}
-                                                        <div class="col-lg-2 col-md-5 col-8">
+                                                        {{-- <div class="col-lg-2 col-md-5 col-8">
                                                             <div class="form-group mb-2">
                                                                 <label class="form-label font-size-13 text-muted d-block">
                                                                     {{ __('forms.leader') }} / {{ __('forms.assign') }}
@@ -463,10 +473,100 @@
                                                                         </label>
                                                                     </div>
 
+                                                                    <div class="form-check mb-0">
+                                                                        <input type="hidden" class="pocket-money-value"
+                                                                            name="pocket_money[]" value="0">
+
+                                                                        <input type="checkbox"
+                                                                            class="form-check-input pocket-money"
+                                                                            name="pocket_money_checkbox[]">
+
+                                                                        <label class="form-check-label">
+                                                                            {{ __('forms.pocket.money') }}
+                                                                        </label>
+                                                                    </div>
+
+                                                                    <div class="form-check mb-0">
+                                                                        <input type="hidden" class="meal-money-value"
+                                                                            name="meal_money[]" value="0">
+
+                                                                        <input type="checkbox"
+                                                                            class="form-check-input meal-money"
+                                                                            name="meal_money_checkbox[]">
+
+                                                                        <label class="form-check-label">
+                                                                            {{ __('forms.meal.money') }}
+                                                                        </label>
+                                                                    </div>
+
+                                                                    <div class="form-check mb-0">
+                                                                        <input type="hidden"
+                                                                            class="accommodation-money-value"
+                                                                            name="accommodation_money[]" value="0">
+
+                                                                        <input type="checkbox"
+                                                                            class="form-check-input accommodation-money"
+                                                                            name="accommodation_money_checkbox[]">
+
+                                                                        <label class="form-check-label">
+                                                                            {{ __('forms.accommodation.money') }}
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
+                                                        </div> --}}
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-start flex-nowrap gap-3">
 
+                                                            <div class="form-check mb-0">
+                                                                <input type="radio"
+                                                                    class="form-check-input employee-leader"
+                                                                    name="leader_index" value="0">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.leader') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="assign-budget-value"
+                                                                    name="assign_budget[]" value="0">
+                                                                <input type="checkbox"
+                                                                    class="form-check-input assign-budget"
+                                                                    name="assign_budget_checkbox[]">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.assign') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="pocket-money-value"
+                                                                    name="pocket_money[]" value="0">
+                                                                <input type="checkbox"
+                                                                    class="form-check-input pocket-money"
+                                                                    name="pocket_money_checkbox[]">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.pocket.money') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="meal-money-value"
+                                                                    name="meal_money[]" value="0">
+                                                                <input type="checkbox" class="form-check-input meal-money"
+                                                                    name="meal_money_checkbox[]">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.meal.money') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="accommodation-money-value"
+                                                                    name="accommodation_money[]" value="0">
+                                                                <input type="checkbox"
+                                                                    class="form-check-input accommodation-money"
+                                                                    name="accommodation_money_checkbox[]">
+                                                                <label class="form-check-label">
+                                                                    {{ __('forms.accommodation.money') }}
+                                                                </label>
+                                                            </div>
+
+                                                        </div>
                                                         {{-- Remove --}}
                                                         <div class="col-lg-1 col-md-2 col-4">
                                                             <div class="form-group mb-2">
@@ -1817,48 +1917,61 @@
                                         </select>
                                     </div>
                                 </div>
-
-                                {{-- Assign Budget --}}
-                                <div class="col-lg-2 col-md-6 col-8">
+                                <div class="col-lg-2 col-md-6 col-12">
                                     <div class="form-group mb-2">
-                                        <label class="form-label font-size-13 text-muted d-block">
-                                            {{ __('forms.assign') }}
-                                        </label>
-
-                                        <input
-                                            type="hidden"
-                                            class="assign-budget-value"
-                                            name="assign_budget[]"
-                                            value="0">
-
-                                        <div class="form-check d-flex align-items-center gap-2">
-                                            <input
-                                                type="checkbox"
-                                                class="form-check-input assign-budget m-0"
-                                                name="assign_budget_checkbox[]"
-                                                style="width:20px;height:20px;cursor:pointer;">
-
-                                            <label class="form-check-label" style="cursor:pointer;">
-                                                {{ __('forms.assign') }}
-                                            </label>
-                                        </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-remove-row">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
+                                {{-- Assign Budget --}}
+                                <div
+                                    class="d-flex align-items-center justify-content-start flex-nowrap gap-3">
+                                    
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="assign-budget-value"
+                                            name="assign_budget[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input assign-budget"
+                                            name="assign_budget_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.assign') }}</label>
+                                    </div>
 
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="pocket-money-value"
+                                            name="pocket_money[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input pocket-money"
+                                            name="pocket_money_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.pocket.money') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="meal-money-value"
+                                            name="meal_money[]" value="0">
+                                        <input type="checkbox" class="form-check-input meal-money"
+                                            name="meal_money_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.meal.money') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="accommodation-money-value"
+                                            name="accommodation_money[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input accommodation-money"
+                                            name="accommodation_money_checkbox[]">
+                                        <label class="form-check-label">
+                                            {{ __('forms.accommodation.money') }}
+                                        </label>
+                                    </div>
+
+                                </div>
                                 {{-- Remove --}}
-                            <div class="col">
-
-                                <button
-                                    type="button"
-                                    class="btn btn-danger btn-remove-row">
-
-                                    <i class="bx bx-trash"></i>
-
-                                </button>
-
-                            </div>
-
-
                             </div>
                         </div>
                     `);
@@ -2122,6 +2235,7 @@
                 row.find('.assign-budget-value').val(0);
             }
         }); // When employee is selected/changed 
+
         $(document).on('change', '.employee-name', function() {
             const rows = $('.employee-row'); // If there is only ONE employee 
             if (rows.length === 1) {
