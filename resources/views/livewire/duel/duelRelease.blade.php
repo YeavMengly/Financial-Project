@@ -27,7 +27,7 @@
                                      View File
                                  </a>
                              @endif
-                             <div class="col-md-12">
+                             {{-- <div class="col-md-12">
                                  <div class="mb-3">
                                      <label class="form-label"
                                          for="validationCategory">{{ __('forms.document.file') }}</label>
@@ -36,10 +36,27 @@
                                          <div class="pristine-error text-help">{{ $message }}</div>
                                      @enderror
                                  </div>
+                             </div> --}}
+                             <div class="form-group">
+                                 <label> Upload {{ __('menus.document') }}</label>
+                                 <input type="file" id="documentFile" class="form-control" wire:model="file">
+                                 <div wire:loading wire:target="file" class="text-info mt-1">
+                                     Uploading file, please wait...
+                                 </div>
+                                 @error('file')
+                                     <span class="text-danger d-block mt-1">
+                                         {{ $message }}
+                                     </span>
+                                 @enderror
                              </div>
                              <div class="d-flex flex-wrap gap-2">
-                                 <button class="btn btn-primary" type="submit" name="submit"
-                                     value="save">{{ __('buttons.save') }}</button>
+                                 <button type="submit" class="btn btn-primary mt-3" wire:loading.attr="disabled"
+                                     wire:target="newDocumentFile" type="submit" name="submit" value="save">
+                                     <span wire:loading.remove wire:target="save">{{ __('buttons.save') }}</span>
+                                     <span wire:loading wire:target="save">
+                                         <i class="fas fa-spinner fa-spin me-1"></i> Saving...
+                                     </span>
+                                 </button>
                              </div>
                          </div>
                      </form>
