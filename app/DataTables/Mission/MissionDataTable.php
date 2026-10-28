@@ -29,7 +29,7 @@ class MissionDataTable extends DataTable
             ->addColumn('select', function ($row) {
                 if ((int) $row->payment_is_archived === 2) {
                     // return '';
-                     return '
+                    return '
             <input
                 type="checkbox"
                 class="form-check-input mission-checkbox"
@@ -76,11 +76,19 @@ class MissionDataTable extends DataTable
                     . e($module->nights_count)
                     . 'យប់';
             })
-            ->editColumn('payment_status', function ($row) {
+            // ->editColumn('payment_status', function ($row) {
 
-                return (int) $row->payment_is_archived === 1
-                    ? 'មិនទាន់ទូទាត់'
-                    : 'បានទូទាត់រួចរាល់';
+            //     return (int) $row->payment_is_archived === 1
+            //         ? 'មិនទាន់ទូទាត់'
+            //         : 'បានទូទាត់រួចរាល់';
+            // })
+            ->editColumn('payment_status', function ($row) {
+                return match ((int) $row->payment_is_archived) {
+                    1 => '1. មិនទាន់ទូទាត់ - Unpaid',
+                    2 => '2. រក្សាទុកទូទាត់ - Pending',
+                    3 => '3. បានទូទាត់រួចរាល់ - Paid',
+                    default => 'Unknown',
+                };
             })
             ->editColumn('payment_is_archived', function ($row) {
 
@@ -184,6 +192,8 @@ class MissionDataTable extends DataTable
                 $model->where('missions.payment_is_archived', 1);
             } elseif ($request->cboTodo == 3) {
                 $model->where('missions.payment_is_archived', 2);
+            } elseif ($request->cboTodo == 4) {
+                $model->where('missions.payment_is_archived', 3);
             }
         } else {
             $model->where('missions.payment_is_archived', 1);
@@ -246,6 +256,22 @@ class MissionDataTable extends DataTable
                 '<=',
                 $request->end_date
             );
+        }
+
+        $startIndex = (int) $request->input('start_index', 1);
+        $endIndex = (int) $request->input('end_index', 0);
+
+        if ($request->filled('start_index') || $request->filled('end_index')) {
+            $model->orderBy('missions.id');
+
+            $results = $model->get();
+
+            $start = max(0, $startIndex - 1);
+            $length = $endIndex > 0
+                ? max(0, $endIndex - $start + 1)
+                : $results->count() - $start;
+
+            $results = $results->slice($start, $length)->values();
         }
 
         // ===== Ministry Filter =====
@@ -355,6 +381,8 @@ class MissionDataTable extends DataTable
                 d.cboProvince    = $("#cboProvince").val();
                 d.start_date     = $("#start_date").val();
                 d.end_date       = $("#end_date").val();
+                d.start_index    = $("#start_index").val();
+                d.end_index      = $("#end_index").val();
 
             }',
             ])
@@ -373,6 +401,8 @@ class MissionDataTable extends DataTable
                     "disabled",
                     checked === 0
                 );
+                
+                $("#btnSavePaymentDraft").prop("disabled", checked === 0);
             }
 
             // Check all

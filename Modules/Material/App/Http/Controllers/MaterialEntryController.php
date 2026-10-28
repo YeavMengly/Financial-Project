@@ -244,8 +244,8 @@ class MaterialEntryController extends Controller
         $validated = $request->validate([
             'cboProject'    => 'required',
             'cboSubProject' => 'sometimes|nullable', // Allows null/skipped sub-projects
-            'p_name'        => 'required|array|min:1',
-            'p_name.*' => 'required|string|max:255|distinct',
+            'p_name'        => 'required|array',
+            'p_name.*' => 'required|string|max:255',
             'unit'          => 'required|array',
             'unit.*'        => 'required',
             'quantity'      => 'required|array',
@@ -268,15 +268,15 @@ class MaterialEntryController extends Controller
 
             foreach ($validated['p_name'] as $index => $name) {
 
-                $exists = MaterialEntry::where('ministry_id', $ministry->id)
-                    ->where('project_id', $project->id)
-                    ->where('project_sub_id', $subProjectId)
-                    ->where('p_name', $name)
-                    ->exists();
+                // $exists = MaterialEntry::where('ministry_id', $ministry->id)
+                //     ->where('project_id', $project->id)
+                //     ->where('project_sub_id', $subProjectId)
+                    // ->where('p_name', $name)
+                    // ->exists();
 
-                if ($exists) {
-                    throw new \Exception("សម្ភារៈ \"$name\" មានរួចហើយក្នុង Project នេះ។");
-                }
+                // if ($exists) {
+                //     throw new \Exception("សម្ភារៈ \"$name\" មានរួចហើយក្នុង Project នេះ។");
+                // }
 
                 $unitId   = $validated['unit'][$index] ?? null;
                 $unitType = UnitType::find($unitId);

@@ -44,6 +44,8 @@ class Mission extends Model
         'chapter_id',
         'account_id',
         'account_sub_id',
+        'payment_approval_status', 
+        'paid_at'
     ];
 
     protected $casts = [

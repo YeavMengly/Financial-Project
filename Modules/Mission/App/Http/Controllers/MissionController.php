@@ -44,13 +44,25 @@ class MissionController extends Controller
         $level = Levels::all();
         $provinces = Province::all();
         $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
+        $pendingMissionCount = Mission::where('payment_is_archived', 2)->count();
+        $exportLogs = Mission::query()
+            ->where('ministry_id', decode_params($params))
+            ->where('payment_status', 'paid')
+            ->whereNull('deleted_at')
+            ->select('paid_at')
+            ->distinct()
+            ->orderByDesc('paid_at')
+            ->get();
+
         return $dataTable->render('mission::missions.index', [
             'params' => $params,
             'ministry' => $ministry,
             'position' => $position,
             'level' => $level,
             'provinces' => $provinces,
-            'employees' => $employees
+            'employees' => $employees,
+            'pendingMissionCount' => $pendingMissionCount,
+            'exportLogs' => $exportLogs,
         ]);
     }
 
@@ -233,13 +245,11 @@ class MissionController extends Controller
         $ministry = Ministry::where('id', $id)->first();
         $positions = Positions::all();
         $provinces = Province::all();
-        // $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
         $employees = Employee::whereNotNull('name_kh')
             ->whereNotNull('account_number')
             ->whereIn('id', function ($query) {
                 $query->selectRaw('MIN(id)')
                     ->from('employees')
-                    // ->whereNotNull('id_number')
                     ->groupBy('name_kh', 'account_number');
             })
             ->orderBy('id')
@@ -247,7 +257,6 @@ class MissionController extends Controller
         $document = Document::all();
         $program   = Program::where('ministry_id', $ministry->id)->orderBy('no')->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
-
 
         return view('mission::missions.create')
             ->with('ministry', $ministry)
@@ -271,6 +280,9 @@ class MissionController extends Controller
             'legal_number'     => 'required|string',
             'legal_date'  => 'required|date',
 
+            'cboTitle'    => 'required|array',
+            'cboTitle.*'  => 'required|string',
+
             'cboName'             => 'required|array|min:1',
             'cboName.*'             => 'required|integer|exists:employees,id',
 
@@ -289,6 +301,15 @@ class MissionController extends Controller
             'assign_budget' => 'required|array',
             'assign_budget.*' => 'required|integer',
 
+            'pocket_money' => 'required|array',
+            'pocket_money.*' => 'required|integer',
+
+            'meal_money' => 'required|array',
+            'meal_money.*' => 'required|integer',
+
+            'accommodation_money' => 'required|array',
+            'accommodation_money.*' => 'required|integer',
+
             'fileName' => [
                 'nullable',
                 'file',
@@ -299,7 +320,6 @@ class MissionController extends Controller
             'cboProgram'     => 'nullable|integer',
             'cboProgramSub'  => 'nullable|integer',
             'cboCluster'     => 'nullable|integer',
-            // 'cboAgency'           => 'nullable|integer',
             'cboSubAccount'       => 'nullable|integer',
             'account_number' => ['required', 'array'],
             'account_number.*' => ['required', 'string'],
@@ -445,6 +465,8 @@ class MissionController extends Controller
                 */
                 $employee = Employee::findOrFail($employeeId);
 
+                $employeeTitle = $validated['cboTitle'][$index] ?? null;
+
                 /*
                 |--------------------------------------------------------------------------
                 | Money calculation
@@ -547,6 +569,8 @@ class MissionController extends Controller
 
                     'mission_id' =>
                     $mission->id,
+
+                    'employee_title' => $employeeTitle,
 
                     'employee_id' =>
                     $employeeId,
@@ -668,7 +692,7 @@ class MissionController extends Controller
                 'missions.*',
 
                 'provinces.name as province_name',
-
+                'mission_employees.employee_title',
                 'mission_employees.employee_id as mission_employee_id',
                 'mission_employees.travel_allowance',
                 'mission_employees.pocket_money',
@@ -682,6 +706,7 @@ class MissionController extends Controller
                 'mission_employees.account_number',
 
                 'employees.id as employee_id',
+
                 'employees.name_kh',
                 'employees.name_latin',
                 'employees.account_number as payment_account_employee_id',
@@ -1226,38 +1251,81 @@ class MissionController extends Controller
     public function paymentTotal(Request $request, $params)
     {
         $validated = $request->validate([
-            'cboId' => ['required', 'array', 'min:1'],
+            'cboId' => ['sometimes', 'array'],
             'cboId.*' => [
                 'required',
                 'integer',
                 'exists:missions,id',
             ],
+            'start_id' => ['nullable', 'integer', 'min:1'],
+            'end_id' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $ministryId = decode_params($params);
 
-        $totalAmount = DB::table('mission_employees')
+        $startId = $validated['start_id'] ?? null;
+        $endId = $validated['end_id'] ?? null;
+        $selectedIds = $validated['cboId'] ?? [];
+
+        // Validate ID range
+        if (
+            $startId !== null &&
+            $endId !== null &&
+            $startId > $endId
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Start ID must be less than or equal to End ID.',
+            ], 422);
+        }
+
+        $query = DB::table('mission_employees')
             ->join(
                 'missions',
                 'mission_employees.mission_id',
                 '=',
                 'missions.id'
             )
-            ->whereIn(
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at');
+
+        // If an ID range is supplied, calculate all missions in that range.
+        if ($startId !== null || $endId !== null) {
+            if ($startId !== null) {
+                $query->where('missions.id', '>=', $startId);
+            }
+
+            if ($endId !== null) {
+                $query->where('missions.id', '<=', $endId);
+            }
+        } else {
+            // Otherwise, calculate only selected missions.
+            if (empty($selectedIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select missions or enter an ID range.',
+                ], 422);
+            }
+
+            $query->whereIn(
                 'mission_employees.mission_id',
-                $validated['cboId']
-            )
-            ->where(
-                'missions.ministry_id',
-                $ministryId
-            )
-            ->whereNull('missions.deleted_at')
-            ->sum('mission_employees.total');
+                $selectedIds
+            );
+        }
+
+        // Get the mission IDs included in the calculation.
+        $missionIds = (clone $query)
+            ->distinct()
+            ->pluck('mission_employees.mission_id')
+            ->values()
+            ->all();
+
+        $totalAmount = $query->sum('mission_employees.total');
 
         return response()->json([
             'success' => true,
             'total_amount' => $totalAmount,
-            'mission_ids' => $validated['cboId'],
+            'mission_ids' => $missionIds,
         ]);
     }
 
@@ -1293,10 +1361,11 @@ class MissionController extends Controller
                     $query->where('payment_status', '!=', 'paid')
                         ->orWhereNull('payment_status');
                 })
-                ->where('payment_is_archived', '!=', 2)
+                ->where('payment_is_archived', '!=', 3)
                 ->update([
                     'payment_status' => 'paid',
-                    'payment_is_archived' => 2,
+                    'payment_is_archived' => 3,
+                    'paid_at' => now(),
                     'updated_at' => now(),
                 ]);
 
@@ -1343,6 +1412,62 @@ class MissionController extends Controller
                 'message' => 'មានបញ្ហាក្នុងការបង់ប្រាក់។',
             ], 500);
         }
+    }
+
+    public function calculatePaymentDraftTotal(Request $request, $params)
+    {
+        $validated = $request->validate([
+            'cboId' => ['required', 'array', 'min:1'],
+            'cboId.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:missions,id',
+            ],
+        ]);
+
+        $ministryId = decode_params($params);
+
+        $selectedIds = array_map('intval', $validated['cboId']);
+
+        // Existing missions already included in payment.
+        $existingTotal = DB::table('mission_employees')
+            ->join(
+                'missions',
+                'mission_employees.mission_id',
+                '=',
+                'missions.id'
+            )
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at')
+            ->where('missions.payment_is_archived', 2)
+            ->sum('mission_employees.total');
+
+        // Calculate newly selected missions.
+        // Exclude missions already included in the existing total.
+        $newTotal = DB::table('mission_employees')
+            ->join(
+                'missions',
+                'mission_employees.mission_id',
+                '=',
+                'missions.id'
+            )
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at')
+            ->whereIn('missions.id', $selectedIds)
+            ->where('missions.payment_is_archived', '!=', 2)
+            ->sum('mission_employees.total');
+
+        // Combined amount.
+        $totalAmount = $existingTotal + $newTotal;
+
+        return response()->json([
+            'success' => true,
+            'existing_total' => (float) $existingTotal,
+            'new_total' => (float) $newTotal,
+            'total_amount' => (float) $totalAmount,
+            'mission_ids' => array_values($selectedIds),
+        ]);
     }
 
     public function destroyEmployee($params, $id)
@@ -1466,6 +1591,7 @@ class MissionController extends Controller
 
                     'provinces.name as province_name',
 
+                    'mission_employees.employee_title',
                     'mission_employees.employee_id as mission_employee_id',
                     'mission_employees.mission_id as mission_employee_mission_id',
                     'mission_employees.employee_id',
@@ -1741,6 +1867,34 @@ class MissionController extends Controller
         }
     }
 
+    public function getPaidMissionExportIds(Request $request, $params)
+    {
+        $request->validate([
+            'paid_at' => ['required', 'date'],
+        ]);
+
+        $missionIds = DB::table('missions')
+            ->where('ministry_id', decode_params($params))
+            ->where('payment_status', 'paid')
+            ->whereNull('deleted_at')
+            ->where('paid_at', $request->input('paid_at'))
+            ->distinct()
+            ->orderBy('id')
+            ->pluck('id');
+
+        if ($missionIds->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'រកមិនឃើញបេសកកម្មដែលបានទូទាត់ទេ។',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'mission_ids' => $missionIds,
+        ]);
+    }
+
     public function getPaymentAccount(Request $request)
     {
         $request->validate([
@@ -1830,4 +1984,213 @@ class MissionController extends Controller
             'payments' => $payments,
         ]);
     }
+
+    // public function savePaymentStatusExportHistory(Request $request, $params)
+    // {
+    //     $validated = $request->validate([
+    //         'export_url' => ['required', 'string', 'max:10000'],
+    //         'file_name' => ['nullable', 'string', 'max:255'],
+    //         'filters' => ['nullable', 'array'],
+    //         'mission_ids' => ['nullable', 'array'],
+    //         'mission_ids.*' => [
+    //             'integer',
+    //             'distinct',
+    //             'exists:missions,id',
+    //         ],
+    //         'start_id' => ['nullable', 'integer', 'min:1'],
+    //         'end_id' => ['nullable', 'integer', 'min:1'],
+    //         'total_amount' => ['nullable', 'numeric'],
+    //     ]);
+
+    //     $ministryId = decode_params($params);
+
+    //     $missionIds = $validated['mission_ids'] ?? [];
+
+    //     // Validate the ID range.
+    //     if (
+    //         isset($validated['start_id'], $validated['end_id']) &&
+    //         $validated['start_id'] > $validated['end_id']
+    //     ) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Start ID must be less than or equal to End ID.',
+    //         ], 422);
+    //     }
+
+    //     // Ensure selected missions belong to the current ministry.
+    //     if (!empty($missionIds)) {
+    //         $validCount = Mission::whereIn('id', $missionIds)
+    //             ->where('ministry_id', $ministryId)
+    //             ->whereNull('deleted_at')
+    //             ->count();
+
+    //         if ($validCount !== count($missionIds)) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Some selected missions are invalid.',
+    //             ], 422);
+    //         }
+    //     }
+
+    //     $filters = $validated['filters'] ?? [];
+
+    //     $filters['mission_ids'] = $missionIds;
+    //     $filters['start_id'] = $validated['start_id'] ?? null;
+    //     $filters['end_id'] = $validated['end_id'] ?? null;
+    //     $filters['total_amount'] = $validated['total_amount'] ?? null;
+    //     $filters['ministry_id'] = $ministryId;
+
+    //     $logId = DB::table('payment_export_logs')->insertGetId([
+    //         'payment_draft_id' => null,
+    //         'exported_by' => auth()->id(),
+    //         'export_type' => 'payment_status',
+    //         'file_name' => $validated['file_name']
+    //             ?? 'payment_status_export.xlsx',
+    //         'filters' => json_encode(
+    //             $filters,
+    //             JSON_UNESCAPED_UNICODE
+    //         ),
+    //         'exported_at' => now(),
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Export history saved successfully.',
+    //         'log_id' => $logId,
+    //     ]);
+    // }
+
+
+    public function savePaymentDraft(Request $request, $params)
+    {
+        $validated = $request->validate([
+            'cboId' => ['required', 'array', 'min:1'],
+            'cboId.*' => [
+                'required',
+                'integer',
+                'distinct',
+                'exists:missions,id',
+            ],
+        ]);
+
+        $missionIds = array_map('intval', $validated['cboId']);
+
+        $result = DB::transaction(function () use ($missionIds) {
+
+            // Find selected missions that are still drafts.
+            $missions = Mission::whereIn('id', $missionIds)
+                ->where('payment_status', 'unpaid')
+                ->lockForUpdate()
+                ->get();
+
+            if ($missions->count() !== count($missionIds)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cboId' => 'ទិន្ន័យបានបង្កើតឡើងរួច.',
+                ]);
+            }
+
+            $totalAmount = 0;
+
+            foreach ($missions as $mission) {
+
+                // Calculate the total employee payment for this mission.
+                $missionTotal = MissionEmployee::where(
+                    'mission_id',
+                    $mission->id
+                )->sum('total');
+
+                // Update the existing mission record.
+                $mission->update([
+                    'total_amount' => $missionTotal,
+                    'created_by' => auth()->id(),
+                    'payment_status' => 'pending',
+                    'payment_is_archived' => 2,
+                ]);
+
+                $totalAmount += $missionTotal;
+            }
+
+            return [
+                'mission_count' => $missions->count(),
+                'total_amount' => $totalAmount,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'ការដាក់ស្នើសេចក្តីព្រាងទូទាត់ប្រាក់បានជោគជ័យ។',
+            'mission_count' => $result['mission_count'],
+            'total_amount' => (float) $result['total_amount'],
+        ]);
+    }
+
+    // public function savePaymentDraft(Request $request, $params)
+    // {
+    //     $validated = $request->validate([
+    //         'cboId' => ['required', 'array', 'min:1'],
+    //         'cboId.*' => [
+    //             'required',
+    //             'integer',
+    //             'distinct',
+    //             'exists:missions,id',
+    //         ],
+    //     ]);
+
+    //     $missionIds = array_map('intval', $validated['cboId']);
+
+    //     $draft = DB::transaction(function () use ($missionIds) {
+
+    //         $totalAmount = MissionEmployee::whereIn('mission_id', $missionIds)
+    //             ->sum('total');
+
+    //         return Mission::create([
+    //             'mission_ids'  => $missionIds,
+    //             'total_amount' => $totalAmount,
+    //             'created_by'   => auth()->id(),
+    //             'status'       => 'draft',
+    //         ]);
+    //     });
+
+    //     return response()->json([
+    //         'success'       => true,
+    //         'message'       => 'Payment draft saved successfully.',
+    //         'draft_id'      => $draft->id,
+    //         'mission_count' => count($missionIds),
+    //         'total_amount'  => (float) $draft->total_amount,
+    //     ]);
+    // }
+
+    // View Draft Payment Details
+    // public function viewPaymentDraft(Request $request, $params, $id)
+    // {
+    //     $draft = MissionPaymentDraft::where('id', $id)
+    //         ->where('created_by', auth()->id())
+    //         ->where('status', 'draft')
+    //         ->firstOrFail();
+
+    //     $missionIds = $draft->mission_ids ?? [];
+
+    //     // Retrieve the saved mission records.
+    //     $missions = Mission::whereIn('id', $missionIds)
+    //         ->get();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'draft' => [
+    //             'id' => $draft->id,
+    //             'mission_ids' => $missionIds,
+    //             'mission_count' => count($missionIds),
+    //             'total_amount' => $draft->total_amount,
+    //             'created_at' => $draft->created_at?->format('Y-m-d H:i'),
+    //             'missions' => $missions->map(function ($mission) {
+    //                 return [
+    //                     'id' => $mission->id,
+    //                     'legal_number' => $mission->legal_number ?? '',
+    //                 ];
+    //             })->values(),
+    //         ],
+    //     ]);
+    // }
 }

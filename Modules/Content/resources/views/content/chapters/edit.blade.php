@@ -90,6 +90,12 @@
                                     <label>ប្រភេទ</label>
 
                                     <div>
+                                        <input class="form-check-input" type="checkbox" name="subType[]" value="ចំណាយចរន្ត"
+                                            {{ in_array('ចំណាយចរន្ត', $chapter->sub_type ?? []) ? 'checked' : '' }}>
+                                        <label>ចំណាយចរន្ត</label>
+                                    </div>
+
+                                    <div>
                                         <input class="form-check-input" type="checkbox" name="subType[]"
                                             value="មូលនិធិទ្រទ្រង់ថវិកា"
                                             {{ in_array('មូលនិធិទ្រទ្រង់ថវិកា', $chapter->sub_type ?? []) ? 'checked' : '' }}>
