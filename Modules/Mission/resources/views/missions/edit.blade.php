@@ -239,7 +239,7 @@
                                 <div class="row">
 
                                     {{-- File --}}
-                                    <div class="col-lg-2 col-md-3">
+                                    {{-- <div class="col-lg-2 col-md-3">
                                         <div class="form-group mb-3">
 
                                             <div class="d-flex justify-content-between align-items-center mb-1">
@@ -269,7 +269,6 @@
                                                 Allowed types: PDF (Max: 10MB per file)
                                             </small>
 
-                                            {{-- Existing file --}}
                                             @if ($mission->fileName)
                                                 <div class="mt-2">
 
@@ -292,7 +291,7 @@
                                             @enderror
 
                                         </div>
-                                    </div>
+                                    </div> --}}
 
 
                                     {{-- Program --}}
@@ -450,9 +449,53 @@
                                                     <div class="employee-row border rounded p-3 mb-3">
 
                                                         <div class="row align-items-end">
+                                                            {{-- Employee Title --}}
+                                                            <div class="col-lg-2 col-md-3 col-6">
+                                                                <div class="form-group mb-2">
+                                                                    <label class="form-label font-size-13 text-muted">
+                                                                        គោរមងារ
+                                                                    </label>
+
+                                                                    @php
+                                                                        $selectedTitle = old(
+                                                                            'cboTitle.' . $loop->index,
+                                                                            $employee->title ?? '',
+                                                                        );
+                                                                    @endphp
+
+                                                                    <select class="form-select employee-title"
+                                                                        name="cboTitle[]" required
+                                                                        data-pristine-required-message="{{ __('messages.required') }}">
+
+                                                                        <option value="">
+                                                                            {{ __('forms.search...') }}
+                                                                        </option>
+
+                                                                        <option value="ឯកឧត្តម"
+                                                                            {{ $selectedTitle == 'ឯកឧត្តម' ? 'selected' : '' }}>
+                                                                            ឯកឧត្តម
+                                                                        </option>
+
+                                                                        <option value="លោកជំទាវ"
+                                                                            {{ $selectedTitle == 'លោកជំទាវ' ? 'selected' : '' }}>
+                                                                            លោកជំទាវ
+                                                                        </option>
+
+                                                                        <option value="លោក"
+                                                                            {{ $selectedTitle == 'លោក' ? 'selected' : '' }}>
+                                                                            លោក
+                                                                        </option>
+
+                                                                        <option value="លោកស្រី"
+                                                                            {{ $selectedTitle == 'លោកស្រី' ? 'selected' : '' }}>
+                                                                            លោកស្រី
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
 
                                                             {{-- Employee --}}
-                                                            <div class="col-lg-2 col-md-4">
+                                                            <div class="col-lg-2 col-md-3 col-6">
                                                                 <div class="form-group mb-3">
 
                                                                     <label class="form-label font-size-13 text-muted">
@@ -481,7 +524,7 @@
                                                             </div>
 
                                                             {{-- Position --}}
-                                                            <div class="col-lg-2 col-md-4">
+                                                            <div class="col-lg-2 col-md-3 col-6">
                                                                 <div class="form-group mb-3">
 
                                                                     <label class="form-label font-size-13 text-muted">
@@ -509,7 +552,7 @@
                                                             </div>
 
                                                             {{-- Own Account Number --}}
-                                                            <div class="col-lg-2 col-md-4">
+                                                            <div class="col-lg-2 col-md-3 col-6">
                                                                 <div class="form-group mb-3">
 
                                                                     <label class="form-label font-size-13 text-muted">
@@ -528,7 +571,7 @@
                                                             </div>
 
                                                             {{-- Payment Account --}}
-                                                            <div class="col-lg-2 col-md-4">
+                                                            <div class="col-lg-2 col-md-3 col-6">
                                                                 <div class="form-group mb-3">
 
                                                                     <label class="form-label font-size-13 text-muted">
@@ -559,8 +602,24 @@
 
                                                                 </div>
                                                             </div>
+                                                            {{-- Remove --}}
+                                                            <div class="col-lg-2 col-md-3 col-6">
 
-                                                            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                                                {{-- Remove Button (Hidden for index 0 / First Row) --}}
+                                                                {{-- <div class="col-lg-2 col-md-4"> --}}
+                                                                <div class="form-group mb-3">
+                                                                    @if (!$loop->first)
+                                                                        <button type="button"
+                                                                            class="btn btn-danger btn-remove-row"
+                                                                            data-id="{{ $missionEmployee->id ?? '' }}">
+                                                                            <i class="bx bx-trash"></i>
+                                                                        </button>
+                                                                    @endif
+                                                                </div>
+                                                                {{-- </div> --}}
+                                                            </div>
+
+                                                            {{-- <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                                                                 <div class="form-group mb-3">
 
                                                                     @php
@@ -579,7 +638,7 @@
 
                                                                     <div class="d-flex align-items-end flex-wrap gap-4">
 
-                                                                        {{-- Leader --}}
+                                                                       
                                                                         @if ($isLeader)
                                                                             <div>
                                                                                 <label
@@ -603,7 +662,7 @@
 
                                                                             </div>
                                                                         @endif
-                                                                        {{-- Assign Budget --}}
+                                                                       
                                                                         <div>
                                                                             <label
                                                                                 class="form-label font-size-13 text-muted d-block">
@@ -631,22 +690,129 @@
 
                                                                     </div>
                                                                 </div>
-                                                            </div>
+                                                            </div> --}}
 
-                                                            {{-- Remove --}}
-                                                            <div class="col-lg-2 col-md-4">
+                                                            <div
+                                                                class="d-flex align-items-center justify-content-start flex-wrap gap-3">
 
-                                                                {{-- Remove Button (Hidden for index 0 / First Row) --}}
-                                                                {{-- <div class="col-lg-2 col-md-4"> --}}
-                                                                @if (!$loop->first)
-                                                                    <button type="button"
-                                                                        class="btn btn-danger btn-remove-row"
-                                                                        data-id="{{ $missionEmployee->id ?? '' }}">
-                                                                        <i class="bx bx-trash"></i>
-                                                                    </button>
+                                                                {{-- Leader --}}
+                                                                {{-- <div class="form-check mb-0">
+                                                                    <input type="radio"
+                                                                        class="form-check-input employee-leader"
+                                                                        name="leader_index" value="{{ $index }}"
+                                                                        {{ $isLeader ? 'checked' : '' }}
+                                                                        style="width:22px;height:22px;cursor:pointer;">
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.leader') }}
+                                                                    </label>
+                                                                </div> --}}
+
+                                                                @php
+                                                                    $leaderExists =
+                                                                        !empty($mission->leader_id) &&
+                                                                        $missionEmployees->contains(
+                                                                            'employee_id',
+                                                                            $mission->leader_id,
+                                                                        );
+
+                                                                    $isLeader = $leaderExists
+                                                                        ? $mission->leader_id ==
+                                                                            $missionEmployee->employee_id
+                                                                        : $index === 0;
+                                                                @endphp
+
+                                                                @if ($isLeader)
+                                                                    <div>
+                                                                        {{-- <label
+                                                                            class="form-label font-size-13 text-muted d-block">
+                                                                            {{ __('forms.leader') }}
+                                                                        </label> --}}
+
+                                                                        <div class="form-check">
+                                                                            <input type="radio"
+                                                                                class="form-check-input employee-leader"
+                                                                                name="leader_index"
+                                                                                value="{{ $index }}" checked
+                                                                                style="cursor:pointer;">
+
+                                                                            <label class="form-check-label ms-2"
+                                                                                style="padding-top:3px;cursor:pointer;">
+                                                                                {{ __('forms.leader') }}
+                                                                            </label>
+                                                                        </div>
+
+                                                                    </div>
                                                                 @endif
-                                                                {{-- </div> --}}
+
+                                                                {{-- Assign Budget --}}
+                                                                <div class="form-check mb-0">
+                                                                    <input type="hidden" class="assign-budget-value"
+                                                                        name="assign_budget[]"
+                                                                        value="{{ $missionEmployee->assign_budget ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input assign-budget"
+                                                                        name="assign_budget_checkbox[]"
+                                                                        {{ ($missionEmployee->assign_budget ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.assign') }}
+                                                                    </label>
+                                                                </div>
+
+                                                                {{-- Pocket Money --}}
+                                                                <div class="form-check mb-0">
+                                                                    <input type="hidden" class="pocket-money-value"
+                                                                        name="pocket_money[]"
+                                                                        value="{{ $missionEmployee->pocket_money ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input pocket-money"
+                                                                        name="pocket_money_checkbox[]"
+                                                                        {{ ($missionEmployee->pocket_money ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.pocket.money') }}
+                                                                    </label>
+                                                                </div>
+
+                                                                {{-- Meal Money --}}
+                                                                <div class="form-check mb-0">
+                                                                    <input type="hidden" class="meal-money-value"
+                                                                        name="meal_money[]"
+                                                                        value="{{ $missionEmployee->meal_money ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input meal-money"
+                                                                        name="meal_money_checkbox[]"
+                                                                        {{ ($missionEmployee->meal_money ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.meal.money') }}
+                                                                    </label>
+                                                                </div>
+
+                                                                {{-- Accommodation Money --}}
+                                                                <div class="form-check mb-0">
+                                                                    <input type="hidden"
+                                                                        class="accommodation-money-value"
+                                                                        name="accommodation_money[]"
+                                                                        value="{{ $missionEmployee->accommodation_money ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input accommodation-money"
+                                                                        name="accommodation_money_checkbox[]"
+                                                                        {{ ($missionEmployee->accommodation_money ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.accommodation.money') }}
+                                                                    </label>
+                                                                </div>
+
                                                             </div>
+
+
                                                         </div>
                                                     </div>
                                                 @endforeach
@@ -839,6 +1005,17 @@
 
             });
         });
+        document.addEventListener('DOMContentLoaded', function() {
+            const element = document.getElementById('cboDocument');
+            const choices = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false,
+
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             const element = document.getElementById('cboSubAccount');
@@ -900,7 +1077,6 @@
     </script>
 
     {{-- Filter Date Lock --}}
-
     <script>
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
@@ -1140,89 +1316,175 @@
                 document
                     .querySelectorAll('#employeeRows .employee-row')
                     .forEach(function(row) {
+                        const employeeSelect = row.querySelector('.employee-name');
 
-                        const employeeSelect =
-                            row.querySelector('.employee-name');
-
-                        if (!employeeSelect) {
-                            return;
-                        }
-
-                        const employeeId =
-                            employeeSelect.value;
-
-                        if (!employeeId) {
+                        if (!employeeSelect || !employeeSelect.value) {
                             return;
                         }
 
                         const selectedOption =
-                            employeeSelect.options[
-                                employeeSelect.selectedIndex
-                            ];
+                            employeeSelect.options[employeeSelect.selectedIndex];
 
                         const employeeName =
                             selectedOption?.textContent.trim() || '';
 
                         const accountInput =
-                            row.querySelector(
-                                '.employee-account-number'
-                            );
+                            row.querySelector('.employee-account-number');
+
+                        const titleSelect =
+                            row.querySelector('.employee-title');
 
                         const accountNumber =
                             accountInput?.value ||
-                            selectedOption?.getAttribute(
-                                'data-account-number'
-                            ) ||
+                            selectedOption?.dataset.accountNumber ||
                             '';
 
                         employees.push({
-                            id: String(employeeId),
+                            id: String(employeeSelect.value),
                             name: employeeName,
+                            title: titleSelect?.value || '',
                             account_number: accountNumber
                         });
-
                     });
+
                 return employees;
+                // document
+                //     .querySelectorAll('#employeeRows .employee-row')
+                //     .forEach(function(row) {
 
-                document.querySelectorAll('.employee-row').forEach(function(row) {
-                    const employeeSelect = row.querySelector('.employee-name');
-                    const accountInput = row.querySelector('.employee-account-number');
-                    const paymentSelect = row.querySelector('.payment-account-employee');
+                //         const employeeSelect =
+                //             row.querySelector('.employee-name');
 
-                    // Restore the employee's own account number.
-                    if (employeeSelect && accountInput) {
-                        const selectedEmployee =
-                            employeeSelect.options[employeeSelect.selectedIndex];
+                //         if (!employeeSelect) {
+                //             return;
+                //         }
 
-                        accountInput.value =
-                            selectedEmployee?.dataset.accountNumber || '';
-                    }
+                //         const employeeId =
+                //             employeeSelect.value;
 
-                    // Restore the saved payment account.
-                    if (paymentSelect) {
-                        const savedPaymentId =
-                            paymentSelect.dataset.selectedPaymentAccount || '';
+                //         if (!employeeId) {
+                //             return;
+                //         }
 
-                        if (savedPaymentId) {
-                            paymentSelect.value = savedPaymentId;
-                        }
-                    }
-                });
+                //         const selectedOption =
+                //             employeeSelect.options[
+                //                 employeeSelect.selectedIndex
+                //             ];
 
-                // Update own account number when employee changes.
-                $(document).on('change', '.employee-name', function() {
-                    const row = this.closest('.employee-row');
-                    const selectedOption = this.options[this.selectedIndex];
+                //         const employeeName =
+                //             selectedOption?.textContent.trim() || '';
 
-                    row.querySelector('.employee-account-number').value =
-                        selectedOption?.dataset.accountNumber || '';
-                });
+                //         const accountInput =
+                //             row.querySelector(
+                //                 '.employee-account-number'
+                //             );
+
+                //         const accountNumber =
+                //             accountInput?.value ||
+                //             selectedOption?.getAttribute(
+                //                 'data-account-number'
+                //             ) ||
+                //             '';
+
+                //         employees.push({
+                //             id: String(employeeId),
+                //             name: employeeName,
+                //             account_number: accountNumber
+                //         });
+
+                //     });
+                // return employees;
+
+                // document.querySelectorAll('.employee-row').forEach(function(row) {
+
+                //     const employeeTitleSelect = row.querySelector('.employee-title');
+                //     const employeeSelect = row.querySelector('.employee-name');
+                //     const accountInput = row.querySelector('.employee-account-number');
+                //     const paymentSelect = row.querySelector('.payment-account-employee');
+
+                //     // Restore the employee's own account number.
+                //     if (employeeSelect && accountInput) {
+                //         const selectedEmployee =
+                //             employeeSelect.options[employeeSelect.selectedIndex];
+
+                //         accountInput.value =
+                //             selectedEmployee?.dataset.accountNumber || '';
+                //     }
+
+                //     // Restore the saved payment account.
+                //     if (paymentSelect) {
+                //         const savedPaymentId =
+                //             paymentSelect.dataset.selectedPaymentAccount || '';
+
+                //         if (savedPaymentId) {
+                //             paymentSelect.value = savedPaymentId;
+                //         }
+                //     }
+                // });
+
+                // // Update own account number when employee changes.
+                // $(document).on('change', '.employee-name', function() {
+                //     const row = this.closest('.employee-row');
+                //     const selectedOption = this.options[this.selectedIndex];
+
+                //     row.querySelector('.employee-account-number').value =
+                //         selectedOption?.dataset.accountNumber || '';
+                // });
 
             }
 
 
-            function updateEmployeeAccount(row) {
+            // function updateEmployeeAccount(row) {
 
+            //     const employeeSelect = row.querySelector('.employee-name');
+            //     const accountInput = row.querySelector('.employee-account-number');
+
+            //     if (!employeeSelect || !accountInput) {
+            //         return;
+            //     }
+
+            //     const employeeId = employeeSelect.value;
+
+            //     // Clear the previous account number
+            //     accountInput.value = '';
+
+            //     if (!employeeId) {
+            //         return;
+            //     }
+
+            //     $.ajax({
+            //         url: "{{ route('missions.paymentAccount') }}",
+            //         type: "GET",
+            //         data: {
+            //             payment_account_employee_id: employeeId
+            //         },
+
+            //         success: function(response) {
+
+            //             // Avoid displaying a previous employee's response
+            //             if (employeeSelect.value != employeeId) {
+            //                 return;
+            //             }
+
+            //             if (response.success && response.employee) {
+            //                 accountInput.value =
+            //                     response.employee.account_number || '';
+            //             } else {
+            //                 accountInput.value = '';
+            //             }
+            //         },
+
+            //         error: function(xhr) {
+            //             console.error(
+            //                 'Failed to load employee account number:',
+            //                 xhr.responseText
+            //             );
+
+            //             accountInput.value = '';
+            //         }
+            //     });
+            // }
+            function updateEmployeeAccount(row) {
                 const employeeSelect = row.querySelector('.employee-name');
                 const accountInput = row.querySelector('.employee-account-number');
 
@@ -1232,7 +1494,6 @@
 
                 const employeeId = employeeSelect.value;
 
-                // Clear the previous account number
                 accountInput.value = '';
 
                 if (!employeeId) {
@@ -1247,9 +1508,8 @@
                     },
 
                     success: function(response) {
-
-                        // Avoid displaying a previous employee's response
-                        if (employeeSelect.value != employeeId) {
+                        // Ignore the response if the employee has changed.
+                        if (employeeSelect.value !== employeeId) {
                             return;
                         }
 
@@ -1267,7 +1527,10 @@
                             xhr.responseText
                         );
 
-                        accountInput.value = '';
+                        // Do not clear a newer employee's account number.
+                        if (employeeSelect.value === employeeId) {
+                            accountInput.value = '';
+                        }
                     }
                 });
             }
@@ -1552,6 +1815,9 @@
             */
             function initEmployeeRow(row) {
 
+                const employeeTitleSelect =
+                    row.querySelector('.employee-title');
+
                 const employeeSelect =
                     row.querySelector('.employee-name');
 
@@ -1572,6 +1838,19 @@
                 | Initialize Choices
                 |--------------------------------------------------------------------------
                 */
+                initChoices(employeeTitleSelect);
+
+                const savedTitle =
+                    employeeTitleSelect?.dataset.selectedTitle || '';
+
+                if (savedTitle) {
+                    employeeTitleSelect.value = savedTitle;
+
+                    choicesInstances
+                        .get(employeeTitleSelect)
+                        ?.setChoiceByValue(savedTitle);
+                }
+
                 initChoices(employeeSelect);
 
                 initChoices(positionSelect);
@@ -1606,6 +1885,21 @@
                     }
                 );
 
+                /*
+                |--------------------------------------------------------------------------
+                | Employee Title Change
+                |--------------------------------------------------------------------------
+                */
+                employeeTitleSelect?.addEventListener('change', function() {
+                    updateValidation(this);
+
+                    const employeeTitle = this.value;
+
+                    console.log('Selected employee title:', employeeTitle);
+
+                    // Store the selected title on the row if needed.
+                    row.dataset.employeeTitle = employeeTitle;
+                });
 
                 /*
                 |--------------------------------------------------------------------------
@@ -1701,74 +1995,121 @@
             | Input validation border
             |--------------------------------------------------------------------------
             */
-            function updateInputValidation(input) {
+            // function updateInputValidation(input) {
 
-                if (!input) {
-                    return false;
-                }
+            //     if (!input) {
+            //         return false;
+            //     }
 
-                const value =
-                    input.value ?
-                    input.value.trim() :
-                    '';
+            //     const value =
+            //         input.value ?
+            //         input.value.trim() :
+            //         '';
 
-                const isValid =
-                    value !== '';
+            //     const isValid =
+            //         value !== '';
 
 
-                if (isValid) {
+            //     if (isValid) {
 
-                    input.classList.remove(
-                        'is-invalid'
-                    );
+            //         input.classList.remove(
+            //             'is-invalid'
+            //         );
 
-                    input.classList.add(
-                        'is-valid'
-                    );
+            //         input.classList.add(
+            //             'is-valid'
+            //         );
 
-                } else {
+            //     } else {
 
-                    input.classList.remove(
-                        'is-valid'
-                    );
+            //         input.classList.remove(
+            //             'is-valid'
+            //         );
 
-                    input.classList.add(
-                        'is-invalid'
-                    );
-                }
+            //         input.classList.add(
+            //             'is-invalid'
+            //         );
+            //     }
 
-                return isValid;
-            }
+            //     return isValid;
+            // }
 
             /*
             |--------------------------------------------------------------------------
             | Validation border
             |--------------------------------------------------------------------------
             */
-            function updateValidation(select) {
+            // function updateValidation(select) {
 
-                if (!select) {
-                    return;
+            //     if (!select) {
+            //         return;
+            //     }
+
+            //     const choicesContainer = select.closest('.choices');
+
+            //     if (!choicesContainer) {
+            //         return;
+            //     }
+
+            //     if (select.value) {
+
+            //         choicesContainer.classList.remove('is-invalid');
+            //         choicesContainer.classList.add('is-valid');
+
+            //     } else {
+
+            //         choicesContainer.classList.remove('is-valid');
+            //         choicesContainer.classList.add('is-invalid');
+            //     }
+            // }
+            /*
+            |--------------------------------------------------------------------------
+            | Input validation border
+            |--------------------------------------------------------------------------
+            */
+            function updateInputValidation(input) {
+                if (!input) {
+                    return false;
                 }
 
-                const choicesContainer = select.closest('.choices');
+                const value = input.value ?
+                    input.value.trim() :
+                    '';
 
-                if (!choicesContainer) {
-                    return;
-                }
+                const isValid = value !== '';
 
-                if (select.value) {
+                input.classList.toggle('is-valid', isValid);
+                input.classList.toggle('is-invalid', !isValid);
 
-                    choicesContainer.classList.remove('is-invalid');
-                    choicesContainer.classList.add('is-valid');
-
-                } else {
-
-                    choicesContainer.classList.remove('is-valid');
-                    choicesContainer.classList.add('is-invalid');
-                }
+                return isValid;
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | Select validation border (supports Choices.js)
+            |--------------------------------------------------------------------------
+            */
+            function updateValidation(select) {
+                if (!select) {
+                    return false;
+                }
+
+                const isValid = select.value !== '';
+
+                // Apply validation to the original select.
+                select.classList.toggle('is-valid', isValid);
+                select.classList.toggle('is-invalid', !isValid);
+
+                // Apply validation to the visible Choices.js container.
+                const choicesContainer = select.closest('.choices');
+
+                if (choicesContainer) {
+                    choicesContainer.classList.toggle('is-valid', isValid);
+                    choicesContainer.classList.toggle('is-invalid', !isValid);
+                }
+
+                return isValid;
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -1899,10 +2240,30 @@
                     <div class="employee-row border rounded p-3 mb-3">
 
                         <div class="row align-items-end">
+                            
+                             {{-- Employee Title --}}
+                            <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            គោរមងារ
+                                        </label>
+
+                                        <select class="form-select employee-title"
+                                            name="cboTitle[]">
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+                                            <option value="ឯកឧត្តម">ឯកឧត្តម</option>
+                                            <option value="លោកជំទាវ">លោកជំទាវ</option>
+                                            <option value="លោក">លោក</option>
+                                            <option value="លោកស្រី">លោកស្រី</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                             {{-- Employee --}}
-                            <div class="col-lg-2 col-md-4">
-                                <div class="form-group mb-3">
+                            <div class="col-lg-2 col-md-3 col-6">
+                                <div class="form-group mb-2">
 
                                     <label class="form-label font-size-13 text-muted">
                                         {{ __('forms.name') }}
@@ -1929,8 +2290,8 @@
                             </div>
 
                             {{-- Position --}}
-                            <div class="col-lg-2 col-md-4">
-                                <div class="form-group mb-3">
+                            <div class="col-lg-2 col-md-3 col-6">
+                                <div class="form-group mb-2">
 
                                     <label class="form-label font-size-13 text-muted">
                                         {{ __('forms.position') }}
@@ -1957,9 +2318,9 @@
                             </div>
 
                                  {{-- Own Account Number --}}
-                            <div class="col-lg-2 col-md-4">
+                             <div class="col-lg-2 col-md-3 col-6">
 
-                                <div class="form-group mb-3">
+                                <div class="form-group mb-2">
 
                                     <label class="form-label font-size-13 text-muted">
                                         {{ __('forms.account.number') }}
@@ -1977,10 +2338,8 @@
                             </div>
 
                             {{-- Payment Account --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
+                            <div class="col-lg-2 col-md-3 col-6">
+                                <div class="form-group mb-2">
                                     <label class="form-label font-size-13 text-muted">
                                         {{ __('forms.payment.account') }}
                                     </label>
@@ -1992,52 +2351,66 @@
                                         <option value="">
                                             {{ __('forms.search...') }}
                                         </option>
-
                                     </select>
+
+                                    <small class="payment-account-number text-muted d-block mt-1"></small>
                                 </div>
-
                             </div>
-                              
+
+                            <div class="col-lg-2 col-md-3 col-6">
+                                <div class="form-group mb-2">
+                                    <button type="button"
+                                            class="btn btn-danger btn-remove-row">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                   
                             {{-- Assign Budget --}}
-                            <div class="col-lg-2 col-md-4">
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted d-block">
-                                        {{ __('forms.assign') }}
-                                    </label>
-
-                                    <input type="hidden"
-                                        class="assign-budget-value"
-                                        name="assign_budget[]"
-                                        value="0">
-
-                                    <div class="form-check">
-
+                                <div
+                                    class="d-flex align-items-center justify-content-start flex-nowrap gap-3">
+                                    
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="assign-budget-value"
+                                            name="assign_budget[]" value="0">
                                         <input type="checkbox"
                                             class="form-check-input assign-budget"
-                                            name="assign_budget_checkbox[]"
-                                            style="width:22px;height:22px;cursor:pointer;">
+                                            name="assign_budget_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.assign') }}</label>
+                                    </div>
 
-                                        <label class="form-check-label ms-2"
-                                            style="padding-top:3px;cursor:pointer;">
-                                            {{ __('forms.assign') }}
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="pocket-money-value"
+                                            name="pocket_money[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input pocket-money"
+                                            name="pocket_money_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.pocket.money') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="meal-money-value"
+                                            name="meal_money[]" value="0">
+                                        <input type="checkbox" class="form-check-input meal-money"
+                                            name="meal_money_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.meal.money') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="accommodation-money-value"
+                                            name="accommodation_money[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input accommodation-money"
+                                            name="accommodation_money_checkbox[]">
+                                        <label class="form-check-label">
+                                            {{ __('forms.accommodation.money') }}
                                         </label>
-
                                     </div>
 
                                 </div>
-                            </div>
-
-                            <div class="col-lg-2 col-md-4">
-
-                                <button type="button"
-                                        class="btn btn-danger btn-remove-row">
-
-                                    <i class="bx bx-trash"></i>
-
-                                </button>
-
-                            </div>
 
                         </div>
 
