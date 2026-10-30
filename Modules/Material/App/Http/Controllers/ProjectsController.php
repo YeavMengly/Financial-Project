@@ -15,9 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\File;
 
 
 class ProjectsController extends Controller

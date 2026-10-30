@@ -85,44 +85,6 @@ class ProjectDataTable extends DataTable
                     . nl2br(e($row->refer))
                     . '</div>';
             })
-
-            // ->editColumn('file', function ($row) {
-            //     if (!$row->file) {
-            //         return '<span class="text-muted">-</span>';
-            //     }
-            //     $url = asset('storage/' . $row->file);
-            //     $filename = basename($row->file);
-
-            //     return "<a href='{$url}' target='_blank' class='text-primary'>
-            //     <i class='fas fa-file-alt me-1'></i>Preview
-            // </a>";
-            // })
-            // ->editColumn('file', function ($row) {
-            //     if (empty($row->file)) {
-            //         return '<span class="text-muted">-</span>';
-            //     }
-
-            //     // Check file in storage/app
-            //     if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($row->file)) {
-            //         return '<span class="text-danger">
-            //         <i class="fas fa-exclamation-circle me-1"></i>
-            //         File not found
-            //     </span>';
-            //     }
-
-            //     $url = route('project.file.preview', $row->id);
-            //     $filename = basename($row->file);
-
-            //     return '<a href="' . e($url) . '"
-            //     target="_blank"
-            //     rel="noopener noreferrer"
-            //     class="text-primary"
-            //     title="' . e($filename) . '">
-            //     <i class="fas fa-file-pdf me-1"></i>
-            //     Preview
-            // </a>';
-            // })
-
             ->editColumn('file', function ($row) {
                 if (empty($row->file)) {
                     return '<span class="text-muted">-</span>';
