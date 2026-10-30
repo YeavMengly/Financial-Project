@@ -29,7 +29,11 @@ class MaterialEntry extends Model
     ];
 
     public function materialReleases()
-{
-    return $this->hasMany(MaterialRelease::class, 'material_entry_id', 'id');
-}
+    {
+        return $this->hasMany(MaterialRelease::class, 'material_entry_id', 'id');
+    }
+    public function project()
+    {
+        return $this->belongsTo(Projects::class, 'project_id', 'id');
+    }
 }

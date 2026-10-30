@@ -262,7 +262,7 @@
 
                             <div class="col-lg-4 col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="fileInput" class="form-label mb-0">{{ __('forms.file.type') }}</label>
+                                    <label for="fileInput" class="form-label mb-0">{{ __('forms.select_request_date') }}</label>
                                     <input type="text" id="requestDate" name="requestDate" class="form-control"
                                         value="{{ old('requestDate', $module->request_date) }}"
                                         placeholder="{{ __('forms.select_request_date') }}" required

@@ -161,8 +161,7 @@
                             </a>
 
                             {{-- Export --}}
-                            <a href="{{ route('materialEntry.export', array_merge(['params' => $params])) }}"
-                                class="btn btn-success d-flex align-items-center px-3">
+                            <a href="#" id="excel-export-btn" class="btn btn-success d-flex align-items-center px-3">
                                 <i class="bx bx-download me-1"></i> {{ __('buttons.download') }}
                             </a>
 
@@ -338,7 +337,8 @@
                 return urlParams.get(param);
             }
 
-            const initialStartDate = getUrlParam('start_date') || document.getElementById('start_date')?.value || null;
+            const initialStartDate = getUrlParam('start_date') || document.getElementById('start_date')?.value ||
+                null;
             const initialEndDate = getUrlParam('end_date') || document.getElementById('end_date')?.value || null;
 
             // Common config with auto-reload on selection
@@ -378,6 +378,42 @@
                 function() {
                     $('#materialentry-table').DataTable().ajax.reload();
                 });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.getElementById('excel-export-btn');
+            const baseExportUrl = "{{ route('materialEntry.export', ['params' => $params]) }}";
+
+            exportBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Get values from your filters dynamically
+                const projectId = document.getElementById('project').value;
+                const companyName = document.getElementById('companyName').value;
+                const userEntry = document.getElementById('userEntry').value;
+                const source = document.getElementById('source').value;
+                const pname = document.getElementById('Pname').value;
+                const endDate = document.getElementById('end_date').value;
+
+                // Build query parameters object
+                let queryParams = new URLSearchParams();
+                if (projectId) queryParams.append('project', projectId);
+                if (companyName) queryParams.append('company_name', companyName);
+                if (userEntry) queryParams.append('user_entry', userEntry);
+                if (source) queryParams.append('source', source);
+                if (pname) queryParams.append('p_name', pname);
+                if (endDate) queryParams.append('end_date', endDate);
+
+                // Construct final export URL with filters
+                let finalUrl = baseExportUrl;
+                if (queryParams.toString()) {
+                    finalUrl += '?' + queryParams.toString();
+                }
+
+                // Trigger download redirection
+                window.location.href = finalUrl;
+            });
+        });
     </script>
 
     {!! $dataTable->scripts() !!}

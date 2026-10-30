@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+
 class MaterialEntryController extends Controller
 {
 
@@ -560,29 +561,24 @@ class MaterialEntryController extends Controller
         }
     }
 
-    public function export(Request $request, $params)
-    {
 
+
+    public function export(Request $request, $params, $projectId = null)
+    {
         try {
             $ministryId = decode_params($params);
+            $projectId = $projectId ?? $request->get('project');
+
             $query = MaterialEntry::query()
-                // ->leftJoin('budget_voucher_loans', 'begin_vouchers.account_sub_id', '=', 'budget_voucher_loans.account_sub_id')
                 ->where('material_entries.ministry_id', $ministryId)
-                ->select(
-                    'material_entries.*',
-                );
+                ->select('material_entries.*');
 
-            // Apply filters...
+            if (!empty($projectId)) {
+                $query->where('material_entries.project_id', $projectId);
+            }
+
+            $query->orderBy('created_at', 'ASC');
             $data = $query->get();
-
-            $query->orderBy('created_at', 'DESC');
-
-            $data = $query->get();
-
-            Log::info('Exported MaterialExport Count', [
-                'ministry_id' => $ministryId,
-                'count'       => $data->count(),
-            ]);
 
             if ($data->isEmpty()) {
                 flash()
@@ -594,15 +590,15 @@ class MaterialEntryController extends Controller
                 return redirect()->route('materialEntry.index', $params);
             }
 
-            // Pass filtered data + ministry id into export
-            $export = new MaterialEntriesExport($data, $ministryId);
+            // Fetch the selected project details for row 6
+            $selectedProject = !empty($projectId) ? Projects::find($projectId) : null;
 
-            // you can pass $request if you want to use date filters/text in header
+            // Pass $selectedProject into the exporter
+            $export = new MaterialEntriesExport($data, $ministryId, $projectId, $selectedProject);
+
             return $export->export($request);
         } catch (\Throwable $e) {
-            Log::error('Export Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-            ]);
+            Log::error('Export Error: ' . $e->getMessage());
 
             flash()
                 ->translate('en')
