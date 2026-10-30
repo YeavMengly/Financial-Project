@@ -53,127 +53,30 @@ class DuelReleaseDataTable extends DataTable
                 return view('duel::duelRelease.action', ['module' => $module]);
             })
             ->editColumn('file', function ($row) {
-                if (!$row->file) {
-                    return '<span class="text-muted">-</span>';
+                if (empty($row->file)) {
+                    return '';
                 }
-                $url = asset('storage/' . $row->file);
-                $filename = basename($row->file);
 
-                return "<a href='{$url}' target='_blank' class='text-primary'>
-                <i class='fas fa-file-alt me-1'></i>Preview
-            </a>";
+                $url = asset('storage/' . $row->file);
+
+                return '<a href="' . $url . '" target="_blank" class="text-primary">
+                <i class="fas fa-file-alt me-1"></i>Preview
+            </a>';
             })
-            // ->editColumn('file', function ($row) {
-            //     if (!$row->file) {
-            //         return '<span class="text-muted">-</span>';
-            //     }
-            //     $files = json_decode($row->file, true);
-            //     if (is_array($files)) {
-            //         $html = '<ul class="list-unstyled m-0">';
-            //         foreach ($files as $file) {
-            //             $url = asset('storage/uploads/' . $file);
-            //             $html .= "<li><a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>$file</a></li>";
-            //         }
-            //         $html .= '</ul>';
-            //         return $html;
-            //     }
-            //     $url = asset('storage/uploads/' . $row->file);
-            //     return "<a href='$url' target='_blank' class='text-primary'><i class='fas fa-file-alt me-1'></i>Preview</a>";
-            // })
-            ->rawColumns(['note', 'refer', 'file', 'soft_delete']);
+            ->rawColumns([
+                'title',
+                'status',
+                'action',
+                'note',
+                'refer',
+                'file',
+                'soft_delete'
+            ]);
     }
 
     /**
      * Get the query source of dataTable.
      */
-    // public function query(DuelRelease $model, Request $request): QueryBuilder
-    // {
-    //     $params = $request->params;
-    //     $ministryId = decode_params($params);
-
-    //     $query = $model->newQuery()
-
-    //         ->leftJoin('duel_entries', 'duel_entries.item_name', '=', 'duel_types.id')
-
-    //         ->leftJoin('duel_entries', 'duel_entries.project_id', '=', 'projects.id')
-
-    //         ->leftJoin('agencies', 'duel_releases.agency', '=', 'agencies.id')
-    //         ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
-    //         // ->leftJoin('duel_entries', function ($join) use ($ministryId) {
-    //         //     $join->on('duel_entries.stock_number', '=', 'duel_releases.stock_number')
-    //         //         ->on('duel_entries.item_name', '=', 'duel_releases.item_name')
-    //         //         ->where('duel_entries.ministry_id', '=', $ministryId);
-    //         // })
-
-    //         ->where('duel_releases.ministry_id', $ministryId);
-
-    //     // Filters
-    //     if ($request->filled('start_date') && $request->filled('end_date')) {
-    //         $query->whereBetween('duel_releases.date_release', [$request->start_date, $request->end_date]);
-    //     } elseif ($request->filled('start_date')) {
-    //         $query->whereDate('duel_releases.date_release', '>=', $request->start_date);
-    //     } elseif ($request->filled('end_date')) {
-    //         $query->whereDate('duel_releases.date_release', '<=', $request->end_date);
-    //     }
-
-    //     if ($request->filled('cboNumber')) {
-    //         $query->where('duel_releases.receipt_number', $request->cboNumber);
-    //     }
-    //     if ($request->filled('cboUserRequest')) {
-    //         $query->where('duel_releases.user_request', $request->cboUserRequest);
-    //     }
-    //     if ($request->filled('cboDuelType')) {
-    //         $query->where('duel_releases.item_name', $request->cboDuelType);
-    //     }
-    //     if ($request->filled('cboExecutiveUnit')) {
-    //         $query->where('duel_releases.executive_unit', $request->cboExecutiveUnit);
-    //     }
-
-    //     // Subquery matching release sequence strictly by (date_release, receipt_number, id)
-    //     $previousReleasesSubQuery = DB::table('duel_releases as dr_prev')
-    //         ->selectRaw('COALESCE(SUM(dr_prev.quantity_request), 0)')
-    //         ->whereColumn('dr_prev.ministry_id', 'duel_releases.ministry_id')
-    //         ->whereColumn('dr_prev.stock_number', 'duel_releases.stock_number')
-    //         ->whereColumn('dr_prev.item_name', 'duel_releases.item_name')
-    //         ->where(function ($q) {
-    //             $q->whereColumn('dr_prev.date_release', '<', 'duel_releases.date_release')
-    //                 ->orWhere(function ($q2) {
-    //                     $q2->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
-    //                         ->whereColumn('dr_prev.receipt_number', '<', 'duel_releases.receipt_number');
-    //                 })
-    //                 ->orWhere(function ($q3) {
-    //                     $q3->whereColumn('dr_prev.date_release', '=', 'duel_releases.date_release')
-    //                         ->whereColumn('dr_prev.receipt_number', '=', 'duel_releases.receipt_number')
-    //                         ->whereColumn('dr_prev.id', '<', 'duel_releases.id');
-    //                 });
-    //         });
-
-    //     $query->select([
-    //         'duel_releases.id',
-    //         'duel_releases.ministry_id',
-    //         'duel_types.name_km as item_name',
-    //         'duel_releases.receipt_number',
-    //         'projects.stock_number',
-    //         'agencies.name as agency',
-    //         'duel_releases.user_request',
-    //         'duel_releases.receiver',
-    //         'duel_releases.quantity_request',
-    //         'duel_releases.note',
-    //         'duel_releases.refer',
-    //         'duel_releases.title',
-    //         'duel_releases.date_release',
-    //         'duel_releases.file',
-    //         'duel_releases.created_at',
-    //         'duel_releases.updated_at',
-    //         DB::raw("GREATEST(0, COALESCE(duel_entries.quantity, 0) - ({$previousReleasesSubQuery->toSql()})) as running_total")
-    //     ])
-    //         ->mergeBindings($previousReleasesSubQuery);
-
-    //     // Make sure table sort order matches subquery sequence logic
-    //     return $query->orderBy('duel_releases.date_release', 'ASC')
-    //         ->orderBy('duel_releases.receipt_number', 'ASC')
-    //         ->orderBy('duel_releases.id', 'ASC');
-    // }
     public function query(DuelRelease $model, Request $request): QueryBuilder
     {
         $params = $request->params;
@@ -181,7 +84,6 @@ class DuelReleaseDataTable extends DataTable
 
         $query = $model->newQuery()
             // 1. Join Related Lookups Properly
-            // ->leftJoin('agencies', 'duel_releases.agency', '=', 'agencies.id')
             ->leftJoin('executive_units', 'duel_releases.executive_unit_id', '=', 'executive_units.id')
             ->leftJoin('duel_types', 'duel_releases.item_name', '=', 'duel_types.id')
 
@@ -314,7 +216,7 @@ class DuelReleaseDataTable extends DataTable
             Column::computed('refer')->title(__('tables.th.refer'))->width(200)->addClass('align-middle'),
             Column::computed('note')->title(__('tables.th.note'))->width(200)->addClass('align-middle'),
             Column::computed('title')->title(__('tables.th.title'))->width(200)->addClass('align-middle'),
-            Column::computed('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
+            Column::make('file')->title(__('tables.th.file'))->width(200)->addClass('align-middle'),
             Column::computed('action', __('tables.th.action'))->exportable(false)->printable(false)->width(100)->addClass('text-center align-middle'),
         ];
     }
