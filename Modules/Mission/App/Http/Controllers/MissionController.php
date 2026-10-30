@@ -423,6 +423,16 @@ class MissionController extends Controller
                     $validated['assign_budget'][$index] ?? 0
                 );
 
+                $pocketMoney = (int) (
+                    $validated['pocket_money'][$index] ?? 0
+                );
+                $mealMoney = (int) (
+                    $validated['meal_money'][$index] ?? 0
+                );
+                $accommodationMoney = (int) (
+                    $validated['accommodation_money'][$index] ?? 0
+                );
+
                 // Employee's own account
                 $accountNumber =
                     $validated['account_number'][$index] ?? null;
@@ -472,15 +482,15 @@ class MissionController extends Controller
                 | Money calculation
                 |--------------------------------------------------------------------------
                 */
-                $pocketMoney = $level->pocket_money;
-                $totalPocketMoney = $pocketMoney * $daysCount;
+                // $pocketMoney = $level->pocket_money;
+                // $totalPocketMoney = $pocketMoney * $daysCount;
 
-                $mealMoney = $level->meal_money;
-                $totalMealMoney = $mealMoney * $daysCount;
+                // $mealMoney = $level->meal_money;
+                // $totalMealMoney = $mealMoney * $daysCount;
 
-                $accommodationMoney = $level->accommodation_money;
-                $totalAccommodationMoney =
-                    $accommodationMoney * $nightsCount;
+                // $accommodationMoney = $level->accommodation_money;
+                // $totalAccommodationMoney =
+                //     $accommodationMoney * $nightsCount;
 
 
                 /*
@@ -488,24 +498,38 @@ class MissionController extends Controller
                 | Condition assign budget
                 |--------------------------------------------------------------------------
                 */
-                if ($assignBudget === 1) {
+                if ($assignBudget === 1 || $pocketMoney === 1  || $mealMoney === 1 || $accommodationMoney === 1) {
 
                     $travelAllowance =
                         $province->budget ?? 0;
+                    $pocketMoney = $level->pocket_money ?? 0;
+                    $mealMoney = $level->meal_money ?? 0;
+                    $accommodationMoney = $level->accommodation_money ?? 0;
+
+                    $totalPocketMoney = $pocketMoney * $daysCount ?? 0;
+                    $totalMealMoney = $mealMoney * $daysCount ?? 0;
+                    $totalAccommodationMoney =
+                        $accommodationMoney * $nightsCount ?? 0;
 
                     $total =
                         $travelAllowance +
                         $totalPocketMoney +
                         $totalMealMoney +
-                        $totalAccommodationMoney;
+                        $totalAccommodationMoney ?? 0;
                 } else {
 
                     $travelAllowance = 0;
-
-                    $total =
-                        $totalPocketMoney +
-                        $totalMealMoney +
-                        $totalAccommodationMoney;
+                    $pocketMoney = 0;
+                    $mealMoney = 0;
+                    $accommodationMoney = 0;
+                    $totalPocketMoney = 0;
+                    $totalMealMoney = 0;
+                    $totalAccommodationMoney = 0;
+                    $total = 0;
+                    // $total =
+                    //     $totalPocketMoney +
+                    //     $totalMealMoney +
+                    //     $totalAccommodationMoney;
                 }
 
 
@@ -806,6 +830,9 @@ class MissionController extends Controller
 
             'txtDescription' => 'required|string|max:9999',
 
+            'cboTitle'    => 'required|array',
+            'cboTitle.*'  => 'required|string',
+
             'cboName' => 'required|array|min:1',
             'cboName.*' => 'required|integer|exists:employees,id',
 
@@ -967,6 +994,8 @@ class MissionController extends Controller
 
             foreach ($employeeIds as $index => $employeeId) {
 
+                $employeeTitle = $validated['cboTitle'][$index] ?? null;
+
                 $positionId =
                     $validated['cboPosition'][$index] ?? null;
 
@@ -1061,6 +1090,8 @@ class MissionController extends Controller
 
                     'mission_id' =>
                     $mission->id,
+
+                    'employee_title' => $employeeTitle,
 
                     'employee_id' =>
                     $employeeId,
