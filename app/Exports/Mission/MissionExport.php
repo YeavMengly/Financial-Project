@@ -161,10 +161,10 @@ class MissionExport
                     $index
                 );
 
-           $sheet->setCellValue(
-    "B{$row}",
-    ($employee->employee_title ?? '') . ' ' . ($employee->name_kh ?? '-')
-);
+                $sheet->setCellValue(
+                    "B{$row}",
+                    ($employee->employee_title ?? '') . ' ' . ($employee->name_kh ?? '-')
+                );
 
                 $sheet->setCellValue(
                     "C{$row}",
@@ -214,7 +214,7 @@ class MissionExport
 
                 $sheet->setCellValue(
                     "M{$row}",
-                    number_format($employee->travel_allowance ?? 0)
+                    number_format(($employee->travel_allowance ?? 0) + ($employee->unexpected_budget ?? 0))
                 );
 
                 $sheet->setCellValue(
@@ -289,7 +289,7 @@ class MissionExport
 
             // Your existing total code...
             $missionTravel_allowance = $employees->sum(function ($employee) {
-                return (float) ($employee->travel_allowance ?? 0);
+                return (float) (($employee->travel_allowance ?? 0) + ($employee->unexpected_budget ?? 0));
             });
 
             $missionPocket_money = $employees->sum(function ($employee) {

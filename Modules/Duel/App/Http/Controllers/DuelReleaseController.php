@@ -43,7 +43,7 @@ class DuelReleaseController extends Controller
         // $duelRelease = DuelRelease::where('id', $id)
         //     ->where('ministry_id', $ministry->id)->get();
         $duelRelease = DuelRelease::where('ministry_id', $ministry->id)
-            ->select('agency')
+            ->select('agency', 'user_request')
             ->distinct()
             ->get();
 
@@ -857,6 +857,9 @@ class DuelReleaseController extends Controller
     // }
     public function export(Request $request, $params)
     {
+
+        // Unlimited execution time and memory
+        loadRunUnlimitedTime();
         try {
             $ministryId = decode_params($params);
 
@@ -1015,7 +1018,7 @@ class DuelReleaseController extends Controller
         }
     }
 
-    
+
     private function getFile($id): array
     {
         $duelRelease = DuelRelease::findOrFail($id);

@@ -258,127 +258,78 @@
                                             {{ $pendingMissionCount }}
                                         </span>
                                     </button>
-
-                                    {{-- Export History --}}
-                                    {{-- <button type="button" class="btn btn-dark" data-bs-toggle="modal"
-                                        data-bs-target="#paymentExportHistoryModal">
-                                        <i class="bx bx-history me-1"></i>
-                                        Export History
-                                    </button> --}}
                                     <button type="button" class="btn btn-dark" data-bs-toggle="modal"
                                         data-bs-target="#paymentExportHistoryModal">
                                         <i class="bx bx-history me-1"></i>
-                                        Export History
+                                        ប្រវត្តិការទូទាត់ <span class="badge bg-danger ms-1" id="totalRounds">
+                                            {{ $totalRounds }}
+                                        </span>
                                     </button>
 
                                     <a class="btn btn-outline-secondary" href="{{ route('initialMission.index') }}">
                                         <i class="bx bx-arrow-back me-1"></i>
                                         {{ __('buttons.back') }}
                                     </a>
-
                                 </div>
-
-                                {{-- Right: Search by Mission ID --}}
-                                {{-- <div class="d-flex flex-wrap align-items-end gap-2">
-
-                                    <div style="width: 120px;">
-                                        <label for="start_index" class="form-label mb-1">
-                                            ID ចាប់ពី
-                                        </label>
-                                        <input type="number" id="start_index" class="form-control" min="1"
-                                            placeholder="Start ID">
-                                    </div>
-
-                                    <div style="width: 120px;">
-                                        <label for="end_index" class="form-label mb-1">
-                                            ID ដល់
-                                        </label>
-                                        <input type="number" id="end_index" class="form-control" min="1"
-                                            placeholder="End ID">
-                                    </div>
-
-                                    <button type="button" class="btn btn-primary" id="btnSearchIdRange">
-                                        <i class="bx bx-search me-1"></i>
-                                        ស្វែងរក
-                                    </button>
-
-                                    <button type="button" class="btn btn-secondary" id="btnResetIdRange"
-                                        title="Reset ID search">
-                                        <i class="bx bx-reset"></i>
-                                    </button>
-
-                                </div> --}}
                             </div>
                         </div>
                     </div>
-
-                    {{-- Payment Export History Modal --}}
 
                     {{-- Payment Export History Modal --}}
                     <div class="modal fade" id="paymentExportHistoryModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-xl modal-dialog-scrollable">
                             <div class="modal-content">
 
-                                <div class="modal-header bg-dark text-white">
+                                <div class="modal-header text-white">
                                     <h5 class="modal-title">
                                         <i class="bx bx-history me-1"></i>
-                                        Payment Export History
+                                        ប្រវត្តិការទាញយកទូទាត់
                                     </h5>
-
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
                                     </button>
                                 </div>
-
                                 <div class="modal-body">
                                     <p class="text-muted">
-                                        List of paid missions. Each mission appears only once.
+                                        ប្រតិបត្តិទូទាត់ដែលបានទាញយករួចរាល់នឹងត្រូវបង្ហាញនៅក្នុងតារាងខាងក្រោម។
+                                        អ្នកអាចចុចលើប៊ូតុង "ទាញយក" ដើម្បីទាញយកទិន្នន័យទូទាត់ម្តងទៀត។
                                     </p>
-
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-hover align-middle">
                                             <thead class="table-light">
                                                 <tr>
-                                                    <th>#</th>
-                                                    <th>Payment Status</th>
-                                                    <th>Paid At</th>
-                                                    <th>Action</th>
+                                                    <th width="60">ល.រ</th>
+                                                    <th>ប្រតិបត្តិជុំ</th>
+                                                    <th>ទឹកប្រាក់សរុប</th>
+                                                    <th>ថ្ងៃទីខែឆ្នាំ</th>
+                                                    <th class="text-center">ចំនួនបេសកកម្ម</th>
+                                                    <th width="150">សកម្មភាព</th>
                                                 </tr>
                                             </thead>
-
                                             <tbody>
                                                 @forelse ($exportLogs as $mission)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
-
                                                         <td>
-                                                            <span class="badge bg-success">
-                                                                {{ ucfirst($mission->payment_status) }}
+                                                            <span class="badge bg-primary">
+                                                                ទូទាត់លើកទី{{ $loop->iteration }}
                                                             </span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            {{ number_format($mission->total_amount ?? 0, 2) }}
                                                         </td>
                                                         <td>
                                                             {{ $mission->paid_at ? \Carbon\Carbon::parse($mission->paid_at)->format('d/m/Y H:i:s') : '-' }}
                                                         </td>
-                                                        <td>
-                                                            {{-- <a href="{{ route('missions.edit', [
-                                                                'params' => $params,
-                                                                'id' => $mission->id,
-                                                            ]) }}"
-                                                                class="btn btn-sm btn-outline-primary">
-                                                                <i class="bx bx-show"></i>
-                                                                Open
-                                                            </a> --}}
 
-                                                            {{-- <button type="button"
-                                                                class="btn btn-sm btn-success btn-export-again"
-                                                                data-mission-id="{{ $mission->id }}">
-                                                                <i class="bx bx-export"></i>
-                                                                Export Again
-                                                            </button> --}}
+                                                        <td class="text-center">
+                                                            {{ number_format($mission->mission_count) }}
+                                                        </td>
+                                                        <td>
                                                             <button type="button"
                                                                 class="btn btn-sm btn-success btn-export-again"
                                                                 data-paid-at="{{ $mission->paid_at }}">
                                                                 <i class="bx bx-export"></i>
-                                                                Export Again
+                                                                ទាញយក
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -390,6 +341,7 @@
                                                     </tr>
                                                 @endforelse
                                             </tbody>
+
                                         </table>
                                     </div>
                                 </div>
@@ -1800,55 +1752,55 @@
     </script>
 
     <script>
-        $(document).on('click', '.btn-export-again', function () {
-    const paidAt = $(this).attr('data-paid-at');
-    const $button = $(this);
+        $(document).on('click', '.btn-export-again', function() {
+            const paidAt = $(this).attr('data-paid-at');
+            const $button = $(this);
 
-    $button.prop('disabled', true);
+            $button.prop('disabled', true);
 
-    $.ajax({
-        url: @json(route('missions.exportIds', ['params' => $params])),
-        type: 'GET',
-        dataType: 'json',
-        data: {
-            paid_at: paidAt
-        },
+            $.ajax({
+                url: @json(route('missions.exportIds', ['params' => $params])),
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    paid_at: paidAt
+                },
 
-        success: function (response) {
-            if (!response.success || !response.mission_ids.length) {
-                Swal.fire(
-                    'មិនមានទិន្នន័យ',
-                    response.message || 'រកមិនឃើញបេសកកម្មដែលបានទូទាត់ទេ។',
-                    'warning'
-                );
-                return;
-            }
+                success: function(response) {
+                    if (!response.success || !response.mission_ids.length) {
+                        Swal.fire(
+                            'មិនមានទិន្នន័យ',
+                            response.message || 'រកមិនឃើញបេសកកម្មដែលបានទូទាត់ទេ។',
+                            'warning'
+                        );
+                        return;
+                    }
 
-            // Use the existing GET export route.
-            const exportUrl = new URL(
-                @json(route('missions.export', ['params' => $params])),
-                window.location.origin
-            );
+                    // Use the existing GET export route.
+                    const exportUrl = new URL(
+                        @json(route('missions.export', ['params' => $params])),
+                        window.location.origin
+                    );
 
-            response.mission_ids.forEach(function (id) {
-                exportUrl.searchParams.append('cboId[]', id);
+                    response.mission_ids.forEach(function(id) {
+                        exportUrl.searchParams.append('cboId[]', id);
+                    });
+
+                    window.location.href = exportUrl.toString();
+                },
+
+                error: function(xhr) {
+                    Swal.fire(
+                        'មានបញ្ហា',
+                        xhr.responseJSON?.message || 'មិនអាចទាញយកទិន្នន័យបានទេ។',
+                        'error'
+                    );
+                },
+
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
             });
-
-            window.location.href = exportUrl.toString();
-        },
-
-        error: function (xhr) {
-            Swal.fire(
-                'មានបញ្ហា',
-                xhr.responseJSON?.message || 'មិនអាចទាញយកទិន្នន័យបានទេ។',
-                'error'
-            );
-        },
-
-        complete: function () {
-            $button.prop('disabled', false);
-        }
-    });
-});
+        });
     </script>
 @endsection

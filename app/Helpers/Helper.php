@@ -50,3 +50,23 @@ if (!function_exists('formatDateTime')) {
         return Date("d-M-Y h:i A", strtotime($datetime));
     }
 }
+
+if (!function_exists('loadRunUnlimitedTime')) {
+
+    function loadRunUnlimitedTime(int $minutes = 0): void
+    {
+        if ($minutes === 0) {
+            // Unlimited
+            ini_set('memory_limit', '-1');
+            ini_set('max_execution_time', '0');
+            set_time_limit(0);
+        } else {
+            $seconds = $minutes * 60;
+
+            ini_set('memory_limit', '2G');
+            ini_set('max_execution_time', (string) $seconds);
+
+            set_time_limit($seconds);
+        }
+    }
+}
