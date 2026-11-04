@@ -39,7 +39,7 @@ return new class extends Migration
             $table->boolean('accommodation_money_status')
                 ->default(false);
             $table->string('account_number', 15)->nullable();
-            $table->unsignedBigInteger('payment_account_employee_id', 5)->nullable();
+            $table->string('payment_account_employee_id', 5)->nullable();
             $table->string('payment_account_number', 15)->nullable();
             $table->timestamps();
             $table->softDeletes();

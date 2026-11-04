@@ -133,6 +133,22 @@ class MissionExport
 
         $missionNumber = 1;
 
+        /*
+            |--------------------------------------------------------------------------
+            | Grand Total Initialization
+            |--------------------------------------------------------------------------
+            */
+        $grandTotal = [
+            'travel_allowance' => 0,
+            'pocket_money' => 0,
+            'total_pocket_money' => 0,
+            'meal_money' => 0,
+            'total_meal_money' => 0,
+            'accommodation_money' => 0,
+            'total_accommodation_money' => 0,
+            'total' => 0,
+        ];
+
         foreach ($data as $missionId => $employees) {
 
             $mission = $employees->first();
@@ -140,6 +156,8 @@ class MissionExport
 
             // Employee index starts from 1 for each mission
             $employeeIndex = 1;
+
+
 
             /*
             |--------------------------------------------------------------------------
@@ -353,7 +371,68 @@ class MissionExport
 
             // Next mission
             $missionNumber++;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Accumulate Grand Total
+            |--------------------------------------------------------------------------
+            */
+            $grandTotal['travel_allowance'] += $missionTravel_allowance;
+            $grandTotal['pocket_money'] += $missionPocket_money;
+            $grandTotal['total_pocket_money'] += $missionTotal_pocket_money;
+            $grandTotal['meal_money'] += $missionMeal_money;
+            $grandTotal['total_meal_money'] += $missionTotal_meal_money;
+            $grandTotal['accommodation_money'] += $missionAccommodation_money;
+            $grandTotal['total_accommodation_money'] += $missionTotal_accommodation_money;
+            $grandTotal['total'] += $missionTotal;
         }
+        /*
+|--------------------------------------------------------------------------
+| Grand Total - All Missions
+|--------------------------------------------------------------------------
+*/
+
+        $sheet->mergeCells("A{$row}:L{$row}");
+
+        $sheet->setCellValue(
+            "A{$row}",
+            'សរុបចុងក្រោយ'
+        );
+
+        $sheet->getStyle("A{$row}:L{$row}")
+            ->getAlignment()
+            ->setHorizontal(
+                \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+            )
+            ->setVertical(
+                \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+            );
+
+        // Grand Total Amounts
+        $sheet->setCellValue("M{$row}", number_format($grandTotal['travel_allowance']));
+        $sheet->setCellValue("N{$row}", number_format($grandTotal['pocket_money']));
+        $sheet->setCellValue("O{$row}", number_format($grandTotal['total_pocket_money']));
+        $sheet->setCellValue("P{$row}", number_format($grandTotal['meal_money']));
+        $sheet->setCellValue("Q{$row}", number_format($grandTotal['total_meal_money']));
+        $sheet->setCellValue("R{$row}", number_format($grandTotal['accommodation_money']));
+        $sheet->setCellValue("S{$row}", number_format($grandTotal['total_accommodation_money']));
+        $sheet->setCellValue("T{$row}", '');
+        $sheet->setCellValue("U{$row}", number_format($grandTotal['total']));
+
+        // Apply Grand Total Style
+        $sheet->getStyle("A{$row}:U{$row}")
+            ->applyFromArray($missionTotalStyle);
+
+        // Optional: Bold Grand Total
+        $sheet->getStyle("A{$row}:U{$row}")
+            ->getFont()
+            ->setBold(true);
+
+        $sheet->getRowDimension($row)->setRowHeight(25);
+
+        $row++;
+
         $exportDirectory = storage_path('app/excel/export');
 
         if (!File::exists($exportDirectory)) {

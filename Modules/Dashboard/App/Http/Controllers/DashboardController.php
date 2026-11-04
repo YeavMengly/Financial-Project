@@ -447,6 +447,7 @@ class DashboardController extends Controller
             ->keyBy('month');
 
 
+
         // =========================
         // MONTHLY DATA
         // =========================
@@ -473,22 +474,53 @@ class DashboardController extends Controller
         $entryTotalQ = [];
         $releaseTotalQ = [];
 
-        foreach ($months as $monthNumber => $monthName) {
+        // foreach ($months as $monthNumber => $monthName) {
 
-            $chartLabels[] = $monthName;
+        //     $chartLabels[] = $monthName;
 
-            $entry = $materialEntry->get($monthNumber);
-            $release = $materialRelease->get($monthNumber);
+        //     $entry = $materialEntry->get($monthNumber);
+        //     $release = $materialRelease->get($monthNumber);
 
-            $entryQty[] = (float) ($entry->total_product ?? 0);
-            $releaseQty[] = (float) ($release->total_product ?? 0);
+        //     $entryQty[] = (float) ($entry->total_product ?? 0);
+        //     $releaseQty[] = (float) ($release->total_product ?? 0);
 
-            $entryTotalQ[] = (float) ($entry->total_qty ?? 0);
-            $releaseTotalQ[] = (float) ($release->total_qty ?? 0);
+        //     $entryTotalQ[] = (float) ($entry->total_qty ?? 0);
+        //     $releaseTotalQ[] = (float) ($release->total_qty ?? 0);
+
+        //     $entryPrice[] = (float) ($entry->total_price ?? 0);
+        //     $releasePrice[] = (float) ($release->total_price ?? 0);
+        // }
+        for ($month = 1; $month <= 12; $month++) {
+
+            $entry = $materialEntry->get($month);
+            $release = $materialRelease->get($month);
+
+            $chartLabels[] = \Carbon\Carbon::create()
+                ->month($month)
+                ->format('M');
+
+            $entryProducts[] = (int) ($entry->total_product ?? 0);
+            $releaseProducts[] = (int) ($release->total_product ?? 0);
+
+            $entryQty[] = (float) ($entry->total_qty ?? 0);
+            $releaseQty[] = (float) ($release->total_qty ?? 0);
 
             $entryPrice[] = (float) ($entry->total_price ?? 0);
             $releasePrice[] = (float) ($release->total_price ?? 0);
         }
+
+        // =========================
+        // OVERALL SUMMARY
+        // =========================
+        $totalEntryQty = array_sum($entryQty);
+        $totalReleaseQty = array_sum($releaseQty);
+
+        $totalEntryPrice = array_sum($entryPrice);
+        $totalReleasePrice = array_sum($releasePrice);
+
+        $totalEntryProducts = $materialEntry->sum('total_product');
+        $totalReleaseProducts = $materialRelease->sum('total_product');
+
         // $months = [
         //     1  => 'Jan',
         //     2  => 'Feb',
@@ -547,6 +579,12 @@ class DashboardController extends Controller
             'releasePrice' => $releasePrice,
             'entryTotalQ' => $entryTotalQ,
             'releaseTotalQ' => $releaseTotalQ,
+            'totalEntryQty' => $totalEntryQty,
+            'totalReleaseQty' => $totalReleaseQty,
+            'totalEntryPrice' => $totalEntryPrice,
+            'totalReleasePrice' => $totalReleasePrice,
+            'totalEntryProducts' => $totalEntryProducts,
+            'totalReleaseProducts' => $totalReleaseProducts,
 
             'ministries' => $ministries,
             'selectedYear' => $year,

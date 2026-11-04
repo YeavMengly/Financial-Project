@@ -26,6 +26,14 @@ class MissionDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->addColumn('select', function ($mission) {
+    return '
+        <input type="checkbox"
+            class="form-check-input mission-checkbox"
+            name="mission_ids[]"
+            value="' . $mission->id . '">
+    ';
+})
             ->addColumn('select', function ($row) {
                 if ((int) $row->payment_is_archived === 2) {
                     // return '';
@@ -156,6 +164,7 @@ class MissionDataTable extends DataTable
                 <i class='fas fa-file-alt me-1'></i>Preview
             </a>";
             })
+    
             ->rawColumns([
                 'select',
                 'description',
@@ -281,6 +290,25 @@ class MissionDataTable extends DataTable
             $id
         );
 
+        // ===== Mission Combination Filter =====
+
+        if ($request->input('combination_search') == 1) {
+
+            $combinationIds = $request->input('combination_ids', []);
+
+            if (!empty($combinationIds) && is_array($combinationIds)) {
+
+                $model->whereIn(
+                    'missions.id',
+                    array_map('intval', $combinationIds)
+                );
+            } else {
+
+                // No exact combination: return no missions.
+                $model->whereRaw('1 = 0');
+            }
+        }
+
         // ===== Select Columns =====
 
         $model->select([
@@ -384,6 +412,9 @@ class MissionDataTable extends DataTable
                 d.start_index    = $("#start_index").val();
                 d.end_index      = $("#end_index").val();
 
+                // Mission combination search
+                d.combination_search = window.combinationSearchActive ? 1 : 0;
+                d.combination_ids = window.combinationMissionIds || [];
             }',
             ])
 

@@ -436,7 +436,8 @@
                                             </h5>
 
                                             <button type="button" class="btn btn-primary btn-sm" id="btnAddRow">
-                                                {{ __('forms.add') }}
+                                                {{-- {{ __('forms.add') }} --}}
+                                                  បន្ថែមមន្ត្រីបេសកកម្ម
                                             </button>
 
                                         </div>

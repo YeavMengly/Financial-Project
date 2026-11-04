@@ -271,7 +271,7 @@ class MissionController extends Controller
             })
             ->orderBy('id')
             ->get();
-        $document = Document::all();
+        $missionDocType = MissionDocType::all();
         $program   = Program::where('ministry_id', $ministry->id)->orderBy('no')->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
@@ -281,7 +281,7 @@ class MissionController extends Controller
             ->with('provinces', $provinces)
             ->with('employees', $employees)
             ->with('params', $params)
-            ->with('document', $document)
+            ->with('missionDocType', $missionDocType)
             ->with('program', $program)
             ->with('accountSub', $accountSub);
     }
@@ -2142,4 +2142,179 @@ class MissionController extends Controller
     //         ],
     //     ]);
     // }
+    public function searchMissionCombination(Request $request, $params)
+    {
+        $request->validate([
+            'define_amount' => 'required|numeric|min:1',
+        ]);
+
+        $ministryId = decode_params($params);
+
+        $target = (int) round(
+            (float) $request->define_amount * 100
+        );
+
+        // Base mission query with employee total
+        $query = DB::table('missions')
+            ->leftJoin(
+                'mission_employees',
+                'missions.id',
+                '=',
+                'mission_employees.mission_id'
+            )
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at');
+
+        // Payment archive filter
+        $todo = $request->input('cboTodo');
+
+        if ($todo == 2 || !$todo) {
+            $query->where('missions.payment_is_archived', 1);
+        } elseif ($todo == 3) {
+            $query->where('missions.payment_is_archived', 2);
+        } elseif ($todo == 4) {
+            $query->where('missions.payment_is_archived', 3);
+        }
+
+        // Mission type
+        $missionType = $request->input('cboMissionType', 2);
+
+        if ($missionType == 2) {
+            $query->where('missions.mission_type_is_archived', 1);
+        } elseif ($missionType == 3) {
+            $query->where('missions.mission_type_is_archived', 2);
+        }
+
+        // Leader
+        if ($request->filled('cboName')) {
+            $query->where(
+                'missions.leader_id',
+                $request->cboName
+            );
+        }
+
+        // Province
+        if ($request->filled('cboProvince')) {
+            $query->where(
+                'missions.province_id',
+                $request->cboProvince
+            );
+        }
+
+        // Start date
+        if ($request->filled('start_date')) {
+            $query->whereDate(
+                'missions.start_date',
+                '>=',
+                $request->start_date
+            );
+        }
+
+        // End date
+        if ($request->filled('end_date')) {
+            $query->whereDate(
+                'missions.end_date',
+                '<=',
+                $request->end_date
+            );
+        }
+
+        // Get mission totals
+        $missions = $query
+            ->select(
+                'missions.id',
+                DB::raw('COALESCE(SUM(mission_employees.total), 0) as total_amount')
+            )
+            ->groupBy('missions.id')
+            ->havingRaw('SUM(mission_employees.total) > 0')
+            ->orderByDesc('total_amount')
+            ->get();
+
+        // Only consider missions not exceeding target.
+        $missions = $missions->filter(function ($mission) use ($target) {
+
+            $amount = (int) round(
+                (float) $mission->total_amount * 100
+            );
+
+            $mission->amount_cents = $amount;
+
+            return $amount > 0 && $amount <= $target;
+        })->values();
+
+        // Subset Sum algorithm
+        $states = [
+            0 => null
+        ];
+
+        $maxStates = 250000;
+
+        $found = false;
+
+        foreach ($missions as $mission) {
+
+            $amount = $mission->amount_cents;
+
+            $previousSums = array_keys($states);
+
+            foreach ($previousSums as $previousSum) {
+
+                $newSum = $previousSum + $amount;
+
+                if ($newSum > $target || isset($states[$newSum])) {
+                    continue;
+                }
+
+                if (count($states) >= $maxStates && $newSum !== $target) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Search limit reached. Please narrow your filters.',
+                    ], 422);
+                }
+
+                $states[$newSum] = [
+                    'previous' => $previousSum,
+                    'mission_id' => $mission->id,
+                ];
+
+                if ($newSum === $target) {
+                    $found = true;
+                    break 2;
+                }
+            }
+        }
+
+        // No exact match
+        if (!$found) {
+            return response()->json([
+                'success' => true,
+                'found' => false,
+                'mission_ids' => [],
+                'message' => 'រកមិនឃើញបេសកកម្មដែលមានទឹកប្រាក់សរុបស្មើគ្នាទេ។',
+            ]);
+        }
+
+        // Reconstruct combination
+        $selectedIds = [];
+
+        $currentSum = $target;
+
+        while ($currentSum > 0) {
+
+            $state = $states[$currentSum];
+
+            $selectedIds[] = $state['mission_id'];
+
+            $currentSum = $state['previous'];
+        }
+
+        return response()->json([
+            'success' => true,
+            'found' => true,
+            'mission_ids' => $selectedIds,
+            'mission_count' => count($selectedIds),
+            'total_amount' => $request->define_amount,
+            'message' => 'រកឃើញបេសកកម្មដែលមានទឹកប្រាក់សរុបត្រូវគ្នា។',
+        ]);
+    }
 }

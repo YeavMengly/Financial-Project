@@ -271,93 +271,101 @@
                                         {{ __('buttons.back') }}
                                     </a>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    {{-- Payment Export History Modal --}}
-                    <div class="modal fade" id="paymentExportHistoryModal" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                            <div class="modal-content">
-
-                                <div class="modal-header text-white">
-                                    <h5 class="modal-title">
-                                        <i class="bx bx-history me-1"></i>
-                                        ប្រវត្តិការទាញយកទូទាត់
-                                    </h5>
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <p class="text-muted">
-                                        ប្រតិបត្តិទូទាត់ដែលបានទាញយករួចរាល់នឹងត្រូវបង្ហាញនៅក្នុងតារាងខាងក្រោម។
-                                        អ្នកអាចចុចលើប៊ូតុង "ទាញយក" ដើម្បីទាញយកទិន្នន័យទូទាត់ម្តងទៀត។
-                                    </p>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered table-hover align-middle">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th width="60">ល.រ</th>
-                                                    <th>ប្រតិបត្តិជុំ</th>
-                                                    <th>ទឹកប្រាក់សរុប</th>
-                                                    <th>ថ្ងៃទីខែឆ្នាំ</th>
-                                                    <th class="text-center">ចំនួនបេសកកម្ម</th>
-                                                    <th width="150">សកម្មភាព</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse ($exportLogs as $mission)
-                                                    <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>
-                                                            <span class="badge bg-primary">
-                                                                ទូទាត់លើកទី{{ $loop->iteration }}
-                                                            </span>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            {{ number_format($mission->total_amount ?? 0, 2) }}
-                                                        </td>
-                                                        <td>
-                                                            {{ $mission->paid_at ? \Carbon\Carbon::parse($mission->paid_at)->format('d/m/Y H:i:s') : '-' }}
-                                                        </td>
-
-                                                        <td class="text-center">
-                                                            {{ number_format($mission->mission_count) }}
-                                                        </td>
-                                                        <td>
-                                                            <button type="button"
-                                                                class="btn btn-sm btn-success btn-export-again"
-                                                                data-paid-at="{{ $mission->paid_at }}">
-                                                                <i class="bx bx-export"></i>
-                                                                ទាញយក
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                @empty
-                                                    <tr>
-                                                        <td colspan="6" class="text-center text-muted py-4">
-                                                            No paid missions found.
-                                                        </td>
-                                                    </tr>
-                                                @endforelse
-                                            </tbody>
-
-                                        </table>
+                                <div class="d-flex flex-wrap align-items-end gap-2">
+                                    <div style="width:240px;">
+                                        <input type="number" id="define_amount" class="form-control" min="1"
+                                            placeholder="កំណត់ចំនួនទឹកប្រាក់សរុប">
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
+                </div>
 
+                {{-- Payment Export History Modal --}}
+                <div class="modal fade" id="paymentExportHistoryModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
 
-                    {{-- @endif --}}
-                    <div class="table-responsive">
-                        {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
+                            <div class="modal-header text-white">
+                                <h5 class="modal-title">
+                                    <i class="bx bx-history me-1"></i>
+                                    ប្រវត្តិការទាញយកទូទាត់
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="text-muted">
+                                    ប្រតិបត្តិទូទាត់ដែលបានទាញយករួចរាល់នឹងត្រូវបង្ហាញនៅក្នុងតារាងខាងក្រោម។
+                                    អ្នកអាចចុចលើប៊ូតុង "ទាញយក" ដើម្បីទាញយកទិន្នន័យទូទាត់ម្តងទៀត។
+                                </p>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="60">ល.រ</th>
+                                                <th>ប្រតិបត្តិជុំ</th>
+                                                <th>ទឹកប្រាក់សរុប</th>
+                                                <th>ថ្ងៃទីខែឆ្នាំ</th>
+                                                <th class="text-center">ចំនួនបេសកកម្ម</th>
+                                                <th width="150">សកម្មភាព</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($exportLogs as $mission)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>
+                                                        <span class="badge bg-primary">
+                                                            ទូទាត់លើកទី{{ $loop->iteration }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        {{ number_format($mission->total_amount ?? 0, 2) }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $mission->paid_at ? \Carbon\Carbon::parse($mission->paid_at)->format('d/m/Y H:i:s') : '-' }}
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        {{ number_format($mission->mission_count) }}
+                                                    </td>
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-success btn-export-again"
+                                                            data-paid-at="{{ $mission->paid_at }}">
+                                                            <i class="bx bx-export"></i>
+                                                            ទាញយក
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted py-4">
+                                                        No paid missions found.
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
+                </div>
+
+
+                {{-- @endif --}}
+                <div class="table-responsive">
+                    {!! $dataTable->table(['class' => 'table table-bordered dt-responsive  nowrap w-100']) !!}
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 @section('script')
@@ -486,7 +494,15 @@
             .on(
                 'change keyup',
                 function() {
-                    $('#mission-table').DataTable().ajax.reload();
+                    if ($('#define_amount').val()) {
+
+                        searchMissionCombination();
+
+                    } else {
+
+                        $('#mission-table').DataTable().ajax.reload();
+
+                    }
                 });
     </script>
     {!! $dataTable->scripts() !!}
@@ -1801,6 +1817,328 @@
                     $button.prop('disabled', false);
                 }
             });
+        });
+    </script>
+
+    {{-- <script>
+        let combinationMissionIds = [];
+        let combinationSearchTimer = null;
+        let combinationSearchRequest = null;
+
+        $('#define_amount').on('input', function() {
+
+            clearTimeout(combinationSearchTimer);
+
+            // Cancel previous request if it is still running.
+            if (combinationSearchRequest) {
+                combinationSearchRequest.abort();
+                combinationSearchRequest = null;
+            }
+
+            const amount = $(this).val();
+
+            combinationMissionIds = [];
+
+            if (!amount || Number(amount) <= 0) {
+                $('#mission-table').DataTable().ajax.reload();
+                return;
+            }
+
+            combinationSearchTimer = setTimeout(function() {
+
+                combinationSearchRequest = $.ajax({
+                    url: "{{ route('missions.combination.search', ['params' => $params]) }}",
+                    type: "POST",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        define_amount: amount
+                    },
+
+                    beforeSend: function() {
+                        $('#define_amount').addClass('loading');
+                    },
+
+                    success: function(response) {
+
+                        combinationMissionIds = response.found ?
+                            response.mission_ids.map(Number) : [];
+
+                        if (response.found) {
+                            console.log('Matching missions:', combinationMissionIds);
+                            console.log('Combined total:', response.total_amount);
+                        } else {
+                            console.log(response.message);
+                        }
+
+                        $('#mission-table').DataTable().ajax.reload();
+                    },
+
+                    error: function(xhr, status) {
+
+                        if (status === 'abort') {
+                            return;
+                        }
+
+                        combinationMissionIds = [];
+
+                        const message = xhr.responseJSON?.message ||
+                            'Unable to search mission combinations.';
+
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Search Failed',
+                                text: message
+                            });
+                        }
+
+                        $('#mission-table').DataTable().ajax.reload();
+                    },
+
+                    complete: function() {
+                        $('#define_amount').removeClass('loading');
+                        combinationSearchRequest = null;
+                    }
+                });
+
+            }, 500);
+
+        });
+    </script> --}}
+
+
+
+    <script>
+        let combinationMissionIds = [];
+        let combinationSearchTimer = null;
+        let combinationSearchRequest = null;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Auto select matching missions
+        |--------------------------------------------------------------------------
+        */
+        function autoSelectCombinationMissions() {
+
+            const table = $('#mission-table').DataTable();
+
+            // Restore selection on the current DataTable page.
+            table.rows({
+                page: 'current'
+            }).nodes().to$().find('.mission-checkbox').each(function() {
+
+                const missionId = Number($(this).val());
+
+                const isSelected = combinationMissionIds.includes(missionId);
+
+                $(this).prop('checked', isSelected);
+
+            });
+
+            // Update check-all checkbox.
+            const checkboxes = table
+                .rows({
+                    page: 'current'
+                })
+                .nodes()
+                .to$()
+                .find('.mission-checkbox');
+
+            $('#checkAllMissions').prop(
+                'checked',
+                checkboxes.length > 0 &&
+                checkboxes.length === checkboxes.filter(':checked').length
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Restore selected missions after DataTable redraw
+        |--------------------------------------------------------------------------
+        */
+        $('#mission-table').on('draw.dt', function() {
+            autoSelectCombinationMissions();
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search mission combinations by amount
+        |--------------------------------------------------------------------------
+        */
+        $('#define_amount').on('input', function() {
+
+            clearTimeout(combinationSearchTimer);
+
+            // Cancel previous AJAX request.
+            if (combinationSearchRequest) {
+                combinationSearchRequest.abort();
+                combinationSearchRequest = null;
+            }
+
+            const amount = $(this).val();
+
+            // Clear previous combination.
+            combinationMissionIds = [];
+
+            // Clear current checkbox selections.
+            $('#mission-table .mission-checkbox')
+                .prop('checked', false);
+
+            $('#checkAllMissions').prop('checked', false);
+
+            if (!amount || Number(amount) <= 0) {
+                $('#mission-table').DataTable().ajax.reload();
+                return;
+            }
+
+            combinationSearchTimer = setTimeout(function() {
+
+                combinationSearchRequest = $.ajax({
+
+                    url: "{{ route('missions.combination.search', ['params' => $params]) }}",
+
+                    type: 'POST',
+
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        define_amount: amount
+                    },
+
+                    beforeSend: function() {
+                        $('#define_amount').addClass('loading');
+                    },
+
+                    success: function(response) {
+
+                        if (response.found) {
+
+                            combinationMissionIds = response.mission_ids.map(Number);
+
+                            Swal.fire({
+
+                                icon: 'success',
+
+                                title: 'Combination Found!',
+
+                                html: `
+                                <div class="text-start">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Target Amount:</span>
+                                        <strong>
+                                            ${Number(amount).toLocaleString()}
+                                        </strong>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Combined Total:</span>
+                                        <strong class="text-success">
+                                            ${Number(response.total_amount).toLocaleString()}
+                                        </strong>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between">
+                                        <span>Total Missions:</span>
+                                        <strong>
+                                            ${combinationMissionIds.length}
+                                        </strong>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                Do you want to automatically select these missions?
+                            `,
+
+                                showCancelButton: true,
+
+                                confirmButtonText: 'Yes, Select Missions',
+
+                                cancelButtonText: 'Cancel',
+
+                                confirmButtonColor: '#206bc4',
+
+                                cancelButtonColor: '#6c757d'
+
+                            }).then(function(result) {
+
+                                if (result.isConfirmed) {
+
+                                    // Reload and automatically select matching missions.
+                                    $('#mission-table').DataTable().ajax.reload();
+
+                                } else {
+
+                                    // Cancel selection.
+                                    combinationMissionIds = [];
+
+                                    $('#mission-table').DataTable().ajax.reload();
+                                }
+
+                            });
+
+                        } else {
+
+                            combinationMissionIds = [];
+
+                            $('#mission-table').DataTable().ajax.reload();
+
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'No Combination Found',
+                                text: response.message ||
+                                    'No matching mission combination found.'
+                            });
+                        }
+                    },
+
+                    error: function(xhr, status) {
+
+                        if (status === 'abort') {
+                            return;
+                        }
+
+                        combinationMissionIds = [];
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Search Failed',
+                            text: xhr.responseJSON?.message ||
+                                'Unable to search mission combinations.'
+                        });
+
+                        $('#mission-table').DataTable().ajax.reload();
+                    },
+
+                    complete: function() {
+
+                        $('#define_amount').removeClass('loading');
+
+                        combinationSearchRequest = null;
+                    }
+                });
+
+            }, 500);
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Check all missions
+        |--------------------------------------------------------------------------
+        */
+        $(document).on('change', '#checkAllMissions', function() {
+
+            const checked = $(this).is(':checked');
+
+            $('#mission-table .mission-checkbox').each(function() {
+
+                $(this).prop('checked', checked).trigger('change');
+
+            });
+
         });
     </script>
 @endsection

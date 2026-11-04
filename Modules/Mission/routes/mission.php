@@ -72,7 +72,7 @@ Route::post(
     [MissionController::class, 'calculatePaymentDraftTotal']
 )->name('missions.paymentDraft.calculateTotal');
 
-// Route::post(
-//     '/missions/export-selected-payments/{params}',
-//     [MissionController::class, 'exportSelectedPayments']
-// )->name('missions.exportSelectedPayments');
+Route::post(
+    'missions/{params}/combination-search',
+    [MissionController::class, 'searchMissionCombination']
+)->name('missions.combination.search');

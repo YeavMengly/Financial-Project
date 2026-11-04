@@ -135,7 +135,7 @@
                                             <select class="form-select" id="cboDocument" name="cboDocument" required
                                                 data-pristine-required-message="{{ __('messages.required') }}">
                                                 <option value="">{{ __('forms.search...') }}</option>
-                                                @foreach ($document as $doc)
+                                                @foreach ($missionDocType as $doc)
                                                     <option value="{{ $doc->id }}">
                                                         {{ $doc->id_order }}
                                                         {{ $doc->name }}
@@ -310,7 +310,7 @@
                                                 {{ __('forms.mission.employee') }}
                                             </h5>
                                             <button type="button" class="btn btn-primary btn-sm" id="btnAddRow">
-                                                {{ __('forms.add') }}
+                                               បន្ថែមមន្ត្រីបេសកកម្ម
                                             </button>
                                         </div>
                                         <div class="card-body">
