@@ -25,6 +25,7 @@ class BeginVoucher extends Model
      */
     protected $fillable = [
         'ministry_id',
+        'type_id',
         'agency_id',
         'program_id',
         'program_sub_id',
