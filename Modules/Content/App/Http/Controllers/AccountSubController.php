@@ -199,27 +199,34 @@ class AccountSubController extends Controller
         try {
 
             $id = decode_params($id);
-            $chapter = Chapter::where('id', decode_params($chId))->first();
+            $ministry = Ministry::where('id', decode_params($params))->first();
+            $chapter = Chapter::where('id', decode_params($chId))
+                ->where('ministry_id', $ministry->id)
+                ->first();
             $account = Account::where('id', decode_params($accId))
+
+                ->where('ministry_id', $ministry->id)
                 ->where('chapter_id', $chapter->id)->first();
 
-            $existingRecord = AccountSub::where('account_id', $account->id)
-                ->where('chapter_id', $chapter->id)
-                ->where('no', $request->no)
-                ->where('id', '<>', $id)
-                ->first();
+            // $existingRecord = AccountSub::where('account_id', $account->id)
+            //     ->where('chapter_id', $chapter->id)
+            //     ->where('no', $request->no)
+            //     ->where('id', '<>', $id)
+            //     ->first();
+            $existingRecord = AccountSub::findOrFail($id);
 
-            if (!$existingRecord) {
-                flash()
-                    ->translate('en')
-                    ->option('timeout', 2000)
-                    ->error(__('messages.sub.account.number'), 'បញ្ហា')
-                    ->flash();
+            // if (!$existingRecord) {
+            //     flash()
+            //         ->translate('en')
+            //         ->option('timeout', 2000)
+            //         ->error(__('messages.sub.account.number'), 'បញ្ហា')
+            //         ->flash();
 
-                return redirect()->back()->withInput();
-            }
+            //     return redirect()->back()->withInput();
+            // }
 
             $existingRecord->update([
+      
                 'no' => $request->no,
                 'name' => $request->name,
             ]);

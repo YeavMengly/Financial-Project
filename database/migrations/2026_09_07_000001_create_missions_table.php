@@ -33,8 +33,16 @@ return new class extends Migration
             $table->enum('mission_type', ['local', 'abroad']);
             $table->integer('mission_type_is_archived')->default(1);
             $table->string('fileName')->nullable();
-            $table->enum('payment_status', ['unpaid', 'paid']);
+            $table->enum('payment_status', ['unpaid', 'pending',  'paid'])->default('unpaid');
             $table->integer('payment_is_archived')->default(1);
+            // New fields
+            $table->decimal('total_amount', 18, 2)->default(0);
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
+            $table->timestamp('paid_at')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

@@ -6,7 +6,7 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
-                @php
+                {{-- @php
                     // Checks if file exists directly under the public/ directory
                     $hasFile = !empty($module->file) && file_exists(public_path($module->file));
                     $hasOtherActions = hasPermission('project.edit') || hasPermission('project.destroy');
@@ -21,7 +21,34 @@
                     @if ($hasOtherActions)
                         <hr class="dropdown-divider" />
                     @endif
+                @endif --}}
+
+                @php
+                    $hasFile =
+                        !empty($module->file) &&
+                        (\Illuminate\Support\Facades\Storage::disk('local')->exists($module->file) ||
+                            \Illuminate\Support\Facades\Storage::disk('public')->exists($module->file));
+
+                    $hasOtherActions = hasPermission('project.edit') || hasPermission('project.destroy');
+                @endphp
+
+                @if (hasPermission('project.index') && $hasFile)
+                    <a href="{{ route('project.file.preview', $module->id) }}" target="_blank" rel="noopener noreferrer"
+                        class="dropdown-item">
+                        <i class="bx bx-show"></i>
+                        Preview PDF
+                    </a>
+
+                    <a href="{{ route('project.file.download', $module->id) }}" class="dropdown-item">
+                        <i class="bx bx-download"></i>
+                        {{ __('buttons.download') }}
+                    </a>
+
+                    @if ($hasOtherActions)
+                        <hr class="dropdown-divider" />
+                    @endif
                 @endif
+
 
                 @if (hasPermission('project.edit'))
                     <a href="{{ route('project.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"

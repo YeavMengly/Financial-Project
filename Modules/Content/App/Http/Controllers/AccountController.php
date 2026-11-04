@@ -143,6 +143,7 @@ class AccountController extends Controller
         $chapter = Chapter::where('id', decode_params($chId))->first();
         $account = Account::where('id', $id)
             ->where('chapter_id', $chapter->id)
+            ->where('ministry_id', $module->id)
             ->first();
 
         /**
@@ -180,24 +181,13 @@ class AccountController extends Controller
         try {
 
             $ministry = Ministry::where('id', decode_params($params))->first();
-            $chapter = Chapter::where('id', decode_params($chId))->first();
-
-            $account = Account::where('id', $id)
-                ->where('chapter_id', $chapter->id)
-                ->where('ministry_id', $ministry->id)
-                ->first();
-
-
-            if (!$account) {
-                flash()
-                    ->translate('en')
-                    ->option('timeout', 2000)
-                    ->error(__('messages.account.not.found'), 'បញ្ហា')
-                    ->flash();
-
-                return redirect()->route('accounts.index', ['params' => $params, 'chId' => $chId]);
-            }
+            $chapter = Chapter::where('id', decode_params($chId))
+            ->where('ministry_id', $ministry->id)
+            ->first();
+            $account = Account::findOrFail($id);
             $account->update([
+                'ministry_id' => $ministry->id,
+                'chapter_id' => $chapter->id,
                 'no' => $request->no,
                 'name' => $request->name
             ]);

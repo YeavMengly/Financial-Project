@@ -7,8 +7,8 @@
 
     <style>
         /* =========================================================
-                                     * TABLE FIXES FOR DROPDOWNS
-                                     * ========================================================= */
+                                             * TABLE FIXES FOR DROPDOWNS
+                                             * ========================================================= */
         #itemTable {
             table-layout: fixed !important;
             width: 100% !important;
@@ -31,8 +31,8 @@
         }
 
         /* =========================================================
-                                     * CHOICES.JS STYLING
-                                     * ========================================================= */
+                                             * CHOICES.JS STYLING
+                                             * ========================================================= */
         .choices {
             margin-bottom: 0 !important;
             width: 100% !important;
@@ -93,8 +93,8 @@
         }
 
         /* =========================================================
-                                     * DISABLED / SKIPPED STATE
-                                     * ========================================================= */
+                                             * DISABLED / SKIPPED STATE
+                                             * ========================================================= */
         #itemTableWrapper.table-skipped {
             opacity: 0.6;
         }
@@ -393,7 +393,11 @@
                                     <i class="bi bi-arrow-clockwise"></i>
                                     {{ __('buttons.delete') }}
                                 </a>
-                                <a class="btn btn-dark" href="{{ route('project.index', $params) }}">
+                                {{-- <a class="btn btn-dark" href="{{ route('project.index', $params) }}">
+                                    {{ __('buttons.back') }}
+                                </a> --}}
+                                <a class="btn btn-outline-secondary" href="{{ route('project.index', $params) }}">
+                                    <i class="bx bx-arrow-back me-1"></i>
                                     {{ __('buttons.back') }}
                                 </a>
                             </div>
@@ -767,7 +771,8 @@
                 reinitPristine();
             });
 
-            $(document).on('click', '.removeRow', function() {k
+            $(document).on('click', '.removeRow', function() {
+                k
                 const row = $(this).closest('tr');
                 row.find('select').each(function() {
                     const choicesInstance = choicesMap.get(this);

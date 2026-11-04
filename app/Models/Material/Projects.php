@@ -57,7 +57,7 @@ class Projects extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName(trans('menus.projects'))
+            ->useLogName(trans('menus.project'))
             ->logOnly([
                 'user_receiver',
             ])

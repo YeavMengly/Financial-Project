@@ -25,4 +25,12 @@ Route::controller(ProjectsController::class)->group(function () {
     Route::get('project/edit-by-program/agencies', 'editByAgency')->name('project.edit.agency');
     Route::get('project/edit-by-program-sub/clusters', 'editByProgramSubId')->name('project.edit.cluster');
     
+     Route::get(
+        '/projects/{id}/file/preview', 'preview'
+    )->name('project.file.preview');
+
+    Route::get(
+        '/projects/{id}/file/download', 'download'
+    )->name('project.file.download');
+
 });

@@ -72,7 +72,7 @@ class AccountSubDataTable extends DataTable
             ->where('account_subs.ministry_id', $id)
             ->where('account_subs.chapter_id', $chId)
             ->where('account_subs.account_id', $accId)
-            ->orderBy('account_subs.no', 'ASC');
+            ->orderBy('account_subs.created_at', 'ASC');
 
 
         if ($request->filled('no')) {

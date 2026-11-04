@@ -19,6 +19,7 @@ use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 
+
 class ProjectsController extends Controller
 {
     /**
@@ -569,5 +570,70 @@ class ProjectsController extends Controller
             ->flash();
 
         return redirect()->route('project.index', $params);
+    }
+
+    private function getProjectFile($id): array
+    {
+        $project = Projects::findOrFail($id);
+
+        // Apply your project's authorization rules here.
+        abort_unless(hasPermission('project.index'), 403);
+
+        $path = $project->file;
+
+        abort_if(empty($path), 404);
+
+        // Accept only paths inside the project upload directory.
+        abort_unless(
+            str_starts_with($path, 'uploads/project/')
+                && !str_contains($path, '..')
+                && !str_contains($path, '\\'),
+            404
+        );
+
+        // New files: storage/app/uploads/...
+        if (Storage::disk('local')->exists($path)) {
+            return [$project, 'local', $path];
+        }
+
+        // Legacy files: public/uploads/...
+        if (Storage::disk('public')->exists($path)) {
+            return [$project, 'public', $path];
+        }
+
+        abort(404, 'File not found.');
+    }
+
+    public function preview($id)
+    {
+        [$project, $disk, $path] = $this->getProjectFile($id);
+
+        abort_unless(
+            strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'pdf',
+            415,
+            'Only PDF files can be previewed.'
+        );
+
+        return Storage::disk($disk)->response(
+            $path,
+            basename($path),
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' =>
+                'inline; filename="' .
+                    addcslashes(basename($path), '"\\') . '"',
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+    }
+
+    public function download($id)
+    {
+        [$project, $disk, $path] = $this->getProjectFile($id);
+
+        return Storage::disk($disk)->download(
+            $path,
+            basename($path)
+        );
     }
 }

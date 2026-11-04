@@ -135,5 +135,12 @@ return [
     'budget.revenue' => 'ចំណូល',
     'vat' => 'អត្រា (%)',
     'revenue.execution.agency' => 'ចំណូលតាមអង្គភាព',
-    'payment.pathner' => 'ទូទាត់តាមធនាគារដៃគូរ'
+    'payment.pathner' => 'ទូទាត់តាមធនាគារដៃគូរ',
+    'pocket.money' => 'ប្រាក់ហោប៉ៅ',
+    'meal.money' => 'ប្រាក់ហូបចុក',
+    'accommodation.money' => 'ប្រាក់ស្នាក់នៅ',
+    'total.pocket.money' => 'ប្រាក់ហោប៉ៅសរុប',
+    'total.meal.money' => 'ប្រាក់ហូបចុកសរុប',
+    'total.accommodation.money' => 'ប្រាក់ស្នាក់នៅសរុប',
+    'total' => 'សរុប',
 ];

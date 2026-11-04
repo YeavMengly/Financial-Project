@@ -92,8 +92,8 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.deleted_at', // Fixed: Added deleted_at for badge status check
                 'material_entries.created_at',
                 'material_entries.updated_at',
-            ])
-            ->orderBy('material_entries.project_id', 'ASC');
+            ]);
+            // ->orderBy('material_entries.created_at', 'ASC');
 
         if ($request->filled('project')) {
             $query->where('material_entries.project_id', $request->input('project'));

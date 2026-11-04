@@ -30,7 +30,7 @@ class ProjectDataTable extends DataTable
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
                 return $active;
             })
-        
+
             ->addColumn('status', function ($row) {
 
                 if (is_null($row->deleted_at)) {
@@ -86,17 +86,69 @@ class ProjectDataTable extends DataTable
                     . '</div>';
             })
 
+            // ->editColumn('file', function ($row) {
+            //     if (!$row->file) {
+            //         return '<span class="text-muted">-</span>';
+            //     }
+            //     $url = asset('storage/' . $row->file);
+            //     $filename = basename($row->file);
+
+            //     return "<a href='{$url}' target='_blank' class='text-primary'>
+            //     <i class='fas fa-file-alt me-1'></i>Preview
+            // </a>";
+            // })
+            // ->editColumn('file', function ($row) {
+            //     if (empty($row->file)) {
+            //         return '<span class="text-muted">-</span>';
+            //     }
+
+            //     // Check file in storage/app
+            //     if (!\Illuminate\Support\Facades\Storage::disk('local')->exists($row->file)) {
+            //         return '<span class="text-danger">
+            //         <i class="fas fa-exclamation-circle me-1"></i>
+            //         File not found
+            //     </span>';
+            //     }
+
+            //     $url = route('project.file.preview', $row->id);
+            //     $filename = basename($row->file);
+
+            //     return '<a href="' . e($url) . '"
+            //     target="_blank"
+            //     rel="noopener noreferrer"
+            //     class="text-primary"
+            //     title="' . e($filename) . '">
+            //     <i class="fas fa-file-pdf me-1"></i>
+            //     Preview
+            // </a>';
+            // })
+
             ->editColumn('file', function ($row) {
-                if (!$row->file) {
+                if (empty($row->file)) {
                     return '<span class="text-muted">-</span>';
                 }
-                $url = asset('storage/' . $row->file);
+
+                $exists = \Illuminate\Support\Facades\Storage::disk('local')
+                    ->exists($row->file)
+                    || \Illuminate\Support\Facades\Storage::disk('public')
+                    ->exists($row->file);
+
+                if (!$exists) {
+                    return '<span class="text-danger">File not found</span>';
+                }
+
+                $url = route('project.file.preview', $row->id);
                 $filename = basename($row->file);
 
-                return "<a href='{$url}' target='_blank' class='text-primary'>
-                <i class='fas fa-file-alt me-1'></i>Preview
-            </a>";
+                return '<a href="' . e($url) . '"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-primary"
+                title="' . e($filename) . '">
+                <i class="fas fa-file-pdf me-1"></i> Preview
+            </a>';
             })
+
             ->editColumn('dateTime', function ($row) {
                 return Carbon::parse($row->created_at)->format('Y-m-d  h:i:s A');
             })

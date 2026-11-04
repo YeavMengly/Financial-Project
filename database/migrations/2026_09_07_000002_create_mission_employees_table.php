@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ministry_id');
             $table->unsignedBigInteger('mission_id');
+            $table->string('employee_title', 10)->nullable();
             $table->unsignedBigInteger('employee_id');
             $table->unsignedBigInteger('position_id');
             $table->string('level_name', 5);

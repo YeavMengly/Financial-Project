@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\File;
+
 class DuelReleaseExport
 {
     protected $data;
@@ -187,7 +188,12 @@ class DuelReleaseExport
             $firstItem = $group->first();
 
             $sheet->setCellValue("A{$row}", $index);
-            $sheet->setCellValue("B{$row}", $firstItem->date_release);
+            $sheet->setCellValue(
+                "B{$row}",
+                $firstItem->date_release
+                    ? \Carbon\Carbon::parse($firstItem->date_release)->format('d/m/Y')
+                    : ''
+            );
             $sheet->setCellValue("C{$row}", $firstItem->receipt_number);
             $sheet->setCellValue("D{$row}", $firstItem->refer);
 

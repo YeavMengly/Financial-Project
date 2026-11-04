@@ -161,10 +161,10 @@ class MissionExport
                     $index
                 );
 
-                $sheet->setCellValue(
-                    "B{$row}",
-                    $employee->name_kh ?? '-'
-                );
+           $sheet->setCellValue(
+    "B{$row}",
+    ($employee->employee_title ?? '') . ' ' . ($employee->name_kh ?? '-')
+);
 
                 $sheet->setCellValue(
                     "C{$row}",

@@ -154,6 +154,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center">ល.រ</th>
+                                <th>គោរមងារ</th>
                                 <th>ឈ្មោះខ្មែរ</th>
                                 <th>ឈ្មោះឡាតាំង</th>
                                 <th>តួនាទី</th>
@@ -179,6 +180,10 @@
 
                                         <td class="text-center">
                                             {{ $index + 1 }}
+                                        </td>
+
+                                        <td>
+                                            {{ $item->employee_title ?? '-' }}
                                         </td>
 
                                         <td>
@@ -261,7 +266,7 @@
 
                             <tr class="table-light fw-bold">
 
-                                <td colspan="5" class="text-end">
+                                <td colspan="6" class="text-end">
                                     សរុបរួម
                                 </td>
                                 <td class="text-end">

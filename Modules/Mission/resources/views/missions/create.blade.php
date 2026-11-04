@@ -45,6 +45,22 @@
             font-size: 0.875rem;
             color: #dc3545;
         }
+
+        .employee-options {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            white-space: nowrap;
+        }
+
+        #vDescription+.note-editor .note-editable {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            line-height: 1.6;
+        }
     </style>
 @endsection
 
@@ -175,7 +191,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-2 col-md-3">
+                                    {{-- <div class="col-lg-2 col-md-3">
                                         <div class="form-group mb-3">
 
                                             <div class="d-flex justify-content-between align-items-center mb-1">
@@ -216,7 +232,7 @@
                                             @enderror
 
                                         </div>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="col-lg-2 col-md-3">
                                         <div class="form-group mb-3">
@@ -268,21 +284,6 @@
                                             @enderror
                                         </div>
                                     </div>
-
-                                    {{-- <div class="col-lg-2 col-md-3">
-                                        <div class="form-group mb-3">
-                                            <label for="cboAgency" class="form-label font-size-13 text-muted">
-                                                {{ __('forms.agency') }}
-                                            </label>
-                                            <select id="cboAgency" class="form-select" name="cboAgency" required
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-                                                <option value="">{{ __('forms.search...') }}</option>
-                                            </select>
-                                            @error('cboAgency')
-                                                <div class="pristine-error text-help">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div> --}}
 
                                     <div class="col-lg-2 col-md-3">
                                         <div class="form-group mb-3">
@@ -336,13 +337,31 @@
 
                                                 {{-- First row --}}
                                                 <div class="employee-row border rounded p-3 mb-3">
+                                                    <div class="row align-items-end g-2">
 
-                                                    <div class="row align-items-end">
+                                                        {{-- Employee Title --}}
+                                                        <div class="col-lg-2 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label font-size-13 text-muted">
+                                                                    គោរមងារ
+                                                                </label>
+
+                                                                <select class="form-select employee-title"
+                                                                    name="cboTitle[]" required
+                                                                    data-pristine-required-message="{{ __('messages.required') }}">
+                                                                    <option value="">{{ __('forms.search...') }}
+                                                                    </option>
+                                                                    <option value="ឯកឧត្តម">ឯកឧត្តម</option>
+                                                                    <option value="លោកជំទាវ">លោកជំទាវ</option>
+                                                                    <option value="លោក">លោក</option>
+                                                                    <option value="លោកស្រី">លោកស្រី</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
 
                                                         {{-- Employee --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
+                                                        <div class="col-lg-2 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
                                                                 <label class="form-label font-size-13 text-muted">
                                                                     {{ __('forms.name') }}
                                                                 </label>
@@ -350,9 +369,7 @@
                                                                 <select class="form-select employee-name" name="cboName[]"
                                                                     required
                                                                     data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                                    <option value="">
-                                                                        {{ __('forms.search...') }}
+                                                                    <option value="">{{ __('forms.search...') }}
                                                                     </option>
 
                                                                     @foreach ($employees as $emp)
@@ -361,16 +378,13 @@
                                                                             {{ $emp->name_kh }} - {{ $emp->name_latin }}
                                                                         </option>
                                                                     @endforeach
-
                                                                 </select>
-
                                                             </div>
                                                         </div>
 
                                                         {{-- Position --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3">
-
+                                                        <div class="col-lg-2 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
                                                                 <label class="form-label font-size-13 text-muted">
                                                                     {{ __('forms.position') }}
                                                                 </label>
@@ -378,9 +392,7 @@
                                                                 <select class="form-select employee-position"
                                                                     name="cboPosition[]" required
                                                                     data-pristine-required-message="{{ __('messages.required') }}">
-
-                                                                    <option value="">
-                                                                        {{ __('forms.search...') }}
+                                                                    <option value="">{{ __('forms.search...') }}
                                                                     </option>
 
                                                                     @foreach ($positions as $pos)
@@ -388,88 +400,101 @@
                                                                             {{ $pos->name }}
                                                                         </option>
                                                                     @endforeach
-
                                                                 </select>
-
                                                             </div>
                                                         </div>
+
                                                         {{-- Own Account Number --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3"> <label
-                                                                    class="form-label font-size-13 text-muted">
-                                                                    {{ __('forms.account.number') }} </label> <input
-                                                                    type="text"
-                                                                    class="form-control employee-account-number"
-                                                                    name="account_number[]" value="" readonly>
-                                                            </div>
-                                                        </div>
-                                                        {{-- Payment Account --}}
-                                                        <div class="col-lg-2 col-md-4">
-                                                            <div class="form-group mb-3"> <label
-                                                                    class="form-label font-size-13 text-muted">
-                                                                    {{ __('forms.payment.account') }} </label> <select
-                                                                    class="form-select payment-account-employee"
-                                                                    name="payment_account_employee_id[]">
-                                                                    <option value=""> {{ __('forms.search...') }}
-                                                                    </option>
-                                                                </select>
-                                                                {{-- <small class="text-muted payment-account-number">
-                                                                </small> --}}
-                                                            </div>
-                                                        </div>
-
-                                                        <!-- Leader + Assign Budget -->
-                                                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                                                            <div class="form-group mb-3">
-
-                                                                <label class="form-label font-size-13 text-muted d-block">
-                                                                    {{ __('forms.leader') }} / {{ __('forms.assign') }}
+                                                        <div class="col-lg-2 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label font-size-13 text-muted">
+                                                                    {{ __('forms.account.number') }}
+                                                                    <span class="text-danger">*</span>
                                                                 </label>
 
-                                                                <div class="d-flex align-items-center flex-wrap gap-3">
-
-                                                                    {{-- Leader --}}
-                                                                    <div class="form-check mb-0 d-flex align-items-center">
-                                                                        <input type="radio"
-                                                                            class="form-check-input employee-leader"
-                                                                            name="leader_index" value="0"
-                                                                            style="width:20px;height:20px;cursor:pointer;">
-
-                                                                        <label class="form-check-label ms-2"
-                                                                            style="cursor:pointer;">
-                                                                            {{ __('forms.leader') }}
-                                                                        </label>
-                                                                    </div>
-
-                                                                    {{-- Assign Budget --}}
-                                                                    <div class="form-check mb-0 d-flex align-items-center">
-
-                                                                        <input type="hidden" class="assign-budget-value"
-                                                                            name="assign_budget[]" value="0">
-
-                                                                        <input type="checkbox"
-                                                                            class="form-check-input assign-budget"
-                                                                            name="assign_budget_checkbox[]"
-                                                                            style="width:20px;height:20px;cursor:pointer;">
-
-                                                                        <label class="form-check-label ms-2"
-                                                                            style="cursor:pointer;">
-                                                                            {{ __('forms.assign') }}
-                                                                        </label>
-
-                                                                    </div>
-
-                                                                </div>
+                                                                <input type="text"
+                                                                    class="form-control employee-account-number"
+                                                                    name="account_number[]" value="" required
+                                                                    readonly
+                                                                    data-pristine-required-message="{{ __('messages.required') }}">
                                                             </div>
                                                         </div>
 
-                                                        {{-- Remove --}}
-                                                        <div class="col-lg-2 col-md-4">
+                                                        {{-- Payment Account --}}
+                                                        <div class="col-lg-2 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <label class="form-label font-size-13 text-muted">
+                                                                    {{ __('forms.payment.account') }}
+                                                                </label>
 
-                                                            <button type="button" class="btn btn-danger btn-remove-row"
-                                                                disabled>
-                                                                <i class="bx bx-trash"></i>
-                                                            </button>
+                                                                <!-- Payment Account: required if every employee needs one -->
+                                                                <select class="form-select payment-account-employee"
+                                                                    name="payment_account_employee_id[]" required
+                                                                    data-pristine-required-message="{{ __('messages.required') }}">
+                                                                    <option value="">{{ __('forms.search...') }}
+                                                                    </option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="d-flex align-items-center justify-content-start flex-nowrap gap-3">
+                                                            <div class="form-check mb-0">
+                                                                <input type="radio"
+                                                                    class="form-check-input employee-leader"
+                                                                    name="leader_index" value="0">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.leader') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="assign-budget-value"
+                                                                    name="assign_budget[]" value="0">
+                                                                <input type="checkbox"
+                                                                    class="form-check-input assign-budget"
+                                                                    name="assign_budget_checkbox[]">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.assign') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="pocket-money-value"
+                                                                    name="pocket_money[]" value="0">
+                                                                <input type="checkbox"
+                                                                    class="form-check-input pocket-money"
+                                                                    name="pocket_money_checkbox[]">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.pocket.money') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="meal-money-value"
+                                                                    name="meal_money[]" value="0">
+                                                                <input type="checkbox" class="form-check-input meal-money"
+                                                                    name="meal_money_checkbox[]">
+                                                                <label
+                                                                    class="form-check-label">{{ __('forms.meal.money') }}</label>
+                                                            </div>
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="accommodation-money-value"
+                                                                    name="accommodation_money[]" value="0">
+                                                                <input type="checkbox"
+                                                                    class="form-check-input accommodation-money"
+                                                                    name="accommodation_money_checkbox[]">
+                                                                <label class="form-check-label">
+                                                                    {{ __('forms.accommodation.money') }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        {{-- Remove --}}
+                                                        <div class="col-lg-2 col-md-3 col-6">
+                                                            <div class="form-group mb-2">
+                                                                <button type="button"
+                                                                    class="btn btn-danger btn-remove-row w-100" disabled>
+                                                                    <i class="bx bx-trash"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -478,7 +503,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="d-flex flex-wrap gap-2">
                                 <button class="btn btn-primary" type="submit" name="submit"
                                     value="save">{{ __('buttons.save') }}</button>
@@ -534,7 +558,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
+    {{-- <script>
         $(document).ready(function() {
             $('#vDescription').summernote({
                 backColor: 'red',
@@ -544,6 +568,43 @@
                     ['para', ['ul', 'ol', 'paragraph']],
                     ['color', ['color']],
                 ]
+            });
+        });
+    </script> --}}
+
+    <script>
+        $(document).ready(function() {
+            $('#vDescription').summernote({
+                height: 150,
+                styleWithCSS: true,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['color', ['color']]
+                ],
+                callbacks: {
+                    onPaste: function(e) {
+                        // Preserve pasted text spacing and line breaks
+                        const clipboardData = (e.originalEvent || e).clipboardData;
+                        if (!clipboardData) return;
+
+                        const text = clipboardData.getData('text/plain');
+
+                        if (text) {
+                            e.preventDefault();
+
+                            document.execCommand(
+                                'insertHTML',
+                                false,
+                                $('<div>').text(text).html()
+                                .replace(/\r\n|\r|\n/g, '<br>')
+                                .replace(/ {2,}/g, function(spaces) {
+                                    return '&nbsp;'.repeat(spaces.length);
+                                })
+                            );
+                        }
+                    }
+                }
             });
         });
     </script>
@@ -602,47 +663,7 @@
         });
     </script>
 
-    {{-- Alert message that's leader in employee-row  --}}
     {{-- <script>
-        $(document).ready(function() {
-
-            $('#pristine-valid-example').on('submit', function(event) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Check selected leader
-                |--------------------------------------------------------------------------
-                */
-                const leader = document.querySelector(
-                    '#employeeRows .employee-leader:checked'
-                );
-
-                /*
-                |--------------------------------------------------------------------------
-                | Require leader before submit
-                |--------------------------------------------------------------------------
-                */
-                if (!leader) {
-
-                    event.preventDefault();
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'សូមជ្រើសរើសប្រធាន',
-                        text: 'សូមជ្រើសរើសបុគ្គលិកម្នាក់ជាប្រធានបេសកកម្មជាមុនសិន។',
-                        confirmButtonText: 'យល់ព្រម',
-                        confirmButtonColor: '#dc3545',
-                        allowOutsideClick: false
-                    });
-
-                    return false;
-                }
-
-            });
-
-        });
-    </script> --}}
-    <script>
         $(document).ready(function() {
             /* |-------------------------------------------------------------------------- | Keep hidden assign_budget[] value synchronized |-------------------------------------------------------------------------- | | Checked => 1 | Unchecked => 0 | */
             $(document).on('change', '#employeeRows .assign-budget', function() {
@@ -654,9 +675,10 @@
                 /* |-------------------------------------------------------------------------- | Get all employee rows |-------------------------------------------------------------------------- */
                 const employeeRows = document.querySelectorAll('#employeeRows .employee-row');
                 const rowCount = employeeRows
-                .length; /* |-------------------------------------------------------------------------- | 1. Check Leader |-------------------------------------------------------------------------- */
+                    .length; /* |-------------------------------------------------------------------------- | 1. Check Leader |-------------------------------------------------------------------------- */
                 const leader = document.querySelector(
-                '#employeeRows .employee-leader:checked'); /* |-------------------------------------------------------------------------- | Leader is required |-------------------------------------------------------------------------- */
+                    '#employeeRows .employee-leader:checked'
+                ); /* |-------------------------------------------------------------------------- | Leader is required |-------------------------------------------------------------------------- */
                 if (!leader) {
                     event.preventDefault();
                     Swal.fire({
@@ -671,7 +693,8 @@
                 } /* |-------------------------------------------------------------------------- | 2. Check Assign Budget |-------------------------------------------------------------------------- | | If only ONE employee: | Assign Budget is not required. | | If MORE THAN ONE employee: | At least ONE Assign Budget must be selected. | */
                 if (rowCount > 1) {
                     const assignBudget = document.querySelector(
-                    '#employeeRows .assign-budget:checked'); /* |-------------------------------------------------------------------------- | Assign Budget is required |-------------------------------------------------------------------------- */
+                        '#employeeRows .assign-budget:checked'
+                    ); /* |-------------------------------------------------------------------------- | Assign Budget is required |-------------------------------------------------------------------------- */
                     if (!assignBudget) {
                         event.preventDefault();
                         Swal.fire({
@@ -697,7 +720,7 @@
                 return true;
             });
         });
-    </script>
+    </script> --}}
 
     {{-- UI Searching Dropdown  --}}
     <script>
@@ -1057,7 +1080,6 @@
                 return employees;
             }
 
-
             /*
             |--------------------------------------------------------------------------
             | Update employee's OWN account number
@@ -1379,6 +1401,9 @@
             */
             function initEmployeeRow(row) {
 
+                const employeeTitleSelect =
+                    row.querySelector('.employee-title');
+
                 const employeeSelect =
                     row.querySelector('.employee-name');
 
@@ -1399,6 +1424,8 @@
                 | Initialize Choices
                 |--------------------------------------------------------------------------
                 */
+                initChoices(employeeTitleSelect);
+
                 initChoices(employeeSelect);
 
                 initChoices(positionSelect);
@@ -1470,8 +1497,6 @@
 
                     }
                 );
-
-
                 /*
                 |--------------------------------------------------------------------------
                 | Payment Account changed
@@ -1487,7 +1512,6 @@
 
                     }
                 );
-
 
                 /*
                 |--------------------------------------------------------------------------
@@ -1513,17 +1537,13 @@
 
                     }
                 );
-
-
                 /*
                 |--------------------------------------------------------------------------
                 | Initialize existing employee account
                 |--------------------------------------------------------------------------
                 */
                 updateEmployeeAccount(row);
-
             }
-
 
             /*
             |--------------------------------------------------------------------------
@@ -1564,7 +1584,74 @@
                     );
                 }
             }
+            /*
+            |--------------------------------------------------------------------------
+            | Validate all employee rows
+            |--------------------------------------------------------------------------
+            */
 
+            function validateAllEmployeeRows() {
+                let isValid = true;
+                let firstInvalidField = null;
+
+                const rows = document.querySelectorAll(
+                    '#employeeRows .employee-row'
+                );
+
+                rows.forEach(function(row) {
+                    // Validate required dropdowns, including Choices.js fields.
+                    row.querySelectorAll('select[required]').forEach(function(select) {
+                        const fieldValid = updateValidation(select);
+
+                        if (!fieldValid) {
+                            isValid = false;
+
+                            if (!firstInvalidField) {
+                                firstInvalidField =
+                                    select.closest('.choices') || select;
+                            }
+                        }
+                    });
+
+                    // Validate required text inputs, including readonly account numbers.
+                    row.querySelectorAll(
+                        'input[required]:not([type="hidden"]):not([type="checkbox"]), textarea[required]'
+                    ).forEach(function(input) {
+                        const fieldValid =
+                            String(input.value || '').trim() !== '';
+
+                        input.classList.toggle('is-invalid', !fieldValid);
+                        input.classList.toggle('is-valid', fieldValid);
+
+                        if (!fieldValid) {
+                            isValid = false;
+
+                            if (!firstInvalidField) {
+                                firstInvalidField = input;
+                            }
+                        }
+                    });
+                });
+
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    // Focus the original select when the invalid field uses Choices.js.
+                    const focusTarget =
+                        firstInvalidField.classList.contains('choices') ?
+                        firstInvalidField.previousElementSibling :
+                        firstInvalidField;
+
+                    if (focusTarget && typeof focusTarget.focus === 'function') {
+                        focusTarget.focus();
+                    }
+                }
+
+                return isValid;
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -1728,7 +1815,6 @@
                 });
             }
 
-
             /*
             |--------------------------------------------------------------------------
             | Add employee row
@@ -1743,189 +1829,180 @@
                     | Create clean row
                     |--------------------------------------------------------------------------
                     */
+
                     const row = $(`
-                    <div class="employee-row border rounded p-3 mb-3">
+                        <div class="employee-row border rounded p-3 mb-3">
+                            <div class="row align-items-end g-2">
 
-                        <div class="row align-items-end">
-
-                            {{-- Employee --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.name') }}
-                                    </label>
-
-                                    <select
-                                        class="form-select employee-name"
-                                        name="cboName[]"
-                                        required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-
-                                        <option value="">
-                                            {{ __('forms.search...') }}
-                                        </option>
-
-                                        @foreach ($employees as $emp)
-
-                                            <option
-                                                value="{{ $emp->id }}"
-                                                data-account-number="{{ $emp->account_number }}">
-
-                                                {{ $emp->name_kh }}
-                                                -
-                                                {{ $emp->name_latin }}
-
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Position --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.position') }}
-                                    </label>
-
-                                    <select
-                                        class="form-select employee-position"
-                                        name="cboPosition[]"
-                                        required
-                                        data-pristine-required-message="{{ __('messages.required') }}">
-
-                                        <option value="">
-                                            {{ __('forms.search...') }}
-                                        </option>
-
-                                        @foreach ($positions as $pos)
-
-                                            <option value="{{ $pos->id }}">
-                                                {{ $pos->name }}
-                                            </option>
-
-                                        @endforeach
-
-                                    </select>
-
-                                </div>
-
-                            </div>
-
-                            {{-- Own Account Number --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.account.number') }}
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        class="form-control employee-account-number"
-                                        name="account_number[]"
-                                        value=""
-                                        readonly>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Payment Account --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label class="form-label font-size-13 text-muted">
-                                        {{ __('forms.payment.account') }}
-                                    </label>
-
-                                    <select
-                                        class="form-select payment-account-employee"
-                                        name="payment_account_employee_id[]">
-
-                                        <option value="">
-                                            {{ __('forms.search...') }}
-                                        </option>
-
-                                    </select>
-
-                                   
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- Assign Budget --}}
-                            <div class="col-lg-2 col-md-4">
-
-                                <div class="form-group mb-3">
-
-                                    <label
-                                        class="form-label font-size-13 text-muted d-block">
-
-                                        {{ __('forms.assign') }}
-
-                                    </label>
-
-                                    <input
-                                        type="hidden"
-                                        class="assign-budget-value"
-                                        name="assign_budget[]"
-                                        value="0">
-
-                                    <div class="form-check">
-
-                                        <input
-                                            type="checkbox"
-                                            class="form-check-input assign-budget"
-                                            name="assign_budget_checkbox[]"
-                                            style="width:22px;height:22px;cursor:pointer;">
-
-                                        <label
-                                            class="form-check-label ms-2"
-                                            style="padding-top:3px;cursor:pointer;">
-
-                                            {{ __('forms.assign') }}
-
+                                {{-- Employee Title --}}
+                                <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            គោរមងារ
                                         </label>
 
+                                        <select class="form-select employee-title"
+                                            name="cboTitle[]">
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+                                            <option value="ឯកឧត្តម">ឯកឧត្តម</option>
+                                            <option value="លោកជំទាវ">លោកជំទាវ</option>
+                                            <option value="លោក">លោក</option>
+                                            <option value="លោកស្រី">លោកស្រី</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Employee --}}
+                                <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.name') }}
+                                        </label>
+
+                                        <select
+                                            class="form-select employee-name"
+                                            name="cboName[]"
+                                            required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+
+                                            @foreach ($employees as $emp)
+                                                <option
+                                                    value="{{ $emp->id }}"
+                                                    data-account-number="{{ $emp->account_number }}">
+                                                    {{ $emp->name_kh }} - {{ $emp->name_latin }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Position --}}
+                                 <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.position') }}
+                                        </label>
+
+                                        <select
+                                            class="form-select employee-position"
+                                            name="cboPosition[]"
+                                            required
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+
+                                            @foreach ($positions as $pos)
+                                                <option value="{{ $pos->id }}">
+                                                    {{ $pos->name }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- Own Account Number --}}
+                                    <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.account.number') }}
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            class="form-control employee-account-number"
+                                            name="account_number[]"
+                                            value=""
+                                            data-pristine-required-message="{{ __('messages.required') }}"
+                                            readonly>
+                                    </div>
+                                </div>
+
+                                {{-- Payment Account --}}
+                              <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <label class="form-label font-size-13 text-muted">
+                                            {{ __('forms.payment.account') }}
+                                        </label>
+
+                                        <select
+                                            class="form-select payment-account-employee"
+                                            name="payment_account_employee_id[]">
+                        data-pristine-required-message="{{ __('messages.required') }}"
+                                            <option value="">
+                                                {{ __('forms.search...') }}
+                                            </option>
+
+                                        </select>
+                                    </div>
+                                </div>
+                        <div class="col-lg-2 col-md-3 col-6">
+                                    <div class="form-group mb-2">
+                                        <button
+                                            type="button"
+                                            class="btn btn-danger btn-remove-row">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {{-- Assign Budget --}}
+                                <div
+                                    class="d-flex align-items-center justify-content-start flex-nowrap gap-3">
+                                    
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="assign-budget-value"
+                                            name="assign_budget[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input assign-budget"
+                                            name="assign_budget_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.assign') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="pocket-money-value"
+                                            name="pocket_money[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input pocket-money"
+                                            name="pocket_money_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.pocket.money') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="meal-money-value"
+                                            name="meal_money[]" value="0">
+                                        <input type="checkbox" class="form-check-input meal-money"
+                                            name="meal_money_checkbox[]">
+                                        <label
+                                            class="form-check-label">{{ __('forms.meal.money') }}</label>
+                                    </div>
+
+                                    <div class="form-check mb-0">
+                                        <input type="hidden" class="accommodation-money-value"
+                                            name="accommodation_money[]" value="0">
+                                        <input type="checkbox"
+                                            class="form-check-input accommodation-money"
+                                            name="accommodation_money_checkbox[]">
+                                        <label class="form-check-label">
+                                            {{ __('forms.accommodation.money') }}
+                                        </label>
                                     </div>
 
                                 </div>
-
+                                {{-- Remove --}}
                             </div>
-
-
-                            {{-- Remove --}}
-                            <div class="col">
-
-                                <button
-                                    type="button"
-                                    class="btn btn-danger btn-remove-row">
-
-                                    <i class="bx bx-trash"></i>
-
-                                </button>
-
-                            </div>
-
                         </div>
-
-                    </div>
-                `);
+                    `);
 
 
                     /*
@@ -2186,6 +2263,7 @@
                 row.find('.assign-budget-value').val(0);
             }
         }); // When employee is selected/changed 
+
         $(document).on('change', '.employee-name', function() {
             const rows = $('.employee-row'); // If there is only ONE employee 
             if (rows.length === 1) {
@@ -2199,7 +2277,7 @@
     </script>
 
     {{-- Assign Budget --}}
-    <script>
+    {{-- <script>
         $(document).on('change', '.employee-name', function() {
 
             // Get all employee rows
@@ -2227,7 +2305,7 @@
                 row.find('.assign-budget').prop('disabled', false);
             }
         });
-    </script>
+    </script> --}}
 
     {{-- Skip File Input --}}
     <script>
@@ -2484,5 +2562,96 @@
                 }
             });
         }
+    </script>
+
+    <script>
+        $(document).ready(function() {
+
+            // Synchronize Assign Budget checkbox and hidden values
+            function syncAssignBudget(row) {
+                const checkbox = row.find('.assign-budget');
+                const hiddenInput = row.find('.assign-budget-value');
+
+                const isChecked = checkbox.is(':checked');
+
+                // Assign Budget: checked = 1, unchecked = 0
+                hiddenInput.val(isChecked ? 1 : 0);
+
+                // Budget fields
+                const budgetFields = [
+                    'pocket_money',
+                    'meal_money',
+                    'accommodation_money'
+                ];
+
+                budgetFields.forEach(function(field) {
+                    const input = row.find('[name="' + field + '[]"], [name="' + field + '"]');
+
+                    if (!isChecked) {
+                        // Unchecked: submit zero
+                        input.val(0);
+                    }
+                });
+            }
+
+            // When Assign Budget checkbox changes
+            $(document).on('change', '#employeeRows .assign-budget', function() {
+                const row = $(this).closest('.employee-row');
+                syncAssignBudget(row);
+            });
+
+            // Validate form before submitting
+            $('#pristine-valid-example').on('submit', function(event) {
+
+                const employeeRows = $('#employeeRows .employee-row');
+                const rowCount = employeeRows.length;
+
+                // 1. Leader is required
+                const leader = $('#employeeRows .employee-leader:checked');
+
+                if (leader.length === 0) {
+                    event.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'សូមជ្រើសរើសប្រធាន',
+                        text: 'សូមជ្រើសរើសបុគ្គលិកម្នាក់ជាប្រធានបេសកកម្មជាមុនសិន។',
+                        confirmButtonText: 'យល់ព្រម',
+                        confirmButtonColor: '#dc3545',
+                        allowOutsideClick: false
+                    });
+
+                    return false;
+                }
+
+                // 2. If there is more than one employee,
+                // at least one must be assigned the budget
+                // if (
+                //     rowCount > 1 &&
+                //     $('#employeeRows .assign-budget:checked').length === 0
+                // ) {
+                //     event.preventDefault();
+
+                //     Swal.fire({
+                //         icon: 'warning',
+                //         title: 'សូមជ្រើសរើសអ្នកបែងចែកថវិកា',
+                //         text: 'សូមជ្រើសរើសបុគ្គលិកយ៉ាងហោចណាស់ម្នាក់សម្រាប់បែងចែកថវិកា។',
+                //         confirmButtonText: 'យល់ព្រម',
+                //         confirmButtonColor: '#dc3545',
+                //         allowOutsideClick: false
+                //     });
+
+                //     return false;
+                // }
+
+                // 3. Synchronize all budget values before submission
+                employeeRows.each(function() {
+                    syncAssignBudget($(this));
+                });
+
+                return true;
+            });
+
+        });
     </script>
 @endsection

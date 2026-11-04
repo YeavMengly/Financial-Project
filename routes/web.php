@@ -10,7 +10,7 @@ use App\Livewire\BudgetPlan\GaranteeFile;
 use App\Livewire\BudgetPlan\ProcurementFile;
 use App\Livewire\BudgetPlan\ExpenseRecordTrainingFile;
 use App\Livewire\BudgetPlan\PaymentDeadlineTraining;
-use App\Livewire\Duel\Release;
+use App\Livewire\Duel\EditFileRelease;
 use App\Livewire\Mission\EditFileMission;
 use App\Livewire\Project\EditFileProject;
 use App\Livewire\project\Project;
@@ -54,5 +54,5 @@ Route::prefix('mission')->middleware(['auth'])->group(function () {
 });
 
 Route::prefix('duel')->middleware(['auth'])->group(function () {
-    Route::get('{params}/duel-release-file/{id}', Release::class)->name('duelRelease.edit.doc');
+    Route::get('{params}/duel-release-file/{id}', EditFileRelease::class)->name('duelRelease.edit.doc');
 });

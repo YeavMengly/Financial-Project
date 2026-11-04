@@ -67,7 +67,7 @@ class AccountDataTable extends DataTable
             ])
             ->where('accounts.ministry_id', $id)
             ->where('accounts.chapter_id', $chId)
-            ->orderBy('accounts.created_at', 'DESC');
+            ->orderBy('accounts.created_at', 'asc');
         // $query->where('accounts.ministry_id', $id);
         // $query->where('accounts.chapter_id', $chId);
 
