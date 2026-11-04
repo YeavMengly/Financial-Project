@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('level_name', 5);
             // Allowances
             $table->decimal('travel_allowance', 15, 0)->default(0);
+            $table->decimal('unexpected_budget', 15, 0)->default(0);
             $table->decimal('pocket_money', 15, 0)->default(0);
             $table->decimal('total_pocket_money', 15, 0)->default(0);
             $table->decimal('meal_money', 15, 0)->default(0);
@@ -31,8 +32,14 @@ return new class extends Migration
             // Assign budget checkbox
             $table->boolean('assign_budget')
                 ->default(false);
+            $table->boolean('pocket_money_status')
+                ->default(false);
+            $table->boolean('meal_money_status')
+                ->default(false);
+            $table->boolean('accommodation_money_status')
+                ->default(false);
             $table->string('account_number', 15)->nullable();
-            $table->unsignedBigInteger('payment_account_employee_id', 5)->nullable();
+            $table->string('payment_account_employee_id', 5)->nullable();
             $table->string('payment_account_number', 15)->nullable();
             $table->timestamps();
             $table->softDeletes();

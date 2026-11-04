@@ -26,6 +26,14 @@ class MissionDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
+            ->addColumn('select', function ($mission) {
+    return '
+        <input type="checkbox"
+            class="form-check-input mission-checkbox"
+            name="mission_ids[]"
+            value="' . $mission->id . '">
+    ';
+})
             ->addColumn('select', function ($row) {
                 if ((int) $row->payment_is_archived === 2) {
                     // return '';
@@ -156,6 +164,7 @@ class MissionDataTable extends DataTable
                 <i class='fas fa-file-alt me-1'></i>Preview
             </a>";
             })
+    
             ->rawColumns([
                 'select',
                 'description',
@@ -183,7 +192,7 @@ class MissionDataTable extends DataTable
 
         $model->leftJoin('ministries', 'missions.ministry_id', '=', 'ministries.id');
         $model->leftJoin('provinces', 'missions.province_id', '=', 'provinces.id');
-        $model->leftJoin('documents', 'missions.document_id', '=', 'documents.id');
+        $model->leftJoin('mission_doc_types', 'missions.mission_doc_type_id', '=', 'mission_doc_types.id');
 
         $model->leftJoin('mission_employees', 'missions.id', '=', 'mission_employees.mission_id');
 
@@ -281,13 +290,32 @@ class MissionDataTable extends DataTable
             $id
         );
 
+        // ===== Mission Combination Filter =====
+
+        if ($request->input('combination_search') == 1) {
+
+            $combinationIds = $request->input('combination_ids', []);
+
+            if (!empty($combinationIds) && is_array($combinationIds)) {
+
+                $model->whereIn(
+                    'missions.id',
+                    array_map('intval', $combinationIds)
+                );
+            } else {
+
+                // No exact combination: return no missions.
+                $model->whereRaw('1 = 0');
+            }
+        }
+
         // ===== Select Columns =====
 
         $model->select([
             // Main mission
             'missions.id',
             'missions.ministry_id',
-            'missions.document_id',
+            'missions.mission_doc_type_id',
             'missions.leader_id',
             'missions.province_id',
             'missions.legal_number',
@@ -302,7 +330,7 @@ class MissionDataTable extends DataTable
             'missions.fileName',
             'missions.payment_status',
             'missions.payment_is_archived',
-            'documents.name as doc_name',
+            'mission_doc_types.name as doc_name',
 
             // Province
             'provinces.name as province_name',
@@ -323,7 +351,7 @@ class MissionDataTable extends DataTable
         $model->groupBy([
             'missions.id',
             'missions.ministry_id',
-            'missions.document_id',
+            'missions.mission_doc_type_id',
             'missions.leader_id',
             'missions.province_id',
             'missions.legal_number',
@@ -338,7 +366,7 @@ class MissionDataTable extends DataTable
             'missions.fileName',
             'missions.payment_status',
             'missions.payment_is_archived',
-            'documents.name',
+            'mission_doc_types.name',
             'provinces.name',
             'missions.created_at',
             'missions.deleted_at',
@@ -384,6 +412,9 @@ class MissionDataTable extends DataTable
                 d.start_index    = $("#start_index").val();
                 d.end_index      = $("#end_index").val();
 
+                // Mission combination search
+                d.combination_search = window.combinationSearchActive ? 1 : 0;
+                d.combination_ids = window.combinationMissionIds || [];
             }',
             ])
 

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('chapter_id')->nullable();
             $table->unsignedBigInteger('account_id')->nullable();
             $table->unsignedBigInteger('account_sub_id')->nullable();
-            $table->unsignedBigInteger('document_id');
+            $table->unsignedBigInteger('mission_doc_type_id');
             $table->integer('leader_id')->default(0);
             $table->unsignedBigInteger('province_id');
             $table->string('legal_number');

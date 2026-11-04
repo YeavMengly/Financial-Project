@@ -23,7 +23,7 @@ class Mission extends Model
 
     protected $fillable = [
         'ministry_id',
-        'document_id',
+        'mission_doc_type_id',
         'leader_id',
         'province_id',
         'legal_number',
@@ -44,7 +44,7 @@ class Mission extends Model
         'chapter_id',
         'account_id',
         'account_sub_id',
-        'payment_approval_status', 
+        'payment_approval_status',
         'paid_at'
     ];
 
@@ -67,7 +67,7 @@ class Mission extends Model
             ->useLogName(trans('menus.content.missions'))
             ->logOnly([
                 'ministry_id',
-                'document_id',
+                'mission_doc_type_id',
                 'leader_id',
                 'province_id',
                 'legal_number',
@@ -94,9 +94,21 @@ class Mission extends Model
     {
         $agent = new Agent();
 
+        $user = auth()->user();
+
         $activity->default_field = "{$this->name}";
 
         $activity->log_name = trans('menus.content.missions');
+
+        // Authenticated user information
+        $activity->causer_id = $user?->id;
+        $activity->causer_type = $user ? get_class($user) : null;
+
+        // Store the user's name as a custom activity property
+        $activity->properties = $activity->properties->put(
+            'fullname',
+            $user?->fullname
+        );
 
         $browser = $agent->browser();
 

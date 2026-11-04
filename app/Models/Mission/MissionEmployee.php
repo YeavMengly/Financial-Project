@@ -21,6 +21,7 @@ class MissionEmployee extends Model
         'position_id',
         'level_name',
         'travel_allowance',
+        'unexpected_budget',
         'pocket_money',
         'total_pocket_money',
         'meal_money',
@@ -29,8 +30,11 @@ class MissionEmployee extends Model
         'total_accommodation_money',
         'total',
         'assign_budget',
+        'pocket_money_status',
+        'meal_money_status',
+        'accommodation_money_status',
         'account_number',
-        'payment_account_employee_id', 
+        'payment_account_employee_id',
         'payment_account_number'
     ];
 
@@ -44,6 +48,9 @@ class MissionEmployee extends Model
         'total_accommodation_money' => 'decimal:0',
         'total' => 'decimal:0',
         'assign_budget' => 'boolean',
+        'pocket_money_status' => 'boolean',
+        'meal_money_status' => 'boolean',
+        'accommodation_money_status' => 'boolean',
     ];
 
     public function mission()

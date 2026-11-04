@@ -7,12 +7,16 @@
         <ul class="dropdown-menu dropdown-menu-end">
             @if (is_null($module->deleted_at))
                 @php
-                    // Checks if file exists directly under the public/ directory
-                    $hasFile = !empty($module->file) && file_exists(public_path($module->file));
+                    $hasFile =
+                        !empty($module->file) &&
+                        (\Illuminate\Support\Facades\Storage::disk('local')->exists($module->file) ||
+                            \Illuminate\Support\Facades\Storage::disk('public')->exists($module->file));
+
                     $hasOtherActions = hasPermission('duelRelease.edit') || hasPermission('duelRelease.destroy');
                 @endphp
+
                 @if (hasPermission('duelRelease.index') && $hasFile)
-                    <a download href="{{ asset($module->file) }}" class="dropdown-item">
+                    <a href="{{ route('duelRelease.file.download', $module->id) }}" class="dropdown-item">
                         <i class="bx bx-download"></i>
                         {{ __('buttons.download') }}
                     </a>
@@ -20,6 +24,7 @@
                         <hr class="dropdown-divider" />
                     @endif
                 @endif
+
                 @if (hasPermission('duelRelease.edit'))
                     <a href="{{ route('duelRelease.edit', ['params' => encode_params($module->ministry_id), 'id' => encode_params($module->id)]) }}"
                         class="dropdown-item"><i class="bx bx-edit"></i> {{ __('buttons.edit') }}</a>

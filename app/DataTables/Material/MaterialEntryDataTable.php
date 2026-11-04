@@ -93,7 +93,7 @@ class MaterialEntryDataTable extends DataTable
                 'material_entries.created_at',
                 'material_entries.updated_at',
             ]);
-            // ->orderBy('material_entries.created_at', 'ASC');
+        // ->orderBy('material_entries.created_at', 'ASC');
 
         if ($request->filled('project')) {
             $query->where('material_entries.project_id', $request->input('project'));

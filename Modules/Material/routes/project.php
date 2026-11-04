@@ -15,22 +15,24 @@ Route::controller(ProjectsController::class)->group(function () {
     Route::post('project/{params}/update/{id}', 'update')->name('project.update');
     Route::get('project/{params}/restore/{id}', 'restore')->name('project.restore');
 
-     // These routes are for ajax request
+    // These routes are for ajax request
     Route::get('project/get-by-program/program-subs', 'getByProgramId')->name('project.by.program_sub');
     Route::get('project/get-by-program/agencies', 'getByAgency')->name('project.by.agency');
     Route::get('project/get-by-program-sub/clusters', 'getByProgramSubId')->name('project.by.cluster');
-   
+
     // These routes are for edit page ajax request
     Route::get('project/edit-by-program/program-subs', 'editByProgramId')->name('project.edit.program_sub');
     Route::get('project/edit-by-program/agencies', 'editByAgency')->name('project.edit.agency');
     Route::get('project/edit-by-program-sub/clusters', 'editByProgramSubId')->name('project.edit.cluster');
-    
-     Route::get(
-        '/projects/{id}/file/preview', 'preview'
-    )->name('project.file.preview');
 
+    // Preview
     Route::get(
-        '/projects/{id}/file/download', 'download'
+        '/projects/{id}/file/preview',
+        'preview'
+    )->name('project.file.preview');
+    // Download
+    Route::get(
+        '/projects/{id}/file/download',
+        'download'
     )->name('project.file.download');
-
 });

@@ -72,8 +72,20 @@ class Projects extends Model
     {
         $agent = new Agent();
 
+        $user = auth()->user();
+
         $activity->default_field = $this->stock_name;
         $activity->log_name = trans('menus.project');
+
+        // Authenticated user information
+        $activity->causer_id = $user?->id;
+        $activity->causer_type = $user ? get_class($user) : null;
+
+        // Store the user's name as a custom activity property
+        $activity->properties = $activity->properties->put(
+            'fullname',
+            $user?->fullname
+        );
 
         $platform = $agent->platform();
         $browser = $agent->browser();

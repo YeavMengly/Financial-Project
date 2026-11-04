@@ -46,7 +46,7 @@ class EditFileProject extends Component
                 'required',
                 'file',
                 'mimes:pdf',
-                'max:51200',
+                'max:10240',
             ],
         ], [
             'newDocumentFile.required' =>
@@ -59,7 +59,7 @@ class EditFileProject extends Component
             'សូមជ្រើសរើសឯកសារ PDF ប៉ុណ្ណោះ',
 
             'newDocumentFile.max' =>
-            'File ឯកសារត្រូវតែតូចជាង ឬស្មើ 50MB',
+            'File ឯកសារត្រូវតែតូចជាង ឬស្មើ 10MB',
         ]);
 
         $disk = Storage::disk('local');

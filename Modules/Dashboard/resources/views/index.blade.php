@@ -1100,14 +1100,14 @@
             </div>
 
         </div>
-        <div class="modal fade" id="fuelDetailModal" tabindex="-1" aria-labelledby="fuelDetailModalLabel"
+        {{-- <div class="modal fade" id="fuelDetailModal" tabindex="-1" aria-labelledby="fuelDetailModalLabel"
             aria-hidden="true">
 
             <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
 
                 <div class="modal-content">
 
-                    {{-- Header --}}
+     
                     <div class="modal-header bg-light">
 
                         <div>
@@ -1122,7 +1122,7 @@
 
                             <small class="text-muted">
                                 បញ្ជី Duel Release ប្រចាំឆ្នាំ
-                                {{-- {{ $year }} --}}
+                              
                             </small>
 
                         </div>
@@ -1133,10 +1133,10 @@
                     </div>
 
 
-                    {{-- Body --}}
+  
                     <div class="modal-body">
 
-                        {{-- Summary --}}
+                  
                         <div class="row g-3 mb-4">
 
                             <div class="col-md-4">
@@ -1217,7 +1217,7 @@
 
                         </div>
 
-                        {{-- Chart --}}
+                   
                         <div class="card border shadow-none">
 
                             <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
@@ -1234,7 +1234,7 @@
                                 </div>
 
                                 <span class="badge bg-primary-subtle text-primary">
-                                    {{-- {{ $year }} --}}
+                             
                                 </span>
 
                             </div>
@@ -1250,7 +1250,7 @@
                     </div>
 
 
-                    {{-- Footer --}}
+            
                     <div class="modal-footer bg-light">
 
                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
@@ -1267,7 +1267,7 @@
 
             </div>
 
-        </div>
+        </div> --}}
         @php
             $qtyDieselRemain = max(($qtyDiesel ?? 0) - ($qtyDieselRelease ?? 0), 0);
         @endphp
@@ -1386,7 +1386,7 @@
             </div>
         </div>
 
-        <div class="col-xl-2 col-md-6">
+        {{-- <div class="col-xl-2 col-md-6">
             <!-- card -->
             <div class="card card-h-100">
                 <!-- card body -->
@@ -1417,28 +1417,33 @@
                     </div>
                 </div><!-- end card body -->
             </div><!-- end card -->
-        </div>
+        </div> --}}
     </div>
     {{-- ំMaterial --}}
-    <div class="row card">
-        <div class="card-body">
+    <div class="row">
+        <div class="col-xl-6 col-md-12">
+            <div class="row card">
+                <div class="card-body">
 
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <div class="card-title mb-1">
-                        {{ __('menus.material') }}
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="card-title mb-1">
+                                {{ __('menus.material') }}
+                            </div>
+                            <p class="text-muted mb-0">
+                                Entry vs Release
+                            </p>
+                        </div>
                     </div>
-                    <p class="text-muted mb-0">
-                        Entry vs Release
-                    </p>
+                    <div style="height: 300px;">
+                        <canvas id="materialMovementChart"></canvas>
+                    </div>
+
                 </div>
             </div>
-            <div style="height: 300px;">
-                <canvas id="materialMovementChart"></canvas>
-            </div>
-
         </div>
     </div>
+
     {{-- Modal Program Sub --}}
     <div class="modal fade" id="programSubModal" tabindex="-1" aria-labelledby="programSubModalLabel"
         aria-hidden="true">
@@ -1521,7 +1526,7 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             const labels = @json($chartLabels);
@@ -1751,7 +1756,150 @@
             });
 
         });
+    </script> --}}
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const labels = @json($chartLabels);
+
+            const entryQty = @json($entryQty);
+            const releaseQty = @json($releaseQty);
+
+            const entryPrice = @json($entryPrice);
+            const releasePrice = @json($releasePrice);
+
+            const ctx = document
+                .getElementById('materialMovementChart');
+
+            if (!ctx) return;
+
+            new Chart(ctx, {
+
+                type: 'bar',
+
+                data: {
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+                            label: 'បញ្ចូល',
+                            data: entryQty,
+
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59,130,246,0.12)',
+
+                            fill: true,
+                            tension: 0.4,
+
+                            borderWidth: 2,
+
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+
+                        },
+
+                        {
+                            label: 'បញ្ចេញ',
+                            data: releaseQty,
+
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239,68,68,0.08)',
+
+                            fill: true,
+                            tension: 0.4,
+
+                            borderWidth: 2,
+
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+
+                        }
+
+                    ]
+                },
+
+                options: {
+
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+
+                    plugins: {
+
+                        legend: {
+                            position: 'top',
+
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 7,
+                                padding: 12
+                            }
+                        },
+
+                        tooltip: {
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    const index = context.dataIndex;
+
+                                    const isEntry = context.datasetIndex === 0;
+
+                                    const price = isEntry ?
+                                        entryPrice[index] :
+                                        releasePrice[index];
+
+                                    return [
+                                        `${context.dataset.label}: ${Number(context.raw).toLocaleString()}`,
+                                        `តម្លៃសរុប: ៛ ${Number(price).toLocaleString()}`
+                                    ];
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            grid: {
+                                color: 'rgba(128,128,128,0.12)'
+                            },
+                            // min: 0,
+                            // max: 10000,
+                            ticks: {
+                                callback: value =>
+                                    Number(value).toLocaleString()
+                            }
+                        }
+
+                    }
+
+                }
+
+            });
+
+        });
     </script>
+
     {{-- mini cahart --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -2961,111 +3109,111 @@
 
         });
     </script> --}}
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-    const chartLabels = @json($chartLabels);
+            const chartLabels = @json($chartLabels);
 
-    const entryQty = @json($fuelEntryQty);
+            const entryQty = @json($fuelEntryQty);
 
-    const releaseQty = @json($fuelReleaseQty);
+            const releaseQty = @json($fuelReleaseQty);
 
-    const remainQty = @json($fuelRemainQty);
-
-
-    const chartElement = document.querySelector('#fuelReleaseChart');
-
-    if (!chartElement) {
-        return;
-    }
+            const remainQty = @json($fuelRemainQty);
 
 
-    const options = {
+            const chartElement = document.querySelector('#fuelReleaseChart');
 
-        chart: {
-            type: 'line',
-            height: 400,
-            toolbar: {
-                show: true
+            if (!chartElement) {
+                return;
             }
-        },
 
-        series: [
-            {
-                name: 'Entry',
-                data: entryQty
-            },
-            {
-                name: 'Release',
-                data: releaseQty
-            },
-            {
-                name: 'Remain',
-                data: remainQty
-            }
-        ],
 
-        xaxis: {
-            categories: chartLabels,
+            const options = {
 
-            title: {
-                text: 'Month'
-            }
-        },
+                chart: {
+                    type: 'line',
+                    height: 400,
+                    toolbar: {
+                        show: true
+                    }
+                },
 
-        yaxis: {
-            title: {
-                text: 'Quantity (Liter)'
-            },
+                series: [{
+                        name: 'Entry',
+                        data: entryQty
+                    },
+                    {
+                        name: 'Release',
+                        data: releaseQty
+                    },
+                    {
+                        name: 'Remain',
+                        data: remainQty
+                    }
+                ],
 
-            labels: {
-                formatter: function (value) {
-                    return Number(value).toLocaleString();
+                xaxis: {
+                    categories: chartLabels,
+
+                    title: {
+                        text: 'Month'
+                    }
+                },
+
+                yaxis: {
+                    title: {
+                        text: 'Quantity (Liter)'
+                    },
+
+                    labels: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString();
+                        }
+                    }
+                },
+
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+
+                markers: {
+                    size: 5
+                },
+
+                tooltip: {
+                    shared: true,
+                    intersect: false,
+
+                    y: {
+                        formatter: function(value) {
+                            return Number(value).toLocaleString() + ' លីត្រ';
+                        }
+                    }
+                },
+
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center'
+                },
+
+                grid: {
+                    strokeDashArray: 4
+                },
+
+                noData: {
+                    text: 'មិនមានទិន្នន័យ'
                 }
-            }
-        },
-
-        stroke: {
-            curve: 'smooth',
-            width: 3
-        },
-
-        markers: {
-            size: 5
-        },
-
-        tooltip: {
-            shared: true,
-            intersect: false,
-
-            y: {
-                formatter: function (value) {
-                    return Number(value).toLocaleString() + ' លីត្រ';
-                }
-            }
-        },
-
-        legend: {
-            position: 'top',
-            horizontalAlign: 'center'
-        },
-
-        grid: {
-            strokeDashArray: 4
-        },
-
-        noData: {
-            text: 'មិនមានទិន្នន័យ'
-        }
-    };
+            };
 
 
-    const fuelChart = new ApexCharts(
-        chartElement,
-        options
-    );
+            const fuelChart = new ApexCharts(
+                chartElement,
+                options
+            );
 
-    fuelChart.render();
+            fuelChart.render();
 
-});
-</script>
+        });
+    </script>
+    @endsection

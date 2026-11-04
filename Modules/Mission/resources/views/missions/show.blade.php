@@ -15,10 +15,15 @@
                     ព័ត៌មានបេសកកម្ម
                 </h5>
 
-                <a href="{{ url()->previous() }}" class="btn btn-danger btn-sm">
+                {{-- <a href="{{ url()->previous() }}" class="btn btn-danger btn-sm">
                     <i class="fa fa-arrow-left me-1"></i>
                     {{ __('buttons.back') }}
-                </a>
+                </a> --}}
+
+                  <a class="btn btn-outline-danger" href="{{ url()->previous() }}">
+                                        <i class="bx bx-arrow-back me-1"></i>
+                                        {{ __('buttons.back') }}
+                                    </a>
             </div>
 
             <div class="card-body">
@@ -154,9 +159,8 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="text-center">ល.រ</th>
-                                <th>គោរមងារ</th>
                                 <th>ឈ្មោះខ្មែរ</th>
-                                <th>ឈ្មោះឡាតាំង</th>
+                                {{-- <th>ឈ្មោះឡាតាំង</th> --}}
                                 <th>តួនាទី</th>
                                 <th>កម្រិត</th>
                                 <th class="text-end">ប្រាក់ធ្វើដំណើរ</th>
@@ -183,16 +187,12 @@
                                         </td>
 
                                         <td>
-                                            {{ $item->employee_title ?? '-' }}
+                                            {{ $item->employee_title ?? '-' }} {{ $item->name_kh ?? '-' }}
                                         </td>
 
-                                        <td>
-                                            {{ $item->name_kh ?? '-' }}
-                                        </td>
-
-                                        <td>
+                                        {{-- <td>
                                             {{ $item->name_latin ?? '-' }}
-                                        </td>
+                                        </td> --}}
 
                                         <td>
                                             {{ $item->name ?? '-' }}
@@ -203,7 +203,8 @@
                                         </td>
 
                                         <td class="text-end">
-                                            {{ number_format($item->travel_allowance ?? 0) }} ៛
+                                            {{ number_format(($item->travel_allowance ?? 0) + ($item->unexpected_budget ?? 0)) }}
+                                            ៛
                                         </td>
 
                                         <td class="text-end">
@@ -254,7 +255,7 @@
                             @empty
 
                                 <tr>
-                                    <td colspan="14" class="text-center text-muted py-3">
+                                    <td colspan="12" class="text-center text-muted py-3">
                                         {{ __('forms.mission.employee') }}
                                     </td>
                                 </tr>
@@ -266,11 +267,12 @@
 
                             <tr class="table-light fw-bold">
 
-                                <td colspan="6" class="text-end">
+                                <td colspan="4" class="text-end">
                                     សរុបរួម
                                 </td>
                                 <td class="text-end">
-                                    {{ number_format($mission->sum('travel_allowance')) }} ៛
+                                    {{ number_format(($mission->sum('travel_allowance') ?? 0) + ($mission->sum('unexpected_budget') ?? 0)) }}
+                                    ៛
                                 </td>
                                 <td class="text-end">
                                     {{ number_format($mission->sum('pocket_money')) }} ៛

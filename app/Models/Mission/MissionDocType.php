@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models\Mission;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Jenssegers\Agent\Agent;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
+
+class MissionDocType extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'id_order',
+        'name',
+        'name_kh',
+        'doc_type',
+        'description'
+    ];
+
+      public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName(trans('menus.document'))
+            ->logOnly([
+                'id_order',
+                'name',
+                'name_kh',
+                'doc_type',
+                'description'
+            ])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "{$eventName}");
+    }
+
+    public function tapActivity(Activity $activity)
+    {
+        $agent = new Agent();
+        $activity->default_field = "{$this->name} ";
+        $activity->log_name = trans('menus.document');
+        $platform = $agent->platform();
+        $browser = $agent->browser();
+        $activity->ip_address = request()->ip();
+        $activity->platform = $platform;
+        $activity->device = $agent->device();
+        $activity->browser_version = $agent->version($browser);
+        $activity->browser = $browser;
+    }
+}

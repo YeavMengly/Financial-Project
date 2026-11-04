@@ -17,6 +17,7 @@ use App\Models\Content\Program;
 use App\Models\Content\ProgramSub;
 use App\Models\Document;
 use App\Models\Mission\Mission;
+use App\Models\Mission\MissionDocType;
 use App\Models\Mission\MissionEmployee;
 use App\Models\Province;
 use Carbon\Carbon;
@@ -45,14 +46,29 @@ class MissionController extends Controller
         $provinces = Province::all();
         $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
         $pendingMissionCount = Mission::where('payment_is_archived', 2)->count();
+        // $exportLogsCount = Mission::where('payment_status', 'paid')->count();
         $exportLogs = Mission::query()
-            ->where('ministry_id', decode_params($params))
-            ->where('payment_status', 'paid')
-            ->whereNull('deleted_at')
-            ->select('paid_at')
-            ->distinct()
-            ->orderByDesc('paid_at')
+            ->where('missions.ministry_id', decode_params($params))
+            ->where('missions.payment_status', 'paid')
+            ->whereNull('missions.deleted_at')
+            ->leftJoin(
+                'mission_employees',
+                'missions.id',
+                '=',
+                'mission_employees.mission_id'
+            )
+            ->selectRaw('
+        missions.paid_at,
+        COUNT(DISTINCT missions.id) as mission_count,
+        SUM(mission_employees.total) as total_amount
+    ')
+            ->groupBy('missions.paid_at')
+            ->orderBy('missions.paid_at', 'asc')
             ->get();
+
+        // $totalPaid = $exportLogs->sum('total_amount');
+        // $totalMissions = $exportLogs->sum('mission_count');
+        $totalRounds = $exportLogs->count();
 
         return $dataTable->render('mission::missions.index', [
             'params' => $params,
@@ -63,6 +79,7 @@ class MissionController extends Controller
             'employees' => $employees,
             'pendingMissionCount' => $pendingMissionCount,
             'exportLogs' => $exportLogs,
+            'totalRounds' => $totalRounds,
         ]);
     }
 
@@ -254,7 +271,7 @@ class MissionController extends Controller
             })
             ->orderBy('id')
             ->get();
-        $document = Document::all();
+        $missionDocType = MissionDocType::all();
         $program   = Program::where('ministry_id', $ministry->id)->orderBy('no')->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
 
@@ -264,7 +281,7 @@ class MissionController extends Controller
             ->with('provinces', $provinces)
             ->with('employees', $employees)
             ->with('params', $params)
-            ->with('document', $document)
+            ->with('missionDocType', $missionDocType)
             ->with('program', $program)
             ->with('accountSub', $accountSub);
     }
@@ -297,18 +314,20 @@ class MissionController extends Controller
             'txtDescription' => 'required|string|max:9999',
 
             'leader_index' =>  'required',
-            // Assign checkbox
-            'assign_budget' => 'required|array',
-            'assign_budget.*' => 'required|integer',
+            'assign_budget' => 'nullable|array',
+            'assign_budget.*' => 'nullable|in:0,1',
 
-            'pocket_money' => 'required|array',
-            'pocket_money.*' => 'required|integer',
+            'unexpected_budget' => 'nullable|array',
+            'unexpected_budget.*' => 'nullable|numeric|min:0',
 
-            'meal_money' => 'required|array',
-            'meal_money.*' => 'required|integer',
+            'pocket_money' => 'nullable|array',
+            'pocket_money.*' => 'nullable|in:0,1',
 
-            'accommodation_money' => 'required|array',
-            'accommodation_money.*' => 'required|integer',
+            'meal_money' => 'nullable|array',
+            'meal_money.*' => 'nullable|in:0,1',
+
+            'accommodation_money' => 'nullable|array',
+            'accommodation_money.*' => 'nullable|in:0,1',
 
             'fileName' => [
                 'nullable',
@@ -366,7 +385,6 @@ class MissionController extends Controller
             | 2. Store Table 1: missions
             |--------------------------------------------------------------------------
             */
-            // dd($validated['legal_type']);
             $is_archived = 1;/*
             |--------------------------------------------------------------------------
             | Get employee IDs
@@ -405,7 +423,7 @@ class MissionController extends Controller
                 'nights_count' => $nightsCount,
                 'mission_type' => $is_archived == 1 ? 'local' : 'abroad',
                 'mission_type_is_archived' => $is_archived,
-                'document_id' => $validated['cboDocument'],
+                'mission_doc_type_id' => $validated['cboDocument'],
                 'fileName' => $validated['fileName'] ?? null,
                 'program_id'          => $validated['cboProgram'],
                 'program_sub_id'      => $validated['cboProgramSub'],
@@ -417,155 +435,98 @@ class MissionController extends Controller
 
             foreach ($validated['cboName'] as $index => $employeeId) {
 
-                $positionId = $validated['cboPosition'][$index] ?? null;
-
-                $assignBudget = (int) (
-                    $validated['assign_budget'][$index] ?? 0
-                );
-
-                $pocketMoney = (int) (
-                    $validated['pocket_money'][$index] ?? 0
-                );
-                $mealMoney = (int) (
-                    $validated['meal_money'][$index] ?? 0
-                );
-                $accommodationMoney = (int) (
-                    $validated['accommodation_money'][$index] ?? 0
-                );
-
-                // Employee's own account
-                $accountNumber =
-                    $validated['account_number'][$index] ?? null;
-
-                // Employee who should receive the payment
-                $paymentAccountEmployeeId =
-                    $validated['payment_account_employee_id'][$index] ?? null;
                 /*
                 |--------------------------------------------------------------------------
-                | Payment employee
+                | 1. Employee form values
                 |--------------------------------------------------------------------------
                 */
+                $positionId = $validated['cboPosition'][$index] ?? null;
+                $employeeTitle = $validated['cboTitle'][$index] ?? null;
+
+                $assignBudget = (int) ($validated['assign_budget'][$index] ?? 0);
+                $unexpected_budget = (float) (
+                    $validated['unexpected_budget'][$index] ?? 0
+                );
+
+                // Checkbox statuses: 1 = checked, 0 = unchecked
+                $pocketMoneyStatus = (int) ($validated['pocket_money'][$index] ?? 0);
+                $mealMoneyStatus = (int) ($validated['meal_money'][$index] ?? 0);
+                $accommodationMoneyStatus = (int) ($validated['accommodation_money'][$index] ?? 0);
+
+                // Employee's own account with account number and employee ID
+                $accountNumber = $validated['account_number'][$index] ?? null;
+                $paymentAccountEmployeeId =
+                    $validated['payment_account_employee_id'][$index] ?? null;
+
+                /*
+                |--------------------------------------------------------------------------
+                | 2. Get employee and payment account
+                |--------------------------------------------------------------------------
+                */
+                $employee = Employee::findOrFail($employeeId);
                 $paymentEmployee = Employee::findOrFail(
                     $paymentAccountEmployeeId
                 );
 
-                // Get their account number
+                // load the payment acccount number form the payment eployee record
                 $paymentAccountNumber = $paymentEmployee->account_number;
 
-                /*
-                |--------------------------------------------------------------------------
-                | Position
-                |--------------------------------------------------------------------------
-                */
+                // load the position and level for the employee
                 $position = Positions::findOrFail($positionId);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Level
-                |--------------------------------------------------------------------------
-                */
                 $level = Levels::findOrFail($position->level_id);
 
+                // Intiailize varriables
+                $travelAllowance = 0;
+                $pocketMoney = 0;
+                $mealMoney = 0;
+                $accommodationMoney = 0;
+                $totalPocketMoney = 0;
+                $totalMealMoney = 0;
+                $totalAccommodationMoney = 0;
+                $travelAllowance = 0;
+                $unexpected_budget = 0;
 
-                /*
-                |--------------------------------------------------------------------------
-                | Employee
-                |--------------------------------------------------------------------------
-                */
-                $employee = Employee::findOrFail($employeeId);
+                // Checked checkboxes for variables == 1
+                if ($assignBudget === 1) {
+                    $travelAllowance = ($province->budget ?? 0);
+                    $unexpected_budget = $validated['unexpected_budget'][$index] ?? 0;
+                }
+                if ($pocketMoneyStatus === 1) {
 
-                $employeeTitle = $validated['cboTitle'][$index] ?? null;
-
-                /*
-                |--------------------------------------------------------------------------
-                | Money calculation
-                |--------------------------------------------------------------------------
-                */
-                // $pocketMoney = $level->pocket_money;
-                // $totalPocketMoney = $pocketMoney * $daysCount;
-
-                // $mealMoney = $level->meal_money;
-                // $totalMealMoney = $mealMoney * $daysCount;
-
-                // $accommodationMoney = $level->accommodation_money;
-                // $totalAccommodationMoney =
-                //     $accommodationMoney * $nightsCount;
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Condition assign budget
-                |--------------------------------------------------------------------------
-                */
-                if ($assignBudget === 1 || $pocketMoney === 1  || $mealMoney === 1 || $accommodationMoney === 1) {
-
-                    $travelAllowance =
-                        $province->budget ?? 0;
                     $pocketMoney = $level->pocket_money ?? 0;
+
+                    $totalPocketMoney = $pocketMoney * $daysCount;
+                }
+                if ($mealMoneyStatus === 1) {
+
                     $mealMoney = $level->meal_money ?? 0;
+
+                    $totalMealMoney = $mealMoney * $daysCount;
+                }
+                if ($accommodationMoneyStatus === 1) {
+
                     $accommodationMoney = $level->accommodation_money ?? 0;
 
-                    $totalPocketMoney = $pocketMoney * $daysCount ?? 0;
-                    $totalMealMoney = $mealMoney * $daysCount ?? 0;
                     $totalAccommodationMoney =
-                        $accommodationMoney * $nightsCount ?? 0;
-
-                    $total =
-                        $travelAllowance +
-                        $totalPocketMoney +
-                        $totalMealMoney +
-                        $totalAccommodationMoney ?? 0;
-                } else {
-
-                    $travelAllowance = 0;
-                    $pocketMoney = 0;
-                    $mealMoney = 0;
-                    $accommodationMoney = 0;
-                    $totalPocketMoney = 0;
-                    $totalMealMoney = 0;
-                    $totalAccommodationMoney = 0;
-                    $total = 0;
-                    // $total =
-                    //     $totalPocketMoney +
-                    //     $totalMealMoney +
-                    //     $totalAccommodationMoney;
+                        $accommodationMoney * $nightsCount;
                 }
+                $total = $travelAllowance + $unexpected_budget
+                    + $totalPocketMoney
+                    + $totalMealMoney
+                    + $totalAccommodationMoney;
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | Check monthly mission days
-                |--------------------------------------------------------------------------
-                */
+                // Check employee's used over 10day per month
                 $usedDays = Mission::whereHas(
                     'missionEmployees',
                     function ($query) use ($employeeId) {
-
-                        $query->where(
-                            'employee_id',
-                            $employeeId
-                        );
+                        $query->where('employee_id', $employeeId);
                     }
                 )
-                    ->where(function ($query) use ($startDate) {
-
-                        $query
-                            ->whereYear(
-                                'start_date',
-                                $startDate->year
-                            )
-                            ->whereMonth(
-                                'start_date',
-                                $startDate->month
-                            );
-                    })
+                    ->whereYear('start_date', $startDate->year)
+                    ->whereMonth('start_date', $startDate->month)
                     ->sum('days_count');
 
-
-                $totalDays =
-                    $usedDays + $daysCount;
-
+                $totalDays = $usedDays + $daysCount;
 
                 if ($totalDays > 10) {
 
@@ -583,75 +544,71 @@ class MissionController extends Controller
 
                 /*
                 |--------------------------------------------------------------------------
-                | Create Mission Employee
+                | Check duplicate employee in the same mission
+                |--------------------------------------------------------------------------
+                */
+
+                $duplicateEmployee = MissionEmployee::where('mission_id', $mission->id)
+                    ->where('employee_id', $employeeId)
+                    ->exists();
+
+                if ($duplicateEmployee) {
+
+                    throw new \Exception(
+                        'ឈ្មោះ ' .
+                            ($employee->name_kh ?? $employeeId) .
+                            ' មានរួចហើយនៅក្នុងបេសកកម្មនេះ។ ' .
+                            'មិនអាចបញ្ចូលបុគ្គលិកដដែលម្ដងទៀតបានទេ។'
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | 11. Create Mission Employee
                 |--------------------------------------------------------------------------
                 */
                 MissionEmployee::create([
 
-                    'ministry_id' =>
-                    $ministry->id,
-
-                    'mission_id' =>
-                    $mission->id,
+                    'ministry_id' => $ministry->id,
+                    'mission_id' => $mission->id,
 
                     'employee_title' => $employeeTitle,
+                    'employee_id' => $employeeId,
 
-                    'employee_id' =>
-                    $employeeId,
+                    'position_id' => $positionId,
+                    'level_name' => $level->name,
 
-                    'position_id' =>
-                    $positionId,
+                    // Travel allowance
+                    'assign_budget' => $assignBudget,
+                    'travel_allowance' => $travelAllowance,
+                    'unexpected_budget' => $unexpected_budget,
 
-                    'level_name' =>
-                    $level->name,
+                    // Pocket money
+                    'pocket_money_status' => $pocketMoneyStatus,
+                    'pocket_money' => $pocketMoney,
+                    'total_pocket_money' => $totalPocketMoney,
 
-                    'travel_allowance' =>
-                    $travelAllowance,
+                    // Meal money
+                    'meal_money_status' => $mealMoneyStatus,
+                    'meal_money' => $mealMoney,
+                    'total_meal_money' => $totalMealMoney,
 
-                    'pocket_money' =>
-                    $pocketMoney,
+                    // Accommodation money
+                    'accommodation_money_status' => $accommodationMoneyStatus,
+                    'accommodation_money' => $accommodationMoney,
+                    'total_accommodation_money' => $totalAccommodationMoney,
 
-                    'total_pocket_money' =>
-                    $totalPocketMoney,
+                    // Total
+                    'total' => $total,
 
-                    'meal_money' =>
-                    $mealMoney,
-
-                    'total_meal_money' =>
-                    $totalMealMoney,
-
-                    'accommodation_money' =>
-                    $accommodationMoney,
-
-                    'total_accommodation_money' =>
-                    $totalAccommodationMoney,
-
-                    'total' =>
-                    $total,
-
-                    'assign_budget' =>
-                    $assignBudget,
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Employee's OWN account
-                    |--------------------------------------------------------------------------
-                    */
-                    'account_number' =>
-                    $accountNumber,
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Employee who RECEIVES payment
-                    |--------------------------------------------------------------------------
-                    */
-                    // Employee ID receiving payment
+                    // Bank accounts
+                    'account_number' => $accountNumber,
                     'payment_account_employee_id' => $paymentAccountEmployeeId,
-
-                    // If you have a column for the payment account number:
                     'payment_account_number' => $paymentAccountNumber,
                 ]);
             }
+
+
             DB::commit();
 
             flash()
@@ -719,6 +676,7 @@ class MissionController extends Controller
                 'mission_employees.employee_title',
                 'mission_employees.employee_id as mission_employee_id',
                 'mission_employees.travel_allowance',
+                'mission_employees.unexpected_budget',
                 'mission_employees.pocket_money',
                 'mission_employees.total_pocket_money',
                 'mission_employees.meal_money',
@@ -790,8 +748,7 @@ class MissionController extends Controller
             ->orderBy('id')
             ->get();
 
-        $document = Document::all();
-
+        $missionDocType = MissionDocType::all();
         $program = Program::where('ministry_id', $ministry->id)
             ->orderBy('no')
             ->get();
@@ -804,7 +761,7 @@ class MissionController extends Controller
             ->with('provinces', $provinces)
             ->with('employees', $employees)
             ->with('params', $params)
-            ->with('document', $document)
+            ->with('missionDocType', $missionDocType)
             ->with('program', $program)
             ->with('accountSub', $accountSub)
             ->with('missionEmployees', $missionEmployees);
@@ -816,44 +773,47 @@ class MissionController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validated = $request->validate([
-            'cboDocument' => 'required|integer|exists:documents,id',
+            'cboDocument' => 'required',
 
-            'legal_number' => 'required|string',
-
-            'legal_date' => 'required|date',
-
-            'cboProvince' => 'required|integer|exists:provinces,id',
-
-            'start_date' => 'required|date',
-
-            'end_date' => 'required|date|after_or_equal:start_date',
-
-            'txtDescription' => 'required|string|max:9999',
+            'legal_number'     => 'required|string',
+            'legal_date'  => 'required|date',
 
             'cboTitle'    => 'required|array',
             'cboTitle.*'  => 'required|string',
 
-            'cboName' => 'required|array|min:1',
-            'cboName.*' => 'required|integer|exists:employees,id',
+            'cboName'             => 'required|array|min:1',
+            'cboName.*'             => 'required|integer|exists:employees,id',
 
-            'cboPosition' => 'required|array|min:1',
-            'cboPosition.*' => 'required|integer|exists:positions,id',
+            'cboPosition'             => 'required|array|min:1',
+            'cboPosition.*'             => 'required|integer|exists:positions,id',
 
-            'leader_index' => 'required|integer|min:0',
+            'cboProvince'        => 'required|integer|exists:provinces,id',
 
+            'start_date'  => 'required|date',
+            'end_date'  => 'required|date|after_or_equal:start_date',
+
+            'txtDescription' => 'required|string|max:9999',
+
+            'leader_index' =>  'required',
             'assign_budget' => 'nullable|array',
-            'assign_budget.*' => 'nullable|integer|in:0,1',
+            'assign_budget.*' => 'nullable|in:0,1',
 
-            'fileName' => [
-                'nullable',
-                'file',
-                'mimes:pdf',
-                'max:10240',
-            ],
+            'unexpected_budget' => 'nullable|array',
+            'unexpected_budget.*' => 'nullable|numeric|min:0',
 
-            'cboProgram' => 'nullable|integer',
-            'cboProgramSub' => 'nullable|integer',
-            'cboCluster' => 'nullable|integer',
+            'pocket_money' => 'nullable|array',
+            'pocket_money.*' => 'nullable|in:0,1',
+
+            'meal_money' => 'nullable|array',
+            'meal_money.*' => 'nullable|in:0,1',
+
+            'accommodation_money' => 'nullable|array',
+            'accommodation_money.*' => 'nullable|in:0,1',
+
+
+            'cboProgram'     => 'nullable|integer',
+            'cboProgramSub'  => 'nullable|integer',
+            'cboCluster'     => 'nullable|integer',
             'cboSubAccount'       => 'nullable|integer',
             'account_number' => ['required', 'array'],
             'account_number.*' => ['required', 'string'],
@@ -863,8 +823,6 @@ class MissionController extends Controller
                 'integer',
                 'exists:employees,id',
             ],
-
-            'submit' => 'required|in:save,save_create',
         ]);
         // dd($validated);
         DB::beginTransaction();
@@ -965,7 +923,7 @@ class MissionController extends Controller
 
                 'mission_type_is_archived' => 1,
 
-                'document_id' => $validated['cboDocument'],
+                'mission_doc_type_id' => $validated['cboDocument'],
 
                 'fileName' => $fileName,
 
@@ -994,22 +952,26 @@ class MissionController extends Controller
 
             foreach ($employeeIds as $index => $employeeId) {
 
-                $employeeTitle = $validated['cboTitle'][$index] ?? null;
 
-                $positionId =
-                    $validated['cboPosition'][$index] ?? null;
+                // List value by index
+                $employeeTitle = $validated['cboTitle'][$index] ?? null;
+                $positionId = $validated['cboPosition'][$index] ?? null;
 
                 $assignBudget = (int) (
                     $validated['assign_budget'][$index] ?? 0
                 );
-
-                // Employee's own account
+                $unexpected_budget = (float) (
+                    $validated['unexpected_budget'][$index] ?? 0
+                );
+                // Checkbox statuses: 1 = checked, 0 = unchecked
+                $pocketMoneyStatus = (int) ($validated['pocket_money'][$index] ?? 0);
+                $mealMoneyStatus = (int) ($validated['meal_money'][$index] ?? 0);
+                $accommodationMoneyStatus = (int) ($validated['accommodation_money'][$index] ?? 0);
                 $accountNumber =
                     $validated['account_number'][$index] ?? null;
-
-                // Employee who should receive the payment
                 $paymentAccountEmployeeId =
                     $validated['payment_account_employee_id'][$index] ?? null;
+
                 /*
                 |--------------------------------------------------------------------------
                 | Payment employee
@@ -1018,156 +980,109 @@ class MissionController extends Controller
                 $paymentEmployee = Employee::findOrFail(
                     $paymentAccountEmployeeId
                 );
-
                 // Get their account number
                 $paymentAccountNumber = $paymentEmployee->account_number;
-
                 if (!$positionId) {
                     throw new \Exception(
                         "Position is missing for employee row {$index}."
                     );
                 }
 
-                // Position ID
+                //    Load the position and level for the employee
                 $position = Positions::findOrFail($positionId);
-
-                // Position -> Level
                 $level = Levels::findOrFail($position->level_id);
 
-                // -----------------------------------------------------
-                // Money calculation
-                // -----------------------------------------------------
+                // Intiailize varriables
+                $travelAllowance = 0;
+                $pocketMoney = 0;
+                $mealMoney = 0;
+                $accommodationMoney = 0;
+                $totalPocketMoney = 0;
+                $totalMealMoney = 0;
+                $totalAccommodationMoney = 0;
+                $travelAllowance = 0;
+                $unexpected_budget = 0;
 
-                $pocketMoney =
-                    $level->pocket_money ?? 0;
-
-                $totalPocketMoney =
-                    $pocketMoney * $daysCount;
-
-                $mealMoney =
-                    $level->meal_money ?? 0;
-
-                $totalMealMoney =
-                    $mealMoney * $daysCount;
-
-                $accommodationMoney =
-                    $level->accommodation_money ?? 0;
-
-                $totalAccommodationMoney =
-                    $accommodationMoney * $nightsCount;
-
-                // -----------------------------------------------------
-                // Travel allowance
-                // -----------------------------------------------------
-
+                // Checked checkboxes for variables == 1
                 if ($assignBudget === 1) {
-
-                    $travelAllowance =
-                        $province->budget ?? 0;
-                } else {
-
-                    $travelAllowance = 0;
+                    $travelAllowance = ($province->budget ?? 0);
+                    $unexpected_budget = $validated['unexpected_budget'][$index] ?? 0;
                 }
+                if ($pocketMoneyStatus === 1) {
 
-                // -----------------------------------------------------
-                // Total
-                // -----------------------------------------------------
+                    $pocketMoney = $level->pocket_money ?? 0;
 
-                $total =
-                    $travelAllowance
+                    $totalPocketMoney = $pocketMoney * $daysCount;
+                }
+                if ($mealMoneyStatus === 1) {
+
+                    $mealMoney = $level->meal_money ?? 0;
+
+                    $totalMealMoney = $mealMoney * $daysCount;
+                }
+                if ($accommodationMoneyStatus === 1) {
+
+                    $accommodationMoney = $level->accommodation_money ?? 0;
+
+                    $totalAccommodationMoney =
+                        $accommodationMoney * $nightsCount;
+                }
+                $total = $travelAllowance + $unexpected_budget
                     + $totalPocketMoney
                     + $totalMealMoney
                     + $totalAccommodationMoney;
 
+                // dd($totalAccommodationMoney);
                 // -----------------------------------------------------
-                // Create
+                // Create new mission employee record
                 // -----------------------------------------------------
 
                 MissionEmployee::create([
 
-                    'ministry_id' =>
-                    $ministry->id,
-
-                    'mission_id' =>
-                    $mission->id,
+                    'ministry_id' => $ministry->id,
+                    'mission_id' => $mission->id,
 
                     'employee_title' => $employeeTitle,
+                    'employee_id' => $employeeId,
 
-                    'employee_id' =>
-                    $employeeId,
+                    'position_id' => $positionId,
+                    'level_name' => $level->name,
 
-                    'position_id' =>
-                    $position->id,
+                    // Travel allowance
+                    'assign_budget' => $assignBudget,
+                    'travel_allowance' => $travelAllowance,
+                    'unexpected_budget' => $unexpected_budget,
 
-                    'level_name' =>
-                    $level->name,
+                    // Pocket money
+                    'pocket_money_status' => $pocketMoneyStatus,
+                    'pocket_money' => $pocketMoney,
+                    'total_pocket_money' => $totalPocketMoney,
 
-                    'travel_allowance' =>
-                    $travelAllowance,
+                    // Meal money
+                    'meal_money_status' => $mealMoneyStatus,
+                    'meal_money' => $mealMoney,
+                    'total_meal_money' => $totalMealMoney,
 
-                    'pocket_money' =>
-                    $pocketMoney,
+                    // Accommodation money
+                    'accommodation_money_status' => $accommodationMoneyStatus,
+                    'accommodation_money' => $accommodationMoney,
+                    'total_accommodation_money' => $totalAccommodationMoney,
 
-                    'total_pocket_money' =>
-                    $totalPocketMoney,
+                    // Total
+                    'total' => $total,
 
-                    'meal_money' =>
-                    $mealMoney,
-
-                    'total_meal_money' =>
-                    $totalMealMoney,
-
-                    'accommodation_money' =>
-                    $accommodationMoney,
-
-                    'total_accommodation_money' =>
-                    $totalAccommodationMoney,
-
-                    'total' =>
-                    $total,
-
-                    'assign_budget' =>
-                    $assignBudget,
-
+                    // Bank accounts
                     'account_number' => $accountNumber,
                     'payment_account_employee_id' => $paymentAccountEmployeeId,
                     'payment_account_number' => $paymentAccountNumber,
                 ]);
             }
-
-            // ---------------------------------------------------------
-            // COMMIT MUST BE BEFORE REDIRECT
-            // ---------------------------------------------------------
-
             DB::commit();
 
-            // ---------------------------------------------------------
-            // Redirect
-            // ---------------------------------------------------------
-
-            if ($request->input('submit') === 'save_create') {
-
-                flash()
-                    ->translate('en')
-                    ->option('timeout', 2000)
-                    ->success(
-                        'បញ្ចូលទិន្នន័យបានជោគជ័យ!',
-                        'ជោគជ័យ'
-                    )
-                    ->flash();
-                return redirect()
-                    ->route(
-                        'missions.create',
-                        $params
-                    );
-            }
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
-                ->success(
-                    'បញ្ចូលទិន្នន័យបានជោគជ័យ!',
-                    'ជោគជ័យ'
-                )
+                ->success('success_msg', 'successful')
                 ->flash();
             return redirect()
                 ->route(
@@ -1536,6 +1451,8 @@ class MissionController extends Controller
 
     public function export(Request $request, $params)
     {
+        // Unlimited execution time and memory
+        loadRunUnlimitedTime();
         try {
 
             // ==========================================================
@@ -1629,6 +1546,7 @@ class MissionController extends Controller
                     'mission_employees.position_id',
                     'mission_employees.level_name',
                     'mission_employees.travel_allowance',
+                    'mission_employees.unexpected_budget',
                     'mission_employees.pocket_money',
                     'mission_employees.total_pocket_money',
                     'mission_employees.meal_money',
@@ -2224,4 +2142,179 @@ class MissionController extends Controller
     //         ],
     //     ]);
     // }
+    public function searchMissionCombination(Request $request, $params)
+    {
+        $request->validate([
+            'define_amount' => 'required|numeric|min:1',
+        ]);
+
+        $ministryId = decode_params($params);
+
+        $target = (int) round(
+            (float) $request->define_amount * 100
+        );
+
+        // Base mission query with employee total
+        $query = DB::table('missions')
+            ->leftJoin(
+                'mission_employees',
+                'missions.id',
+                '=',
+                'mission_employees.mission_id'
+            )
+            ->where('missions.ministry_id', $ministryId)
+            ->whereNull('missions.deleted_at');
+
+        // Payment archive filter
+        $todo = $request->input('cboTodo');
+
+        if ($todo == 2 || !$todo) {
+            $query->where('missions.payment_is_archived', 1);
+        } elseif ($todo == 3) {
+            $query->where('missions.payment_is_archived', 2);
+        } elseif ($todo == 4) {
+            $query->where('missions.payment_is_archived', 3);
+        }
+
+        // Mission type
+        $missionType = $request->input('cboMissionType', 2);
+
+        if ($missionType == 2) {
+            $query->where('missions.mission_type_is_archived', 1);
+        } elseif ($missionType == 3) {
+            $query->where('missions.mission_type_is_archived', 2);
+        }
+
+        // Leader
+        if ($request->filled('cboName')) {
+            $query->where(
+                'missions.leader_id',
+                $request->cboName
+            );
+        }
+
+        // Province
+        if ($request->filled('cboProvince')) {
+            $query->where(
+                'missions.province_id',
+                $request->cboProvince
+            );
+        }
+
+        // Start date
+        if ($request->filled('start_date')) {
+            $query->whereDate(
+                'missions.start_date',
+                '>=',
+                $request->start_date
+            );
+        }
+
+        // End date
+        if ($request->filled('end_date')) {
+            $query->whereDate(
+                'missions.end_date',
+                '<=',
+                $request->end_date
+            );
+        }
+
+        // Get mission totals
+        $missions = $query
+            ->select(
+                'missions.id',
+                DB::raw('COALESCE(SUM(mission_employees.total), 0) as total_amount')
+            )
+            ->groupBy('missions.id')
+            ->havingRaw('SUM(mission_employees.total) > 0')
+            ->orderByDesc('total_amount')
+            ->get();
+
+        // Only consider missions not exceeding target.
+        $missions = $missions->filter(function ($mission) use ($target) {
+
+            $amount = (int) round(
+                (float) $mission->total_amount * 100
+            );
+
+            $mission->amount_cents = $amount;
+
+            return $amount > 0 && $amount <= $target;
+        })->values();
+
+        // Subset Sum algorithm
+        $states = [
+            0 => null
+        ];
+
+        $maxStates = 250000;
+
+        $found = false;
+
+        foreach ($missions as $mission) {
+
+            $amount = $mission->amount_cents;
+
+            $previousSums = array_keys($states);
+
+            foreach ($previousSums as $previousSum) {
+
+                $newSum = $previousSum + $amount;
+
+                if ($newSum > $target || isset($states[$newSum])) {
+                    continue;
+                }
+
+                if (count($states) >= $maxStates && $newSum !== $target) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Search limit reached. Please narrow your filters.',
+                    ], 422);
+                }
+
+                $states[$newSum] = [
+                    'previous' => $previousSum,
+                    'mission_id' => $mission->id,
+                ];
+
+                if ($newSum === $target) {
+                    $found = true;
+                    break 2;
+                }
+            }
+        }
+
+        // No exact match
+        if (!$found) {
+            return response()->json([
+                'success' => true,
+                'found' => false,
+                'mission_ids' => [],
+                'message' => 'រកមិនឃើញបេសកកម្មដែលមានទឹកប្រាក់សរុបស្មើគ្នាទេ។',
+            ]);
+        }
+
+        // Reconstruct combination
+        $selectedIds = [];
+
+        $currentSum = $target;
+
+        while ($currentSum > 0) {
+
+            $state = $states[$currentSum];
+
+            $selectedIds[] = $state['mission_id'];
+
+            $currentSum = $state['previous'];
+        }
+
+        return response()->json([
+            'success' => true,
+            'found' => true,
+            'mission_ids' => $selectedIds,
+            'mission_count' => count($selectedIds),
+            'total_amount' => $request->define_amount,
+            'message' => 'រកឃើញបេសកកម្មដែលមានទឹកប្រាក់សរុបត្រូវគ្នា។',
+        ]);
+    }
 }

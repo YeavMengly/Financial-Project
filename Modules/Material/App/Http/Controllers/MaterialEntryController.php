@@ -40,6 +40,8 @@ class MaterialEntryController extends Controller
         $materialEntry = MaterialEntry::where('ministry_id', $ministry->id)
             ->where('project_id', '!=', null)
             ->whereNull('deleted_at')
+            ->select('p_name')
+            ->distinct('project_id')
             ->get();
         $projectsQuery = Projects::where('ministry_id', $ministry->id)
             ->whereNull('deleted_at')
@@ -211,7 +213,7 @@ class MaterialEntryController extends Controller
     {
         $id       = decode_params($params);
         $ministry = Ministry::where('id', $id)->firstOrFail();
-        $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
+        $unitType = UnitType::all();
 
         // Deduplicate projects by stock_number
         $project  = Projects::where('ministry_id', $ministry->id)
@@ -271,8 +273,8 @@ class MaterialEntryController extends Controller
                 // $exists = MaterialEntry::where('ministry_id', $ministry->id)
                 //     ->where('project_id', $project->id)
                 //     ->where('project_sub_id', $subProjectId)
-                    // ->where('p_name', $name)
-                    // ->exists();
+                // ->where('p_name', $name)
+                // ->exists();
 
                 // if ($exists) {
                 //     throw new \Exception("សម្ភារៈ \"$name\" មានរួចហើយក្នុង Project នេះ។");
