@@ -7,169 +7,309 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+
 class MaterialEntriesExport
 {
     protected $data;
     protected $ministryId;
-    public function __construct($data, $ministryId)
+    protected $projectId;
+    protected $selectedProject;
+
+    public function __construct($data, $ministryId, $projectId = null, $selectedProject = null)
     {
         $this->data = $data;
         $this->ministryId = $ministryId;
+        $this->projectId = $projectId;
+        $this->selectedProject = $selectedProject;
     }
 
     public function export(Request $request)
     {
-
-        $params =  $request->params;
+        $params = $request->params;
         $id = decode_params($params);
 
         $templatePath = storage_path('app/excel/template/material_entries_template.xlsx');
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
+        $rowNum = 7;
+        $stockDisplayNumber = '';
 
-        $currentMonth = date('m');
-        $currentYear = date('Y');
-        $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
-
-        $row = 8;
-        $sheet->getStyle("A{$row}:H{$row}")->applyFromArray([
+        if ($this->selectedProject) {
+            $stockDisplayNumber = ('  លេខបញ្ចូលឃ្លាំង' . $this->selectedProject->stock_number ?? '');
+        } else {
+            $stockDisplayNumber = ' ';
+        }
+        $sheet->setCellValue("A{$rowNum}", $stockDisplayNumber);
+        //   $sheet->mergeCells("A{$rowNum}:C{$rowNum}");
+        $sheet->getStyle("A{$rowNum}:C{$rowNum}")->applyFromArray([
             'font' => [
-                'bold' => true,
+                'name'  => 'Khmer OS Battambang',
+                'size'  => 9,
                 'color' => ['rgb' => '000000'],
-                'size' => 12,
             ],
             'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                'horizontal' => Alignment::HORIZONTAL_GENERAL,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => false,
             ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
-
         ]);
 
-        $sheet->setCellValue("A{$row}", $dateRangeText);
-        $sheet->mergeCells("A{$row}:H{$row}");
-        $row = 11;
+        $rowName = 8;
+        $stockDisplayName = '';
 
-        // foreach ($this->data as $index => $item) {
+        if ($this->selectedProject) {
+            $stockDisplayName = ($this->selectedProject->stock_name ?? '');
+        } else {
+            $stockDisplayName = 'គម្រោងទាំងអស់';
+        }
 
-        //     $sheet->setCellValue("A{$row}", $index + 1);
-        //     $sheet->setCellValue("B{$row}", $item->title_entity);
-        //     $sheet->setCellValue("C{$row}", $item->location_number_use);
-        //     $sheet->setCellValue("D{$row}", $item->invoice);
-        //     $sheet->setCellValue("E{$row}", date('d/m/Y', strtotime($item->date)));
-        //     $start = date('d/m/Y', strtotime($item->use_start));
-        //     $end   = date('d/m/Y', strtotime($item->use_end));
-        //     $sheet->setCellValue("F{$row}", "{$start} - {$end}");
-        //     $sheet->setCellValue("G{$row}", $item->kilo);
-        //     $sheet->setCellValue("H{$row}", "$item->cost_total, រៀល");
+        $sheet->setCellValue("D{$rowName}", $stockDisplayName);
+        $sheet->mergeCells("D{$rowName}:I{$rowName}");
+        $sheet->getRowDimension($rowName)->setRowHeight(40);
 
-        //     $row++;
-        // }
-
-
-        $totalsStyleArray = [
+        $sheet->getStyle("D{$rowName}:I{$rowName}")->applyFromArray([
             'font' => [
-                'bold' => true,
-                'size' => 8
+                'name'  => 'Khmer OS Muol Light',
+                'size'  => 9,
+                'color' => ['rgb' => '000000'],
             ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => [
-                    'argb' => '00FF00',
-                ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => true,
             ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                    'color' => ['argb' => '000000'],
-                ],
+        ]);
+        $rowNote = 9;
+        $stockDisplayNote = '';
+
+        if ($this->selectedProject) {
+            $rawNote = $this->selectedProject->note ?? '';
+
+            // 🛠️ ប្រើ html_entity_decode ដើម្បីបំប្លែង &nbsp; ឱ្យទៅជាការដកឃ្លាធម្មតាវិញ
+            $cleanNote = html_entity_decode($rawNote, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+            // លុបសញ្ញាចុះបន្ទាត់លាក់ បើមិនចង់ឱ្យវាធ្លាក់ចុះខុសទម្រង់
+            $stockDisplayNote = trim(str_replace(["\r", "\n"], ' ', $cleanNote));
+        } else {
+            $stockDisplayNote = ' ';
+        }
+
+        $sheet->setCellValue("D{$rowNote}", $stockDisplayNote);
+        $sheet->mergeCells("D{$rowNote}:I{$rowNote}");
+        $sheet->getRowDimension($rowNote)->setRowHeight(25);
+
+        $sheet->getStyle("D{$rowNote}:I{$rowNote}")->applyFromArray([
+            'font' => [
+                'name'  => 'Khmer OS Battambang',
+                'size'  => 9,
+                'color' => ['rgb' => '000000'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => false,
+            ],
+        ]);
+        $rowInfor = 10;
+
+        // កំណត់ Style សម្រាប់ស្លាក (ក្រឡា B)
+        $labelStyle = [
+            'font' => [
+                'name'  => 'Khmer OS Muol Light',
+                'size'  => 9,
+                'color' => ['rgb' => '000000'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
             ],
         ];
 
-        // $fileName = 'material_entries_template.xlsx';
+        // កំណត់ Style សម្រាប់ក្រឡា C ដល់ I (ដែលបាន Merge ចូលគ្នា)
+        $valueStyle = [
+            'font' => [
+                'name'  => 'Khmer OS Battambang',
+                'size'  => 9,
+                'color' => ['rgb' => '000000'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_LEFT,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+                'wrapText'   => true,
+            ],
+        ];
 
-        // return response()->streamDownload(function () use ($spreadsheet) {
-        //     $writer = new Xlsx($spreadsheet);
-        //     $writer->save('php://output');
-        // }, $fileName, [
-        //     'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        //     'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-        //     'Cache-Control' => 'max-age=0',
+        // --- ជួរទី ១០: ឈ្មោះក្រុមហ៊ុន ---
+        $sheet->setCellValue("B{$rowInfor}", 'បញ្ចូលពី');
+        $companyText = $this->selectedProject ? ('៖ ' . ($this->selectedProject->company_name ?? '')) : ' ';
+        $sheet->setCellValue("C{$rowInfor}", $companyText);
+        $sheet->mergeCells("C{$rowInfor}:J{$rowInfor}"); // Merge C ដល់ J
+
+        $sheet->getStyle("B{$rowInfor}")->applyFromArray($labelStyle);
+        $sheet->getStyle("C{$rowInfor}:J{$rowInfor}")->applyFromArray($valueStyle);
+
+
+        // --- ជួរទី ១១: តាមបណ្ណបញ្ចូលឃ្លាំង ---
+        $rowInfor++;
+        $sheet->setCellValue("B{$rowInfor}", 'តាមបណ្ណបញ្ចូលឃ្លាំង');
+        $warehouseVoucher = $this->selectedProject ? ('៖ ' . ($this->selectedProject->warehouse_voucher ?? '')) : ' ';
+        $sheet->setCellValue("C{$rowInfor}", $warehouseVoucher);
+        $sheet->mergeCells("C{$rowInfor}:J{$rowInfor}"); // Merge C ដល់ J
+
+        $sheet->getStyle("B{$rowInfor}")->applyFromArray($labelStyle);
+        $sheet->getStyle("C{$rowInfor}:J{$rowInfor}")->applyFromArray($valueStyle);
+
+        // --- ជួរទី ១២: យោង ---
+        $rowInfor++;
+        $sheet->setCellValue("B{$rowInfor}", 'យោង');
+
+        // 🛠️ ប្រើ str_replace ដើម្បីលុបការចុះបន្ទាត់លាក់ចេញពី Database ឱ្យវាស្ថិតក្នុងបន្ទាត់តែមួយ
+        if ($this->selectedProject && !empty($this->selectedProject->refer)) {
+            $cleanRefer = trim(str_replace(["\r", "\n"], ' ', $this->selectedProject->refer));
+            $refer = '៖ ' . $cleanRefer;
+        } else {
+            $refer = ' ';
+        }
+        $sheet->setCellValue("C{$rowInfor}", $refer);
+        $sheet->mergeCells("C{$rowInfor}:J{$rowInfor}"); // Merge ពី C ដល់ J
+
+        $sheet->getStyle("B{$rowInfor}")->applyFromArray($labelStyle);
+        $sheet->getStyle("C{$rowInfor}:J{$rowInfor}")->applyFromArray($valueStyle);
+
+
+        // --- ជួរទី ១៣: អ្នកបញ្ចូល ---
+        $rowInfor++;
+        $sheet->setCellValue("B{$rowInfor}", 'អ្នកបញ្ចូល');
+        $userText = $this->selectedProject ? ('៖ ' . ($this->selectedProject->user_entry ?? '')) : ' ';
+        $sheet->setCellValue("C{$rowInfor}", $userText);
+        $sheet->mergeCells("C{$rowInfor}:J{$rowInfor}"); // Merge C ដល់ J
+
+        $sheet->getStyle("B{$rowInfor}")->applyFromArray($labelStyle);
+        $sheet->getStyle("C{$rowInfor}:J{$rowInfor}")->applyFromArray($valueStyle);
+
+
+        // --- ជួរទី ១៤: បញ្ចូលទៅឃ្លាំង ---
+        $rowInfor++;
+        $sheet->setCellValue("B{$rowInfor}", 'បញ្ចូលទៅឃ្លាំង');
+        $warehouseText = $this->selectedProject ? ('៖ ' . ($this->selectedProject->warehouse_owner ?? '')) : ' ';
+        $sheet->setCellValue("C{$rowInfor}", $warehouseText);
+        $sheet->mergeCells("C{$rowInfor}:J{$rowInfor}"); // Merge C ដល់ J
+
+        $sheet->getStyle("B{$rowInfor}")->applyFromArray($labelStyle);
+        $sheet->getStyle("C{$rowInfor}:J{$rowInfor}")->applyFromArray($valueStyle);
+        // ==========================================
+        // 2. DATE RANGE HEADER (Row 8)
+        // ==========================================
+        // $currentMonth = date('m');
+        // $currentYear = date('Y');
+        // // $dateRangeText = 'ប្រចាំ​ ខែ ' . $currentMonth . ' ឆ្នាំ ' . $currentYear;
+
+        // $row = 13;
+        // $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+        //     'font' => [
+        //         'bold'  => true,
+        //         'color' => ['rgb' => '000000'],
+        //         'size'  => 12,
+        //     ],
+        //     'alignment' => [
+        //         'horizontal' => Alignment::HORIZONTAL_CENTER,
+        //         'vertical'   => Alignment::VERTICAL_CENTER,
+        //     ],
+        //     'borders' => [
+        //         'allBorders' => [
+        //             'borderStyle' => Border::BORDER_THIN,
+        //             'color'       => ['rgb' => '000000'],
+        //         ],
+        //     ],
         // ]);
-        $exportDirectory = storage_path('app/excel/export');
 
-        if (!File::exists($exportDirectory)) {
-            File::makeDirectory($exportDirectory, 0755, true);
+        // // $sheet->setCellValue("A{$row}", $dateRangeText);
+        // $sheet->mergeCells("A{$row}:H{$row}");
+
+        // ==========================================
+        // 3. DATA ROWS (Starting at Row 11)
+        // ==========================================
+        $row = 18;
+        $no = 1;
+        $totalAmount = 0;
+
+        foreach ($this->data as $index => $item) {
+            $sheet->setCellValue("A{$row}", $no);
+            $sheet->setCellValue("B{$row}", $item->p_name ?? '');
+            $sheet->setCellValue("C{$row}", $item->unit ?? '');
+            $sheet->setCellValue("D{$row}", $item->qty ?? 0);
+            $sheet->setCellValue("E{$row}", $item->price ? number_format($item->price) : 0);
+            $sheet->setCellValue("F{$row}", $item->total_price ? number_format($item->total_price) : 0);
+            $sheet->setCellValue("G{$row}", $item->source ?? '');
+            $sheet->setCellValue("H{$row}", $item->p_year ?? '');
+
+            // $totalQty += ($item->qty ?? 0);
+            $totalAmount += ($item->total_price ?? 0);
+
+            $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+                'font' => [
+                    'name' => 'Khmer OS Battambang',
+                    'size' => 9,
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical'   => Alignment::VERTICAL_CENTER,
+                    'wrapText'   => true,
+                ],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color'       => ['rgb' => '000000'],
+                    ],
+                ],
+            ]);
+            $no++;
+            $row++;
         }
 
-        $fileName = 'material_entries.xlsx';
+        // ==========================================
+        // 4. TOTAL SUMMARY ROW
+        // ==========================================
+        $sheet->setCellValue("A{$row}", "សរុប");
+        $sheet->mergeCells("A{$row}:C{$row}");
+        $sheet->setCellValue("E{$row}", "");
+        $sheet->setCellValue("F{$row}", number_format($totalAmount));
+        $sheet->setCellValue("G{$row}", "");
+        $sheet->setCellValue("H{$row}", "");
 
-        $outputPath = $exportDirectory . '/' . $fileName;
+        $sheet->getStyle("A{$row}:I{$row}")->applyFromArray([
+            'font' => [
+                'name' => 'Khmer OS Battambang',
+                // 'bold' => true,
+                'size' => 9,
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical'   => Alignment::VERTICAL_CENTER,
+            ],
+            // 'fill' => [
+            //     'fillType' => Fill::FILL_SOLID,
+            //     'startColor' => ['rgb' => 'E2E8F0'],
+            // ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color'       => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($outputPath);
+        $fileName = 'material_entries_export.xlsx';
 
-        return response()->download(
-            $outputPath,
-            $fileName,
-            [
-                'Content-Type' =>
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            ]
-        );
+        return response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
-
-    // private function initTotals(): array
-    // {
-    //     return [
-    //         'fin_law'            => 0,
-    //         'current_loan'       => 0,
-    //         'internal_increase'  => 0,
-    //         'unexpected_increase' => 0,
-    //         'additional_increase' => 0,
-    //         'total_increase'     => 0,
-    //         'decrease'           => 0,
-    //         'editorial'          => 0,
-    //         'new_credit_status'  => 0,
-    //         'early_balance'      => 0,
-    //         'apply'              => 0,
-    //         'deadline_balance'   => 0,
-    //         'credit'             => 0,
-    //         'law_average'        => 0,
-    //         'law_correction'     => 0,
-    //     ];
-    // }
-
-    // private function addToTotals(array &$totals, array $values): void
-    // {
-    //     foreach ($totals as $key => $v) {
-    //         if (isset($values[$key])) {
-    //             $totals[$key] += $values[$key];
-    //         }
-    //     }
-    // }
-
-    // private function writeTotalsRow(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet, int $row, array $totals): void
-    // {
-    //     $sheet->setCellValue("F{$row}", $totals['fin_law']);
-    //     $sheet->setCellValue("G{$row}", $totals['current_loan']);
-    //     $sheet->setCellValue("H{$row}", $totals['internal_increase']);
-    //     $sheet->setCellValue("I{$row}", $totals['unexpected_increase']);
-    //     $sheet->setCellValue("J{$row}", $totals['additional_increase']);
-    //     $sheet->setCellValue("K{$row}", $totals['total_increase']);
-    //     $sheet->setCellValue("L{$row}", $totals['decrease']);
-    //     $sheet->setCellValue("M{$row}", $totals['editorial']);
-    //     $sheet->setCellValue("N{$row}", $totals['new_credit_status']);
-    //     $sheet->setCellValue("O{$row}", $totals['early_balance']);
-    //     $sheet->setCellValue("P{$row}", $totals['apply']);
-    //     $sheet->setCellValue("Q{$row}", $totals['deadline_balance']);
-    //     $sheet->setCellValue("R{$row}", $totals['credit']);
-    //     $sheet->setCellValue("S{$row}", $totals['law_average']);
-    //     $sheet->setCellValue("T{$row}", $totals['law_correction']);
-    // }
 }

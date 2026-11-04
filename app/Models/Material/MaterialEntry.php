@@ -37,6 +37,10 @@ class MaterialEntry extends Model
     {
         return $this->hasMany(MaterialRelease::class, 'material_entry_id', 'id');
     }
+    public function project()
+    {
+        return $this->belongsTo(Projects::class, 'project_id', 'id');
+    }
 
     public function getActivitylogOptions(): LogOptions
     {
