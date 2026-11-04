@@ -2268,7 +2268,7 @@ class MissionController extends Controller
                 if (count($states) >= $maxStates && $newSum !== $target) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Search limit reached. Please narrow your filters.',
+                        'message' => 'មិនអាចកំណត់បានទេ។',
                     ], 422);
                 }
 
