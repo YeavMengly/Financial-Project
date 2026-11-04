@@ -245,7 +245,7 @@
                                     @endif
 
                                     {{-- Payment --}}
-                                    <button type="button" class="btn btn-success" id="btnPaymentStatus" disabled>
+                                    <button type="button" class="btn btn-success" id="btnPaymentStatus">
                                         <i class="bx bx-money me-1"></i>
                                         ទូទាត់
                                     </button>
@@ -272,12 +272,12 @@
                                     </a>
                                 </div>
 
-                                <div class="d-flex flex-wrap align-items-end gap-2">
+                                {{-- <div class="d-flex flex-wrap align-items-end gap-2">
                                     <div style="width:240px;">
                                         <input type="number" id="define_amount" class="form-control" min="1"
                                             placeholder="កំណត់ចំនួនទឹកប្រាក់សរុប">
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>
@@ -1591,6 +1591,7 @@
         });
     </script> --}}
 
+    {{-- Save Payment Draft Button --}}
     <script>
         $(document).on('click', '#btnSavePaymentDraft', function() {
 
@@ -1767,6 +1768,7 @@
         });
     </script>
 
+    {{-- Export Again Button --}}
     <script>
         $(document).on('click', '.btn-export-again', function() {
             const paidAt = $(this).attr('data-paid-at');
@@ -1910,6 +1912,8 @@
 
     <script>
         let combinationMissionIds = [];
+        let selectedMissionIds = [];
+
         let combinationSearchTimer = null;
         let combinationSearchRequest = null;
 
@@ -1918,24 +1922,55 @@
         | Auto select matching missions
         |--------------------------------------------------------------------------
         */
+        // function autoSelectCombinationMissions() {
+
+        //     const table = $('#mission-table').DataTable();
+
+        //     // Restore selection on the current DataTable page.
+        //     table.rows({
+        //         page: 'current'
+        //     }).nodes().to$().find('.mission-checkbox').each(function() {
+
+        //         const missionId = Number($(this).val());
+
+        //         const isSelected = combinationMissionIds.includes(missionId);
+
+        //         $(this).prop('checked', isSelected);
+
+        //     });
+
+        //     // Update check-all checkbox.
+        //     const checkboxes = table
+        //         .rows({
+        //             page: 'current'
+        //         })
+        //         .nodes()
+        //         .to$()
+        //         .find('.mission-checkbox');
+
+        //     $('#checkAllMissions').prop(
+        //         'checked',
+        //         checkboxes.length > 0 &&
+        //         checkboxes.length === checkboxes.filter(':checked').length
+        //     );
+        // }
         function autoSelectCombinationMissions() {
 
             const table = $('#mission-table').DataTable();
 
-            // Restore selection on the current DataTable page.
             table.rows({
                 page: 'current'
             }).nodes().to$().find('.mission-checkbox').each(function() {
 
                 const missionId = Number($(this).val());
 
-                const isSelected = combinationMissionIds.includes(missionId);
-
-                $(this).prop('checked', isSelected);
+                $(this).prop(
+                    'checked',
+                    selectedMissionIds.includes(missionId)
+                );
 
             });
 
-            // Update check-all checkbox.
             const checkboxes = table
                 .rows({
                     page: 'current'
@@ -1949,6 +1984,9 @@
                 checkboxes.length > 0 &&
                 checkboxes.length === checkboxes.filter(':checked').length
             );
+
+            $('#btnPaymentStatus, #btnSavePaymentDraft')
+                .prop('disabled', selectedMissionIds.length === 0);
         }
 
 
@@ -1967,6 +2005,7 @@
         | Search mission combinations by amount
         |--------------------------------------------------------------------------
         */
+
         $('#define_amount').on('input', function() {
 
             clearTimeout(combinationSearchTimer);
@@ -2020,42 +2059,42 @@
 
                                 icon: 'success',
 
-                                title: 'Combination Found!',
+                                title: 'រកឃើញការផ្គុំចំនួនទឹកប្រាក់!',
 
                                 html: `
-                                <div class="text-start">
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Target Amount:</span>
-                                        <strong>
-                                            ${Number(amount).toLocaleString()}
-                                        </strong>
-                                    </div>
-
-                                    <div class="d-flex justify-content-between mb-2">
-                                        <span>Combined Total:</span>
-                                        <strong class="text-success">
-                                            ${Number(response.total_amount).toLocaleString()}
-                                        </strong>
-                                    </div>
-
-                                    <div class="d-flex justify-content-between">
-                                        <span>Total Missions:</span>
-                                        <strong>
-                                            ${combinationMissionIds.length}
-                                        </strong>
-                                    </div>
+                            <div class="text-start">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>ចំនួនទឹកប្រាក់គោលដៅ៖</span>
+                                    <strong>
+                                        ${Number(amount).toLocaleString()} ៛
+                                    </strong>
                                 </div>
 
-                                <hr>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>ទឹកប្រាក់សរុប៖</span>
+                                    <strong class="text-success">
+                                        ${Number(response.total_amount).toLocaleString()} ៛
+                                    </strong>
+                                </div>
 
-                                Do you want to automatically select these missions?
-                            `,
+                                <div class="d-flex justify-content-between">
+                                    <span>ចំនួនបេសកកម្មសរុប៖</span>
+                                    <strong>
+                                        ${combinationMissionIds.length}
+                                    </strong>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            តើអ្នកចង់ជ្រើសរើសបេសកកម្មទាំងនេះដោយស្វ័យប្រវត្តិដែរឬទេ?
+                        `,
 
                                 showCancelButton: true,
 
-                                confirmButtonText: 'Yes, Select Missions',
+                                confirmButtonText: 'បាទ/ចាស ជ្រើសរើស',
 
-                                cancelButtonText: 'Cancel',
+                                cancelButtonText: 'បោះបង់',
 
                                 confirmButtonColor: '#206bc4',
 
@@ -2065,18 +2104,59 @@
 
                                 if (result.isConfirmed) {
 
-                                    // Reload and automatically select matching missions.
-                                    $('#mission-table').DataTable().ajax.reload();
+                                    // Store matching mission IDs for payment operations.
+                                    selectedMissionIds = [...combinationMissionIds];
+
+                                    // Reload DataTable and restore checkbox selections.
+                                    $('#mission-table').DataTable().ajax.reload(
+                                        function() {
+
+                                            autoSelectCombinationMissions();
+
+                                            // Enable both payment buttons.
+                                            $('#btnPaymentStatus').prop('disabled',
+                                                selectedMissionIds.length === 0);
+
+                                            $('#btnSavePaymentDraft').prop(
+                                                'disabled', selectedMissionIds
+                                                .length === 0);
+
+                                            console.log('Selected Mission IDs:',
+                                                selectedMissionIds);
+
+                                        }, false);
 
                                 } else {
 
-                                    // Cancel selection.
+                                    // Clear selected missions.
                                     combinationMissionIds = [];
+                                    selectedMissionIds = [];
 
                                     $('#mission-table').DataTable().ajax.reload();
+
+                                    // Disable both buttons.
+                                    $('#btnPaymentStatus').prop('disabled', true);
+                                    $('#btnSavePaymentDraft').prop('disabled', true);
                                 }
 
                             });
+
+                            // }).then(function(result) {
+
+                            //     if (result.isConfirmed) {
+
+                            //         // Reload and automatically select matching missions.
+                            //         $('#mission-table').DataTable().ajax.reload();
+
+                            //     } else {
+
+                            //         // Cancel selection.
+                            //         combinationMissionIds = [];
+
+                            //         $('#mission-table').DataTable().ajax.reload();
+                            //     }
+
+                            // });
 
                         } else {
 
@@ -2086,9 +2166,10 @@
 
                             Swal.fire({
                                 icon: 'info',
-                                title: 'No Combination Found',
+                                title: 'រកមិនឃើញការផ្គំទឹកប្រាក់ឡើយ',
                                 text: response.message ||
-                                    'No matching mission combination found.'
+                                    'មិនមានបេសកកម្មដែលអាចផ្គុំបានតាមចំនួនទឹកប្រាក់ដែលបានកំណត់ទេ។',
+                                confirmButtonText: 'យល់ព្រម'
                             });
                         }
                     },
@@ -2103,9 +2184,10 @@
 
                         Swal.fire({
                             icon: 'warning',
-                            title: 'Search Failed',
+                            title: 'ការស្វែងរកមានបញ្ហា',
                             text: xhr.responseJSON?.message ||
-                                'Unable to search mission combinations.'
+                                'មិនអាចស្វែងរកការផ្គុំបេសកកម្មបានទេ។ សូមព្យាយាមម្ដងទៀត។',
+                            confirmButtonText: 'យល់ព្រម'
                         });
 
                         $('#mission-table').DataTable().ajax.reload();
@@ -2139,6 +2221,44 @@
 
             });
 
+        });
+
+        $(document).on('click', '#btnSavePaymentDraft', function() {
+
+            const missionIds = selectedMissionIds;
+
+            if (missionIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'សូមជ្រើសរើសបេសកកម្ម',
+                    text: 'សូមជ្រើសរើសបេសកកម្មមុនពេលរក្សាទុកការទូទាត់។'
+                });
+
+                return;
+            }
+
+            console.log('Draft Mission IDs:', missionIds);
+
+            // Continue your existing save payment draft process.
+        });
+
+        $(document).on('click', '#btnPaymentStatus', function() {
+
+            const missionIds = selectedMissionIds;
+
+            if (missionIds.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'សូមជ្រើសរើសបេសកកម្ម',
+                    text: 'សូមជ្រើសរើសបេសកកម្មមុនពេលទូទាត់ប្រាក់។'
+                });
+
+                return;
+            }
+
+            console.log('Payment Mission IDs:', missionIds);
+
+            // Continue your existing payment process.
         });
     </script>
 @endsection
