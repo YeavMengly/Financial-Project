@@ -61,6 +61,30 @@
             overflow-wrap: anywhere;
             line-height: 1.6;
         }
+
+        /* Allow selected employee name to wrap */
+        .employee-name+.choices .choices__inner {
+            min-height: 38px;
+            height: auto;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        /* Allow selected text to wrap */
+        .employee-name+.choices .choices__list--single {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        /* Wrap dropdown employee names */
+        .employee-name+.choices .choices__list--dropdown .choices__item {
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.5;
+        }
     </style>
 @endsection
 
@@ -111,8 +135,9 @@
                                             <select class="form-select" id="cboDocument" name="cboDocument" required
                                                 data-pristine-required-message="{{ __('messages.required') }}">
                                                 <option value="">{{ __('forms.search...') }}</option>
-                                                @foreach ($document as $doc)
+                                                @foreach ($missionDocType as $doc)
                                                     <option value="{{ $doc->id }}">
+                                                        {{ $doc->id_order }}
                                                         {{ $doc->name }}
                                                     </option>
                                                 @endforeach
@@ -187,53 +212,9 @@
                                             @enderror
                                         </div>
                                     </div>
-
                                 </div>
 
                                 <div class="row">
-                                    {{-- <div class="col-lg-2 col-md-3">
-                                        <div class="form-group mb-3">
-
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <label for="fileInput" class="form-label mb-0">
-                                                    {{ __('forms.file.type') }}
-                                                </label>
-
-                                                <div class="form-check form-switch mb-0">
-                                                    <input class="form-check-input" type="checkbox" role="switch"
-                                                        id="skipFileInput" style="cursor: pointer;">
-
-                                                    <label class="form-check-label font-size-12 text-muted"
-                                                        for="skipFileInput" style="cursor: pointer;">
-                                                        រំលង
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <input type="file" id="fileInput" name="file" tabindex="10"
-                                                class="form-control" tabindex="15" accept=".pdf,.doc,.docx"
-                                                data-allowed-extensions="pdf,doc,docx"
-                                                data-pristine-required-message="{{ __('messages.required') }}">
-
-                                            <small class="form-text text-muted">
-                                                Allowed types: PDF (Max: 10MB per file)
-                                            </small>
-
-                                            @error('file')
-                                                <div class="pristine-error text-help text-danger mt-1">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
-
-                                            @error('file.*')
-                                                <div class="pristine-error text-help text-danger mt-1">
-                                                    {{ $message }}
-                                                </div>
-                                            @enderror
-
-                                        </div>
-                                    </div> --}}
-
                                     <div class="col-lg-2 col-md-3">
                                         <div class="form-group mb-3">
                                             <label for="cboProgram" class="form-label font-size-13 text-muted">
@@ -329,7 +310,7 @@
                                                 {{ __('forms.mission.employee') }}
                                             </h5>
                                             <button type="button" class="btn btn-primary btn-sm" id="btnAddRow">
-                                                {{ __('forms.add') }}
+                                               បន្ថែមមន្ត្រីបេសកកម្ម
                                             </button>
                                         </div>
                                         <div class="card-body">
@@ -369,6 +350,7 @@
                                                                 <select class="form-select employee-name" name="cboName[]"
                                                                     required
                                                                     data-pristine-required-message="{{ __('messages.required') }}">
+
                                                                     <option value="">{{ __('forms.search...') }}
                                                                     </option>
 
@@ -447,7 +429,7 @@
                                                                     class="form-check-label">{{ __('forms.leader') }}</label>
                                                             </div>
 
-                                                            <div class="form-check mb-0">
+                                                            {{-- <div class="form-check mb-0">
                                                                 <input type="hidden" class="assign-budget-value"
                                                                     name="assign_budget[]" value="0">
                                                                 <input type="checkbox"
@@ -455,6 +437,38 @@
                                                                     name="assign_budget_checkbox[]">
                                                                 <label
                                                                     class="form-check-label">{{ __('forms.assign') }}</label>
+                                                            </div> --}}
+
+                                                            <div class="form-check mb-0">
+                                                                <input type="hidden" class="assign-budget-value"
+                                                                    name="assign_budget[]" value="0">
+
+                                                                <input type="checkbox"
+                                                                    class="form-check-input assign-budget"
+                                                                    name="assign_budget_checkbox[]">
+
+                                                                <label class="form-check-label">
+                                                                    {{ __('forms.assign') }}
+                                                                </label>
+                                                            </div>
+
+                                                            {{-- Additional Travel Allowance --}}
+                                                            <div
+                                                                class="col-xl-2 col-md-3 additional-travel-wrapper mt-2 d-none">
+                                                                <label class="form-label">
+                                                                    បន្ថែមថវិកាធ្វើដំណើរ
+                                                                </label>
+
+                                                                <input type="number"
+                                                                    class="form-control additional-travel-allowance"
+                                                                    name="unexpected_budget[]" value="0"
+                                                                    min="0" step="1"
+                                                                    placeholder="បន្ថែមថវិកាធ្វើដំណើរ" />
+
+                                                                <small class="text-muted">
+                                                                    បន្ថែមថវិកាធ្វើដំណើរ
+                                                                    (បើមាន)
+                                                                </small>
                                                             </div>
 
                                                             <div class="form-check mb-0">
@@ -521,7 +535,7 @@
         <div class="col-3"></div>
 
         {{-- ំMessage Alter Require Leader --}}
-        <div class="modal fade" id="leaderRequiredModal" tabindex="-1" aria-hidden="true">
+        {{-- <div class="modal fade" id="leaderRequiredModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
 
@@ -546,7 +560,7 @@
 
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 @endsection
 @section('script')
@@ -558,19 +572,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    {{-- <script>
-        $(document).ready(function() {
-            $('#vDescription').summernote({
-                backColor: 'red',
-                height: 150,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['color', ['color']],
-                ]
-            });
-        });
-    </script> --}}
 
     <script>
         $(document).ready(function() {
@@ -659,6 +660,66 @@
 
                     return false;
                 }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const form = document.getElementById('missionForm');
+
+            if (!form) {
+                return;
+            }
+
+            // Initialize Pristine
+            const pristine = new Pristine(form, {
+                classTo: 'form-group',
+                errorClass: 'is-invalid',
+                successClass: 'is-valid',
+                errorTextParent: 'form-group',
+                errorTextTag: 'div',
+                errorTextClass: 'invalid-feedback'
+            });
+
+            // Submit validation
+            form.addEventListener('submit', function(e) {
+
+                e.preventDefault();
+
+                // Validate all fields
+                const valid = pristine.validate();
+
+                if (!valid) {
+
+                    // Find first invalid field
+                    const firstInvalid = form.querySelector('.is-invalid');
+
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        firstInvalid.focus();
+                    }
+
+                    return;
+                }
+
+                // Prevent double submit
+                const btnSave = document.getElementById('btnSave');
+
+                if (btnSave) {
+                    btnSave.disabled = true;
+
+                    btnSave.innerHTML = `
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        កំពុងរក្សាទុក...
+                    `;
+                }
+                // Submit form
+                form.submit();
             });
         });
     </script>
@@ -850,68 +911,6 @@
 
         const endDatePicker = flatpickr('#end_date', {
             dateFormat: 'Y-m-d'
-        });
-    </script>
-
-    {{-- Keep this code --}}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const form = document.getElementById('missionForm');
-
-            if (!form) {
-                return;
-            }
-
-            // Initialize Pristine
-            const pristine = new Pristine(form, {
-                classTo: 'form-group',
-                errorClass: 'is-invalid',
-                successClass: 'is-valid',
-                errorTextParent: 'form-group',
-                errorTextTag: 'div',
-                errorTextClass: 'invalid-feedback'
-            });
-
-            // Submit validation
-            form.addEventListener('submit', function(e) {
-
-                e.preventDefault();
-
-                // Validate all fields
-                const valid = pristine.validate();
-
-                if (!valid) {
-
-                    // Find first invalid field
-                    const firstInvalid = form.querySelector('.is-invalid');
-
-                    if (firstInvalid) {
-                        firstInvalid.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-
-                        firstInvalid.focus();
-                    }
-
-                    return;
-                }
-
-                // Prevent double submit
-                const btnSave = document.getElementById('btnSave');
-
-                if (btnSave) {
-                    btnSave.disabled = true;
-
-                    btnSave.innerHTML = `
-                        <span class="spinner-border spinner-border-sm me-1"></span>
-                        កំពុងរក្សាទុក...
-                    `;
-                }
-                // Submit form
-                form.submit();
-            });
         });
     </script>
 
@@ -1518,25 +1517,80 @@
                 | Assign budget
                 |--------------------------------------------------------------------------
                 */
-                const checkbox =
-                    row.querySelector('.assign-budget');
+                // const checkbox =
+                //     row.querySelector('.assign-budget');
 
-                const hiddenValue =
-                    row.querySelector('.assign-budget-value');
+                // const hiddenValue =
+                //     row.querySelector('.assign-budget-value');
 
-                checkbox?.addEventListener(
-                    'change',
-                    function() {
+                // checkbox?.addEventListener(
+                //     'change',
+                //     function() {
 
-                        if (hiddenValue) {
+                //         if (hiddenValue) {
 
-                            hiddenValue.value =
-                                this.checked ? '1' : '0';
+                //             hiddenValue.value =
+                //                 this.checked ? '1' : '0';
 
-                        }
+                //         }
 
+                //     }
+                // );
+                /*
+                |--------------------------------------------------------------------------
+                | Assign Budget
+                |--------------------------------------------------------------------------
+                */
+                const assignBudgetCheckbox = row.querySelector('.assign-budget');
+                const assignBudgetValue = row.querySelector('.assign-budget-value');
+
+                assignBudgetCheckbox?.addEventListener('change', function() {
+                    if (assignBudgetValue) {
+                        assignBudgetValue.value = this.checked ? '1' : '0';
                     }
-                );
+                });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Pocket Money
+                |--------------------------------------------------------------------------
+                */
+                const pocketMoneyCheckbox = row.querySelector('.pocket-money');
+                const pocketMoneyValue = row.querySelector('.pocket-money-value');
+
+                pocketMoneyCheckbox?.addEventListener('change', function() {
+                    if (pocketMoneyValue) {
+                        pocketMoneyValue.value = this.checked ? '1' : '0';
+                    }
+                });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Meal Money
+                |--------------------------------------------------------------------------
+                */
+                const mealMoneyCheckbox = row.querySelector('.meal-money');
+                const mealMoneyValue = row.querySelector('.meal-money-value');
+
+                mealMoneyCheckbox?.addEventListener('change', function() {
+                    if (mealMoneyValue) {
+                        mealMoneyValue.value = this.checked ? '1' : '0';
+                    }
+                });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Accommodation Money
+                |--------------------------------------------------------------------------
+                */
+                const accommodationMoneyCheckbox = row.querySelector('.accommodation-money');
+                const accommodationMoneyValue = row.querySelector('.accommodation-money-value');
+
+                accommodationMoneyCheckbox?.addEventListener('change', function() {
+                    if (accommodationMoneyValue) {
+                        accommodationMoneyValue.value = this.checked ? '1' : '0';
+                    }
+                });
                 /*
                 |--------------------------------------------------------------------------
                 | Initialize existing employee account
@@ -1958,15 +2012,37 @@
                                 <div
                                     class="d-flex align-items-center justify-content-start flex-nowrap gap-3">
                                     
-                                    <div class="form-check mb-0">
-                                        <input type="hidden" class="assign-budget-value"
-                                            name="assign_budget[]" value="0">
-                                        <input type="checkbox"
-                                            class="form-check-input assign-budget"
-                                            name="assign_budget_checkbox[]">
-                                        <label
-                                            class="form-check-label">{{ __('forms.assign') }}</label>
-                                    </div>
+                                  <div class="form-check mb-0">
+                                    <input type="hidden" class="assign-budget-value"
+                                        name="assign_budget[]" value="0">
+
+                                    <input type="checkbox"
+                                        class="form-check-input assign-budget"
+                                        name="assign_budget_checkbox[]">
+
+                                    <label class="form-check-label">
+                                        {{ __('forms.assign') }}
+                                    </label>
+                                </div>
+
+                                {{-- Additional Travel Allowance --}}
+                                <div
+                                    class="col-xl-2 col-md-3 additional-travel-wrapper mt-2 d-none">
+                                    <label class="form-label">
+                                        បន្ថែមថវិកាធ្វើដំណើរ
+                                    </label>
+
+                                    <input type="number"
+                                        class="form-control additional-travel-allowance"
+                                        name="unexpected_budget[]" value="0"
+                                        min="0" step="1"
+                                        placeholder="បន្ថែមថវិកាធ្វើដំណើរ" />
+
+                                    <small class="text-muted">
+                                        បន្ថែមថវិកាធ្វើដំណើរ
+                                        (បើមាន)
+                                    </small>
+                                </div>
 
                                     <div class="form-check mb-0">
                                         <input type="hidden" class="pocket-money-value"
@@ -2254,109 +2330,92 @@
     </script>
 
     <script>
-        // Handle assign budget checkbox for each employee row 
+        // Handle Assign Budget checkbox for each employee row
         $(document).on('change', '.assign-budget', function() {
             const row = $(this).closest('.employee-row');
-            if ($(this).is(':checked')) { // Assign budget = 1 
-                row.find('.assign-budget-value').val(1);
-            } else { // Remove budget assignment 
-                row.find('.assign-budget-value').val(0);
-            }
-        }); // When employee is selected/changed 
 
-        $(document).on('change', '.employee-name', function() {
-            const rows = $('.employee-row'); // If there is only ONE employee 
-            if (rows.length === 1) {
-                const row = $(this).closest('.employee-row'); // Automatically assign budget 
-                row.find('.assign-budget-value').val(1);
-                row.find('.assign-budget').prop('checked', true).prop('disabled', true);
-            } else { // Multiple employees // Allow each employee to be selected independently
-                $('.assign-budget').prop('disabled', false);
-            }
+            row.find('.assign-budget-value').val(
+                $(this).is(':checked') ? 1 : 0
+            );
         });
-    </script>
 
-    {{-- Assign Budget --}}
-    {{-- <script>
-        $(document).on('change', '.employee-name', function() {
+        // Handle Pocket Money checkbox
+        $(document).on('change', '.pocket-money', function() {
+            const row = $(this).closest('.employee-row');
 
-            // Get all employee rows
-            const rows = $('.employee-row');
-
-            // If mission has only ONE person
-            if (rows.length === 1) {
-
-                const row = $(this).closest('.employee-row');
-
-                // Automatically assign budget = 1
-                row.find('.assign-budget-value').val(1);
-
-                // Optional: show checkbox as checked
-                row.find('.assign-budget')
-                    .prop('checked', true)
-                    .prop('disabled', true);
-
-            } else {
-
-                // More than one person
-                const row = $(this).closest('.employee-row');
-
-                // Allow user to choose
-                row.find('.assign-budget').prop('disabled', false);
-            }
+            row.find('.pocket-money-value').val(
+                $(this).is(':checked') ? 1 : 0
+            );
         });
-    </script> --}}
 
-    {{-- Skip File Input --}}
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const skipFileCheckbox = document.getElementById('skipFileInput');
+        // Handle Meal Money checkbox
+        $(document).on('change', '.meal-money', function() {
+            const row = $(this).closest('.employee-row');
 
-        const setupSkipField = ({
-            checkbox,
-            input,
-            defaultValue = '',
-            restoreValidation = () => {}
-        }) => {
-            if (!checkbox || !input) return;
+            row.find('.meal-money-value').val(
+                $(this).is(':checked') ? 1 : 0
+            );
+        });
 
-            checkbox.addEventListener('change', function() {
-                const parentGroup = input.closest('.form-group');
+        // Handle Accommodation Money checkbox
+        $(document).on('change', '.accommodation-money', function() {
+            const row = $(this).closest('.employee-row');
 
-                if (this.checked) {
-                    input.value = '';
-                    input.disabled = true;
+            row.find('.accommodation-money-value').val(
+                $(this).is(':checked') ? 1 : 0
+            );
+        });
 
-                    input.classList.add('border-success', 'bg-success-subtle');
-                    parentGroup?.classList.add('has-success');
+        // When employee is selected/changed
+        // $(document).on('change', '.employee-name', function() {
 
-                    input.removeAttribute('required');
-                    input.removeAttribute('min');
-                    input.removeAttribute('data-pristine-required-message');
+        //     const rows = $('.employee-row');
 
-                    pristine.reset(input);
-                } else {
-                    input.value = defaultValue;
-                    input.disabled = false;
+        //     if (rows.length === 1) {
 
-                    input.classList.remove('border-success', 'bg-success-subtle');
-                    parentGroup?.classList.remove('has-success');
+        //         const row = $(this).closest('.employee-row');
 
-                    restoreValidation();
-                }
+        //         // Automatically assign budget
+        //         row.find('.assign-budget-value').val(1);
 
-                refreshPristine();
+        //         row.find('.assign-budget')
+        //             .prop('checked', true)
+        //             .prop('disabled', true);
+
+        //     } else {
+
+        //         // Allow each employee to select independently
+        //         $('.assign-budget').prop('disabled', false);
+        //     }
+        // });
+
+        // Initialize all allowance values
+        function initializeAllowanceValues() {
+
+            $('.employee-row').each(function() {
+
+                const row = $(this);
+
+                row.find('.assign-budget-value').val(
+                    row.find('.assign-budget').is(':checked') ? 1 : 0
+                );
+
+                row.find('.pocket-money-value').val(
+                    row.find('.pocket-money').is(':checked') ? 1 : 0
+                );
+
+                row.find('.meal-money-value').val(
+                    row.find('.meal-money').is(':checked') ? 1 : 0
+                );
+
+                row.find('.accommodation-money-value').val(
+                    row.find('.accommodation-money').is(':checked') ? 1 : 0
+                );
             });
-        };
+        }
 
-        setupSkipField({
-            checkbox: skipFileCheckbox,
-            input: fileInput,
-            restoreValidation: () => {
-                fileInput.setAttribute('required', true);
-                fileInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
-                    .translations.required);
-            }
+        $(document).ready(function() {
+            initializeAllowanceValues();
         });
     </script>
 
@@ -2564,7 +2623,7 @@
         }
     </script>
 
-    <script>
+    {{-- <script>
         $(document).ready(function() {
 
             // Synchronize Assign Budget checkbox and hidden values
@@ -2652,6 +2711,338 @@
                 return true;
             });
 
+        });
+    </script> --}}
+
+    {{-- <script>
+        $(document).ready(function() {
+
+            const employeeContainer = $('#employeeRows');
+
+            /*
+            |--------------------------------------------------------------------------
+            | 1. Set Default Leader
+            |--------------------------------------------------------------------------
+            */
+            function setDefaultLeader() {
+
+                const selectedLeader = employeeContainer.find('.employee-leader:checked');
+
+                if (selectedLeader.length === 0) {
+
+                    const firstLeader = employeeContainer
+                        .find('.employee-row')
+                        .first()
+                        .find('.employee-leader');
+
+                    firstLeader.prop('checked', true).trigger('change');
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | 2. Synchronize Assign Budget
+            |--------------------------------------------------------------------------
+            */
+            function syncAssignBudget(row) {
+
+                const checkbox = row.find('.assign-budget');
+                const hiddenInput = row.find('.assign-budget-value');
+
+                const isChecked = checkbox.is(':checked');
+
+                // Hidden value: 1 = Assigned, 0 = Not Assigned
+                hiddenInput.val(isChecked ? 1 : 0);
+
+                const budgetFields = [
+                    'pocket_money',
+                    'meal_money',
+                    'accommodation_money'
+                ];
+
+                budgetFields.forEach(function(field) {
+
+                    const input = row.find(
+                        '[name="' + field + '[]"], [name="' + field + '"]'
+                    );
+
+                    if (!isChecked) {
+                        // Unchecked: submit zero
+                        input.val(0);
+                    }
+                });
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | 3. Initialize All Employee Rows
+            |--------------------------------------------------------------------------
+            */
+            function initializeEmployeeRows() {
+
+                setDefaultLeader();
+
+                employeeContainer.find('.employee-row').each(function() {
+                    syncAssignBudget($(this));
+                });
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | 4. Leader Selection
+            |--------------------------------------------------------------------------
+            */
+            $(document).on('change', '#employeeRows .employee-leader', function() {
+
+                // Radio buttons automatically ensure only one Leader.
+                // No additional synchronization is required.
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | 5. Assign Budget Checkbox
+            |--------------------------------------------------------------------------
+            */
+            $(document).on('change', '#employeeRows .assign-budget', function() {
+
+                const row = $(this).closest('.employee-row');
+
+                syncAssignBudget(row);
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | 6. Initialize on Page Load
+            |--------------------------------------------------------------------------
+            */
+            initializeEmployeeRows();
+
+            /*
+            |--------------------------------------------------------------------------
+            | 7. Form Submission Validation
+            |--------------------------------------------------------------------------
+            */
+            $('#pristine-valid-example').on('submit', function(event) {
+
+                const employeeRows = employeeContainer.find('.employee-row');
+
+                // Check Leader
+                const leader = employeeContainer.find('.employee-leader:checked');
+
+                if (leader.length === 0) {
+
+                    event.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'សូមជ្រើសរើសប្រធាន',
+                        text: 'សូមជ្រើសរើសបុគ្គលិកម្នាក់ជាប្រធានបេសកកម្មជាមុនសិន។',
+                        confirmButtonText: 'យល់ព្រម',
+                        confirmButtonColor: '#dc3545',
+                        allowOutsideClick: false
+                    });
+
+                    return false;
+                }
+
+                // Synchronize all employee budget values
+                employeeRows.each(function() {
+                    syncAssignBudget($(this));
+                });
+
+                return true;
+            });
+
+            /*
+            |--------------------------------------------------------------------------
+            | 8. Call After Adding or Removing Employee Rows
+            |--------------------------------------------------------------------------
+            */
+            window.initializeMissionEmployeeRows = initializeEmployeeRows;
+
+        });
+    </script> --}}
+
+    {{-- Default Leader --}}
+    <script>
+        $(document).ready(function() {
+
+            function setDefaultLeader() {
+
+                const employeeRows = $('#employeeRows .employee-row');
+
+                const selectedLeader = employeeRows.find('.employee-leader:checked');
+
+                if (selectedLeader.length === 0) {
+
+                    employeeRows.first()
+                        .find('.employee-leader')
+                        .prop('checked', true)
+                        .trigger('change');
+                }
+            }
+
+            window.setDefaultMissionLeader = setDefaultLeader;
+
+            setDefaultLeader();
+
+        });
+    </script>
+
+    {{-- Assign Budget --}}
+    {{-- <script>
+        $(document).ready(function() {
+
+            function syncAssignBudget(row) {
+
+                const checkbox = row.find('.assign-budget');
+                const hiddenInput = row.find('.assign-budget-value');
+
+                const isChecked = checkbox.is(':checked');
+
+                hiddenInput.val(isChecked ? 1 : 0);
+
+                const budgetFields = [
+                    'pocket_money',
+                    'meal_money',
+                    'accommodation_money'
+                ];
+
+                budgetFields.forEach(function(field) {
+
+                    const input = row.find(
+                        '[name="' + field + '[]"], [name="' + field + '"]'
+                    );
+
+                    if (!isChecked) {
+                        input.val(0);
+                    }
+
+                });
+            }
+
+            // Checkbox change
+            $(document).on('change', '#employeeRows .assign-budget', function() {
+
+                const row = $(this).closest('.employee-row');
+
+                syncAssignBudget(row);
+            });
+
+            // Initialize all rows
+            function initializeAssignBudget() {
+
+                $('#employeeRows .employee-row').each(function() {
+                    syncAssignBudget($(this));
+                });
+            }
+
+            window.initializeMissionBudget = initializeAssignBudget;
+
+            initializeAssignBudget();
+
+        });
+    </script> --}}
+
+    {{-- Leader Validation --}}
+    <script>
+        $(document).ready(function() {
+
+            $('#pristine-valid-example').on('submit', function(event) {
+
+                const leader = $('#employeeRows .employee-leader:checked');
+
+                if (leader.length === 0) {
+
+                    event.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'សូមជ្រើសរើសប្រធាន',
+                        text: 'សូមជ្រើសរើសបុគ្គលិកម្នាក់ជាប្រធានបេសកកម្មជាមុនសិន។',
+                        confirmButtonText: 'យល់ព្រម',
+                        confirmButtonColor: '#dc3545',
+                        allowOutsideClick: false
+                    });
+
+                    return false;
+                }
+
+            });
+
+        });
+    </script>
+
+    {{-- Initail Row --}}
+    <script>
+        $(document).ready(function() {
+
+            window.initializeMissionEmployeeRows = function() {
+
+                if (typeof window.setDefaultMissionLeader === 'function') {
+                    window.setDefaultMissionLeader();
+                }
+
+                if (typeof window.initializeMissionBudget === 'function') {
+                    window.initializeMissionBudget();
+                }
+
+            };
+
+        });
+    </script>
+
+    {{-- <script>
+        function syncBudgetCheckboxes(row) {
+
+            const fields = [
+                ['.assign-budget', '.assign-budget-value'],
+                ['.pocket-money', '.pocket-money-value'],
+                ['.meal-money', '.meal-money-value'],
+                ['.accommodation-money', '.accommodation-money-value']
+            ];
+
+            fields.forEach(([checkboxSelector, hiddenSelector]) => {
+
+                const checkbox = row.querySelector(checkboxSelector);
+                const hidden = row.querySelector(hiddenSelector);
+
+                if (checkbox && hidden) {
+
+                    hidden.value = checkbox.checked ? 1 : 0;
+
+                    checkbox.addEventListener('change', function() {
+                        hidden.value = this.checked ? 1 : 0;
+                    });
+                }
+            });
+        }
+        document.querySelectorAll('#employeeRows .employee-row').forEach(row => {
+            syncBudgetCheckboxes(row);
+        });
+    </script> --}}
+
+    <script>
+        $(document).on('change', '.assign-budget', function() {
+
+            const row = $(this).closest('.employee-row');
+
+            const isChecked = $(this).is(':checked');
+
+            // Update hidden checkbox value
+            row.find('.assign-budget-value')
+                .val(isChecked ? 1 : 0);
+
+            // Show or hide additional allowance
+            const wrapper = row.find('.additional-travel-wrapper');
+
+            if (isChecked) {
+                wrapper.removeClass('d-none');
+            } else {
+                wrapper.addClass('d-none');
+
+                row.find('.additional-travel-allowance').val(0);
+            }
         });
     </script>
 @endsection

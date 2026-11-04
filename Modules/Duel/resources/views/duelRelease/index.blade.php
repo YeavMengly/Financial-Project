@@ -41,6 +41,58 @@
             <div class="card">
                 <div class="card-body">
                     <form id="filter" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0" method="GET">
+
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboAgency">{{ __('menus.content.agency') }}</label>
+                            <select id="cboAgency" name="cboAgency" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">
+                                    {{ __('forms.search...') }}
+                                </option>
+                                @foreach ($duelRelease as $item)
+                                    <option value="{{ $item->agency }}"
+                                        {{ request('cboAgency') == $item->agency ? 'selected' : '' }}>
+                                        {{ $item->agency }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboUserRequest">{{ __('menus.user.request') }}</label>
+                            <select id="cboUserRequest" name="cboUserRequest" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">
+                                    {{ __('forms.search...') }}
+                                </option>
+                                @foreach ($duelRelease as $item)
+                                    <option value="{{ $item->user_request }}"
+                                        {{ request('cboUserRequest') == $item->user_request ? 'selected' : '' }}>
+                                        {{ $item->user_request }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
+                                for="cboDuelType">{{ __('menus.item.name') }}</label>
+                            <select id="cboDuelType" name="cboDuelType" class="form-select"
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">
+                                    {{ __('forms.search...') }}
+                                </option>
+                                @foreach ($duelType as $type)
+                                    <option value="{{ $type->id }}"
+                                        {{ request('cboDuelType') == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name_km }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <!-- Start Date -->
                         <div class="col-sm-2">
                             {{-- <label for="cboTodo" class="form-label font-size-13 text-muted">ជ្រើសរើស
@@ -68,43 +120,17 @@
                                 data-pristine-required-message="{{ __('messages.required') }}" />
                         </div>
 
-                        <div class="col-sm-2">
+                        {{-- <div class="col-sm-2">
                             <label class="form-label font-size-13 text-muted"
                                 for="cboUserRequest">{{ __('menus.user.request') }}</label>
                             <input type="text" id="cboUserRequest" name="cboUserRequest" class="form-control"
                                 placeholder="{{ __('menus.user.request') }}" value="{{ request('cboUserRequest') }}"
                                 data-pristine-required-message="{{ __('messages.required') }}" />
-                        </div>
+                        </div> --}}
 
-                        <div class="col-sm-2">
-                            <label class="form-label font-size-13 text-muted"
-                                for="cboAgency">{{ __('menus.content.agency') }}</label>
-                            <select id="cboAgency" name="cboAgency" class="form-select"
-                                data-pristine-required-message="{{ __('messages.required') }}">
-                                <option value="">{{ __('menus.content.agency') }}</option>
-                                @foreach ($duelRelease as $item)
-                                    <option value="{{ $item->agency }}"
-                                        {{ request('cboAgency') == $item->agency ? 'selected' : '' }}>
-                                        {{ $item->agency }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
 
-                        <div class="col-sm-2">
-                            <label class="form-label font-size-13 text-muted"
-                                for="cboDuelType">{{ __('menus.item.name') }}</label>
-                            <select id="cboDuelType" name="cboDuelType" class="form-select"
-                                data-pristine-required-message="{{ __('messages.required') }}">
-                                <option value="">{{ __('menus.item.name') }}</option>
-                                @foreach ($duelType as $type)
-                                    <option value="{{ $type->id }}"
-                                        {{ request('cboDuelType') == $type->id ? 'selected' : '' }}>
-                                        {{ $type->name_km }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+
+
 
                         {{-- <div class="col-sm-3">
                             <label class="visually-hidden"
@@ -298,5 +324,38 @@
         });
     </script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboAgency = document.getElementById('cboAgency');
+            const cboAgencyChoice = new Choices(cboAgency, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboDuelType = document.getElementById('cboDuelType');
+            const cboDuelTypeChoice = new Choices(cboDuelType, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const cboUserRequest = document.getElementById('cboUserRequest');
+            const cboUserRequestChoice = new Choices(cboUserRequest, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            });
+        });
+    </script>
     {!! $dataTable->scripts() !!}
 @endsection

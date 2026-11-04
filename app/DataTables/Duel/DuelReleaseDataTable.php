@@ -54,15 +54,30 @@ class DuelReleaseDataTable extends DataTable
             })
             ->editColumn('file', function ($row) {
                 if (empty($row->file)) {
-                    return '';
+                    return '<span class="text-muted">-</span>';
                 }
 
-                $url = asset('storage/' . $row->file);
+                $exists = \Illuminate\Support\Facades\Storage::disk('local')
+                    ->exists($row->file)
+                    || \Illuminate\Support\Facades\Storage::disk('public')
+                    ->exists($row->file);
 
-                return '<a href="' . $url . '" target="_blank" class="text-primary">
-                <i class="fas fa-file-alt me-1"></i>Preview
+                if (!$exists) {
+                    return '<span class="text-danger">File not found</span>';
+                }
+
+                $url = route('duelRelease.file.preview', $row->id);
+                $filename = basename($row->file);
+
+                return '<a href="' . e($url) . '"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-primary"
+                title="' . e($filename) . '">
+                <i class="fas fa-file-pdf me-1"></i> Preview
             </a>';
             })
+
             ->rawColumns([
                 'title',
                 'status',

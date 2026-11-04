@@ -43,7 +43,7 @@ class DuelReleaseController extends Controller
         // $duelRelease = DuelRelease::where('id', $id)
         //     ->where('ministry_id', $ministry->id)->get();
         $duelRelease = DuelRelease::where('ministry_id', $ministry->id)
-            ->select('agency')
+            ->select('agency', 'user_request')
             ->distinct()
             ->get();
 
@@ -857,6 +857,9 @@ class DuelReleaseController extends Controller
     // }
     public function export(Request $request, $params)
     {
+
+        // Unlimited execution time and memory
+        loadRunUnlimitedTime();
         try {
             $ministryId = decode_params($params);
 
@@ -1013,5 +1016,71 @@ class DuelReleaseController extends Controller
 
             return redirect()->route('duelRelease.index', $params);
         }
+    }
+
+
+    private function getFile($id): array
+    {
+        $duelRelease = DuelRelease::findOrFail($id);
+
+        // Apply your duelRelease's authorization rules here.
+        abort_unless(hasPermission('duelRelease.index'), 403);
+
+        $path = $duelRelease->file;
+
+        abort_if(empty($path), 404);
+
+        // Accept only paths inside the duelRelease upload directory.
+        abort_unless(
+            str_starts_with($path, 'uploads/duelRelease/')
+                && !str_contains($path, '..')
+                && !str_contains($path, '\\'),
+            404
+        );
+
+        // New files: storage/app/uploads/...
+        if (Storage::disk('local')->exists($path)) {
+            return [$duelRelease, 'local', $path];
+        }
+
+        // Legacy files: public/uploads/...
+        if (Storage::disk('public')->exists($path)) {
+            return [$duelRelease, 'public', $path];
+        }
+
+        abort(404, 'File not found.');
+    }
+
+    public function preview($id)
+    {
+        [$duelRelease, $disk, $path] = $this->getFile($id);
+
+        abort_unless(
+            strtolower(pathinfo($path, PATHINFO_EXTENSION)) === 'pdf',
+            415,
+            'Only PDF files can be previewed.'
+        );
+
+        return Storage::disk($disk)->response(
+            $path,
+            basename($path),
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' =>
+                'inline; filename="' .
+                    addcslashes(basename($path), '"\\') . '"',
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+    }
+
+    public function download($id)
+    {
+        [$duelRelease, $disk, $path] = $this->getFile($id);
+
+        return Storage::disk($disk)->download(
+            $path,
+            basename($path)
+        );
     }
 }

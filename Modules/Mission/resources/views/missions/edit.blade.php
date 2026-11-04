@@ -110,9 +110,9 @@
                                                     {{ __('forms.search...') }}
                                                 </option>
 
-                                                @foreach ($document as $doc)
+                                                @foreach ($missionDocType as $doc)
                                                     <option value="{{ $doc->id }}"
-                                                        {{ old('cboDocument', $mission->document_id) == $doc->id ? 'selected' : '' }}>
+                                                        {{ old('cboDocument', $mission->mission_doc_type_id) == $doc->id ? 'selected' : '' }}>
                                                         {{ $doc->name }}
                                                     </option>
                                                 @endforeach
@@ -436,7 +436,8 @@
                                             </h5>
 
                                             <button type="button" class="btn btn-primary btn-sm" id="btnAddRow">
-                                                {{ __('forms.add') }}
+                                                {{-- {{ __('forms.add') }} --}}
+                                                  បន្ថែមមន្ត្រីបេសកកម្ម
                                             </button>
 
                                         </div>
@@ -459,7 +460,7 @@
                                                                     @php
                                                                         $selectedTitle = old(
                                                                             'cboTitle.' . $loop->index,
-                                                                            $employee->title ?? '',
+                                                                            $missionEmployee->employee_title ?? '',
                                                                         );
                                                                     @endphp
 
@@ -471,29 +472,16 @@
                                                                             {{ __('forms.search...') }}
                                                                         </option>
 
-                                                                        <option value="ឯកឧត្តម"
-                                                                            {{ $selectedTitle == 'ឯកឧត្តម' ? 'selected' : '' }}>
-                                                                            ឯកឧត្តម
-                                                                        </option>
+                                                                        @foreach (['ឯកឧត្តម', 'លោកជំទាវ', 'លោក', 'លោកស្រី'] as $title)
+                                                                            <option value="{{ $title }}"
+                                                                                {{ $selectedTitle == $title ? 'selected' : '' }}>
+                                                                                {{ $title }}
+                                                                            </option>
+                                                                        @endforeach
 
-                                                                        <option value="លោកជំទាវ"
-                                                                            {{ $selectedTitle == 'លោកជំទាវ' ? 'selected' : '' }}>
-                                                                            លោកជំទាវ
-                                                                        </option>
-
-                                                                        <option value="លោក"
-                                                                            {{ $selectedTitle == 'លោក' ? 'selected' : '' }}>
-                                                                            លោក
-                                                                        </option>
-
-                                                                        <option value="លោកស្រី"
-                                                                            {{ $selectedTitle == 'លោកស្រី' ? 'selected' : '' }}>
-                                                                            លោកស្រី
-                                                                        </option>
                                                                     </select>
                                                                 </div>
                                                             </div>
-
                                                             {{-- Employee --}}
                                                             <div class="col-lg-2 col-md-3 col-6">
                                                                 <div class="form-group mb-3">
@@ -749,20 +737,90 @@
                                                                 <div class="form-check mb-0">
                                                                     <input type="hidden" class="assign-budget-value"
                                                                         name="assign_budget[]"
-                                                                        value="{{ $missionEmployee->assign_budget ?? 0 }}">
+                                                                        value="{{ old('assign_budget.' . $index, $missionEmployee->assign_budget ?? 0) }}">
 
                                                                     <input type="checkbox"
                                                                         class="form-check-input assign-budget"
-                                                                        name="assign_budget_checkbox[]"
-                                                                        {{ ($missionEmployee->assign_budget ?? 0) == 1 ? 'checked' : '' }}>
+                                                                        name="assign_budget_checkbox[]" value="1"
+                                                                        {{ old('assign_budget.' . $index, $missionEmployee->assign_budget ?? 0) == 1 ? 'checked' : '' }}>
 
                                                                     <label class="form-check-label">
                                                                         {{ __('forms.assign') }}
                                                                     </label>
                                                                 </div>
 
+                                                                {{-- Additional Travel Allowance --}}
+                                                                <div
+                                                                    class="col-xl-2 col-md-3 additional-travel-wrapper mt-2
+                                                                    {{ old('assign_budget.' . $index, $missionEmployee->assign_budget ?? 0) == 1 ? '' : 'd-none' }}">
+
+                                                                    <label class="form-label">
+                                                                        បន្ថែមថវិកាធ្វើដំណើរ
+                                                                    </label>
+
+                                                                    <input type="number"
+                                                                        class="form-control additional-travel-allowance"
+                                                                        name="unexpected_budget[]"
+                                                                        value="{{ old('unexpected_budget.' . $index, $missionEmployee->unexpected_budget ?? 0) }}"
+                                                                        min="0" step="1"
+                                                                        placeholder="បន្ថែមថវិកាធ្វើដំណើរ">
+
+                                                                    <small class="text-muted">
+                                                                        បន្ថែមថវិកាធ្វើដំណើរ
+                                                                        (បន្ថែមលើថវិកាធ្វើដំណើរដែលបានកំណត់សម្រាប់ខេត្ត)
+                                                                    </small>
+                                                                </div>
                                                                 {{-- Pocket Money --}}
                                                                 <div class="form-check mb-0">
+                                                                    <input type="hidden" class="pocket-money-value"
+                                                                        name="pocket_money[]"
+                                                                        value="{{ $missionEmployee->pocket_money_status ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input pocket-money"
+                                                                        name="pocket_money_checkbox[]" value="1"
+                                                                        {{ ($missionEmployee->pocket_money_status ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.pocket.money') }}
+                                                                    </label>
+                                                                </div>
+
+                                                                {{-- Meal Money --}}
+                                                                <div class="form-check mb-0">
+                                                                    <input type="hidden" class="meal-money-value"
+                                                                        name="meal_money[]"
+                                                                        value="{{ $missionEmployee->meal_money_status ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input meal-money"
+                                                                        name="meal_money_checkbox[]" value="1"
+                                                                        {{ ($missionEmployee->meal_money_status ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.meal.money') }}
+                                                                    </label>
+                                                                </div>
+
+                                                                {{-- Accommodation Money --}}
+                                                                <div class="form-check mb-0">
+                                                                    <input type="hidden"
+                                                                        class="accommodation-money-value"
+                                                                        name="accommodation_money[]"
+                                                                        value="{{ $missionEmployee->accommodation_money_status ?? 0 }}">
+
+                                                                    <input type="checkbox"
+                                                                        class="form-check-input accommodation-money"
+                                                                        name="accommodation_money_checkbox[]"
+                                                                        value="1"
+                                                                        {{ ($missionEmployee->accommodation_money_status ?? 0) == 1 ? 'checked' : '' }}>
+
+                                                                    <label class="form-check-label">
+                                                                        {{ __('forms.accommodation.money') }}
+                                                                    </label>
+                                                                </div>
+                                                                {{-- Pocket Money --}}
+                                                                {{-- <div class="form-check mb-0">
                                                                     <input type="hidden" class="pocket-money-value"
                                                                         name="pocket_money[]"
                                                                         value="{{ $missionEmployee->pocket_money ?? 0 }}">
@@ -775,10 +833,10 @@
                                                                     <label class="form-check-label">
                                                                         {{ __('forms.pocket.money') }}
                                                                     </label>
-                                                                </div>
+                                                                </div> --}}
 
                                                                 {{-- Meal Money --}}
-                                                                <div class="form-check mb-0">
+                                                                {{-- <div class="form-check mb-0">
                                                                     <input type="hidden" class="meal-money-value"
                                                                         name="meal_money[]"
                                                                         value="{{ $missionEmployee->meal_money ?? 0 }}">
@@ -791,10 +849,10 @@
                                                                     <label class="form-check-label">
                                                                         {{ __('forms.meal.money') }}
                                                                     </label>
-                                                                </div>
+                                                                </div> --}}
 
                                                                 {{-- Accommodation Money --}}
-                                                                <div class="form-check mb-0">
+                                                                {{-- <div class="form-check mb-0">
                                                                     <input type="hidden"
                                                                         class="accommodation-money-value"
                                                                         name="accommodation_money[]"
@@ -808,7 +866,7 @@
                                                                     <label class="form-check-label">
                                                                         {{ __('forms.accommodation.money') }}
                                                                     </label>
-                                                                </div>
+                                                                </div> --}}
 
                                                             </div>
 
@@ -1981,7 +2039,47 @@
                     }
                 );
 
+                /*
+                |--------------------------------------------------------------------------
+                | Pocket Money
+                |--------------------------------------------------------------------------
+                */
+                const pocketMoneyCheckbox = row.querySelector('.pocket-money');
+                const pocketMoneyValue = row.querySelector('.pocket-money-value');
 
+                pocketMoneyCheckbox?.addEventListener('change', function() {
+                    if (pocketMoneyValue) {
+                        pocketMoneyValue.value = this.checked ? '1' : '0';
+                    }
+                });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Meal Money
+                |--------------------------------------------------------------------------
+                */
+                const mealMoneyCheckbox = row.querySelector('.meal-money');
+                const mealMoneyValue = row.querySelector('.meal-money-value');
+
+                mealMoneyCheckbox?.addEventListener('change', function() {
+                    if (mealMoneyValue) {
+                        mealMoneyValue.value = this.checked ? '1' : '0';
+                    }
+                });
+
+                /*
+                |--------------------------------------------------------------------------
+                | Accommodation Money
+                |--------------------------------------------------------------------------
+                */
+                const accommodationMoneyCheckbox = row.querySelector('.accommodation-money');
+                const accommodationMoneyValue = row.querySelector('.accommodation-money-value');
+
+                accommodationMoneyCheckbox?.addEventListener('change', function() {
+                    if (accommodationMoneyValue) {
+                        accommodationMoneyValue.value = this.checked ? '1' : '0';
+                    }
+                });
                 /*
                 |--------------------------------------------------------------------------
                 | Initialize existing employee account
@@ -2217,6 +2315,7 @@
                 });
             }
 
+            
 
             /*
             |--------------------------------------------------------------------------
@@ -2353,8 +2452,7 @@
                                         </option>
                                     </select>
 
-                                    <small class="payment-account-number text-muted d-block mt-1"></small>
-                                </div>
+                                   </div>
                             </div>
 
                             <div class="col-lg-2 col-md-3 col-6">
@@ -2625,77 +2723,24 @@
     {{-- Assign Budget to Members --}}
     <script>
         // Handle assign budget checkbox for each employee row 
-        $(document).on('change', '.assign-budget', function() {
-            const row = $(this).closest('.employee-row');
-            if ($(this).is(':checked')) { // Assign budget = 1 
-                row.find('.assign-budget-value').val(1);
-            } else { // Remove budget assignment 
-                row.find('.assign-budget-value').val(0);
-            }
-        }); // When employee is selected/changed 
-        $(document).on('change', '.employee-name', function() {
-            const rows = $('.employee-row'); // If there is only ONE employee 
-            if (rows.length === 1) {
-                const row = $(this).closest('.employee-row'); // Automatically assign budget 
-                row.find('.assign-budget-value').val(1);
-                row.find('.assign-budget').prop('checked', true).prop('disabled', true);
-            } else { // Multiple employees // Allow each employee to be selected independently
-                $('.assign-budget').prop('disabled', false);
-            }
-        });
-    </script>
-
-    {{-- Skip File Input --}}
-    <script>
-        const fileInput = document.getElementById('fileInput');
-        const skipFileCheckbox = document.getElementById('skipFileInput');
-
-        const setupSkipField = ({
-            checkbox,
-            input,
-            defaultValue = '',
-            restoreValidation = () => {}
-        }) => {
-            if (!checkbox || !input) return;
-
-            checkbox.addEventListener('change', function() {
-                const parentGroup = input.closest('.form-group');
-
-                if (this.checked) {
-                    input.value = '';
-                    input.disabled = true;
-
-                    input.classList.add('border-success', 'bg-success-subtle');
-                    parentGroup?.classList.add('has-success');
-
-                    input.removeAttribute('required');
-                    input.removeAttribute('min');
-                    input.removeAttribute('data-pristine-required-message');
-
-                    pristine.reset(input);
-                } else {
-                    input.value = defaultValue;
-                    input.disabled = false;
-
-                    input.classList.remove('border-success', 'bg-success-subtle');
-                    parentGroup?.classList.remove('has-success');
-
-                    restoreValidation();
-                }
-
-                refreshPristine();
-            });
-        };
-
-        setupSkipField({
-            checkbox: skipFileCheckbox,
-            input: fileInput,
-            restoreValidation: () => {
-                fileInput.setAttribute('required', true);
-                fileInput.setAttribute('data-pristine-required-message', window.BudgetFormConfig
-                    .translations.required);
-            }
-        });
+        // $(document).on('change', '.assign-budget', function() {
+        //     const row = $(this).closest('.employee-row');
+        //     if ($(this).is(':checked')) { // Assign budget = 1 
+        //         row.find('.assign-budget-value').val(1);
+        //     } else { // Remove budget assignment 
+        //         row.find('.assign-budget-value').val(0);
+        //     }
+        // }); // When employee is selected/changed 
+        // $(document).on('change', '.employee-name', function() {
+        //     const rows = $('.employee-row'); // If there is only ONE employee 
+        //     if (rows.length === 1) {
+        //         const row = $(this).closest('.employee-row'); // Automatically assign budget 
+        //         row.find('.assign-budget-value').val(1);
+        //         row.find('.assign-budget').prop('checked', true).prop('disabled', true);
+        //     } else { // Multiple employees // Allow each employee to be selected independently
+        //         $('.assign-budget').prop('disabled', false);
+        //     }
+        // });
     </script>
 
     {{-- Filter Program , Program-Sub, Cluster, Account-Sub --}}
@@ -2894,5 +2939,29 @@
                 }
             });
         }
+    </script>
+
+    <script>
+        $(document).on('change', '.assign-budget', function() {
+
+            const row = $(this).closest('.employee-row');
+
+            const isChecked = $(this).is(':checked');
+
+            // Update hidden checkbox value
+            row.find('.assign-budget-value')
+                .val(isChecked ? 1 : 0);
+
+            // Show or hide additional allowance
+            const wrapper = row.find('.additional-travel-wrapper');
+
+            if (isChecked) {
+                wrapper.removeClass('d-none');
+            } else {
+                wrapper.addClass('d-none');
+
+                row.find('.additional-travel-allowance').val(0);
+            }
+        });
     </script>
 @endsection

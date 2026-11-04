@@ -73,6 +73,21 @@
                                 </select>
                             </div>
 
+                            <div class="col-sm-2">
+                                <label for="item_name" class="form-label font-size-13 text-muted">
+                                    {{ __('forms.pro.name') }}
+                                </label>
+                                <select class="form-control" name="p_name" id="Pname">
+                                    <option value="">{{ __('forms.search...') }}</option>
+                                    @foreach ($materialEntry as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ request('p_name') == $item->p_name ? 'selected' : '' }}>
+                                            {{ $item->p_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <!-- User Entry Dropdown -->
                             <div class="col-sm-2">
                                 <label for="userEntry"
@@ -103,20 +118,7 @@
                                 </select>
                             </div>
 
-                            <div class="col-sm-2">
-                                <label for="item_name" class="form-label font-size-13 text-muted">
-                                    {{ __('forms.pro.name') }}
-                                </label>
-                                <select class="form-control" name="p_name" id="Pname">
-                                    <option value="">{{ __('forms.search...') }}</option>
-                                    @foreach ($materialEntry as $item)
-                                        <option value="{{ $item->id }}"
-                                            {{ request('p_name') == $item->p_name ? 'selected' : '' }}>
-                                            {{ $item->p_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+
 
                             {{-- <div class="col-sm-2">
                                 <label for="unit" class="form-label font-size-13 text-muted">
@@ -141,8 +143,26 @@
                                 value="{{ request('stock_number') }}" />
                         </div> --}}
 
-                        <div class="col-sm-3">
+                        {{-- <div class="col-sm-3">
                             <label class=" form-label font-size-13 text-muted"
+                                for="end_date">{{ __('menus.end_date') }}</label>
+                            <input type="text" id="end_date" name="end_date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div> --}}
+
+                        <div class="col-sm-2">
+                            {{-- <label for="cboTodo" class="form-label font-size-13 text-muted">ជ្រើសរើស
+                                    ស្ថានភាពបង់ប្រាក់</label> --}}
+                            <label class="form-label font-size-13 text-muted"
+                                for="start_date">{{ __('menus.start_date') }}</label>
+                            <input type="text" id="start_date" name="start_date" class="form-control"
+                                placeholder="{{ __('forms.select_date') }}" value="{{ request('start_date') }}"
+                                data-pristine-required-message="{{ __('messages.required') }}" />
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="form-label font-size-13 text-muted"
                                 for="end_date">{{ __('menus.end_date') }}</label>
                             <input type="text" id="end_date" name="end_date" class="form-control"
                                 placeholder="{{ __('forms.select_date') }}" value="{{ request('end_date') }}"
@@ -373,7 +393,7 @@
         });
     </script>
     <script>
-        $('#project, #companyName, #userEntry, #source, #Pname,#stockNum')
+        $('#project, #companyName, #userEntry, #source, #Pname,#stockNum, #unit, #start_date, #end_date')
             .on('change keyup',
                 function() {
                     $('#materialentry-table').DataTable().ajax.reload();

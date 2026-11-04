@@ -22,4 +22,15 @@ Route::controller(DuelReleaseController::class)->group(function () {
 
     Route::get('duel/get-by-agency/executive-unit', 'getByAgencyId')->name('duelRelease.by.get.executive');
     Route::get('duel/edit-by-agency/executive-unit', 'editByAgencyId')->name('duelRelease.by.edit.executive');
+
+    // Preview
+    Route::get(
+        '/duelRelease/{id}/file/preview',
+        'preview'
+    )->name('duelRelease.file.preview');
+    // Download
+    Route::get(
+        '/duelRelease/{id}/file/download',
+        'download'
+    )->name('duelRelease.file.download');
 });
