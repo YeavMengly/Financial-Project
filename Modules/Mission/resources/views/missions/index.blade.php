@@ -49,9 +49,9 @@
                                 {{-- <label class="visually-hidden" for="cboTodo">ជ្រើសរើស កំណត់ចំណាំ</label> --}}
                                 <select class="form-select" id="cboTodo" name="cboTodo">
                                     <option value="1">ជ្រើសរើស កំណត់ចំណាំ</option>
-                                    <option value="2" selected>1. មិនទាន់ទូទាត់ - Unpaid</option>
-                                    <option value="3">2. រក្សាទុកទូទាត់ - Pending</option>
-                                    <option value="4">3. បានទូទាត់រួចរាល់ - Paid</option>
+                                    <option value="2" selected>1. បញ្ជីមិនទាន់ទូទាត់ - Unpaid List</option>
+                                    <option value="3">2. បញ្ជីគ្រោងទូទាត់ - Pending List</option>
+                                    <option value="4">3. បញ្ជីបានទូទាត់ - Paid List</option>
                                 </select>
                             </div>
                         </div>
@@ -151,6 +151,13 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <h5 id="paymentStatusTitle" class="mb-0">
+                        Unpaid List
+                    </h5>
+                </div>
+            </div>
+            <div class="card">
                 <div class="card-body">
                     {{-- @if (hasPermission('missions.create') && $module->is_archived != 2) --}}
                     <div class="col-sm">
@@ -247,17 +254,26 @@
                                     {{-- Payment --}}
                                     <button type="button" class="btn btn-success" id="btnPaymentStatus">
                                         <i class="bx bx-money me-1"></i>
-                                        ទូទាត់
+                                        បញ្ជីទូទាត់ / ទំព័រ
+                                    </button>
+
+                                    <button type="button" class="btn btn-warning" id="btnPaymentPendingList">
+                                        <i class="bx bx-money me-1"></i>
+                                        Pending List
+                                        {{-- <span class="badge bg-warning ms-1" id="pendingMissionCount">
+                                            {{ $pendingMissionCount }}
+                                        </span> --}}
                                     </button>
 
                                     {{-- Save Payment Draft --}}
-                                    <button type="button" class="btn btn-warning" id="btnSavePaymentDraft">
+                                    <button type="button" class="btn btn-secondary" id="btnSavePaymentDraft">
                                         <i class="bx bx-save me-1"></i>
                                         រក្សាទុកទូទាត់
                                         <span class="badge bg-danger ms-1" id="pendingMissionCount">
                                             {{ $pendingMissionCount }}
                                         </span>
                                     </button>
+
                                     <button type="button" class="btn btn-dark" data-bs-toggle="modal"
                                         data-bs-target="#paymentExportHistoryModal">
                                         <i class="bx bx-history me-1"></i>
@@ -272,12 +288,43 @@
                                     </a>
                                 </div>
 
-                                {{-- <div class="d-flex flex-wrap align-items-end gap-2">
-                                    <div style="width:240px;">
-                                        <input type="number" id="define_amount" class="form-control" min="1"
-                                            placeholder="កំណត់ចំនួនទឹកប្រាក់សរុប">
+
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+
+                                    {{-- Payment Status Buttons --}}
+                                    <div class="col-auto">
+                                        <div class="btn-group flex-wrap" role="group" id="paymentStatusButtons">
+
+                                            <button type="button"
+                                                class="btn btn-outline-danger payment-status-btn active" data-value="2">
+                                                <i class="bx bx-time-five me-1"></i>
+                                                Unpaid List
+                                            </button>
+
+                                            <button type="button" class="btn btn-outline-warning payment-status-btn"
+                                                data-value="3">
+                                                <i class="bx bx-wallet me-1"></i>
+                                                Pending List
+                                            </button>
+
+                                            <button type="button" class="btn btn-outline-success payment-status-btn"
+                                                data-value="4">
+                                                <i class="bx bx-check-circle me-1"></i>
+                                                Paid List
+                                            </button>
+
+                                        </div>
+
+                                        <input type="hidden" id="cboTodo" name="cboTodo" value="4">
                                     </div>
-                                </div> --}}
+
+                                    {{-- Total Amount Input --}}
+                                    <div class="col-auto" id="defineAmountWrapper">
+                                        <input type="number" id="define_amount" class="form-control" min="1"
+                                            style="width: 240px;" placeholder="កំណត់ចំនួនទឹកប្រាក់សរុប">
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -293,9 +340,41 @@
                                     <i class="bx bx-history me-1"></i>
                                     ប្រវត្តិការទាញយកទូទាត់
                                 </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal">
+                                <button type="button" class="btn-close btn-close" data-bs-dismiss="modal">
                                 </button>
                             </div>
+
+                            {{-- <div class="row gx-3 gy-2 align-items-end mb-3">
+
+                                <div class="col-md-6">
+                                    <label for="searchPaidHistory" class="form-label">
+                                        ស្វែងរកប្រវត្តិទូទាត់
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="bx bx-search"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="searchPaidHistory"
+                                            placeholder="ស្វែងរក លេខប្រតិបត្តិ, ទឹកប្រាក់, កាលបរិច្ឆេទ...">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <button type="button" class="btn btn-outline-secondary" id="btnResetPaidHistory">
+                                        <i class="bx bx-refresh"></i>
+                                        សម្អាត
+                                    </button>
+                                </div>
+
+                                <div class="col-md-3 text-md-end">
+                                    <span class="text-muted">
+                                        សរុប: <strong id="paidHistoryCount">
+                                            {{ count($exportLogs) }}
+                                        </strong> ប្រតិបត្តិការ
+                                    </span>
+                                </div>
+
+                            </div> --}}
                             <div class="modal-body">
                                 <p class="text-muted">
                                     ប្រតិបត្តិទូទាត់ដែលបានទាញយករួចរាល់នឹងត្រូវបង្ហាញនៅក្នុងតារាងខាងក្រោម។
@@ -313,7 +392,7 @@
                                                 <th width="150">សកម្មភាព</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        {{-- <tbody>
                                             @forelse ($exportLogs as $mission)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
@@ -344,12 +423,51 @@
                                             @empty
                                                 <tr>
                                                     <td colspan="6" class="text-center text-muted py-4">
-                                                        No paid missions found.
+                                                        មិនមានប្រតិបត្តិទូទាត់ដែលបានទាញយកទេ។
+                                                    </td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody> --}}
+                                        <tbody id="paidHistoryTableBody">
+                                            @forelse ($exportLogs as $mission)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+
+                                                    <td>
+                                                        <span class="badge bg-primary">
+                                                            ទូទាត់លើកទី{{ $loop->iteration }}
+                                                        </span>
+                                                    </td>
+
+                                                    <td class="text-end">
+                                                        {{ number_format($mission->total_amount ?? 0, 2) }}
+                                                    </td>
+
+                                                    <td>
+                                                        {{ $mission->paid_at ? \Carbon\Carbon::parse($mission->paid_at)->format('d/m/Y H:i:s') : '-' }}
+                                                    </td>
+
+                                                    <td class="text-center">
+                                                        {{ number_format($mission->mission_count) }}
+                                                    </td>
+
+                                                    <td>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-success btn-export-again"
+                                                            data-paid-at="{{ $mission->paid_at }}">
+                                                            <i class="bx bx-export"></i>
+                                                            ទាញយក
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted py-4">
+                                                        មិនមានប្រតិបត្តិទូទាត់ដែលបានទាញយកទេ។
                                                     </td>
                                                 </tr>
                                             @endforelse
                                         </tbody>
-
                                     </table>
                                 </div>
                             </div>
@@ -358,6 +476,7 @@
                     </div>
                 </div>
 
+                {{-- Dynamic title --}}
 
                 {{-- @endif --}}
                 <div class="table-responsive">
@@ -489,6 +608,7 @@
             });
         });
     </script>
+
     <script>
         $('#cboTodo, #cboStatus, #cboMissionType, #cboName ,#cboPosition, #cboLevel, #cboProvince, #start_date, #end_date,#start_index, #end_index')
             .on(
@@ -505,8 +625,10 @@
                     }
                 });
     </script>
+
     {!! $dataTable->scripts() !!}
 
+    {{-- Date Pickers --}}
     <script>
         const startDateInput = document.getElementById('start_date');
         const endDateInput = document.getElementById('end_date');
@@ -561,6 +683,7 @@
         });
     </script>
 
+    {{-- Export Button --}}
     <script>
         $('#btnExport').on('click', function(e) {
             e.preventDefault();
@@ -631,12 +754,6 @@
             // ==========================================================
             // 1. Get selected mission IDs
             // ==========================================================
-
-            // let cboId = $('.mission-checkbox:checked')
-            //     .map(function() {
-            //         return $(this).val();
-            //     })
-            //     .get();
             let cboId = getSelectedMissionIds();
 
             // Remove duplicate IDs
@@ -1206,149 +1323,6 @@
         }
     </script>
 
-    {{-- <script>
-        $('#btnSearchIdRange').on('click', function() {
-            const start = $('#start_id').val();
-            const end = $('#end_id').val();
-
-            if (start && end && Number(start) > Number(end)) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Invalid ID range',
-                    text: 'Start ID must be less than or equal to End ID.'
-                });
-                return;
-            }
-
-            $('#mission-table').DataTable().ajax.reload();
-        });
-
-        $('#btnResetIdRange').on('click', function() {
-            $('#start_id').val('');
-            $('#end_id').val('');
-
-            $('#mission-table').DataTable().ajax.reload();
-        });
-    </script> --}}
-    {{-- <script>
-        $('#btnSearchIdRange').on('click', function() {
-            const start = Number($('#start_index').val());
-            const end = Number($('#end_index').val());
-
-            if (start && end && start > end) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Invalid index range',
-                    text: 'Start index must be less than or equal to End index.'
-                });
-                return;
-            }
-
-            $('#mission-table').DataTable().ajax.reload();
-        });
-
-        $('#btnResetIdRange').on('click', function() {
-            $('#start_index, #end_index').val('');
-            $('#mission-table').DataTable().ajax.reload();
-        });
-    </script> --}}
-
-    <script>
-        // Search by Mission ID range and calculate payment
-        $('#btnSearchIdRange').on('click', function() {
-            const start = $('#start_index').val();
-            const end = $('#end_index').val();
-
-            if (start && end && Number(start) > Number(end)) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Invalid index range',
-                    text: 'Start index must be less than or equal to End index.'
-                });
-                return;
-            }
-
-            // Reload the DataTable with the ID range
-            $('#mission-table').DataTable().ajax.reload();
-
-            // Calculate payment total for the ID range
-            calculatePaymentByIdRange();
-        });
-
-        // Reset ID range and reload table
-        $('#btnResetIdRange').on('click', function() {
-            $('#start_index').val('');
-            $('#end_index').val('');
-
-            $('#mission-table').DataTable().ajax.reload();
-
-            // Return to calculation using the selected checkboxes
-            calculatePaymentBySelectedIds();
-        });
-
-        // Calculate payment using the ID range
-        function calculatePaymentByIdRange() {
-            const start = $('#start_id').val();
-            const end = $('#end_id').val();
-
-            $.ajax({
-                url: "{{ route('missions.paymentTotal', $params) }}",
-                type: 'POST',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    start_id: start,
-                    end_id: end,
-                    cboId: []
-                },
-                success: function(response) {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Payment Total',
-                        html: `
-                        <p>Mission ID: ${start || 'Minimum'} - ${end || 'Maximum'}</p>
-                        <h3>${Number(response.total || 0).toLocaleString()} ៛</h3>
-                    `,
-                        confirmButtonText: 'OK'
-                    });
-                },
-                error: function(xhr) {
-                    console.error(xhr.responseText);
-
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Unable to calculate payment total.'
-                    });
-                }
-            });
-        }
-
-        // Calculate payment using selected checkboxes after reset
-        function calculatePaymentBySelectedIds() {
-            const ids = window.selectedMissionIds ?
-                Array.from(window.selectedMissionIds) : [];
-
-            if (ids.length === 0) {
-                return;
-            }
-
-            $.ajax({
-                url: "{{ route('missions.paymentTotal', $params) }}",
-                type: 'POST',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    cboId: ids
-                },
-                success: function(response) {
-                    console.log('Selected payment total:', response.total);
-                },
-                error: function(xhr) {
-                    console.error(xhr.responseText);
-                }
-            });
-        }
-    </script>
-
     <script>
         $(document).on('change', '#filterApprovalStatus', function() {
             const status = $(this).val();
@@ -1360,236 +1334,6 @@
             });
         });
     </script>
-
-    {{-- Save Payment Draft --}}
-    {{-- Save Payment Draft --}}
-    {{-- <script>
-        $(document).on('click', '#btnSavePaymentDraft', function() {
-            const $button = $(this);
-
-            // Get selected IDs and remove duplicates.
-            const cboId = [...new Set(
-                getSelectedMissionIds().map(Number)
-            )].filter(id => Number.isInteger(id) && id > 0);
-
-            if (cboId.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'បញ្ជាក់',
-                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។'
-                });
-
-                return;
-            }
-
-            Swal.fire({
-                title: 'Save Draft Payment?',
-                text: `Save ${cboId.length} selected missions for payment later?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Save Draft',
-                cancelButtonText: 'Cancel'
-            }).then(function(result) {
-                if (!result.isConfirmed) {
-                    return;
-                }
-
-                $button.prop('disabled', true);
-
-                $.ajax({
-                    url: @json(route('missions.savePaymentDraft', [
-                            'params' => $params,
-                        ])),
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        _token: $('meta[name="csrf-token"]').attr('content'),
-                        cboId: cboId
-                    },
-
-                    success: function(response) {
-                        if (!response.success) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Unable to save draft',
-                                text: response.message || 'Please try again.'
-                            });
-
-                            return;
-                        }
-
-                        const amount = Number(response.total_amount || 0)
-                            .toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            });
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Draft Saved Successfully',
-                            html: `
-                            <div class="text-start">
-                                <p>
-                                    Draft ID:
-                                    <strong>${response.draft_id}</strong>
-                                </p>
-
-                                <p>
-                                    Number of missions:
-                                    <strong>${response.mission_count}</strong>
-                                </p>
-
-                                <p>
-                                    Total payment:
-                                    <strong>${amount}</strong>
-                                </p>
-
-                                <p>
-                                    Saved date:
-                                    <strong>${response.created_at || ''}</strong>
-                                </p>
-
-                                <p class="text-success mb-0">
-                                    <i class="bx bx-check-circle"></i>
-                                    No missions have been marked as paid.
-                                </p>
-                            </div>
-                        `,
-                            confirmButtonText: 'OK'
-                        }).then(function() {
-                            // Optional: reload the page if it displays a
-                            // server-rendered list of saved drafts.
-                            // Remove this line if you do not want a reload.
-                            // location.reload();
-                        });
-
-                        // If you have a saved-drafts table on this page,
-                        // refresh that table here to show the new draft.
-                    },
-
-                    error: function(xhr) {
-                        let message = 'Failed to save payment draft.';
-
-                        if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                            message = Object.values(xhr.responseJSON.errors)
-                                .flat()
-                                .join('\n');
-                        } else if (xhr.responseJSON?.message) {
-                            message = xhr.responseJSON.message;
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: message
-                        });
-                    },
-
-                    complete: function() {
-                        $button.prop('disabled', false);
-                    }
-                });
-            });
-        });
-    </script> --}}
-    {{-- <script>
-        $(document).on('click', '#btnSavePaymentDraft', function() {
-            const selectedIds = [];
-
-            $('.mission-checkbox:checked').each(function() {
-                selectedIds.push($(this).val());
-            });
-
-            if (selectedIds.length === 0) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'មិនទាន់ជ្រើសរើសបេសកកម្ម',
-                    text: 'សូមជ្រើសរើសបេសកកម្មយ៉ាងហោចណាស់មួយ។',
-                    confirmButtonText: 'យល់ព្រម'
-                });
-                return;
-            }
-
-            const $button = $(this);
-            $button.prop('disabled', true);
-
-            $.ajax({
-                url: "{{ route('missions.paymentDraft.calculateTotal', ['params' => $params]) }}",
-                type: 'POST',
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    cboId: selectedIds
-                },
-                success: function(response) {
-                    if (!response.success) {
-                        Swal.fire(
-                            'មានបញ្ហា',
-                            'មិនអាចគណនាចំនួនទឹកប្រាក់ទូទាត់បានទេ។',
-                            'error'
-                        );
-                        return;
-                    }
-
-                    const total = Number(response.total_amount || 0);
-
-                    Swal.fire({
-                        icon: 'question',
-                        title: 'បញ្ជាក់ការរក្សាទុកសេចក្តីព្រាងទូទាត់',
-                        html: `
-                        <p>ចំនួនបេសកកម្មដែលបានជ្រើសរើស៖
-                            <strong>${response.mission_ids.length}</strong>
-                        </p>
-
-                        <p>ទឹកប្រាក់បេសកកម្មដែលមានស្រាប់៖
-                            <strong>${Number(response.existing_total).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}</strong>
-                        </p>
-
-                        <p>ទឹកប្រាក់បេសកកម្មថ្មី៖
-                            <strong>${Number(response.new_total).toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}</strong>
-                        </p>
-
-                        <hr>
-
-                        <p>ទឹកប្រាក់សរុប៖
-                            <strong>${total.toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}</strong>
-                        </p>
-                    `,
-                        showCancelButton: true,
-                        confirmButtonText: 'បញ្ជាក់ និងរក្សាទុក',
-                        cancelButtonText: 'បោះបង់'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            // ហៅមុខងារ savePaymentDraft ដើម្បីរក្សាទុកសេចក្តីព្រាងទូទាត់។
-                            Swal.fire({
-                                icon: 'info',
-                                title: 'ការគណនាបានបញ្ចប់',
-                                text: 'សូមភ្ជាប់មុខងាររក្សាទុកសេចក្តីព្រាងទូទាត់។',
-                                confirmButtonText: 'យល់ព្រម'
-                            });
-                        }
-                    });
-                },
-                error: function(xhr) {
-                    const message = xhr.responseJSON?.message ||
-                        'Failed to calculate payment total.';
-
-                    Swal.fire('Error', message, 'error');
-                },
-                complete: function() {
-                    $button.prop('disabled', false);
-                }
-            });
-        });
-    </script> --}}
 
     {{-- Save Payment Draft Button --}}
     <script>
@@ -2260,5 +2004,157 @@
 
             // Continue your existing payment process.
         });
+    </script>
+
+    {{-- <script>
+        $(document).on('click', '.payment-status-btn', function() {
+
+            let value = $(this).data('value');
+
+            // Update selected value
+            $('#cboTodo').val(value);
+
+            // Update active button
+            $('.payment-status-btn')
+                .removeClass('active btn-danger btn-warning btn-success')
+                .addClass(function() {
+                    let currentValue = $(this).data('value');
+
+                    if (currentValue == 2) return 'btn-outline-danger';
+                    if (currentValue == 3) return 'btn-outline-warning';
+
+                    return 'btn-outline-success';
+                });
+
+            // Highlight selected button
+            $(this)
+                .removeClass('btn-outline-danger btn-outline-warning btn-outline-success')
+                .addClass('active')
+                .addClass(
+                    value == 2 ? 'btn-danger' :
+                    value == 3 ? 'btn-warning' :
+                    'btn-success'
+                );
+
+            // Trigger existing filtering logic
+            $('#cboTodo').trigger('change');
+
+        });
+    </script> --}}
+
+    <script>
+        $(document).ready(function() {
+
+            const paymentStatus = {
+                2: {
+                    title: 'បញ្ជីមិនទាន់ទូទាត់ - Unpaid List',
+                    active: 'btn-danger',
+                    outline: 'btn-outline-danger'
+                },
+                3: {
+                    title: 'បញ្ជីគ្រោងទូទាត់ - Pending List',
+                    active: 'btn-warning',
+                    outline: 'btn-outline-warning'
+                },
+                4: {
+                    title: 'បញ្ជីបានទូទាត់ - Paid List',
+                    active: 'btn-success',
+                    outline: 'btn-outline-success'
+                }
+            };
+
+            function updatePaymentStatus(value) {
+
+                const status = paymentStatus[value];
+
+                if (!status) return;
+
+                // Update dropdown
+                $('#cboTodo').val(value);
+
+                // Update buttons
+                $('.payment-status-btn').each(function() {
+
+                    const btn = $(this);
+                    const btnValue = btn.data('value');
+
+                    btn.removeClass(
+                        'active btn-danger btn-warning btn-success ' +
+                        'btn-outline-danger btn-outline-warning btn-outline-success'
+                    );
+
+                    if (btnValue == value) {
+                        btn.addClass('active ' + status.active);
+                    } else {
+                        btn.addClass(paymentStatus[btnValue].outline);
+                    }
+                });
+
+                // Update title
+                $('#paymentStatusTitle').text(status.title);
+
+                // Trigger existing filtering
+                $('#cboTodo').trigger('change');
+            }
+
+            // Button click
+            $(document).on('click', '.payment-status-btn', function() {
+                updatePaymentStatus($(this).data('value'));
+            });
+
+            // Dropdown change
+            $('#cboTodo').on('change', function() {
+
+                const value = $(this).val();
+                const status = paymentStatus[value];
+
+                if (!status) return;
+
+                // Update button appearance and title without triggering change again
+                $('.payment-status-btn').each(function() {
+
+                    const btn = $(this);
+                    const btnValue = btn.data('value');
+
+                    btn.removeClass(
+                        'active btn-danger btn-warning btn-success ' +
+                        'btn-outline-danger btn-outline-warning btn-outline-success'
+                    );
+
+                    btn.addClass(
+                        btnValue == value ?
+                        'active ' + status.active :
+                        paymentStatus[btnValue].outline
+                    );
+                });
+
+                $('#paymentStatusTitle').text(status.title);
+            });
+
+            // Initialize from dropdown
+            updatePaymentStatus($('#cboTodo').val());
+
+        });
+    </script>
+
+    <script>
+        $('#cboTodo').on('change', function() {
+
+            const value = $(this).val();
+
+            toggleDefineAmount(value);
+
+            // Existing button and title updates...
+        });
+
+        function toggleDefineAmount(value) {
+
+            if (value == 4) {
+                $('#defineAmountWrapper').hide();
+                $('#define_amount').val('');
+            } else {
+                $('#defineAmountWrapper').show();
+            }
+        }
     </script>
 @endsection
