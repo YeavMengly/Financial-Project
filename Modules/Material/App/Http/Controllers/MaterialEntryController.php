@@ -77,7 +77,6 @@ class MaterialEntryController extends Controller
     public function getByProjectId(Request $request)
     {
         try {
-
             $projectId = $request->input('project_id');
 
             if (empty($projectId)) {
@@ -91,31 +90,18 @@ class MaterialEntryController extends Controller
                 return response()->json([]);
             }
 
+            // If stock_number is empty, null, or blank, show no data
+            if (empty($selectedProject->stock_number)) {
+                return response()->json([]);
+            }
+
             // Get projects with same stock number
-            // Only return projects that have all required fields
             $subProjects = Projects::query()
-                ->when(
-                    !empty($selectedProject->stock_number),
-                    function ($query) use ($selectedProject) {
-
-                        $query->where(
-                            'stock_number',
-                            $selectedProject->stock_number
-                        );
-                    },
-                    function ($query) use ($selectedProject) {
-
-                        $query->where(
-                            'id',
-                            $selectedProject->id
-                        );
-                    }
-                )
-                ->whereNotNull('program_id')
-                ->whereNotNull('program_sub_id')
-                ->whereNotNull('cluster_id')
-                ->whereNotNull('account_sub_id')
+                ->where('stock_number', $selectedProject->stock_number)
                 ->get();
+            $subProjects = $subProjects->filter(function ($item) {
+                return !empty($item->sub_project);
+            });
 
             $data = $subProjects->map(function ($item) {
 
@@ -127,11 +113,8 @@ class MaterialEntryController extends Controller
 
                 // Get program number
                 $programNo = '';
-
                 if (!empty($item->program_id)) {
-
                     $program = Program::find($item->program_id);
-
                     if ($program) {
                         $programNo = $program->no ?? '';
                     }
@@ -139,51 +122,47 @@ class MaterialEntryController extends Controller
 
                 // Get program sub number
                 $programSubNo = '';
-
                 if (!empty($item->program_sub_id)) {
-
                     $programSub = ProgramSub::find($item->program_sub_id);
-
                     if ($programSub) {
                         $programSubNo = $programSub->no ?? '';
                     }
                 }
+
+                // Get cluster number
                 $clusterNo = '';
                 if (!empty($item->cluster_id)) {
-
                     $cluster = Cluster::find($item->cluster_id);
-
-                    if ($programSub) {
+                    if ($cluster) {
                         $clusterNo = $cluster->no ?? '';
                     }
                 }
 
-                // Build dropdown label
-                $label = trim(
-                    implode(' ', array_filter([
-                        $subProjectName . ' - ',
-                        'អនុគណនី' . $accountSubId,
-                        'កម្មវិធីទី' . $programNo,
-                        'អនុកម្មវិធីទី' . $programSubNo,
-                        'ចង្កោមសកម្មភាព' . $clusterNo,
-                    ]))
-                );
+                // Build dropdown label components safely (only add if value exists)
+                $labelParts = [$subProjectName];
+
+                if (!empty($accountSubId)) {
+                    $labelParts[] = 'អនុគណនី' . $accountSubId;
+                }
+                if (!empty($programNo)) {
+                    $labelParts[] = 'កម្មវិធីទី' . $programNo;
+                }
+                if (!empty($programSubNo)) {
+                    $labelParts[] = 'អនុកម្មវិធីទី' . $programSubNo;
+                }
+                if (!empty($clusterNo)) {
+                    $labelParts[] = 'ចង្កោមសកម្មភាព' . $clusterNo;
+                }
+
+                // Join with a dash or space only when multiple parts exist
+                $label = implode(' - ', array_filter($labelParts));
 
                 return [
                     'value' => (string) $item->id,
-
-                    'label' => preg_replace(
-                        '/\s+/',
-                        ' ',
-                        $label
-                    ),
-
+                    'label' => preg_replace('/\s+/', ' ', $label),
                     'program_id' => (string) $item->program_id,
-
                     'program_sub_id' => (string) $item->program_sub_id,
-
                     'cluster_id' => (string) $item->cluster_id,
-
                     'account_sub_id' => (string) $item->account_sub_id,
                 ];
             });
@@ -192,7 +171,6 @@ class MaterialEntryController extends Controller
                 $data->values()
             );
         } catch (\Throwable $e) {
-
             Log::error('getByProjectId Error', [
                 'message' => $e->getMessage(),
                 'file' => $e->getFile(),
@@ -404,8 +382,8 @@ class MaterialEntryController extends Controller
             'p_name.*'      => 'required|string|max:255',
             'unit'          => 'required|array|min:1',
             'unit.*'        => 'required',
-            'quantity'      => 'required|array|min:1',
-            'quantity.*'    => 'required|numeric|min:1',
+            'quantity'      => 'required|array|min:0',
+            'quantity.*'    => 'required|numeric|min:0',
             'price'         => 'required|array|min:1',
             'price.*'       => 'required|numeric|min:0',
             'source'        => 'nullable|array',

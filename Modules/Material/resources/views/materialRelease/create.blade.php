@@ -153,7 +153,7 @@
                                                 </select>
                                             </td>
                                             <td class="form-group">
-                                                <input type="number" min="0" name="quantity[]"
+                                                <input type="number" min="0" name="quantity[]"  step="0.01"
                                                     class="form-control" required>
                                             </td>
                                             <td class="form-group">
