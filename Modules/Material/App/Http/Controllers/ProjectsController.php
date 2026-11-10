@@ -151,41 +151,49 @@ class ProjectsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    /**
+     * Store a newly created project in storage.
+     */
     public function store(Request $request, $params)
     {
         $ministryId = decode_params($params);
-        $ministry = Ministry::where('id', $ministryId)->firstOrFail();
+        $ministry   = Ministry::where('id', $ministryId)->firstOrFail();
 
         // | Validation Rules
         $rules = [
-            'stock_number' => ['required', 'string', 'max:255'],
-            'stock_name' => ['required', 'string', 'max:255'],
-            'company_name' => ['required', 'string', 'max:255'],
+            'stock_number'      => ['required', 'string', 'max:255'],
+            'stock_name'        => ['required', 'string', 'max:255'],
+            'company_name'      => ['required', 'string', 'max:255'],
             'warehouse_voucher' => ['required', 'string', 'max:255'],
-            'user_entry' => ['required', 'string', 'max:255'],
-            'user_receiver' => ['required', 'string', 'max:255'],
-            'date' => ['required', 'date'],
-            'title' => ['nullable', 'string', 'max:255'],
-            // Support both single file and array of files
-            'file' => ['nullable'],
-            'file.*' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
-            'note' => ['required', 'string', 'max:10000'],
-            'refer' => ['required', 'string', 'max:10000'],
+            'user_entry'        => ['required', 'string', 'max:255'],
+            'user_receiver'     => ['required', 'string', 'max:255'],
+            'date'              => ['required', 'date'],
+            'title'             => ['nullable', 'string', 'max:255'],
+            'file'              => ['nullable'],
+            'file.*'            => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+            'note'              => ['required', 'string', 'max:10000'],
+            'refer'             => ['required', 'string', 'max:10000'],
         ];
 
         // | Dynamic Table Validation
         $skipItemTable = $request->boolean('skipItemTable');
         if (!$skipItemTable) {
-            $rules['sub_pro'] = ['required', 'array', 'min:1'];
-            $rules['sub_pro.*'] = ['required', 'string', 'max:255'];
-            $rules['accountSub'] = ['nullable', 'array'];
-            $rules['accountSub.*'] = ['nullable', 'integer'];
-            $rules['program'] = ['nullable', 'array'];
-            $rules['program.*'] = ['nullable', 'integer'];
-            $rules['cboProgramSub'] = ['nullable', 'array'];
-            $rules['cboProgramSub.*'] = ['nullable', 'integer'];
-            $rules['cboCluster'] = ['nullable', 'array'];
-            $rules['cboCluster.*'] = ['nullable', 'integer'];
+            $rules['sub_pro']          = ['required', 'array', 'min:1'];
+            $rules['sub_pro.*']        = ['required', 'string', 'max:255'];
+            $rules['accountSub']       = ['nullable', 'array'];
+            $rules['accountSub.*']     = ['nullable'];
+            $rules['category']         = ['nullable', 'array'];
+            $rules['category.*']       = ['nullable', 'array'];
+            $rules['category.*.*']     = ['nullable', 'string', 'max:255'];
+            $rules['sub_category']     = ['nullable', 'array'];
+            $rules['sub_category.*']   = ['nullable', 'array'];
+            $rules['sub_category.*.*'] = ['nullable', 'string', 'max:255'];
+            $rules['program']          = ['nullable', 'array'];
+            $rules['program.*']        = ['nullable'];
+            $rules['cboProgramSub']    = ['nullable', 'array'];
+            $rules['cboProgramSub.*']  = ['nullable'];
+            $rules['cboCluster']       = ['nullable', 'array'];
+            $rules['cboCluster.*']     = ['nullable'];
         }
 
         $validated = $request->validate($rules);
@@ -198,9 +206,8 @@ class ProjectsController extends Controller
             $filePaths = [];
             if ($request->hasFile('file')) {
                 $path_store = 'uploads/project/' . date('Y-m-d');
-                $files = $request->file('file');
+                $files      = $request->file('file');
 
-                // Force into array so foreach works for both single and multiple uploads
                 if (!is_array($files)) {
                     $files = [$files];
                 }
@@ -212,54 +219,96 @@ class ProjectsController extends Controller
                 }
             }
 
-            // Store string path or JSON array depending on count
             $filePath = match (count($filePaths)) {
-                0 => null,
-                1 => $filePaths[0],
+                0       => null,
+                1       => $filePaths[0],
                 default => json_encode($filePaths),
             };
 
             // | Get Dynamic Table Data
             if (!$skipItemTable) {
-                $subProjects = $validated['sub_pro'];
-                $accountSubs = $validated['accountSub'] ?? [];
-                $programs = $validated['program'] ?? [];
-                $programSubs = $validated['cboProgramSub'] ?? [];
-                $clusters = $validated['cboCluster'] ?? [];
+                $subProjects        = $validated['sub_pro'] ?? [];
+                $accountSubs        = $validated['accountSub'] ?? [];
+                $categoriesGroup    = $validated['category'] ?? [];
+                $subCategoriesGroup = $validated['sub_category'] ?? [];
+                $programs           = $validated['program'] ?? [];
+                $programSubs        = $validated['cboProgramSub'] ?? [];
+                $clusters           = $validated['cboCluster'] ?? [];
             } else {
-                $subProjects = [null];
-                $accountSubs = [];
-                $programs = [];
-                $programSubs = [];
-                $clusters = [];
+                $subProjects        = [null];
+                $accountSubs        = [];
+                $categoriesGroup    = [];
+                $subCategoriesGroup = [];
+                $programs           = [];
+                $programSubs        = [];
+                $clusters           = [];
             }
 
-            // | Create Project Records
+            // Helper to safely extract single scalar values from inputs
+            $flattenValue = function ($val) {
+                while (is_array($val)) {
+                    $val = reset($val);
+                }
+                return (is_null($val) || trim((string)$val) === '') ? null : $val;
+            };
+
+            // Base shared data across all created rows for this submission
+            $baseRecordData = [
+                'ministry_id'       => $ministry->id,
+                'stock_number'      => $validated['stock_number'],
+                'stock_name'        => $validated['stock_name'],
+                'company_name'      => $validated['company_name'],
+                'warehouse_voucher' => $validated['warehouse_voucher'],
+                'warehouse_owner'   => 'ក្រសួងការងារ និងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
+                'user_entry'        => $validated['user_entry'],
+                'user_receiver'     => $validated['user_receiver'],
+                'date'              => $formattedDate,
+                'title'             => !empty($validated['title']) ? $validated['title'] : null,
+                'note'              => strip_tags($validated['note']),
+                'refer'             => strip_tags($validated['refer']),
+                'file'              => $filePath,
+            ];
+
+            // | Create Project Records (Separate row for each category entry)
             foreach ($subProjects as $index => $subProject) {
-                if (!$skipItemTable && (is_null($subProject) || trim($subProject) === '')) {
+                if (!$skipItemTable && (is_null($subProject) || trim((string)$subProject) === '')) {
                     continue;
                 }
 
-                Projects::create([
-                    'ministry_id' => $ministry->id,
-                    'sub_project' => !$skipItemTable ? trim($subProject) : null,
-                    'account_sub_id' => !$skipItemTable ? ($accountSubs[$index] ?? null) : null,
-                    'program_id' => !$skipItemTable ? ($programs[$index] ?? null) : null,
-                    'program_sub_id' => !$skipItemTable ? ($programSubs[$index] ?? null) : null,
-                    'cluster_id' => !$skipItemTable ? ($clusters[$index] ?? null) : null,
-                    'stock_number' => $validated['stock_number'],
-                    'stock_name' => $validated['stock_name'],
-                    'company_name' => $validated['company_name'],
-                    'warehouse_voucher' => $validated['warehouse_voucher'],
-                    'warehouse_owner' => 'ក្រសួងការងារ និងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
-                    'user_entry' => $validated['user_entry'],
-                    'user_receiver' => $validated['user_receiver'],
-                    'date' => $formattedDate,
-                    'title' => !empty($validated['title']) ? $validated['title'] : null,
-                    'note' => strip_tags($validated['note']),
-                    'refer' => strip_tags($validated['refer']),
-                    'file' => $filePath,
-                ]);
+                // Filter out empty elements for this row
+                $rowCategories = isset($categoriesGroup[$index]) && is_array($categoriesGroup[$index])
+                    ? array_values(array_filter($categoriesGroup[$index], fn($v) => !is_null($v) && trim((string)$v) !== ''))
+                    : [];
+
+                $rowSubCategories = isset($subCategoriesGroup[$index]) && is_array($subCategoriesGroup[$index])
+                    ? array_values(array_filter($subCategoriesGroup[$index], fn($v) => !is_null($v) && trim((string)$v) !== ''))
+                    : [];
+
+                $rowSpecificData = [
+                    'sub_project'    => !$skipItemTable ? trim((string)$subProject) : null,
+                    'account_sub_id' => !$skipItemTable ? $flattenValue($accountSubs[$index] ?? null) : null,
+                    'program_id'     => !$skipItemTable ? $flattenValue($programs[$index] ?? null) : null,
+                    'program_sub_id' => !$skipItemTable ? $flattenValue($programSubs[$index] ?? null) : null,
+                    'cluster_id'     => !$skipItemTable ? $flattenValue($clusters[$index] ?? null) : null,
+                ];
+
+                if (empty($rowCategories)) {
+                    // If no categories were filled, create a single row with null categories
+                    Projects::create(array_merge($baseRecordData, $rowSpecificData, [
+                        'category'     => null,
+                        'sub_category' => null,
+                    ]));
+                } else {
+                    // Loop through each category input and create a separate database row
+                    foreach ($rowCategories as $catIdx => $categoryItem) {
+                        $subCategoryItem = $rowSubCategories[$catIdx] ?? null;
+
+                        Projects::create(array_merge($baseRecordData, $rowSpecificData, [
+                            'category'     => $categoryItem,
+                            'sub_category' => $subCategoryItem,
+                        ]));
+                    }
+                }
             }
 
             DB::commit();
@@ -276,8 +325,8 @@ class ProjectsController extends Controller
 
             Log::error('Project Store Error', [
                 'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
                 'request' => $request->except(['file']),
             ]);
 
@@ -307,10 +356,27 @@ class ProjectsController extends Controller
         $module = Projects::where('id', $projectId)
             ->where('ministry_id', $ministryId)
             ->firstOrFail();
-        // Fetch all rows sharing the same stock_number for this project
+
+        // Fetch all rows sharing the same stock_number and group/merge their categories
         $items = Projects::where('ministry_id', $ministryId)
             ->where('stock_number', $module->stock_number)
-            ->get();
+            ->get()
+            ->groupBy('sub_project')
+            ->map(function ($rows) {
+                $first = $rows->first();
+                // Collect and merge all category and sub_category values across rows into single flat arrays
+                $first->category = $rows->flatMap(function ($row) {
+                    return is_array($row->category) ? $row->category : json_decode($row->category, true) ?? [$row->category];
+                })->filter()->values()->all();
+
+                $first->sub_category = $rows->flatMap(function ($row) {
+                    return is_array($row->sub_category) ? $row->sub_category : json_decode($row->sub_category, true) ?? [$row->sub_category];
+                })->filter()->values()->all();
+
+                return $first;
+            })
+            ->values();
+
         $program    = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
         $programSub = ProgramSub::where('ministry_id', $ministry->id)->get();
@@ -330,7 +396,14 @@ class ProjectsController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified project in storage without deleting any rows.
+     */
+
+    /**
+     * Update the specified project in storage.
+     */
+    /**
+     * Update the specified project in storage.
      */
     public function update(Request $request, $params, $id)
     {
@@ -346,12 +419,18 @@ class ProjectsController extends Controller
             'user_entry'        => 'required|string',
             'user_receiver'     => 'required|string',
             'date'              => 'required|date',
-            // 'title'             => 'nullable|string',
             'note'              => 'required|string',
             'refer'             => 'required|string',
             'item_id'           => 'nullable|array',
+            'item_id.*'         => 'nullable',
             'sub_pro'           => 'nullable|array',
             'sub_pro.*'         => 'nullable',
+            'category'          => 'nullable|array',
+            'category.*'        => 'nullable|array',
+            'category.*.*'      => 'nullable|string',
+            'sub_category'      => 'nullable|array',
+            'sub_category.*'    => 'nullable|array',
+            'sub_category.*.*'  => 'nullable|string',
             'accountSub'        => 'nullable|array',
             'accountSub.*'      => 'nullable',
             'program'           => 'nullable|array',
@@ -376,7 +455,7 @@ class ProjectsController extends Controller
             $noteContent  = trim(strip_tags($validated['note'])) === '' ? null : $validated['note'];
             $referContent = trim(strip_tags($validated['refer'])) === '' ? null : $validated['refer'];
 
-            // Shared header data
+            // Shared header details
             $baseData = [
                 'stock_number'      => $validated['stock_number'],
                 'stock_name'        => $validated['stock_name'],
@@ -386,12 +465,10 @@ class ProjectsController extends Controller
                 'user_entry'        => $validated['user_entry'],
                 'user_receiver'     => $validated['user_receiver'],
                 'date'              => $date,
-                // 'title'             => ($request->has('skip_title') || $request->has('skipTitleInput')) ? '' : ($validated['title'] ?? ''),
                 'note'              => $noteContent,
                 'refer'             => $referContent,
             ];
 
-            // Safe helper to flatten nested arrays from Choices.js dropdowns
             $flattenValue = function ($value) {
                 while (is_array($value)) {
                     $value = reset($value);
@@ -399,33 +476,55 @@ class ProjectsController extends Controller
                 return (is_null($value) || trim((string)$value) === '') ? null : $value;
             };
 
-            if (!$request->has('skipItemTable') && $request->has('sub_pro')) {
-                $itemIdArray     = $request->input('item_id', []);
-                $subProArray     = $request->input('sub_pro', []);
-                $accountSubArray = $request->input('accountSub', []);
-                $programArray    = $request->input('program', []);
-                $programSubArray = $request->input('cboProgramSub', []);
-                $clusterArray    = $request->input('cboCluster', []);
+            $skipItemTable = $request->boolean('skipItemTable');
 
-                // Gather all submitted IDs to know which existing rows to keep
-                $submittedIds = array_filter($itemIdArray, function ($v) {
-                    return !empty($v);
-                });
-
-                // Delete rows that were deleted from the UI table
+            if ($skipItemTable) {
+                // Remove all other child records if table is skipped
                 Projects::where('ministry_id', $ministry->id)
                     ->where('stock_number', $oldStockNumber)
-                    ->whereNotIn('id', $submittedIds)
-                    ->delete();
+                    ->where('id', '!=', $project->id)
+                    ->forceDelete(); // Use forceDelete() if using SoftDeletes, or delete()
+
+                $project->update(array_merge($baseData, [
+                    'sub_project'    => null,
+                    'category'       => null,
+                    'sub_category'   => null,
+                    'account_sub_id' => null,
+                    'program_id'     => null,
+                    'program_sub_id' => null,
+                    'cluster_id'     => null,
+                ]));
+            } else {
+                $subProArray      = $request->input('sub_pro', []);
+                $categoriesArray  = $request->input('category', []);
+                $subCategoriesArr = $request->input('sub_category', []);
+                $accountSubArray  = $request->input('accountSub', []);
+                $programArray     = $request->input('program', []);
+                $programSubArray  = $request->input('cboProgramSub', []);
+                $clusterArray     = $request->input('cboCluster', []);
+
+                // Get all active IDs linked to this stock number before updating
+                $existingDbIds = Projects::where('ministry_id', $ministry->id)
+                    ->where('stock_number', $oldStockNumber)
+                    ->pluck('id')
+                    ->toArray();
+
+                // Store array of IDs that were kept/updated or created in this submission
+                $savedIds = [];
 
                 foreach ($subProArray as $index => $subPro) {
                     $subProValue = $flattenValue($subPro);
-
                     if (is_null($subProValue)) {
                         continue;
                     }
 
-                    $rowId = $itemIdArray[$index] ?? null;
+                    $rowCategories = isset($categoriesArray[$index]) && is_array($categoriesArray[$index])
+                        ? array_values(array_filter($categoriesArray[$index], fn($val) => !is_null($val) && trim((string)$val) !== ''))
+                        : [];
+
+                    $rowSubCategories = isset($subCategoriesArr[$index]) && is_array($subCategoriesArr[$index])
+                        ? array_values(array_filter($subCategoriesArr[$index], fn($val) => !is_null($val) && trim((string)$val) !== ''))
+                        : [];
 
                     $rowDetails = [
                         'sub_project'    => $subProValue,
@@ -435,24 +534,49 @@ class ProjectsController extends Controller
                         'cluster_id'     => $flattenValue($clusterArray[$index] ?? null),
                     ];
 
-                    if (!empty($rowId)) {
-                        // Update existing row (Keeps original ID)
-                        Projects::where('id', $rowId)->update(array_merge($baseData, $rowDetails));
+                    if (empty($rowCategories)) {
+                        $targetId = array_shift($existingDbIds);
+
+                        if ($targetId && $existing = Projects::find($targetId)) {
+                            $existing->update(array_merge($baseData, $rowDetails, [
+                                'category'     => null,
+                                'sub_category' => null,
+                            ]));
+                            $savedIds[] = $existing->id;
+                        } else {
+                            $newRecord = Projects::create(array_merge($baseData, ['ministry_id' => $ministry->id], $rowDetails, [
+                                'category'     => null,
+                                'sub_category' => null,
+                            ]));
+                            $savedIds[] = $newRecord->id;
+                        }
                     } else {
-                        // Create NEW row (Assigns NEW auto-increment ID)
-                        Projects::create(array_merge($baseData, [
-                            'ministry_id' => $ministry->id,
-                        ], $rowDetails));
+                        foreach ($rowCategories as $catIdx => $categoryItem) {
+                            $subCategoryItem = $rowSubCategories[$catIdx] ?? null;
+                            $targetId        = array_shift($existingDbIds);
+
+                            if ($targetId && $existing = Projects::find($targetId)) {
+                                $existing->update(array_merge($baseData, $rowDetails, [
+                                    'category'     => $categoryItem,
+                                    'sub_category' => $subCategoryItem,
+                                ]));
+                                $savedIds[] = $existing->id;
+                            } else {
+                                $newRecord = Projects::create(array_merge($baseData, ['ministry_id' => $ministry->id], $rowDetails, [
+                                    'category'     => $categoryItem,
+                                    'sub_category' => $subCategoryItem,
+                                ]));
+                                $savedIds[] = $newRecord->id;
+                            }
+                        }
                     }
                 }
-            } else {
-                $project->update(array_merge($baseData, [
-                    'sub_project'    => null,
-                    'account_sub_id' => null,
-                    'program_id'     => null,
-                    'program_sub_id' => null,
-                    'cluster_id'     => null,
-                ]));
+
+                // Delete any remaining database IDs under this stock number that were removed in the UI
+                Projects::where('ministry_id', $ministry->id)
+                    ->where('stock_number', $oldStockNumber)
+                    ->whereNotIn('id', $savedIds)
+                    ->forceDelete(); // Use ->forceDelete() to permanently erase rows instead of soft-deleting
             }
 
             DB::commit();
@@ -466,9 +590,10 @@ class ProjectsController extends Controller
             return redirect()->route('project.index', ['params' => $params]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             Log::error('Project update error: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
             ]);
 
             flash()
@@ -480,7 +605,6 @@ class ProjectsController extends Controller
             return redirect()->back()->withInput();
         }
     }
-
     /**
      * Remove the specified resource from storage.
      */

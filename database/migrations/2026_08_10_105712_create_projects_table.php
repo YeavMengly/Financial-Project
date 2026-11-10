@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('ministry_id');
             $table->string('sub_project')->nullable();
+            $table->string('category')->nullable();
+            $table->string('sub_category')->nullable();
             $table->string('program_id')->nullable();
             $table->string('program_sub_id')->nullable();
             $table->string('cluster_id')->nullable();
