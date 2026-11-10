@@ -23,6 +23,8 @@ class Projects extends Model
     protected $fillable = [
         'ministry_id',
         'sub_project',
+        'category',
+        'sub_category',
         'program_id',
         'program_sub_id',
         'cluster_id',
