@@ -435,7 +435,7 @@ class MaterialReleaseController extends Controller
             'unit'          => 'required|array|min:1',
             'unit.*'        => 'required|integer',
 
-            'quantity'      => 'required|array|min:1',
+            'quantity'      => 'required|array',
             'quantity.*'    => 'required|numeric|min:0',
 
             'price'         => 'required|array|min:1',
@@ -997,8 +997,8 @@ class MaterialReleaseController extends Controller
             'unit'          => 'required|array|min:1',
             'unit.*'        => 'required',
 
-            'quantity'      => 'required|array|min:1',
-            'quantity.*'    => 'required|numeric|min:0.01',
+            'quantity'      => 'required|array|min:0',
+            'quantity.*'    => 'required|numeric|min:0',
 
             'price'         => 'required|array|min:1',
             'price.*'       => 'required|numeric|min:0',

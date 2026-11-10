@@ -32,7 +32,7 @@ class MaterialReleaseDataTable extends DataTable
                 return number_format($row->total_price ?? 0) . ' ៛';
             })
             ->editColumn('quantity_request', function ($row) {
-                return number_format($row->quantity_request ?? 0);
+                return number_format((float)($row->quantity_request ?? 0),2);
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';
@@ -99,11 +99,11 @@ class MaterialReleaseDataTable extends DataTable
             ->leftJoin('projects as sub_project_rel', 'material_releases.project_sub_id', '=', 'sub_project_rel.id')
 
             // 3. Join Duel Entries table cleanly via project_id and item_name
-            ->leftJoin('material_entries', function ($join) use ($id) {
-                $join->on('material_entries.project_id', '=', 'material_releases.project_id')
-                    ->on('material_entries.p_name', '=', 'material_releases.p_name')
-                    ->where('material_entries.ministry_id', '=', $id);
-            })
+            // ->leftJoin('material_entries', function ($join) use ($id) {
+            //     $join->on('material_entries.project_id', '=', 'material_releases.project_id')
+            //         ->on('material_entries.p_name', '=', 'material_releases.p_name')
+            //         ->where('material_entries.ministry_id', '=', $id);
+            // })
 
             ->select([
                 'material_releases.id',
