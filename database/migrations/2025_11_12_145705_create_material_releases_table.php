@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('unit');
             $table->integer('quantity_total');
-            $table->integer('quantity_request');
+            $table->string('quantity_request');
             $table->decimal('price', 15, 0);
             $table->decimal('total_price', 15, 0);
             $table->string('source')->nullable();

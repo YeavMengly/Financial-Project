@@ -132,7 +132,7 @@
                                                 </select>
                                             </td>
                                             <td class="form-group">
-                                                <input type="number" min="0" name="quantity[]" class="form-control" value="{{ old('quantity.'.$index, $item->qty ?? $item->quantity) }}" required>
+                                                <input type="number" min="0" name="quantity[]" class="form-control" step="0.01" value="{{ old('quantity.'.$index, $item->qty ?? $item->quantity) }}" required>
                                             </td>
                                             <td class="form-group">
                                                 <input type="number" min="0" step="any" name="price[]" class="form-control" value="{{ old('price.'.$index, $item->price) }}" required>
