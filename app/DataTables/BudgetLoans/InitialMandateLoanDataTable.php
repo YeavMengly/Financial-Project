@@ -83,7 +83,7 @@ class InitialMandateLoanDataTable extends DataTable
             'ministries.deleted_at'
         ]);
 
-        return $model->orderBy('ministries.id', 'DESC');
+        return $model->orderBy('ministries.id', 'asc');
     }
     /**
      * Optional method if you want to use the html builder.

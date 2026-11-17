@@ -58,7 +58,7 @@ class ChapterDataTable extends DataTable
         if ($request->filled('cboType')) {
             $model->where('types.code', $request->cboType);
         }
-        $model->leftJoin('types', 'chapters.type_id', '=', 'types.code');
+        $model->leftJoin('types', 'chapters.type_id', '=', 'types.id');
         $model->leftJoin('ministries', 'chapters.ministry_id', '=', 'ministries.id');
 
         $model->withTrashed();
