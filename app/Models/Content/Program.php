@@ -36,6 +36,10 @@ class Program extends Model
     {
         return $this->belongsTo(Ministry::class, 'ministry_id', 'id');
     }
+    public function programSubs()
+    {
+        return $this->hasMany(ProgramSub::class, 'program_id', 'id');
+    }
 
 
     /**

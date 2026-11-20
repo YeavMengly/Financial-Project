@@ -61,6 +61,25 @@ class MaterialReleaseController extends Controller
         ]);
     }
 
+    /**
+     * Helper to scope Projects rows by selected project & optional sub-project
+     */
+    private function scopeProjectRows($projectId, $subProjectId = null)
+    {
+        $selectedProject = Projects::find($projectId);
+        if (!$selectedProject) {
+            return Projects::whereRaw('1 = 0');
+        }
+
+        return Projects::query()
+            ->when(
+                !empty($selectedProject->stock_number),
+                fn($q) => $q->where('stock_number', $selectedProject->stock_number),
+                fn($q) => $q->where('id', $selectedProject->id)
+            )
+            ->when(!empty($subProjectId), fn($q) => $q->where('id', $subProjectId));
+    }
+
     public function getByProjectSubId(Request $request)
     {
         try {
@@ -70,7 +89,6 @@ class MaterialReleaseController extends Controller
             }
 
             $selectedProject = Projects::find($projectId);
-
             if (!$selectedProject) {
                 return response()->json([]);
             }
@@ -78,12 +96,8 @@ class MaterialReleaseController extends Controller
             $subProjects = Projects::query()
                 ->when(
                     !empty($selectedProject->stock_number),
-                    function ($query) use ($selectedProject) {
-                        $query->where('stock_number', $selectedProject->stock_number);
-                    },
-                    function ($query) use ($selectedProject) {
-                        $query->where('id', $selectedProject->id);
-                    }
+                    fn($query) => $query->where('stock_number', $selectedProject->stock_number),
+                    fn($query) => $query->where('id', $selectedProject->id)
                 )
                 ->whereNotNull('program_id')
                 ->whereNotNull('program_sub_id')
@@ -97,29 +111,9 @@ class MaterialReleaseController extends Controller
                     : 'Sub-project #' . $item->id;
                 $accountSubId = $item->account_sub_id ?? '';
 
-                $programNo = '';
-                if (!empty($item->program_id)) {
-                    $program = Program::find($item->program_id);
-                    if ($program) {
-                        $programNo = $program->no ?? '';
-                    }
-                }
-
-                $programSubNo = '';
-                if (!empty($item->program_sub_id)) {
-                    $programSub = ProgramSub::find($item->program_sub_id);
-                    if ($programSub) {
-                        $programSubNo = $programSub->no ?? '';
-                    }
-                }
-
-                $clusterNo = '';
-                if (!empty($item->cluster_id)) {
-                    $cluster = Cluster::find($item->cluster_id);
-                    if ($cluster) {
-                        $clusterNo = $cluster->no ?? '';
-                    }
-                }
+                $programNo    = $item->program_id ? (Program::find($item->program_id)->no ?? '') : '';
+                $programSubNo = $item->program_sub_id ? (ProgramSub::find($item->program_sub_id)->no ?? '') : '';
+                $clusterNo    = $item->cluster_id ? (Cluster::find($item->cluster_id)->no ?? '') : '';
 
                 $label = trim(
                     implode(' ', array_filter([
@@ -132,30 +126,99 @@ class MaterialReleaseController extends Controller
                 );
 
                 return [
-                    'value' => (string) $item->id,
-                    'label' => preg_replace('/\s+/', ' ', $label),
-                    'program_id' => (string) $item->program_id,
+                    'value'          => (string) $item->id,
+                    'label'          => preg_replace('/\s+/', ' ', $label),
+                    'program_id'     => (string) $item->program_id,
                     'program_sub_id' => (string) $item->program_sub_id,
-                    'cluster_id' => (string) $item->cluster_id,
+                    'cluster_id'     => (string) $item->cluster_id,
                     'account_sub_id' => (string) $item->account_sub_id,
+                    'category'       => (string) ($item->category ?? ''),
+                    'sub_category'   => (string) ($item->sub_category ?? ''),
+                    'detail'         => (string) ($item->detail ?? ''),
                 ];
             });
 
             return response()->json($data->values());
         } catch (\Throwable $e) {
-            Log::error('getByProjectId Error', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
+            Log::error('getByProjectSubId Error', [
+                'message'    => $e->getMessage(),
+                'file'       => $e->getFile(),
+                'line'       => $e->getLine(),
                 'project_id' => $request->input('project_id'),
             ]);
 
             return response()->json([
-                'error' => true,
+                'error'   => true,
                 'message' => $e->getMessage(),
-                'line' => $e->getLine(),
+                'line'    => $e->getLine(),
             ], 500);
         }
+    }
+
+    public function getCategory(Request $request)
+    {
+        $projectId    = $request->input('project_id');
+        $subProjectId = $request->input('sub_project_id');
+
+        if (empty($projectId)) {
+            return response()->json([]);
+        }
+
+        $categories = $this->scopeProjectRows($projectId, $subProjectId)
+            ->whereNotNull('category')
+            ->where('category', '!=', '')
+            ->distinct()
+            ->pluck('category')
+            ->map(fn($val) => ['value' => (string) $val, 'label' => (string) $val])
+            ->values();
+
+        return response()->json($categories);
+    }
+
+    public function getSubCategory(Request $request)
+    {
+        $projectId    = $request->input('project_id');
+        $subProjectId = $request->input('sub_project_id');
+        $category     = $request->input('category_id');
+
+        if (empty($projectId)) {
+            return response()->json([]);
+        }
+
+        $subCategories = $this->scopeProjectRows($projectId, $subProjectId)
+            ->when(!empty($category), fn($q) => $q->where('category', $category))
+            ->whereNotNull('sub_category')
+            ->where('sub_category', '!=', '')
+            ->distinct()
+            ->pluck('sub_category')
+            ->map(fn($val) => ['value' => (string) $val, 'label' => (string) $val])
+            ->values();
+
+        return response()->json($subCategories);
+    }
+
+    public function getDetial(Request $request)
+    {
+        $projectId    = $request->input('project_id');
+        $subProjectId = $request->input('sub_project_id');
+        $category     = $request->input('category_id');
+        $subCategory  = $request->input('sub_category_id');
+
+        if (empty($projectId)) {
+            return response()->json([]);
+        }
+
+        $details = $this->scopeProjectRows($projectId, $subProjectId)
+            ->when(!empty($category), fn($q) => $q->where('category', $category))
+            ->when(!empty($subCategory), fn($q) => $q->where('sub_category', $subCategory))
+            ->whereNotNull('detail')
+            ->where('detail', '!=', '')
+            ->distinct()
+            ->pluck('detail')
+            ->map(fn($val) => ['value' => (string) $val, 'label' => (string) $val])
+            ->values();
+
+        return response()->json($details);
     }
 
     // public function getByItemId(Request $request)
@@ -221,68 +284,76 @@ class MaterialReleaseController extends Controller
                 return response()->json([]);
             }
 
-            $query = MaterialEntry::query();
-
-            if ($subProjectId) {
-                $query->where('project_sub_id', $subProjectId);
-            } elseif ($projectId) {
-                $query->where('project_id', $projectId);
-            }
-
-            // Get entry IDs for the current edit batch to preserve them during updates
             $existingEntryIds = [];
             $excludedReleaseIds = [];
 
             if ($releaseId) {
                 $release = MaterialRelease::find($releaseId);
                 if ($release) {
-                    $excludedReleaseIds = MaterialRelease::where('ministry_id', $release->ministry_id)
+                    $excludedReleaseIds = MaterialRelease::query()
+                        ->where('ministry_id', $release->ministry_id)
                         ->where('project_id', $release->project_id)
                         ->where('project_sub_id', $release->project_sub_id)
                         ->where('date_release', $release->date_release)
                         ->pluck('id')
-                        ->toArray();
+                        ->all();
 
-                    $existingEntryIds = MaterialRelease::whereIn('id', $excludedReleaseIds)
+                    $existingEntryIds = MaterialRelease::query()
+                        ->whereIn('id', $excludedReleaseIds)
+                        ->whereNotNull('material_entry_id')
                         ->pluck('material_entry_id')
-                        ->filter()
-                        ->toArray();
+                        ->unique()
+                        ->all();
                 }
             }
 
-            // Filter material entries that still have remaining request quantity
-            $query->where(function ($q) use ($existingEntryIds) {
-                $q->whereRaw('qty > (select coalesce(sum(quantity_request), 0) from material_releases where material_releases.material_entry_id = material_entries.id)');
+            if ($subProjectId) {
+                $subEntries = MaterialEntry::query()
+                    ->where('project_sub_id', $subProjectId)
+                    ->get();
 
-                if (!empty($existingEntryIds)) {
-                    $q->orWhereIn('id', $existingEntryIds);
+                // Fallback to project-level entries if sub-project has none directly attached
+                if ($subEntries->isEmpty() && $projectId) {
+                    $materials = MaterialEntry::query()
+                        ->where('project_id', $projectId)
+                        ->get();
+                } else {
+                    $materials = $subEntries;
                 }
-            });
+            } else {
+                $materials = MaterialEntry::query()
+                    ->where('project_id', $projectId)
+                    ->get();
+            }
 
-            // Execute query to get entries
-            $materials = $query->get();
+            if ($materials->isEmpty()) {
+                return response()->json([]);
+            }
 
-            // Filter out out-of-stock items dynamically
-            $filteredMaterials = $materials->filter(function ($entry) use ($excludedReleaseIds) {
-                $otherReleasesTotal = MaterialRelease::where('p_name', $entry->p_name)
-                    ->where('ministry_id', $entry->ministry_id)
-                    ->when(!empty($excludedReleaseIds), function ($q) use ($excludedReleaseIds) {
-                        $q->whereNotIn('id', $excludedReleaseIds);
-                    })
-                    ->sum('quantity_total');
+            $releasedByEntry = MaterialRelease::query()
+                ->selectRaw('material_entry_id, COALESCE(SUM(quantity_request), 0) as total_released')
+                ->whereIn('material_entry_id', $materials->pluck('id'))
+                ->when(!empty($excludedReleaseIds), fn($q) => $q->whereNotIn('id', $excludedReleaseIds))
+                ->groupBy('material_entry_id')
+                ->pluck('total_released', 'material_entry_id');
 
-                $remainingStock = $entry->qty - $otherReleasesTotal;
+            $filteredMaterials = $materials->filter(function ($entry) use ($releasedByEntry, $existingEntryIds) {
+                if (in_array($entry->id, $existingEntryIds, true)) {
+                    return true;
+                }
 
-                return $remainingStock > 0;
+                $released = (float) ($releasedByEntry[$entry->id] ?? 0);
+                return ((float) $entry->qty - $released) > 0;
             });
 
             return response()->json($filteredMaterials->values());
         } catch (\Throwable $e) {
             Log::error('getByItemId Error: ' . $e->getMessage(), [
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
             ]);
-            return response()->json(['error' => $e->getMessage()], 500);
+
+            return response()->json(['error' => 'Failed to load materials.'], 500);
         }
     }
 
@@ -293,8 +364,7 @@ class MaterialReleaseController extends Controller
     {
         $id       = decode_params($params);
         $ministry = Ministry::where('id', $id)->firstOrFail();
-        $unitType = UnitType::where('name', '!=', 'លីត្រ')->get();
-
+        $unitType = UnitType::all();
         $project = Projects::where('ministry_id', $ministry->id)
             ->get()
             ->unique('stock_number');
@@ -425,30 +495,33 @@ class MaterialReleaseController extends Controller
     public function store(Request $request, $params)
     {
         $validated = $request->validate([
-            'cboProject'    => 'required|integer',
-            'cboSubProject' => 'nullable',
-            'agency'        => 'required|integer',
-            'date_release'  => 'required|date',
-            'p_name'        => 'required|array|min:1',
-            'p_name.*'      => 'required|string|max:255',
+            'cboProject'     => 'required|integer',
+            'cboSubProject'  => 'nullable',
+            'cboCategory'    => 'nullable|string|max:255',
+            'cboSubCategory' => 'nullable|string|max:255',
+            'cboDetail'      => 'nullable|string|max:255',
+            'agency'         => 'required|integer',
+            'date_release'   => 'required|date',
+            'p_name'         => 'required|array|min:1',
+            'p_name.*'       => 'required|string|max:255',
 
-            'unit'          => 'required|array|min:1',
-            'unit.*'        => 'required|integer',
+            'unit'           => 'required|array|min:1',
+            'unit.*'         => 'required|string|max:255',
 
-            'quantity'      => 'required|array',
-            'quantity.*'    => 'required|numeric|min:0',
+            'quantity'       => 'required|array',
+            'quantity.*'     => 'required|numeric|min:0',
 
-            'price'         => 'required|array|min:1',
-            'price.*'       => 'required|numeric|min:0',
+            'price'          => 'required|array|min:1',
+            'price.*'        => 'required|numeric|min:0',
 
-            'source'        => 'nullable|array',
-            'source.*'      => 'nullable|string|max:255',
+            'source'         => 'nullable|array',
+            'source.*'       => 'nullable|string|max:255',
 
-            'refer'         => 'nullable|array',
-            'refer.*'       => 'nullable|string|max:255',
+            'refer'          => 'nullable|array',
+            'refer.*'        => 'nullable|string|max:255',
 
-            'p_year'        => 'nullable|array',
-            'p_year.*'      => 'nullable|string|max:255',
+            'p_year'         => 'nullable|array',
+            'p_year.*'       => 'nullable|string|max:255',
         ]);
 
         $id = decode_params($params);
@@ -456,7 +529,6 @@ class MaterialReleaseController extends Controller
         DB::beginTransaction();
 
         try {
-
             $ministry = Ministry::where('id', $id)->firstOrFail();
 
             $project = Projects::where('id', $validated['cboProject'])
@@ -466,82 +538,34 @@ class MaterialReleaseController extends Controller
                 $validated['date_release']
             )->format('Y-m-d');
 
-            $unitIds = array_filter($validated['unit']);
-
-            $units = UnitType::whereIn('id', $unitIds)
-                ->pluck('name', 'id');
+            // Resolve related project IDs when stock_number groups multiple sub-projects
+            $relatedProjectIds = !empty($project->stock_number)
+                ? Projects::where('stock_number', $project->stock_number)->pluck('id')->toArray()
+                : [$project->id];
 
             foreach ($validated['p_name'] as $index => $materialEntryId) {
-
-                /*
-            |--------------------------------------------------------------------------
-            | 1. Find MaterialEntry
-            |--------------------------------------------------------------------------
-            */
-
                 $materialEntry = MaterialEntry::where('id', $materialEntryId)
                     ->where('ministry_id', $ministry->id)
-                    ->where('project_id', $project->id)
+                    ->whereIn('project_id', $relatedProjectIds)
                     ->first();
 
                 if (!$materialEntry) {
-                    throw new \Exception(
-                        'មិនអាចរកឃើញសម្ភារៈក្នុងស្តុកទេ!'
-                    );
+                    throw new \Exception('មិនអាចរកឃើញសម្ភារៈក្នុងស្តុកទេ!');
                 }
 
-                $pNameValue = $materialEntry->p_name;
-
-                /*
-            |--------------------------------------------------------------------------
-            | 2. Original stock quantity
-            |--------------------------------------------------------------------------
-            */
-
+                $pNameValue    = $materialEntry->p_name;
                 $stockQuantity = (float) $materialEntry->qty;
 
-                /*
-            |--------------------------------------------------------------------------
-            | 3. Get already released quantity
-            |--------------------------------------------------------------------------
-            */
-
-                $alreadyReleased = MaterialRelease::where(
-                    'ministry_id',
-                    $ministry->id
-                )
-                    ->where('project_id', $project->id)
+                $alreadyReleased = MaterialRelease::where('ministry_id', $ministry->id)
+                    ->whereIn('project_id', $relatedProjectIds)
                     ->where('p_name', $pNameValue)
                     ->sum('quantity_request');
 
-                $alreadyReleased = (float) $alreadyReleased;
-
-                /*
-            |--------------------------------------------------------------------------
-            | 4. New request quantity
-            |--------------------------------------------------------------------------
-            */
-
-                $quantity = (float) $validated['quantity'][$index];
-
-                /*
-            |--------------------------------------------------------------------------
-            | 5. Calculate total requested
-            |--------------------------------------------------------------------------
-            */
-
-                $totalRequested = $alreadyReleased + $quantity;
-
-                /*
-            |--------------------------------------------------------------------------
-            | 6. Check stock
-            |--------------------------------------------------------------------------
-            */
+                $quantity       = (float) $validated['quantity'][$index];
+                $totalRequested = (float) $alreadyReleased + $quantity;
 
                 if ($totalRequested > $stockQuantity) {
-
-                    $remaining = $stockQuantity - $alreadyReleased;
-
+                    $remaining = $stockQuantity - (float) $alreadyReleased;
                     throw new \Exception(
                         "ស្តុកមិនគ្រប់សម្រាប់ {$pNameValue}! " .
                             "ចំនួនសរុបមាន: {$stockQuantity}, " .
@@ -551,76 +575,49 @@ class MaterialReleaseController extends Controller
                     );
                 }
 
-                /*
-            |--------------------------------------------------------------------------
-            | 7. Price
-            |--------------------------------------------------------------------------
-            */
-
-                $price = (float) (
-                    $validated['price'][$index] ?? 0
-                );
-
+                $price       = (float) ($validated['price'][$index] ?? 0);
                 $totalAmount = $quantity * $price;
+                $unitValue   = $validated['unit'][$index] ?? '';
 
-                $unitId = $validated['unit'][$index] ?? null;
-
-                /*
-            |--------------------------------------------------------------------------
-            | 8. Create MaterialRelease
-            |--------------------------------------------------------------------------
-            */
+                // Use selected dropdown values or fall back to MaterialEntry values if skipped
+                $categoryValue    = !empty($validated['cboCategory']) ? $validated['cboCategory'] : ($materialEntry->category_id ?? null);
+                $subCategoryValue = !empty($validated['cboSubCategory']) ? $validated['cboSubCategory'] : ($materialEntry->category_sub_id ?? null);
+                $detailValue      = !empty($validated['cboDetail']) ? $validated['cboDetail'] : ($materialEntry->detail ?? null);
 
                 MaterialRelease::create([
-                    'ministry_id'      => $ministry->id,
-                    'project_id'       => $project->id,
+                    'ministry_id'       => $ministry->id,
+                    'project_id'        => $materialEntry->project_id,
                     'material_entry_id' => $materialEntry->id,
-
-                    'project_sub_id'   => !empty($validated['cboSubProject'])
-                        ? $validated['cboSubProject']
-                        : 0,
-
-                    'agency_id'        => $validated['agency'],
-
-                    'p_name'           => $pNameValue,
-
-                    'p_year'           => $validated['p_year'][$index] ?? '',
-
-                    'title'            => $request->input('title', ''),
-
-                    'unit'             => $units[$unitId] ?? '',
-
-                    'quantity_total'   => $stockQuantity,
-
-                    'quantity_request' => $quantity,
-
-                    'price'            => $price,
-
-                    'total_price'      => $totalAmount,
-
-                    'source'           => $validated['source'][$index] ?? null,
-
-                    'refer'            => $project->refer ?? null,
-
-                    'date_release'    => $dateRelease,
+                    'project_sub_id'    => !empty($validated['cboSubProject']) ? $validated['cboSubProject'] : ($materialEntry->project_sub_id ?? 0),
+                    'category_id'       => $categoryValue,
+                    'category_sub_id'   => $subCategoryValue,
+                    'detail'            => $detailValue,
+                    'agency_id'         => $validated['agency'],
+                    'p_name'            => $pNameValue,
+                    'p_year'            => $validated['p_year'][$index] ?? '',
+                    'title'             => $request->input('title', ''),
+                    'unit'              => $unitValue,
+                    'quantity_total'    => $stockQuantity,
+                    'quantity_request'  => $quantity,
+                    'price'             => $price,
+                    'total_price'       => $totalAmount,
+                    'source'            => $validated['source'][$index] ?? null,
+                    'refer'             => $project->refer ?? null,
+                    'date_release'      => $dateRelease,
                 ]);
             }
 
             /*
         |--------------------------------------------------------------------------
-        | 9. Recalculate ledger after ALL releases are inserted
+        | Recalculate ledger after ALL releases are inserted
         |--------------------------------------------------------------------------
         */
-
-            foreach ($validated['p_name'] as $index => $materialEntryId) {
-
-                $materialEntry = MaterialEntry::findOrFail(
-                    $materialEntryId
-                );
+            foreach ($validated['p_name'] as $materialEntryId) {
+                $materialEntry = MaterialEntry::findOrFail($materialEntryId);
 
                 $this->recalculateLedger(
                     $ministry->id,
-                    $project->id,
+                    $materialEntry->project_id,
                     $materialEntry->p_name
                 );
             }
@@ -630,25 +627,16 @@ class MaterialReleaseController extends Controller
             flash()
                 ->translate('en')
                 ->option('timeout', 2000)
-                ->success(
-                    'success_msg',
-                    'successful'
-                )
+                ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route(
-                'materialRelease.index',
-                $params
-            );
+            return redirect()->route('materialRelease.index', $params);
         } catch (\Throwable $e) {
-
             DB::rollBack();
 
             Log::error(
                 'Material Release Store Error: ' . $e->getMessage(),
-                [
-                    'trace' => $e->getTraceAsString()
-                ]
+                ['trace' => $e->getTraceAsString()]
             );
 
             flash()
@@ -796,7 +784,7 @@ class MaterialReleaseController extends Controller
         $releaseId  = is_numeric($id) ? $id : decode_params($id);
 
         $ministry  = Ministry::where('id', $ministryId)->firstOrFail();
-        $unitType  = UnitType::where('name', '!=', 'លីត្រ')->get();
+        $unitType  = UnitType::all();
 
         $project = Projects::where('ministry_id', $ministry->id)
             ->get()
@@ -986,28 +974,31 @@ class MaterialReleaseController extends Controller
         $realId     = is_numeric($id) ? $id : decode_params($id);
 
         $validated = $request->validate([
-            'cboProject'    => 'required|integer',
-            'cboSubProject' => 'nullable',
-            'agency'        => 'required|integer',
-            'date_release'  => 'required|date',
+            'cboProject'     => 'required|integer',
+            'cboSubProject'  => 'nullable',
+            'cboCategory'    => 'nullable',
+            'cboSubCategory' => 'nullable',
+            'cboDetail'      => 'nullable',
+            'agency'         => 'required|integer',
+            'date_release'   => 'required|date',
 
-            'p_name'        => 'required|array|min:1',
-            'p_name.*'      => 'required',
+            'p_name'         => 'required|array|min:1',
+            'p_name.*'       => 'required',
 
-            'unit'          => 'required|array|min:1',
-            'unit.*'        => 'required',
+            'unit'           => 'required|array|min:1',
+            'unit.*'         => 'required',
 
-            'quantity'      => 'required|array|min:0',
-            'quantity.*'    => 'required|numeric|min:0',
+            'quantity'       => 'required|array|min:0',
+            'quantity.*'     => 'required|numeric|min:0',
 
-            'price'         => 'required|array|min:1',
-            'price.*'       => 'required|numeric|min:0',
+            'price'          => 'required|array|min:1',
+            'price.*'        => 'required|numeric|min:0',
 
-            'source'        => 'nullable|array',
-            'p_year'        => 'nullable|array',
+            'source'         => 'nullable|array',
+            'p_year'         => 'nullable|array',
 
-            'title'         => 'nullable|array',
-            'title.*'       => 'nullable|string',
+            'title'          => 'nullable|array',
+            'title.*'        => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -1015,35 +1006,35 @@ class MaterialReleaseController extends Controller
         try {
 
             /*
-        |--------------------------------------------------------------------------
-        | 1. Get Ministry
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 1. Get Ministry
+    |--------------------------------------------------------------------------
+    */
             $ministry = Ministry::where('id', $ministryId)
                 ->firstOrFail();
 
             /*
-        |--------------------------------------------------------------------------
-        | 2. Get Project
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 2. Get Project
+    |--------------------------------------------------------------------------
+    */
             $project = Projects::where('id', $validated['cboProject'])
                 ->firstOrFail();
 
             /*
-        |--------------------------------------------------------------------------
-        | 3. Get existing release
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 3. Get existing release
+    |--------------------------------------------------------------------------
+    */
             $release = MaterialRelease::where('id', $realId)
                 ->where('ministry_id', $ministry->id)
                 ->firstOrFail();
 
             /*
-        |--------------------------------------------------------------------------
-        | 4. Get form arrays
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 4. Get form arrays
+    |--------------------------------------------------------------------------
+    */
             $names      = array_values($request->input('p_name', []));
             $units      = array_values($request->input('unit', []));
             $quantities = array_values($request->input('quantity', []));
@@ -1053,22 +1044,22 @@ class MaterialReleaseController extends Controller
             $titles     = array_values($request->input('title', []));
 
             /*
-        |--------------------------------------------------------------------------
-        | 5. Get Unit Types
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 5. Get Unit Types
+    |--------------------------------------------------------------------------
+    */
             $unitTypes = UnitType::all()->keyBy('id');
 
             /*
-        |--------------------------------------------------------------------------
-        | 6. Get ONLY the rows belonging to this release group
-        |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        | Don't use only project/date because another release may have
-        | the same project and date.
-        |
-        */
+    |--------------------------------------------------------------------------
+    | 6. Get ONLY the rows belonging to this release group
+    |--------------------------------------------------------------------------
+    |
+    | IMPORTANT:
+    | Don't use only project/date because another release may have
+    | the same project and date.
+    |
+    */
             $existingItems = MaterialRelease::where('ministry_id', $ministry->id)
                 ->where('project_id', $release->project_id)
                 ->where('project_sub_id', $release->project_sub_id)
@@ -1078,13 +1069,13 @@ class MaterialReleaseController extends Controller
                 ->get();
 
             /*
-        |--------------------------------------------------------------------------
-        | 7. Restore OLD stock
-        |--------------------------------------------------------------------------
-        |
-        | Use material_entry_id instead of p_name.
-        |
-        */
+    |--------------------------------------------------------------------------
+    | 7. Restore OLD stock
+    |--------------------------------------------------------------------------
+    |
+    | Use material_entry_id instead of p_name.
+    |
+    */
             foreach ($existingItems as $oldItem) {
 
                 if ($oldItem->material_entry_id) {
@@ -1109,10 +1100,10 @@ class MaterialReleaseController extends Controller
             }
 
             /*
-        |--------------------------------------------------------------------------
-        | 8. Process NEW rows
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 8. Process NEW rows
+    |--------------------------------------------------------------------------
+    */
             foreach ($names as $index => $itemVal) {
 
                 $itemStr = (string) $itemVal;
@@ -1128,10 +1119,10 @@ class MaterialReleaseController extends Controller
                 $p = (float) ($prices[$index] ?? 0);
 
                 /*
-            |--------------------------------------------------------------------------
-            | Find MaterialEntry
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Find MaterialEntry
+        |--------------------------------------------------------------------------
+        */
                 $materialEntry = null;
 
                 if (is_numeric($itemStr)) {
@@ -1146,10 +1137,10 @@ class MaterialReleaseController extends Controller
                 }
 
                 /*
-            |--------------------------------------------------------------------------
-            | MaterialEntry is required
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | MaterialEntry is required
+        |--------------------------------------------------------------------------
+        */
                 if (!$materialEntry) {
 
                     throw new \Exception(
@@ -1158,10 +1149,10 @@ class MaterialReleaseController extends Controller
                 }
 
                 /*
-            |--------------------------------------------------------------------------
-            | Check stock
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Check stock
+        |--------------------------------------------------------------------------
+        */
                 if ((float) $materialEntry->qty < $q) {
 
                     throw new \Exception(
@@ -1171,17 +1162,17 @@ class MaterialReleaseController extends Controller
                 }
 
                 /*
-            |--------------------------------------------------------------------------
-            | Deduct NEW quantity
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Deduct NEW quantity
+        |--------------------------------------------------------------------------
+        */
                 $materialEntry->decrement('qty', $q);
 
                 /*
-            |--------------------------------------------------------------------------
-            | Recalculate MaterialEntry total
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Recalculate MaterialEntry total
+        |--------------------------------------------------------------------------
+        */
                 $materialEntry->update([
                     'total_price' =>
                     (float) $materialEntry->qty *
@@ -1189,10 +1180,10 @@ class MaterialReleaseController extends Controller
                 ]);
 
                 /*
-            |--------------------------------------------------------------------------
-            | Values
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Values
+        |--------------------------------------------------------------------------
+        */
                 $pNameValue = $materialEntry->p_name;
 
                 $titleValue = $titles[$index]
@@ -1201,20 +1192,32 @@ class MaterialReleaseController extends Controller
                 $projectSubId = $request->input('cboSubProject');
 
                 /*
-            |--------------------------------------------------------------------------
-            | IMPORTANT:
-            | Schema says project_sub_id is STRING
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | IMPORTANT:
+        | Schema says project_sub_id is STRING
+        |--------------------------------------------------------------------------
+        */
                 $projectSubId = $projectSubId !== null
                     ? (string) $projectSubId
                     : '';
 
+                $categoryId = $request->filled('cboCategory')
+                    ? $request->input('cboCategory')
+                    : null;
+
+                $categorySubId = $request->filled('cboSubCategory')
+                    ? $request->input('cboSubCategory')
+                    : null;
+
+                $detailId = $request->filled('cboDetail')
+                    ? $request->input('cboDetail')
+                    : null;
+
                 /*
-            |--------------------------------------------------------------------------
-            | Build payload according to migration
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Build payload according to migration
+        |--------------------------------------------------------------------------
+        */
                 $payload = [
 
                     'ministry_id'      => $ministry->id,
@@ -1223,30 +1226,28 @@ class MaterialReleaseController extends Controller
 
                     'project_sub_id'   => $projectSubId,
 
+                    'category_id'      => $categoryId,
+
+                    'category_sub_id'  => $categorySubId,
+
+                    'detail'           => $detailId,
+
                     'agency_id'        => $request->input(
                         'agency',
                         $release->agency_id
                     ),
 
-                    /*
-                | Required by schema
-                */
+
                     'material_entry_id' => $materialEntry->id,
 
                     'p_name'            => $pNameValue,
 
                     'p_year'            => $pYears[$index] ?? '',
 
-                    /*
-                | Required by schema
-                */
                     'title'             => $titleValue,
 
                     'unit'              => $unitName ?? '',
 
-                    /*
-                | Keep your original total stock field
-                */
                     'quantity_total'    => (int) $materialEntry->qty,
 
                     'quantity_request'  => $q,
@@ -1254,8 +1255,8 @@ class MaterialReleaseController extends Controller
                     'price'             => $p,
 
                     /*
-                | Schema column is total_price
-                */
+            | Schema column is total_price
+            */
                     'total_price'       => $q * $p,
 
                     'source'            => $sources[$index] ?? null,
@@ -1264,10 +1265,10 @@ class MaterialReleaseController extends Controller
                 ];
 
                 /*
-            |--------------------------------------------------------------------------
-            | Update existing row / create new row
-            |--------------------------------------------------------------------------
-            */
+        |--------------------------------------------------------------------------
+        | Update existing row / create new row
+        |--------------------------------------------------------------------------
+        */
                 if (isset($existingItems[$index])) {
 
                     $existingItems[$index]->update($payload);
@@ -1278,10 +1279,10 @@ class MaterialReleaseController extends Controller
             }
 
             /*
-        |--------------------------------------------------------------------------
-        | 9. Delete removed rows
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 9. Delete removed rows
+    |--------------------------------------------------------------------------
+    */
             if ($existingItems->count() > count($names)) {
 
                 for (
@@ -1295,10 +1296,10 @@ class MaterialReleaseController extends Controller
             }
 
             /*
-        |--------------------------------------------------------------------------
-        | 10. Commit
-        |--------------------------------------------------------------------------
-        */
+    |--------------------------------------------------------------------------
+    | 10. Commit
+    |--------------------------------------------------------------------------
+    */
             DB::commit();
 
             return redirect()

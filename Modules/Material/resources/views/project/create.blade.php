@@ -7,28 +7,28 @@
 
     <style>
         /* =========================================================
-                                 * TABLE WRAPPER & SCROLL FIXES
-                                 * ========================================================= */
+                                                                                                                                         * TABLE WRAPPER & SCROLL FIXES
+                                                                                                                                         * ========================================================= */
         #itemTableWrapper,
-        .table-responsive {
+        /* .table-responsive {
             width: 100% !important;
             overflow-x: visible !important;
             overflow-y: visible !important;
             position: relative !important;
             display: block;
-        }
+        } */
 
-        #itemTableWrapper {
+        /* #itemTableWrapper {
             overflow-x: auto !important;
             padding-top: 300px !important;
             margin-top: -300px !important;
-        }
+        } */
 
-        #itemTable {
+        /* #itemTable {
             table-layout: auto !important;
             width: 100% !important;
             min-width: 1300px !important;
-        }
+        } */
 
         #itemTable th {
             white-space: nowrap !important;
@@ -68,8 +68,8 @@
         }
 
         /* =========================================================
-                                 * CHOICES.JS STYLING & STRICT INPUT-WIDTH CONTROL
-                                 * ========================================================= */
+                                                                                                                                         * CHOICES.JS STYLING & STRICT INPUT-WIDTH CONTROL
+                                                                                                                                         * ========================================================= */
         .choices {
             margin-bottom: 0 !important;
             width: 100% !important;
@@ -163,8 +163,8 @@
         }
 
         /* =========================================================
-                 * FIX SWITCH CLICKABILITY & OVERLAPS
-                 * ========================================================= */
+                                                                                                                         * FIX SWITCH CLICKABILITY & OVERLAPS
+                                                                                                                         * ========================================================= */
         .form-check.form-switch {
             position: relative !important;
             z-index: 100 !important;
@@ -381,27 +381,24 @@
                                 <table class="table table-bordered align-middle text-nowrap" id="itemTable">
                                     <thead>
                                         <tr>
-                                            <th style="width:200px; min-width:200px;" class="align-middle">
+                                            <th   class="align-middle">
                                                 {{ __('forms.project') }}
                                             </th>
-                                            <th style="width:200px; min-width:200px;" class="align-middle">
-                                                ប្រភេទ (Category)
+                                            <th  class="align-middle">
+                                                ប្រភេទ (Category, Sub-category & Detail)
                                             </th>
-                                            <th style="width:200px; min-width:200px;" class="align-middle">
-                                                ប្រភេទរង (Sub-category)
-                                            </th>
-                                            <th style="width:150px; min-width:200px;" class="align-middle">
+                                            {{-- <th style="width:150px; min-width:150px;" class="align-middle">
                                                 {{ __('forms.sub.account') }}
                                             </th>
-                                            <th style="width:150px; min-width:200px;" class="align-middle">
+                                            <th style="width:150px; min-width:150px;" class="align-middle">
                                                 {{ __('forms.program') }}
                                             </th>
-                                            <th style="width:150px; min-width:200px;" class="align-middle">
+                                            <th style="width:150px; min-width:150px;" class="align-middle">
                                                 {{ __('forms.program.sub') }}
                                             </th>
-                                            <th style="width:150px; min-width:200px;" class="align-middle">
+                                            <th style="width:150px; min-width:150px;" class="align-middle">
                                                 {{ __('forms.cluster') }}
-                                            </th>
+                                            </th> --}}
                                             <th style="width:70px; min-width:70px;" class="text-center align-middle">
                                                 Action
                                             </th>
@@ -410,37 +407,70 @@
                                     <tbody>
                                         <tr data-row-index="0">
                                             <td>
-                                                <input type="text" name="sub_pro[]"
-                                                    class="form-control table-required" required>
+                                                {{-- Removed 'required' and 'table-required' class --}}
+                                                <input type="text" name="sub_pro[]" class="form-control">
                                             </td>
+                                            {{-- Grouped Category, Sub-Category & Detail Column --}}
                                             <td>
-                                                <div class="category-wrapper">
-                                                    <div class="d-flex mb-2 category-item">
-                                                        <input type="text" class="form-control me-1"
-                                                            name="category[0][]" placeholder="បញ្ចូលប្រភេទ">
-                                                        <button type="button"
-                                                            class="btn btn-outline-success btn-sm addCategoryBtn">+</button>
+                                                <div class="category-container">
+                                                    <div class="category-block border p-2 mb-2 rounded bg-light"
+                                                        data-cat-index="0">
+
+                                                        {{-- Category Line on Top --}}
+                                                        <div class="d-flex mb-2 align-items-center category-item">
+                                                            {{-- Removed 'required' --}}
+                                                            <input type="text" class="form-control me-1"
+                                                                name="category[0][]"
+                                                                placeholder="បញ្ចូលប្រភេទ (Category)">
+                                                            <button type="button"
+                                                                class="btn btn-outline-success btn-sm addCategoryBtn"
+                                                                title="បន្ថែមប្រភេទ">+</button>
+                                                            <button type="button"
+                                                                class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1"
+                                                                title="លុបប្រភេទ" style="visibility: hidden;">-</button>
+                                                        </div>
+
+                                                        {{-- Sub-categories wrapper underneath --}}
+                                                        <div class="subcategory-wrapper ps-3 border-start">
+                                                            <div class="subcategory-item mb-2 border p-2 rounded bg-white"
+                                                                data-subcat-index="0">
+                                                                <div class="d-flex align-items-center mb-2">
+                                                                    <input type="text" class="form-control me-1"
+                                                                        name="sub_category[0][0][]"
+                                                                        placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-success btn-sm addSubCategoryBtn"
+                                                                        title="បន្ថែមប្រភេទរង">+</button>
+                                                                    <button type="button"
+                                                                        class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1"
+                                                                        title="លុបប្រភេទរង"
+                                                                        style="visibility: hidden;">-</button>
+                                                                </div>
+
+                                                                {{-- Details wrapper underneath Sub-category --}}
+                                                                <div class="detail-wrapper ps-3 border-start">
+                                                                    <div
+                                                                        class="d-flex mb-2 align-items-center detail-item">
+                                                                        <input type="text" class="form-control me-1"
+                                                                            name="detail[0][0][0][]"
+                                                                            placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                                                        <button type="button"
+                                                                            class="btn btn-outline-success btn-sm addDetailBtn"
+                                                                            title="បន្ថែមលម្អិត">+</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
-                                                <div class="subcategory-wrapper">
-                                                    <div class="d-flex mb-2 subcategory-item">
-                                                        <input type="text" class="form-control me-1"
-                                                            name="sub_category[0][]" placeholder="បញ្ចូលប្រភេទរង">
-                                                        <button type="button"
-                                                            class="btn btn-outline-success btn-sm addSubCategoryBtn"
-                                                            style="visibility: hidden;">+</button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
+                                            {{-- <td>
                                                 <select class="form-select cboSubAccount" name="accountSub[]">
                                                     <option value="">ជ្រើសរើស</option>
                                                     @foreach ($accountSub as $bv)
                                                         <option value="{{ $bv->no }}">
-                                                            {{ $bv->no }}-{{ $bv->name }}
-                                                        </option>
+                                                            {{ $bv->no }}-{{ $bv->name }}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -449,8 +479,7 @@
                                                     <option value="">ជ្រើសរើស</option>
                                                     @foreach ($program as $p)
                                                         <option value="{{ $p->id }}">
-                                                            {{ $p->no }}-{{ $p->title }}
-                                                        </option>
+                                                            {{ $p->no }}-{{ $p->title }}</option>
                                                     @endforeach
                                                 </select>
                                             </td>
@@ -463,7 +492,7 @@
                                                 <select class="form-select cboCluster" name="cboCluster[]">
                                                     <option value="">{{ __('forms.search...') }}</option>
                                                 </select>
-                                            </td>
+                                            </td> --}}
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-success addRow">+</button>
                                             </td>
@@ -552,11 +581,22 @@
         function updateRowIndices() {
             $('#itemTable tbody tr').each(function(newIndex) {
                 $(this).attr('data-row-index', newIndex);
-                $(this).find('.category-item input').each(function() {
-                    $(this).attr('name', `category[${newIndex}][]`);
-                });
-                $(this).find('.subcategory-item input').each(function() {
-                    $(this).attr('name', `sub_category[${newIndex}][]`);
+
+                // Update categories, sub-categories, and details index paths
+                $(this).find('.category-block').each(function(catIndex) {
+                    $(this).attr('data-cat-index', catIndex);
+                    $(this).find('.category-item input').attr('name', `category[${newIndex}][]`);
+
+                    $(this).find('.subcategory-item').each(function(subCatIndex) {
+                        $(this).attr('data-subcat-index', subCatIndex);
+                        $(this).find('> div > input').attr('name',
+                            `sub_category[${newIndex}][${catIndex}][]`);
+
+                        $(this).find('.detail-item input').each(function() {
+                            $(this).attr('name',
+                                `detail[${newIndex}][${catIndex}][${subCatIndex}][]`);
+                        });
+                    });
                 });
             });
         }
@@ -653,18 +693,14 @@
             setupSkipToggle('skipFileInput', 'fileInput');
 
             /* =========================================================
-             * 5. TABLE SKIP TOGGLE (DELEGATED EVENT FIX)
+             * 5. TABLE SKIP TOGGLE
              * ========================================================= */
             const itemTableWrapper = document.getElementById('itemTableWrapper');
             const itemTable = document.getElementById('itemTable');
 
             function applyTableSkipState(isSkipped) {
                 if (!itemTableWrapper || !itemTable) return;
-
-                // 1. Toggle visual dimming
                 itemTableWrapper.classList.toggle('table-skipped', isSkipped);
-
-                // 2. Enable/Disable every input, select, and button inside the table
                 itemTable.querySelectorAll('input, select, button').forEach(el => {
                     el.disabled = isSkipped;
                     if (isSkipped) {
@@ -675,22 +711,16 @@
                         }
                     }
                 });
-
-                if (typeof reinitPristine === 'function') {
-                    reinitPristine();
-                }
+                if (typeof reinitPristine === 'function') reinitPristine();
             }
 
-            // Use document-level delegation so even if the switch is redrawn, it still responds instantly
             $(document).on('change click', '#skipItemTable', function() {
                 applyTableSkipState(this.checked);
             });
 
-            // Run on initial page load to respect old('skipItemTable') state
             const initialSkipSwitch = document.getElementById('skipItemTable');
-            if (initialSkipSwitch) {
-                applyTableSkipState(initialSkipSwitch.checked);
-            }
+            if (initialSkipSwitch) applyTableSkipState(initialSkipSwitch.checked);
+
             /* =========================================================
              * 6. DYNAMIC DROPDOWNS: PROGRAM -> SUB PROGRAM
              * ========================================================= */
@@ -711,7 +741,6 @@
                         selected: true
                     }], 'value', 'label', true);
                 }
-
                 if (clusterChoices) {
                     clusterChoices.clearChoices();
                     clusterChoices.setChoices([{
@@ -796,114 +825,215 @@
             });
 
             /* =========================================================
-             * 8. TABLE ROW & CATEGORY INPUT MANAGEMENT
+             * 8. GROUPED CATEGORY, SUB-CATEGORY & DETAIL MANAGEMENT
              * ========================================================= */
+
+            // 1. Add Category block
             $(document).on('click', '.addCategoryBtn', function(e) {
                 e.preventDefault();
                 const tr = $(this).closest('tr');
                 const mainRowIndex = tr.attr('data-row-index') || tr.index();
+                const container = tr.find('.category-container');
+                const newCatIndex = container.children('.category-block').length;
 
-                tr.find('.category-wrapper').append(`
-                    <div class="d-flex mb-2 category-item">
-                        <input type="text" class="form-control me-1" name="category[${mainRowIndex}][]" placeholder="បញ្ចូលប្រភេទ">
-                        <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn">-</button>
+                const blockHtml = `
+                <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="${newCatIndex}">
+                    <div class="d-flex mb-2 align-items-center category-item">
+                        <input type="text" class="form-control me-1" name="category[${mainRowIndex}][]" placeholder="បញ្ចូលប្រភេទ (Category)" required>
+                        <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ">-</button>
                     </div>
-                `);
-
-                tr.find('.subcategory-wrapper').append(`
-                    <div class="d-flex mb-2 subcategory-item">
-                        <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][]" placeholder="បញ្ចូលប្រភេទរង">
-                        <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn" style="visibility: hidden;">-</button>
+                    <div class="subcategory-wrapper ps-3 border-start">
+                        <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
+                            <div class="d-flex align-items-center mb-2">
+                                <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${newCatIndex}][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
+                            </div>
+                            <div class="detail-wrapper ps-3 border-start">
+                                <div class="d-flex mb-2 align-items-center detail-item">
+                                    <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${newCatIndex}][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                    <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                `);
+                </div>
+            `;
+                container.append(blockHtml);
             });
 
+            // 2. Remove Category block
             $(document).on('click', '.removeCategoryBtn', function(e) {
                 e.preventDefault();
-                const tr = $(this).closest('tr');
-                const itemDiv = $(this).closest('.category-item, .subcategory-item');
-                const index = itemDiv.index();
-
-                tr.find('.category-wrapper .category-item').eq(index).remove();
-                tr.find('.subcategory-wrapper .subcategory-item').eq(index).remove();
+                const container = $(this).closest('.category-container');
+                if (container.children('.category-block').length > 1) {
+                    $(this).closest('.category-block').remove();
+                    updateRowIndices();
+                } else {
+                    alert('ត្រូវមានយ៉ាងហោចណាស់ ១ ប្រភេទ!');
+                }
             });
 
+            // 3. Add Sub-Category item
+            $(document).on('click', '.addSubCategoryBtn', function(e) {
+                e.preventDefault();
+                const block = $(this).closest('.category-block');
+                const tr = $(this).closest('tr');
+                const mainRowIndex = tr.attr('data-row-index') || tr.index();
+                const catIndex = block.attr('data-cat-index');
+                const subWrapper = block.find('.subcategory-wrapper');
+                const newSubCatIndex = subWrapper.children('.subcategory-item').length;
+
+                subWrapper.append(`
+                <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="${newSubCatIndex}">
+                    <div class="d-flex align-items-center mb-2">
+                        <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${catIndex}][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                        <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                        <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង">-</button>
+                    </div>
+                    <div class="detail-wrapper ps-3 border-start">
+                        <div class="d-flex mb-2 align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${newSubCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+            });
+
+            // 4. Remove Sub-Category item
+            $(document).on('click', '.removeSubCategoryBtn', function(e) {
+                e.preventDefault();
+                const wrapper = $(this).closest('.subcategory-wrapper');
+                if (wrapper.children('.subcategory-item').length > 1) {
+                    $(this).closest('.subcategory-item').remove();
+                    updateRowIndices();
+                } else {
+                    $(this).closest('.subcategory-item').find('input').val('');
+                }
+            });
+
+            // 5. Add Detail item
+            $(document).on('click', '.addDetailBtn', function(e) {
+                e.preventDefault();
+                const subItem = $(this).closest('.subcategory-item');
+                const catBlock = $(this).closest('.category-block');
+                const tr = $(this).closest('tr');
+
+                const mainRowIndex = tr.attr('data-row-index') || tr.index();
+                const catIndex = catBlock.attr('data-cat-index');
+                const subCatIndex = subItem.attr('data-subcat-index');
+                const detailWrapper = subItem.find('.detail-wrapper');
+
+                detailWrapper.append(`
+                <div class="d-flex mb-2 align-items-center detail-item">
+                    <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${subCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                    <button type="button" class="btn btn-outline-danger btn-sm removeDetailBtn" title="លុបលម្អិត">-</button>
+                </div>
+            `);
+            });
+
+            // 6. Remove Detail item
+            $(document).on('click', '.removeDetailBtn', function(e) {
+                e.preventDefault();
+                const wrapper = $(this).closest('.detail-wrapper');
+                if (wrapper.children('.detail-item').length > 1) {
+                    $(this).closest('.detail-item').remove();
+                } else {
+                    $(this).closest('.detail-item').find('input').val('');
+                }
+            });
+
+            // 7. Add brand new main table row
             $(document).on('click', '.addRow', function(e) {
                 e.preventDefault();
                 const tableBody = $('#itemTable tbody');
                 let rowIndex = tableBody.children('tr').length;
 
                 const newRowHtml = `
-                    <tr data-row-index="${rowIndex}">
-                        <td>
-                            <input type="text" name="sub_pro[]" class="form-control table-required" required>
-                        </td>
-                        <td>
-                            <div class="category-wrapper">
-                                <div class="d-flex mb-2 category-item">
-                                    <input type="text" class="form-control me-1" name="category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទ">
-                                    <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn">+</button>
+                <tr data-row-index="${rowIndex}">
+                    <td>
+                        <input type="text" name="sub_pro[]" class="form-control table-required" required>
+                    </td>
+                    <td>
+                        <div class="category-container">
+                            <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="0">
+                                <div class="d-flex mb-2 align-items-center category-item">
+                                    <input type="text" class="form-control me-1" name="category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទ (Category)" required>
+                                    <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ" style="visibility: hidden;">-</button>
+                                </div>
+                                <div class="subcategory-wrapper ps-3 border-start">
+                                    <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][0][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
+                                        </div>
+                                        <div class="detail-wrapper ps-3 border-start">
+                                            <div class="d-flex mb-2 align-items-center detail-item">
+                                                <input type="text" class="form-control me-1" name="detail[${rowIndex}][0][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                                <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </td>
-                        <td>
-                            <div class="subcategory-wrapper">
-                                <div class="d-flex mb-2 subcategory-item">
-                                    <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទរង">
-                                    <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" style="visibility: hidden;">+</button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <select class="form-select cboSubAccount" name="accountSub[]">
-                                <option value="">ជ្រើសរើស</option>
-                                @foreach ($accountSub as $bv)
-                                    <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select cboProgram" name="program[]">
-                                <option value="">ជ្រើសរើស</option>
-                                @foreach ($program as $p)
-                                    <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select cboProgramSub" name="cboProgramSub[]">
-                                <option value="">{{ __('forms.search...') }}</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select cboCluster" name="cboCluster[]">
-                                <option value="">{{ __('forms.search...') }}</option>
-                            </select>
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-danger removeRow">-</button>
-                        </td>
-                    </tr>`;
+                        </div>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboSubAccount" name="accountSub[]">
+                            <option value="">ជ្រើសរើស</option>
+                            @foreach ($accountSub as $bv)
+                                <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboProgram" name="program[]">
+                            <option value="">ជ្រើសរើស</option>
+                            @foreach ($program as $p)
+                                <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboProgramSub" name="cboProgramSub[]">
+                            <option value="">{{ __('forms.search...') }}</option>
+                        </select>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboCluster" name="cboCluster[]">
+                            <option value="">{{ __('forms.search...') }}</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-danger removeRow">-</button>
+                    </td>
+                </tr>`;
 
                 tableBody.append(newRowHtml);
                 const appendedRow = tableBody.children().last();
                 appendedRow.find('select').each(function() {
-                    initChoicesInstance(this);
+                    if (typeof initChoicesInstance === 'function') {
+                        initChoicesInstance(this);
+                    }
                 });
-                updateRowIndices();
-                handleTableSkip();
+
+                if (typeof updateRowIndices === 'function') updateRowIndices();
             });
 
+            // 8. Remove an entire main table row
             $(document).on('click', '.removeRow', function(e) {
                 e.preventDefault();
-                const row = $(this).closest('tr');
-                row.find('select').each(function() {
-                    const instance = choicesMap.get(this);
-                    if (instance) instance.destroy();
-                });
-                row.remove();
-                updateRowIndices();
-                reinitPristine();
+                const tableBody = $('#itemTable tbody');
+                if (tableBody.children('tr').length > 1) {
+                    $(this).closest('tr').remove();
+                } else {
+                    alert('ត្រូវមានយ៉ាងហោចណាស់ ១ បន្ទាត់!');
+                }
+                if (typeof updateRowIndices === 'function') updateRowIndices();
             });
 
             /* =========================================================
@@ -932,15 +1062,13 @@
                     }
 
                     if (valid) {
-                        // DO NOT re-enable inputs that were intentionally skipped/disabled!
-                        // Only disable the submit button to prevent double clicks
                         const submitBtn = document.getElementById('insertToTableBtn');
                         if (submitBtn) {
                             submitBtn.disabled = true;
                             submitBtn.innerHTML = `
-                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                កំពុងរក្សាទុក...
-                            `;
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            កំពុងរក្សាទុក...
+                        `;
                         }
                         form.submit();
                     } else {

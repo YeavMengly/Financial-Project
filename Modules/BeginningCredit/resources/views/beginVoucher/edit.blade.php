@@ -92,7 +92,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                <div class="col-lg-4 col-md-6" hidden>
                                     <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
@@ -133,7 +133,7 @@
                                     <div class="form-group mb-3">
                                         <label for="fin_law"
                                             class="form-label font-size-13 text-muted">{{ __('forms.fin.law') }}</label>
-                                        <input type="number" min="0" name="fin_law"
+                                        <input type="number" min="0" id="fin_law" name="fin_law"
                                             value="{{ old('fin_law', $module->fin_law) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" required
                                             class="form-control" />
@@ -144,10 +144,10 @@
                                     <div class="form-group mb-3">
                                         <label for="current_loan"
                                             class="form-label font-size-13 text-muted">{{ __('forms.current.loan') }}</label>
-                                        <input type="number" min="0" name="current_loan"
+                                        <input type="number" min="0" id="current_loan" name="current_loan"
                                             value="{{ old('current_loan', $module->current_loan) }}"
                                             data-pristine-required-message="{{ __('messages.required') }}" required
-                                            class="form-control" />
+                                            readonly class="form-control bg-light" />
                                     </div>
                                 </div>
                             </div>
@@ -171,7 +171,7 @@
     <script src="{{ asset('assets/js/pages/form-validations.init.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('pristine-valid-example');
             var pristine = new Pristine(form);
@@ -184,38 +184,190 @@
             });
         });
     </script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboProgram');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
-            });
-        });
+        const finLawInput = document.getElementById('fin_law');
+        const currentLoanInput = document.getElementById('current_loan');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const element = document.getElementById('cboSubAccount');
-            const choices = new Choices(element, {
-                searchEnabled: true,
-                itemSelectText: '',
-                placeholder: true,
-                placeholderValue: 'ស្វែងរក...',
-                shouldSort: false
+        if (finLawInput && currentLoanInput) {
+            finLawInput.addEventListener('input', function() {
+                currentLoanInput.value = this.value;
             });
-        });
+        }
     </script>
 
     <script>
-        $(document).ready(function() {
-            const element = document.getElementById('cboAgency');
-            let choicesInstance = new Choices(element, {
+        document.addEventListener('DOMContentLoaded', function() {
+            /* ================== Choices Config ================== */
+            const choicesConfig = {
                 searchEnabled: true,
                 itemSelectText: '',
-                shouldSort: false,
+                placeholder: true,
+                placeholderValue: 'ស្វែងរក...',
+                shouldSort: false
+            };
+
+            const choicesInstances = {};
+
+            function initChoices(selector) {
+                const el = document.querySelector(selector);
+                if (!el) return null;
+
+                if (choicesInstances[selector]) {
+                    choicesInstances[selector].destroy();
+                    choicesInstances[selector] = null;
+                }
+
+                const instance = new Choices(el, choicesConfig);
+                choicesInstances[selector] = instance;
+                return instance;
+            }
+
+            function resetSelectHtml(selector, html = null) {
+                const el = document.querySelector(selector);
+                if (!el) return null;
+
+                if (choicesInstances[selector]) {
+                    choicesInstances[selector].destroy();
+                    choicesInstances[selector] = null;
+                }
+
+                $(selector).html(html || `<option value="">{{ __('forms.search...') }}</option>`);
+                return initChoices(selector);
+            }
+
+            /* ================== Initialize All Selects ONCE ================== */
+            initChoices('#cboProgram');
+            initChoices('#cboSubAccount');
+            initChoices('#cboProgramSub');
+            initChoices('#cboCluster');
+            initChoices('#cboAgency');
+
+            /* ================== AJAX Loaders ================== */
+            function loadProgramSubs(programId, selectedId = null) {
+                resetSelectHtml('#cboProgramSub');
+                resetSelectHtml('#cboCluster');
+                resetSelectHtml('#cboAgency');
+
+                if (!programId) {
+                    return $.Deferred().resolve().promise();
+                }
+
+                return $.ajax({
+                    url: "{{ route('beginVoucher.edit.program_sub') }}",
+                    type: "GET",
+                    data: {
+                        program_id: programId,
+                        selected_id: selectedId
+                    }
+                }).done(function(html) {
+                    resetSelectHtml('#cboProgramSub', html);
+                }).fail(function() {
+                    resetSelectHtml('#cboProgramSub');
+                });
+            }
+
+            function loadClusters(programSubId, selectedId = null) {
+                resetSelectHtml('#cboCluster');
+                resetSelectHtml('#cboAgency');
+
+                if (!programSubId) {
+                    return $.Deferred().resolve().promise();
+                }
+
+                return $.ajax({
+                    url: "{{ route('beginVoucher.edit.cluster') }}",
+                    type: "GET",
+                    data: {
+                        program_sub_id: programSubId,
+                        selected_id: selectedId
+                    }
+                }).done(function(html) {
+                    resetSelectHtml('#cboCluster', html);
+                }).fail(function() {
+                    resetSelectHtml('#cboCluster');
+                });
+            }
+
+            function loadAgencies(programId, programSubId, clusterId, selectedId = null) {
+                resetSelectHtml('#cboAgency');
+
+                if (!programId || !programSubId || !clusterId) {
+                    return $.Deferred().resolve().promise();
+                }
+
+                return $.ajax({
+                    url: "{{ route('beginVoucher.edit.agency') }}",
+                    type: "GET",
+                    data: {
+                        program_id: programId,
+                        program_sub_id: programSubId,
+                        cluster_id: clusterId,
+                        selected_id: selectedId
+                    }
+                }).done(function(html) {
+                    const selector = '#cboAgency';
+                    if (choicesInstances[selector]) {
+                        choicesInstances[selector].destroy();
+                        choicesInstances[selector] = null;
+                    }
+
+                    const $agency = $(selector);
+                    $agency.html(html);
+
+                    // Ensure a valid agency is selected if none is pre-selected
+                    if (!$agency.val()) {
+                        const $firstOption = $agency.find('option').filter(function() {
+                            return $(this).val() !== '';
+                        }).first();
+
+                        if ($firstOption.length) {
+                            $firstOption.prop('selected', true);
+                            $agency.val($firstOption.val());
+                        }
+                    }
+
+                    initChoices(selector);
+                    $agency.trigger('change');
+                }).fail(function() {
+                    resetSelectHtml('#cboAgency');
+                });
+            }
+
+            /* ================== Sequential Preload Edit Data ================== */
+            const initProgramId = $('#cboProgram').val();
+            const initProgramSubId = $('#cboProgramSub').data('old');
+            const initClusterId = $('#cboCluster').data('old');
+            const initAgencyId = $('#cboAgency').data('old');
+
+            if (initProgramId) {
+                loadProgramSubs(initProgramId, initProgramSubId).then(function() {
+                    const subId = $('#cboProgramSub').val() || initProgramSubId;
+                    if (!subId) return;
+
+                    return loadClusters(subId, initClusterId).then(function() {
+                        const clusterId = $('#cboCluster').val() || initClusterId;
+                        if (!clusterId) return;
+
+                        return loadAgencies(initProgramId, subId, clusterId, initAgencyId);
+                    });
+                });
+            }
+
+            /* ================== Cascade & Agency Change Events ================== */
+            $('#cboProgram').on('change', function() {
+                loadProgramSubs($(this).val());
+            });
+
+            $('#cboProgramSub').on('change', function() {
+                loadClusters($(this).val());
+            });
+
+            $('#cboCluster').on('change', function() {
+                loadAgencies(
+                    $('#cboProgram').val(),
+                    $('#cboProgramSub').val(),
+                    $(this).val()
+                );
             });
 
             $('#cboAgency').on('change', function() {
@@ -239,140 +391,4 @@
             });
         });
     </script>
-
-   <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            /* ================== Choices Instances ================== */
-            let programSubChoices = initChoices('#cboProgramSub');
-            let agencyChoices = initChoices('#cboAgency');
-            let clusterChoices = initChoices('#cboCluster');
-
-            function initChoices(selector) {
-                return new Choices(selector, {
-                    searchEnabled: true,
-                    itemSelectText: '',
-                    placeholder: true,
-                    placeholderValue: "ស្វែងរក..."
-                });
-            }
-
-            /* ================== Helpers ================== */
-            function resetSelect(selector) {
-                $(selector).html(`<option value="">{{ __('forms.search...') }}</option>`);
-            }
-
-            function resetChoices(selector, instance) {
-                instance.destroy();
-                return initChoices(selector);
-            }
-
-            function loadOptions({
-                url,
-                data,
-                targetSelect,
-                instanceRefSetter
-            }) {
-                $.ajax({
-                    url,
-                    type: "GET",
-                    data,
-                    success: function(html) {
-                        $(targetSelect).html(html);
-                        instanceRefSetter();
-                    },
-                    error: function() {
-                        resetSelect(targetSelect);
-                    }
-                });
-            }
-
-            /* ================== Handlers ================== */
-            function handleProgramChangeForProgramSub(programId, selectedId = null) {
-                resetSelect('#cboProgramSub');
-                programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-
-                if (!programId) return;
-
-                loadOptions({
-                    url: "{{ route('beginVoucher.edit.program_sub') }}",
-                    data: {
-                        program_id: programId,
-                        selected_id: selectedId
-                    },
-                    targetSelect: '#cboProgramSub',
-                    instanceRefSetter: () => {
-                        programSubChoices = resetChoices('#cboProgramSub', programSubChoices);
-                    }
-                });
-            }
-
-            function handleProgramChangeForAgency(programId, selectedId = null) {
-                resetSelect('#cboAgency');
-                agencyChoices = resetChoices('#cboAgency', agencyChoices);
-
-                if (!programId) return;
-
-                loadOptions({
-                    url: "{{ route('beginVoucher.edit.agency') }}",
-                    data: {
-                        program_id: programId,
-                        selected_id: selectedId
-                    },
-                    targetSelect: '#cboAgency',
-                    instanceRefSetter: () => {
-                        agencyChoices = resetChoices('#cboAgency', agencyChoices);
-                    }
-                });
-            }
-
-            function handleProgramSubChangeForCluster(programSubId, selectedId = null) {
-                resetSelect('#cboCluster');
-                clusterChoices = resetChoices('#cboCluster', clusterChoices);
-
-                if (!programSubId) return;
-
-                loadOptions({
-                    url: "{{ route('beginVoucher.edit.cluster') }}",
-                    data: {
-                        program_sub_id: programSubId,
-                        selected_id: selectedId
-                    },
-                    targetSelect: '#cboCluster',
-                    instanceRefSetter: () => {
-                        clusterChoices = resetChoices('#cboCluster', clusterChoices);
-                    }
-                });
-            }
-
-            /* ================== PRELOAD EDIT DATA ================== */
-            const programId = $('#cboProgram').val();
-            const oldProgramSubId = $('#cboProgramSub').data('old');
-            const oldAgencyId = $('#cboAgency').data('old');
-            const oldClusterId = $('#cboCluster').data('old');
-
-            if (programId) {
-                handleProgramChangeForProgramSub(programId, oldProgramSubId);
-                handleProgramChangeForAgency(programId, oldAgencyId);
-
-                if (oldProgramSubId) {
-                    handleProgramSubChangeForCluster(oldProgramSubId, oldClusterId);
-                }
-            }
-
-            /* ================== EVENTS ================== */
-            $('#cboProgram').on('change', function() {
-                const programId = $(this).val();
-
-                handleProgramChangeForProgramSub(programId);
-                handleProgramChangeForAgency(programId);
-                handleProgramSubChangeForCluster(null);
-            });
-
-            $('#cboProgramSub').on('change', function() {
-                handleProgramSubChangeForCluster($(this).val());
-            });
-        });
-    </script>
-
 @endsection

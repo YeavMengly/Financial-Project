@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('sub_project')->nullable();
             $table->string('category')->nullable();
             $table->string('sub_category')->nullable();
+            $table->string('detail')->nullable();
             $table->string('program_id')->nullable();
             $table->string('program_sub_id')->nullable();
             $table->string('cluster_id')->nullable();

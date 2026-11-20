@@ -7,6 +7,9 @@ use App\DataTables\AnnualOpen\InitialAgencyDataTable;
 use App\DataTables\Content\ExecutiveUnitDataTable;
 use App\Http\Controllers\Controller;
 use App\Models\Content\Agency;
+use App\Models\Content\AgencyAssignment;
+use App\Models\Content\ProgramSub;
+use App\Models\Content\Cluster;
 use App\Models\Content\ExecutiveUnit;
 use App\Models\Content\Ministry;
 use App\Models\Content\Program;
@@ -56,7 +59,7 @@ class AgencyController extends Controller
     public function store(Request $request, $params)
     {
         $validateData = $request->validate([
-            'cboProgram' => ['required'],
+            'cboProgram' => ['nullable'],
             'no' => ['required'],
             'name' => ['required'],
             'nick_name' => ['required'],
@@ -70,7 +73,7 @@ class AgencyController extends Controller
             $ministries = Ministry::where('id', $id)->first();
             Agency::create([
                 'ministry_id' => $ministries->id,
-                'program_id' => $validateData['cboProgram'],
+                'program_id' => $validateData['cboProgram'] ?? null,
                 'no' => $validateData['no'],
                 'name' => $validateData['name'],
                 'nick_name' => $validateData['nick_name'],
@@ -120,7 +123,7 @@ class AgencyController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validateData = $request->validate([
-            'cboProgram' => ['required'],
+            'cboProgram' => ['nullable'],
             'no' => ['required'],
             'name' => ['required'],
             'nick_name' => ['required'],
@@ -131,7 +134,7 @@ class AgencyController extends Controller
         try {
             $agency = Agency::findOrfail($id);
             $agency->update([
-                'program_id' => $validateData['cboProgram'],
+                'program_id' => $validateData['cboProgram'] ?? null,
                 'no' => $validateData['no'],
                 'name' => $validateData['name'],
                 'nick_name' => $validateData['nick_name'],
@@ -345,5 +348,125 @@ class AgencyController extends Controller
             ->flash();
 
         return redirect()->route('executiveUnit.index', ['params' => $params, 'executiveId' => $executiveId]);
+    }
+    public function assignments(Request $request)
+    {
+        $ministries = Ministry::orderByDesc('year')->orderBy('no')->get();
+        $ministryId = $request->input('ministry_id', $ministries->first()?->id);
+
+        $programs = Program::with([
+            'programSubs' => fn($q) => $q->orderBy('no'),
+            'programSubs.clusters' => fn($q) => $q->orderBy('no'),
+        ])
+            ->when($ministryId, fn($q) => $q->where('ministry_id', $ministryId))
+            ->orderBy('no')
+            ->get();
+
+        $agencies = Agency::when($ministryId, fn($q) => $q->where('ministry_id', $ministryId))
+            ->orderBy('no')
+            ->get();
+
+        $clusMap = AgencyAssignment::whereIn('program_id', $programs->pluck('id'))
+            ->whereNotNull('cluster_id')
+            ->pluck('agency_id', 'cluster_id')
+            ->toArray();
+
+        $subMap  = [];
+        $progMap = [];
+
+        foreach ($programs as $program) {
+            $subAssigned = [];
+            foreach ($program->programSubs as $sub) {
+                $clusIds = $sub->clusters->pluck('id');
+                if ($clusIds->isNotEmpty()) {
+                    $distinctAgencies = $clusIds->map(fn($id) => $clusMap[$id] ?? null)->unique();
+                    if ($distinctAgencies->count() === 1 && $distinctAgencies->first() !== null) {
+                        $subMap[$sub->id] = $distinctAgencies->first();
+                    }
+                }
+                $subAssigned[] = $subMap[$sub->id] ?? null;
+            }
+
+            $uniqueSubAgencies = collect($subAssigned)->unique();
+            if ($program->programSubs->isNotEmpty() && $uniqueSubAgencies->count() === 1 && $uniqueSubAgencies->first() !== null) {
+                $progMap[$program->id] = $uniqueSubAgencies->first();
+            }
+        }
+
+        return view('content::content.agency.assignments', compact(
+            'ministries',
+            'ministryId',
+            'programs',
+            'agencies',
+            'progMap',
+            'subMap',
+            'clusMap'
+        ));
+    }
+
+    public function saveAssignments(Request $request)
+    {
+        $ministryId      = $request->input('ministry_id');
+        $rawClusAgencies = $request->input('clus_agency', []); // keep empty values to detect removals
+
+        DB::beginTransaction();
+
+        try {
+            $programIds   = Program::where('ministry_id', $ministryId)->pluck('id');
+            $clustersById = Cluster::whereIn('id', array_keys($rawClusAgencies))->get()->keyBy('id');
+
+            $toDeleteClusterIds = [];
+
+            foreach ($rawClusAgencies as $clusId => $agencyId) {
+                $clus = $clustersById[$clusId] ?? null;
+                if (!$clus) {
+                    continue;
+                }
+
+                if (empty($agencyId)) {
+                    // User cleared the dropdown -> delete only this cluster's assignment
+                    $toDeleteClusterIds[] = $clus->id;
+                } else {
+                    // Update existing row in-place or insert if new
+                    AgencyAssignment::updateOrCreate(
+                        [
+                            'program_id'     => $clus->program_id,
+                            'program_sub_id' => $clus->program_sub_id,
+                            'cluster_id'     => $clus->id,
+                        ],
+                        [
+                            'agency_id' => $agencyId,
+                        ]
+                    );
+                }
+            }
+
+            if (!empty($toDeleteClusterIds)) {
+                AgencyAssignment::whereIn('program_id', $programIds)
+                    ->whereIn('cluster_id', $toDeleteClusterIds)
+                    ->delete();
+            }
+
+            DB::commit();
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->success('រក្សាទុកការកំណត់អង្គភាពថវិកាបានជោគជ័យ!', 'ជោគជ័យ')
+                ->flash();
+
+            return redirect()->route('agencies.assignments', ['ministry_id' => $ministryId]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error($e->getMessage(), 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('agencies.assignments', ['ministry_id' => $ministryId]);
+        }
     }
 }

@@ -175,27 +175,34 @@ class ProjectsController extends Controller
             'refer'             => ['required', 'string', 'max:10000'],
         ];
 
-        // | Dynamic Table Validation
+        // | Dynamic Table Validation (All Optional / Nullable)
         $skipItemTable = $request->boolean('skipItemTable');
         if (!$skipItemTable) {
-            $rules['sub_pro']          = ['required', 'array', 'min:1'];
-            $rules['sub_pro.*']        = ['required', 'string', 'max:255'];
-            $rules['accountSub']       = ['nullable', 'array'];
-            $rules['accountSub.*']     = ['nullable'];
-            $rules['category']         = ['nullable', 'array'];
-            $rules['category.*']       = ['nullable', 'array'];
-            $rules['category.*.*']     = ['nullable', 'string', 'max:255'];
-            $rules['sub_category']     = ['nullable', 'array'];
-            $rules['sub_category.*']   = ['nullable', 'array'];
-            $rules['sub_category.*.*'] = ['nullable', 'string', 'max:255'];
-            $rules['program']          = ['nullable', 'array'];
-            $rules['program.*']        = ['nullable'];
-            $rules['cboProgramSub']    = ['nullable', 'array'];
-            $rules['cboProgramSub.*']  = ['nullable'];
-            $rules['cboCluster']       = ['nullable', 'array'];
-            $rules['cboCluster.*']     = ['nullable'];
-        }
+            $rules['sub_pro']              = ['nullable', 'array'];
+            $rules['sub_pro.*']            = ['nullable', 'string', 'max:255'];
+            $rules['accountSub']           = ['nullable', 'array'];
+            $rules['accountSub.*']         = ['nullable'];
+            $rules['category']             = ['nullable', 'array'];
+            $rules['category.*']           = ['nullable', 'array'];
+            $rules['category.*.*']         = ['nullable', 'string', 'max:255'];
+            $rules['sub_category']         = ['nullable', 'array'];
+            $rules['sub_category.*']       = ['nullable', 'array'];
+            $rules['sub_category.*.*']     = ['nullable', 'array'];
+            $rules['sub_category.*.*.*']   = ['nullable', 'string', 'max:255'];
 
+            $rules['detail']               = ['nullable', 'array'];
+            $rules['detail.*']             = ['nullable', 'array'];
+            $rules['detail.*.*']           = ['nullable', 'array'];
+            $rules['detail.*.*.*']         = ['nullable', 'array'];
+            $rules['detail.*.*.*.*']       = ['nullable', 'string', 'max:255'];
+
+            $rules['program']              = ['nullable', 'array'];
+            $rules['program.*']            = ['nullable'];
+            $rules['cboProgramSub']        = ['nullable', 'array'];
+            $rules['cboProgramSub.*']      = ['nullable'];
+            $rules['cboCluster']           = ['nullable', 'array'];
+            $rules['cboCluster.*']         = ['nullable'];
+        }
         $validated = $request->validate($rules);
 
         DB::beginTransaction();
@@ -231,6 +238,7 @@ class ProjectsController extends Controller
                 $accountSubs        = $validated['accountSub'] ?? [];
                 $categoriesGroup    = $validated['category'] ?? [];
                 $subCategoriesGroup = $validated['sub_category'] ?? [];
+                $detailsGroup       = $validated['detail'] ?? [];
                 $programs           = $validated['program'] ?? [];
                 $programSubs        = $validated['cboProgramSub'] ?? [];
                 $clusters           = $validated['cboCluster'] ?? [];
@@ -239,6 +247,7 @@ class ProjectsController extends Controller
                 $accountSubs        = [];
                 $categoriesGroup    = [];
                 $subCategoriesGroup = [];
+                $detailsGroup       = [];
                 $programs           = [];
                 $programSubs        = [];
                 $clusters           = [];
@@ -269,44 +278,92 @@ class ProjectsController extends Controller
                 'file'              => $filePath,
             ];
 
-            // | Create Project Records (Separate row for each category entry)
+            // | Create Project Records
             foreach ($subProjects as $index => $subProject) {
-                if (!$skipItemTable && (is_null($subProject) || trim((string)$subProject) === '')) {
-                    continue;
+                $subProjectText = (!$skipItemTable && !is_null($subProject)) ? trim((string)$subProject) : null;
+
+                // If the table is not skipped, but the entire row has no sub_project name AND no categories at all, we can skip it
+                $rowCategories       = $categoriesGroup[$index] ?? [];
+                $rowSubCategoriesMap = $subCategoriesGroup[$index] ?? [];
+                $rowDetailsMap       = $detailsGroup[$index] ?? [];
+
+                // Filter out blank categories
+                $filteredCategories = [];
+                foreach ($rowCategories as $catIdx => $catVal) {
+                    if (!is_null($catVal) && trim((string)$catVal) !== '') {
+                        $filteredCategories[$catIdx] = trim((string)$catVal);
+                    }
                 }
 
-                // Filter out empty elements for this row
-                $rowCategories = isset($categoriesGroup[$index]) && is_array($categoriesGroup[$index])
-                    ? array_values(array_filter($categoriesGroup[$index], fn($v) => !is_null($v) && trim((string)$v) !== ''))
-                    : [];
-
-                $rowSubCategories = isset($subCategoriesGroup[$index]) && is_array($subCategoriesGroup[$index])
-                    ? array_values(array_filter($subCategoriesGroup[$index], fn($v) => !is_null($v) && trim((string)$v) !== ''))
-                    : [];
+                if (!$skipItemTable && empty($subProjectText) && empty($filteredCategories)) {
+                    continue; // Skip completely empty rows
+                }
 
                 $rowSpecificData = [
-                    'sub_project'    => !$skipItemTable ? trim((string)$subProject) : null,
+                    'sub_project'    => $subProjectText,
                     'account_sub_id' => !$skipItemTable ? $flattenValue($accountSubs[$index] ?? null) : null,
                     'program_id'     => !$skipItemTable ? $flattenValue($programs[$index] ?? null) : null,
                     'program_sub_id' => !$skipItemTable ? $flattenValue($programSubs[$index] ?? null) : null,
                     'cluster_id'     => !$skipItemTable ? $flattenValue($clusters[$index] ?? null) : null,
                 ];
 
-                if (empty($rowCategories)) {
-                    // If no categories were filled, create a single row with null categories
+                if (empty($filteredCategories)) {
+                    // Save a row even if category/sub-category/detail are left blank
                     Projects::create(array_merge($baseRecordData, $rowSpecificData, [
                         'category'     => null,
                         'sub_category' => null,
+                        'detail'       => null,
                     ]));
                 } else {
-                    // Loop through each category input and create a separate database row
-                    foreach ($rowCategories as $catIdx => $categoryItem) {
-                        $subCategoryItem = $rowSubCategories[$catIdx] ?? null;
+                    foreach ($filteredCategories as $catIdx => $categoryItem) {
+                        $rawSubCats      = $rowSubCategoriesMap[$catIdx] ?? [];
+                        $filteredSubCats = array_values(array_filter($rawSubCats, fn($v) => !is_null($v) && trim((string)$v) !== ''));
 
-                        Projects::create(array_merge($baseRecordData, $rowSpecificData, [
-                            'category'     => $categoryItem,
-                            'sub_category' => $subCategoryItem,
-                        ]));
+                        $rawSubCatDetailsMap = $rowDetailsMap[$catIdx] ?? [];
+
+                        if (empty($filteredSubCats)) {
+                            $rawCatDetails       = $rawSubCatDetailsMap[0] ?? [];
+                            $filteredCatDetails  = array_values(array_filter($rawCatDetails, fn($v) => !is_null($v) && trim((string)$v) !== ''));
+
+                            if (empty($filteredCatDetails)) {
+                                Projects::create(array_merge($baseRecordData, $rowSpecificData, [
+                                    'category'     => $categoryItem,
+                                    'sub_category' => null,
+                                    'detail'       => null,
+                                ]));
+                            } else {
+                                foreach ($filteredCatDetails as $detailItem) {
+                                    Projects::create(array_merge($baseRecordData, $rowSpecificData, [
+                                        'category'     => $categoryItem,
+                                        'sub_category' => null,
+                                        'detail'       => trim((string)$detailItem),
+                                    ]));
+                                }
+                            }
+                        } else {
+                            foreach ($filteredSubCats as $subCatIdx => $subCategoryItem) {
+                                $subCategoryItem = trim((string)$subCategoryItem);
+
+                                $rawSubCatDetails      = $rawSubCatDetailsMap[$subCatIdx] ?? [];
+                                $filteredSubCatDetails = array_values(array_filter($rawSubCatDetails, fn($v) => !is_null($v) && trim((string)$v) !== ''));
+
+                                if (empty($filteredSubCatDetails)) {
+                                    Projects::create(array_merge($baseRecordData, $rowSpecificData, [
+                                        'category'     => $categoryItem,
+                                        'sub_category' => $subCategoryItem,
+                                        'detail'       => null,
+                                    ]));
+                                } else {
+                                    foreach ($filteredSubCatDetails as $detailItem) {
+                                        Projects::create(array_merge($baseRecordData, $rowSpecificData, [
+                                            'category'     => $categoryItem,
+                                            'sub_category' => $subCategoryItem,
+                                            'detail'       => trim((string)$detailItem),
+                                        ]));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -357,25 +414,16 @@ class ProjectsController extends Controller
             ->where('ministry_id', $ministryId)
             ->firstOrFail();
 
-        // Fetch all rows sharing the same stock_number and group/merge their categories
-        $items = Projects::where('ministry_id', $ministryId)
+        // Fetch all rows sharing the same stock_number
+        $projectItems = Projects::where('ministry_id', $ministryId)
             ->where('stock_number', $module->stock_number)
-            ->get()
-            ->groupBy('sub_project')
-            ->map(function ($rows) {
-                $first = $rows->first();
-                // Collect and merge all category and sub_category values across rows into single flat arrays
-                $first->category = $rows->flatMap(function ($row) {
-                    return is_array($row->category) ? $row->category : json_decode($row->category, true) ?? [$row->category];
-                })->filter()->values()->all();
+            ->get();
 
-                $first->sub_category = $rows->flatMap(function ($row) {
-                    return is_array($row->sub_category) ? $row->sub_category : json_decode($row->sub_category, true) ?? [$row->sub_category];
-                })->filter()->values()->all();
+        // Check if the table was previously skipped/left blank (e.g., sub_project and category are null/empty)
+        $isTableSkipped = $projectItems->isEmpty() || $projectItems->every(fn($item) => is_null($item->sub_project) && is_null($item->category));
 
-                return $first;
-            })
-            ->values();
+        // Group rows by sub_project for clean Blade rendering
+        $groupedRows = $projectItems->groupBy('sub_project');
 
         $program    = Program::where('ministry_id', $ministry->id)->get();
         $accountSub = AccountSub::where('ministry_id', $ministry->id)->get();
@@ -383,15 +431,16 @@ class ProjectsController extends Controller
         $cluster    = Cluster::where('ministry_id', $ministry->id)->get();
 
         return view('material::project.edit', [
-            'ministry'   => $ministry,
-            'module'     => $module,
-            'params'     => $params,
-            'id'         => $id,
-            'program'    => $program,
-            'accountSub' => $accountSub,
-            'programSub' => $programSub,
-            'cluster'    => $cluster,
-            'items'      => $items,
+            'ministry'       => $ministry,
+            'module'         => $module,
+            'params'         => $params,
+            'id'             => $id,
+            'program'        => $program,
+            'accountSub'     => $accountSub,
+            'programSub'     => $programSub,
+            'cluster'        => $cluster,
+            'groupedRows'    => $groupedRows,
+            'isTableSkipped' => $isTableSkipped, // Pass the flag to the view
         ]);
     }
 
@@ -399,46 +448,47 @@ class ProjectsController extends Controller
      * Update the specified project in storage without deleting any rows.
      */
 
-    /**
-     * Update the specified project in storage.
-     */
-    /**
-     * Update the specified project in storage.
-     */
     public function update(Request $request, $params, $id)
     {
         $ministryId = decode_params($params);
         $ministry   = Ministry::where('id', $ministryId)->firstOrFail();
 
         $validated = $request->validate([
-            'stock_number'      => 'required|string',
-            'stock_name'        => 'required|string',
-            'company_name'      => 'required|string',
-            'warehouse_voucher' => 'required|string',
-            'warehouse_owner'   => 'nullable|string',
-            'user_entry'        => 'required|string',
-            'user_receiver'     => 'required|string',
-            'date'              => 'required|date',
-            'note'              => 'required|string',
-            'refer'             => 'required|string',
-            'item_id'           => 'nullable|array',
-            'item_id.*'         => 'nullable',
-            'sub_pro'           => 'nullable|array',
-            'sub_pro.*'         => 'nullable',
-            'category'          => 'nullable|array',
-            'category.*'        => 'nullable|array',
-            'category.*.*'      => 'nullable|string',
-            'sub_category'      => 'nullable|array',
-            'sub_category.*'    => 'nullable|array',
-            'sub_category.*.*'  => 'nullable|string',
-            'accountSub'        => 'nullable|array',
-            'accountSub.*'      => 'nullable',
-            'program'           => 'nullable|array',
-            'program.*'         => 'nullable',
-            'cboProgramSub'     => 'nullable|array',
-            'cboProgramSub.*'   => 'nullable',
-            'cboCluster'        => 'nullable|array',
-            'cboCluster.*'      => 'nullable',
+            'stock_number'         => 'required|string',
+            'stock_name'           => 'required|string',
+            'company_name'         => 'required|string',
+            'warehouse_voucher'    => 'required|string',
+            'warehouse_owner'      => 'nullable|string',
+            'user_entry'           => 'required|string',
+            'user_receiver'        => 'required|string',
+            'date'                 => 'required|date',
+            'note'                 => 'required|string',
+            'refer'                => 'required|string',
+            'item_id'              => 'nullable|array',
+            'item_id.*'            => 'nullable',
+            'sub_pro'              => 'nullable|array',
+            'sub_pro.*'            => 'nullable',
+            'category'             => 'nullable|array',
+            'category.*'           => 'nullable|array',
+            'category.*.*'         => 'nullable',
+            'sub_category'         => 'nullable|array',
+            'sub_category.*'       => 'nullable|array',
+            'sub_category.*.*'     => 'nullable|array',
+            'sub_category.*.*.*'   => 'nullable',
+            // Validation rules for the new multi-detail array
+            'detail'               => 'nullable|array',
+            'detail.*'             => 'nullable|array',
+            'detail.*.*'           => 'nullable|array',
+            'detail.*.*.*'         => 'nullable|array',
+            'detail.*.*.*.*'       => 'nullable',
+            'accountSub'           => 'nullable|array',
+            'accountSub.*'         => 'nullable',
+            'program'              => 'nullable|array',
+            'program.*'            => 'nullable',
+            'cboProgramSub'        => 'nullable|array',
+            'cboProgramSub.*'      => 'nullable',
+            'cboCluster'           => 'nullable|array',
+            'cboCluster.*'         => 'nullable',
         ]);
 
         DB::beginTransaction();
@@ -450,14 +500,15 @@ class ProjectsController extends Controller
                 ->firstOrFail();
 
             $oldStockNumber = $project->stock_number;
+            $newStockNumber = $validated['stock_number'];
             $date           = Carbon::parse($validated['date'])->format('Y-m-d');
 
             $noteContent  = trim(strip_tags($validated['note'])) === '' ? null : $validated['note'];
             $referContent = trim(strip_tags($validated['refer'])) === '' ? null : $validated['refer'];
 
-            // Shared header details
             $baseData = [
-                'stock_number'      => $validated['stock_number'],
+                'ministry_id'       => $ministry->id,
+                'stock_number'      => $newStockNumber,
                 'stock_name'        => $validated['stock_name'],
                 'company_name'      => $validated['company_name'],
                 'warehouse_voucher' => $validated['warehouse_voucher'],
@@ -479,52 +530,62 @@ class ProjectsController extends Controller
             $skipItemTable = $request->boolean('skipItemTable');
 
             if ($skipItemTable) {
-                // Remove all other child records if table is skipped
                 Projects::where('ministry_id', $ministry->id)
-                    ->where('stock_number', $oldStockNumber)
+                    ->where(function ($query) use ($oldStockNumber, $newStockNumber) {
+                        $query->where('stock_number', $oldStockNumber)
+                            ->orWhere('stock_number', $newStockNumber);
+                    })
                     ->where('id', '!=', $project->id)
-                    ->forceDelete(); // Use forceDelete() if using SoftDeletes, or delete()
+                    ->forceDelete();
 
                 $project->update(array_merge($baseData, [
                     'sub_project'    => null,
                     'category'       => null,
                     'sub_category'   => null,
+                    'detail'         => null,
                     'account_sub_id' => null,
                     'program_id'     => null,
                     'program_sub_id' => null,
                     'cluster_id'     => null,
                 ]));
             } else {
-                $subProArray      = $request->input('sub_pro', []);
-                $categoriesArray  = $request->input('category', []);
-                $subCategoriesArr = $request->input('sub_category', []);
-                $accountSubArray  = $request->input('accountSub', []);
-                $programArray     = $request->input('program', []);
-                $programSubArray  = $request->input('cboProgramSub', []);
-                $clusterArray     = $request->input('cboCluster', []);
+                // Use array_values to re-index arrays starting strictly from 0
+                $subProArray         = array_values($validated['sub_pro'] ?? []);
+                $categoriesGroup     = array_values($validated['category'] ?? []);
+                $subCategoriesGroup  = array_values($validated['sub_category'] ?? []);
+                $detailsGroup        = array_values($validated['detail'] ?? []);
+                $accountSubArray     = array_values($validated['accountSub'] ?? []);
+                $programArray        = array_values($validated['program'] ?? []);
+                $programSubArray     = array_values($validated['cboProgramSub'] ?? []);
+                $clusterArray        = array_values($validated['cboCluster'] ?? []);
 
-                // Get all active IDs linked to this stock number before updating
-                $existingDbIds = Projects::where('ministry_id', $ministry->id)
-                    ->where('stock_number', $oldStockNumber)
-                    ->pluck('id')
-                    ->toArray();
+                // 1. Wipe old records for this stock group
+                Projects::where('ministry_id', $ministry->id)
+                    ->where(function ($query) use ($oldStockNumber, $newStockNumber) {
+                        $query->where('stock_number', $oldStockNumber)
+                            ->orWhere('stock_number', $newStockNumber);
+                    })
+                    ->forceDelete();
 
-                // Store array of IDs that were kept/updated or created in this submission
-                $savedIds = [];
-
+                // 2. Insert records sequentially using explicit re-indexed keys
                 foreach ($subProArray as $index => $subPro) {
                     $subProValue = $flattenValue($subPro);
-                    if (is_null($subProValue)) {
-                        continue;
+
+                    // Safely fetch row groups using the clean sequential index
+                    $rowCategories        = array_values($categoriesGroup[$index] ?? []);
+                    $rowSubCategoriesMap  = $subCategoriesGroup[$index] ?? [];
+                    $rowDetailsMap        = $detailsGroup[$index] ?? [];
+
+                    $filteredCategories = [];
+                    foreach ($rowCategories as $catIdx => $catVal) {
+                        if (!is_null($catVal) && trim((string)$catVal) !== '') {
+                            $filteredCategories[$catIdx] = trim((string)$catVal);
+                        }
                     }
 
-                    $rowCategories = isset($categoriesArray[$index]) && is_array($categoriesArray[$index])
-                        ? array_values(array_filter($categoriesArray[$index], fn($val) => !is_null($val) && trim((string)$val) !== ''))
-                        : [];
-
-                    $rowSubCategories = isset($subCategoriesArr[$index]) && is_array($subCategoriesArr[$index])
-                        ? array_values(array_filter($subCategoriesArr[$index], fn($val) => !is_null($val) && trim((string)$val) !== ''))
-                        : [];
+                    if (empty($subProValue) && empty($filteredCategories)) {
+                        continue;
+                    }
 
                     $rowDetails = [
                         'sub_project'    => $subProValue,
@@ -534,49 +595,65 @@ class ProjectsController extends Controller
                         'cluster_id'     => $flattenValue($clusterArray[$index] ?? null),
                     ];
 
-                    if (empty($rowCategories)) {
-                        $targetId = array_shift($existingDbIds);
-
-                        if ($targetId && $existing = Projects::find($targetId)) {
-                            $existing->update(array_merge($baseData, $rowDetails, [
-                                'category'     => null,
-                                'sub_category' => null,
-                            ]));
-                            $savedIds[] = $existing->id;
-                        } else {
-                            $newRecord = Projects::create(array_merge($baseData, ['ministry_id' => $ministry->id], $rowDetails, [
-                                'category'     => null,
-                                'sub_category' => null,
-                            ]));
-                            $savedIds[] = $newRecord->id;
-                        }
+                    if (empty($filteredCategories)) {
+                        Projects::create(array_merge($baseData, $rowDetails, [
+                            'category'     => null,
+                            'sub_category' => null,
+                            'detail'       => null,
+                        ]));
                     } else {
-                        foreach ($rowCategories as $catIdx => $categoryItem) {
-                            $subCategoryItem = $rowSubCategories[$catIdx] ?? null;
-                            $targetId        = array_shift($existingDbIds);
+                        foreach ($filteredCategories as $catIdx => $categoryItem) {
+                            $rawSubCats      = $rowSubCategoriesMap[$catIdx] ?? [];
+                            $filteredSubCats = array_values(array_filter($rawSubCats, fn($v) => !is_null($v) && trim((string)$v) !== ''));
 
-                            if ($targetId && $existing = Projects::find($targetId)) {
-                                $existing->update(array_merge($baseData, $rowDetails, [
-                                    'category'     => $categoryItem,
-                                    'sub_category' => $subCategoryItem,
-                                ]));
-                                $savedIds[] = $existing->id;
+                            $rawSubCatDetailsMap = $rowDetailsMap[$catIdx] ?? [];
+
+                            if (empty($filteredSubCats)) {
+                                $rawCatDetails      = $rawSubCatDetailsMap[0] ?? [];
+                                $filteredCatDetails = array_values(array_filter($rawCatDetails, fn($v) => !is_null($v) && trim((string)$v) !== ''));
+
+                                if (empty($filteredCatDetails)) {
+                                    Projects::create(array_merge($baseData, $rowDetails, [
+                                        'category'     => $categoryItem,
+                                        'sub_category' => null,
+                                        'detail'       => null,
+                                    ]));
+                                } else {
+                                    foreach ($filteredCatDetails as $detailItem) {
+                                        Projects::create(array_merge($baseData, $rowDetails, [
+                                            'category'     => $categoryItem,
+                                            'sub_category' => null,
+                                            'detail'       => trim((string)$detailItem),
+                                        ]));
+                                    }
+                                }
                             } else {
-                                $newRecord = Projects::create(array_merge($baseData, ['ministry_id' => $ministry->id], $rowDetails, [
-                                    'category'     => $categoryItem,
-                                    'sub_category' => $subCategoryItem,
-                                ]));
-                                $savedIds[] = $newRecord->id;
+                                foreach ($filteredSubCats as $subCatIdx => $subCategoryItem) {
+                                    $subCategoryItem = trim((string)$subCategoryItem);
+
+                                    $rawSubCatDetails      = $rawSubCatDetailsMap[$subCatIdx] ?? [];
+                                    $filteredSubCatDetails = array_values(array_filter($rawSubCatDetails, fn($v) => !is_null($v) && trim((string)$v) !== ''));
+
+                                    if (empty($filteredSubCatDetails)) {
+                                        Projects::create(array_merge($baseData, $rowDetails, [
+                                            'category'     => $categoryItem,
+                                            'sub_category' => $subCategoryItem,
+                                            'detail'       => null,
+                                        ]));
+                                    } else {
+                                        foreach ($filteredSubCatDetails as $detailItem) {
+                                            Projects::create(array_merge($baseData, $rowDetails, [
+                                                'category'     => $categoryItem,
+                                                'sub_category' => $subCategoryItem,
+                                                'detail'       => trim((string)$detailItem),
+                                            ]));
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
-
-                // Delete any remaining database IDs under this stock number that were removed in the UI
-                Projects::where('ministry_id', $ministry->id)
-                    ->where('stock_number', $oldStockNumber)
-                    ->whereNotIn('id', $savedIds)
-                    ->forceDelete(); // Use ->forceDelete() to permanently erase rows instead of soft-deleting
             }
 
             DB::commit();
