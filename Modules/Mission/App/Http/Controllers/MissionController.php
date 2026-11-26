@@ -365,15 +365,29 @@ class MissionController extends Controller
             | Calculate days / nights
             |--------------------------------------------------------------------------
             */
-            $startDate = Carbon::parse($validated['start_date']);
-            $endDate = Carbon::parse($validated['end_date']);
+            // $startDate = Carbon::parse($validated['start_date']);
+            // $endDate = Carbon::parse($validated['end_date']);
+            $startDate = Carbon::parse($validated['start_date'])->startOfDay();
+            $endDate   = Carbon::parse($validated['end_date'])->startOfDay();
+
+            $monthStart = $startDate->copy()->startOfMonth();
+            $monthEnd   = $startDate->copy()->endOfMonth();
 
             $daysCount = $startDate->diffInDays($endDate) + 1;
             $nightsCount = max($daysCount - 1, 0);
 
+            // New mission days within the month only
+            $newStart = $startDate->copy()->max($monthStart);
+            $newEnd   = $endDate->copy()->min($monthEnd);
+
+            $newMissionDays = $newStart->lte($newEnd)
+                ? $newStart->diffInDays($newEnd) + 1
+                : 0;
+
             $province = Province::where('id', $validated['cboProvince'])->first();
             $accountSub = AccountSub::where('ministry_id', $ministry->id)->first();
-
+            // dd($daysCount);
+            // dd($nightsCount);
             /*
             |--------------------------------------------------------------------------
             | Create Mission for each employee
@@ -432,7 +446,7 @@ class MissionController extends Controller
                 'account_id'     => substr($accountSub->no, 0, 4),
                 'account_sub_id' => $accountSub->no,
             ]);
-
+// dd($mission->id);
             foreach ($validated['cboName'] as $index => $employeeId) {
 
                 /*
@@ -516,32 +530,90 @@ class MissionController extends Controller
                     + $totalAccommodationMoney;
 
                 // Check employee's used over 10day per month
-                $usedDays = Mission::whereHas(
-                    'missionEmployees',
-                    function ($query) use ($employeeId) {
-                        $query->where('employee_id', $employeeId);
-                    }
-                )
-                    ->whereYear('start_date', $startDate->year)
-                    ->whereMonth('start_date', $startDate->month)
-                    ->sum('days_count');
+                // $usedDays = Mission::whereHas(
+                //     'missionEmployees',
+                //     function ($query) use ($employeeId) {
+                //         $query->where('employee_id', $employeeId);
+                //     }
+                // )
+                //     ->whereYear('start_date', $startDate->year)
+                //     ->whereMonth('start_date', $startDate->month)
+                //     ->sum('days_count');
 
-                $totalDays = $usedDays + $daysCount;
+                // $totalDays = $usedDays + $daysCount;
+                // use Carbon\Carbon;
+
+                // $monthStart = Carbon::parse($startDate)->startOfMonth();
+                // $monthEnd   = Carbon::parse($startDate)->endOfMonth();
+
+                // $missions = Mission::whereHas('missionEmployees', function ($query) use ($employeeId) {
+                //     $query->where('employee_id', $employeeId);
+                // })
+                //     ->whereDate('start_date', '<=', $monthEnd)
+                //     ->whereDate('end_date', '>=', $monthStart)
+                //     ->get(['id', 'start_date', 'end_date']);
+
+                // $usedDays = 0;
+
+                // foreach ($missions as $mission) {
+
+                //     $missionStart = Carbon::parse($mission->start_date)->greaterThan($monthStart)
+                //         ? Carbon::parse($mission->start_date)
+                //         : $monthStart->copy();
+
+                //     $missionEnd = Carbon::parse($mission->end_date)->lessThan($monthEnd)
+                //         ? Carbon::parse($mission->end_date)
+                //         : $monthEnd->copy();
+
+                //     $usedDays += $missionStart->diffInDays($missionEnd) + 1;
+                //     // dd($usedDays);
+                // }
+                $missions = Mission::whereHas('missionEmployees', function ($query) use ($employeeId) {
+                    $query->where('employee_id', $employeeId);
+                })
+                    ->whereDate('start_date', '<=', $monthEnd)
+                    ->whereDate('end_date', '>=', $monthStart)
+                    ->get(['id', 'start_date', 'end_date']);
+// dd($mission->id);
+                $usedDays = 0;
+
+                // foreach ($missions as $mission) {
+
+                    $missionStart = Carbon::parse($mission->start_date)->max($monthStart);
+                    $missionEnd   = Carbon::parse($mission->end_date)->min($monthEnd);
+
+                    $usedDays += $missionStart->diffInDays($missionEnd) + 1;
+                // }
+
+                $totalDays = $usedDays + $newMissionDays;
+
+                // $totalDays = $usedDays + $daysCount;
+                // dd($totalDays);
+                // if ($totalDays > 10) {
+
+                //     throw new \Exception(
+                //         'ឈ្មោះ ' . $employeeTitle .
+                //             ($employee->name_kh ?? $employeeId) .
+                //             ' បានប្រើប្រាស់ថ្ងៃបេសកកម្ម ' .
+                //             $usedDays .
+                //             ' ថ្ងៃក្នុងខែនេះ។ ' .
+                //             'មិនអាចបញ្ចូលបន្ថែម ' .
+                //             $daysCount .
+                //             ' ថ្ងៃបានទេ ព្រោះអតិបរមា 10 ថ្ងៃក្នុងមួយខែ។'
+                //     );
+                // }
 
                 if ($totalDays > 10) {
-
                     throw new \Exception(
-                        'បុគ្គលិក ' .
-                            ($employee->name_kh ?? $employeeId) .
-                            ' បានប្រើប្រាស់ថ្ងៃបេសកកម្ម ' .
-                            $usedDays .
-                            ' ថ្ងៃក្នុងខែនេះ។ ' .
-                            'មិនអាចបញ្ចូលបន្ថែម ' .
-                            $daysCount .
-                            ' ថ្ងៃបានទេ ព្រោះអតិបរមា 10 ថ្ងៃក្នុងមួយខែ។'
+                        'មិនអាចបញ្ចូលបេសកកម្មបានទេ!' . "\n\n" .
+                            'ឈ្មោះមន្ត្រី៖ ' . ($employee->name_kh ?? $employeeId) . "\n" .
+                            'ថ្ងៃបេសកកម្មដែលបានប្រើក្នុងខែនេះ៖ ' . $usedDays . ' ថ្ងៃ' . "\n" .
+                            'ថ្ងៃបេសកកម្មដែលស្នើបន្ថែម៖ ' . $daysCount . ' ថ្ងៃ' . "\n" .
+                            'សរុប៖ ' . $totalDays . ' ថ្ងៃ' . "\n" .
+                            'ចំនួនថ្ងៃអតិបរមាដែលអនុញ្ញាត៖ 10 ថ្ងៃក្នុងមួយខែ។' . "\n\n" .
+                            'សូមពិនិត្យ និងកែសម្រួលចំនួនថ្ងៃបេសកកម្មឡើងវិញ។'
                     );
                 }
-
                 /*
                 |--------------------------------------------------------------------------
                 | Check duplicate employee in the same mission
@@ -551,11 +623,11 @@ class MissionController extends Controller
                 $duplicateEmployee = MissionEmployee::where('mission_id', $mission->id)
                     ->where('employee_id', $employeeId)
                     ->exists();
-
+// dd($duplicateEmployee);
                 if ($duplicateEmployee) {
 
                     throw new \Exception(
-                        'ឈ្មោះ ' .
+                        'ឈ្មោះ ' . $employeeTitle .
                             ($employee->name_kh ?? $employeeId) .
                             ' មានរួចហើយនៅក្នុងបេសកកម្មនេះ។ ' .
                             'មិនអាចបញ្ចូលបុគ្គលិកដដែលម្ដងទៀតបានទេ។'
@@ -613,7 +685,7 @@ class MissionController extends Controller
 
             flash()
                 ->translate('en')
-                ->option('timeout', 2000)
+                ->option('timeout', 4000)
                 ->success('success_msg', 'successful')
                 ->flash();
 
@@ -629,7 +701,7 @@ class MissionController extends Controller
 
             flash()
                 ->translate('en')
-                ->option('timeout', 2000)
+                ->option('timeout', 4000)
                 ->error('បញ្ហាក្នុងការរក្សាទុក: ' . $e->getMessage(), 'បញ្ហា')
                 ->flash();
 
@@ -716,6 +788,8 @@ class MissionController extends Controller
      */
     public function edit($params, $id)
     {
+        // Unlimited execution time and memory
+        loadRunUnlimitedTime();
         $ministry = Ministry::where('id', decode_params($params))->first();
 
         $mission = Mission::where('id', decode_params($id))
@@ -730,6 +804,7 @@ class MissionController extends Controller
         }
         $missionEmployees = MissionEmployee::with('employee')
             ->where('mission_id', $mission->id)
+            ->where('ministry_id', $ministry->id)
             ->get();
 
         $positions = Positions::all();
@@ -1536,6 +1611,9 @@ class MissionController extends Controller
                     'missions.days_count',
                     'missions.nights_count',
                     'missions.mission_type',
+                    'missions.program_id',
+                    'missions.program_sub_id',
+                    'missions.cluster_id',
 
                     'provinces.name as province_name',
 

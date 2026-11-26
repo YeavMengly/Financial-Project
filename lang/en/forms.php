@@ -59,6 +59,15 @@ return [
     'editorial'  => 'វិចារណកម្ម',
     'initial.budget.year' => 'កម្រងឆ្នាំ',
     'id.number' => 'អត្ដលេខ',
+    'service.code' => 'លេខកូដសេវា',
+    'service.name' => 'ឈ្មោះសេវា',
+    'service.price' => 'តម្លៃឯកតានៃសេវា',
+    'max.service.time' => 'រយៈពេលអតិបរមានៃការផ្ដល់សេវា',
+    'expired' => 'សុពលភាព',
+    'percentage.national' => 'ថវិកាជាតិ',
+    'percentage.mlvt' => 'រង្វាន់ក្រសួងការងារនិងបណ្ដុះបណ្ដាលវិជ្ជាជីវៈ',
+    'percentage.interior' => 'រង្វាន់ក្រសួងមហាផ្ទៃ',
+    'percentage.mef' => 'រង្វាន់ក្រសួងសេដ្ឋកិច្ចនិងហិរញ្ញវត្ថុ',
 
     // Material
     'stock.number' => 'លេខបញ្ចូលឃ្លាំង',
@@ -143,4 +152,6 @@ return [
     'total.meal.money' => 'ប្រាក់ហូបចុកសរុប',
     'total.accommodation.money' => 'ប្រាក់ស្នាក់នៅសរុប',
     'total' => 'សរុប',
+
+    'public.service.agency' => 'សេវាសាធារណៈតាមអង្គភាព'
 ];

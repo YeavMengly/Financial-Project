@@ -257,18 +257,19 @@
                                         បញ្ជីទូទាត់ / ទំព័រ
                                     </button>
 
-                                    <button type="button" class="btn btn-warning" id="btnPaymentPendingList">
+                                    {{-- <button type="button" class="btn btn-warning" id="btnPaymentPendingList">
                                         <i class="bx bx-money me-1"></i>
                                         Pending List
-                                        {{-- <span class="badge bg-warning ms-1" id="pendingMissionCount">
+                                        <span class="badge bg-warning ms-1" id="pendingMissionCount">
                                             {{ $pendingMissionCount }}
-                                        </span> --}}
-                                    </button>
+                                        </span>
+                                    </button> --}}
 
                                     {{-- Save Payment Draft --}}
                                     <button type="button" class="btn btn-secondary" id="btnSavePaymentDraft">
                                         <i class="bx bx-save me-1"></i>
-                                        រក្សាទុកទូទាត់
+                                        {{-- រក្សាទុកទូទាត់ --}}
+                                        Pending List
                                         <span class="badge bg-danger ms-1" id="pendingMissionCount">
                                             {{ $pendingMissionCount }}
                                         </span>
