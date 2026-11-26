@@ -6,25 +6,25 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
     <style>
         #itemTableWrapper,
-        .table-responsive {
+        /* .table-responsive {
             width: 100% !important;
             overflow-x: visible !important;
             overflow-y: visible !important;
             position: relative !important;
             display: block;
-        }
+        } */
 
-        #itemTableWrapper {
+        /* #itemTableWrapper {
             overflow-x: auto !important;
             padding-top: 300px !important;
             margin-top: -300px !important;
-        }
+        } */
 
-        #itemTable {
+        /* #itemTable {
             table-layout: fixed !important;
             width: 100% !important;
             min-width: 1300px !important;
-        }
+        } */
 
         #itemTable th {
             white-space: nowrap !important;
@@ -193,8 +193,9 @@
                     <div>
                         <form id="pristine-valid-example"
                             action="{{ route('project.update', ['params' => $params, 'id' => $id]) }}" method="POST"
-                            novalidate>
+                            enctype="multipart/form-data" novalidate>
                             @csrf
+
                             <div class="row">
                                 <div class="col-xl-4 col-md-6">
                                     <div class="form-group mb-3">
@@ -265,15 +266,69 @@
                                             data-pristine-required-message="{{ __('messages.required') }}" />
                                     </div>
                                 </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="titleInput" class="form-label mb-0">
+                                                {{ __('forms.title') }}
+                                            </label>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="skipTitleInput" style="cursor:pointer;"
+                                                    {{ empty($module->title) ? 'checked' : '' }}>
+                                                <label class="form-check-label font-size-12 text-muted skip-label"
+                                                    for="skipTitleInput" style="cursor:pointer;">
+                                                    រំលង / មិនភ្ជាប់
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <input type="text" id="titleInput" name="title" class="form-control"
+                                            tabindex="8" value="{{ old('title', $module->title ?? '') }}"
+                                            data-pristine-required-message="{{ __('messages.required') }}">
+
+                                        @error('title')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label for="fileInput" class="form-label mb-0">
+                                                {{ __('forms.file.type') }}
+                                            </label>
+                                            <div class="form-check form-switch mb-0">
+                                                <input class="form-check-input" type="checkbox" role="switch"
+                                                    id="skipFileInput" style="cursor:pointer;"
+                                                    {{ empty($module->file) ? 'checked' : '' }}>
+                                                <label class="form-check-label font-size-12 text-muted skip-label"
+                                                    for="skipFileInput" style="cursor:pointer;">
+                                                    រំលង / មិនភ្ជាប់
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="fileInput" name="file[]" class="form-control"
+                                            accept=".pdf,.doc,.docx" multiple data-max-size="5"
+                                            data-allowed-extensions="pdf,doc,docx">
+
+                                        <small class="form-text text-muted">
+                                            Allowed types: PDF, DOC, DOCX (Max: 5MB per file)
+                                        </small>
+
+                                        @error('file.*')
+                                            <div class="pristine-error text-help">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
                             </div>
 
-                            {{-- PROJECT TABLE --}}
+                            {{-- =====================================================
+                            SECTION 2: PROJECT TABLE
+                        ====================================================== --}}
                             @php
-                                $hasValidItems =
-                                    isset($items) &&
-                                    count($items) > 0 &&
-                                    !empty($items[0]->sub_project ?? ($items[0]->sub_pro ?? null));
-                                $isTableSkipped = old('skipItemTable', !$hasValidItems);
+                                $isTableChecked = old('skipItemTable', $isTableSkipped ?? false);
                             @endphp
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -283,7 +338,7 @@
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" role="switch" id="skipItemTable"
                                         name="skipItemTable" value="1" style="cursor:pointer;"
-                                        {{ $isTableSkipped ? 'checked' : '' }}>
+                                        {{ $isTableChecked ? 'checked' : '' }}>
                                     <label class="form-check-label font-size-12 text-muted skip-label"
                                         for="skipItemTable">
                                         រំលង / មិនភ្ជាប់
@@ -293,211 +348,283 @@
 
                             <div class="col-xl-12 col-md-12 mt-3" id="itemTableWrapper">
                                 <div class="table-responsive">
-                                    <table class="table table-bordered align-middle text-nowrap" id="itemTable">
-                                        <thead>
-                                            <tr>
-                                                <th style="width:200px; min-width:200px;" class="align-middle">
-                                                    {{ __('forms.project') }}
-                                                </th>
-                                                <th style="width:200px; min-width:200px;" class="align-middle">
-                                                    ប្រភេទ (Category)
-                                                </th>
-                                                <th style="width:200px; min-width:200px;" class="align-middle">
-                                                    ប្រភេទរង (Sub-category)
-                                                </th>
-                                                <th style="width:150px; min-width:200px;" class="align-middle">
-                                                    {{ __('forms.sub.account') }}
-                                                </th>
-                                                <th style="width:150px; min-width:200px;" class="align-middle">
-                                                    {{ __('forms.program') }}
-                                                </th>
-                                                <th style="width:150px; min-width:200px;" class="align-middle">
-                                                    {{ __('forms.program.sub') }}
-                                                </th>
-                                                <th style="width:150px; min-width:200px;" class="align-middle">
-                                                    {{ __('forms.cluster') }}
-                                                </th>
-                                                <th style="width:70px; min-width:70px;" class="text-center align-middle">
-                                                    Action
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @php
-                                                $rowCounts = count($items ?? [1]);
-                                            @endphp
+                                    <div class="card mb-3">
+                                        <div class="card-body p-0">
+                                            <table class="table table-bordered align-middle text-nowrap mb-0"
+                                                id="itemTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="align-middle">
+                                                            {{ __('forms.project') }}
+                                                        </th>
+                                                        <th class="align-middle">
+                                                            ប្រភេទ (Category, Sub-category & Detail)
+                                                        </th>
+                                                        {{-- <th style="width:150px; min-width:150px;" class="align-middle">
+                                                            {{ __('forms.sub.account') }}
+                                                        </th>
+                                                        <th style="width:150px; min-width:150px;" class="align-middle">
+                                                            {{ __('forms.program') }}
+                                                        </th>
+                                                        <th style="width:150px; min-width:150px;" class="align-middle">
+                                                            {{ __('forms.program.sub') }}
+                                                        </th>
+                                                        <th style="width:150px; min-width:150px;" class="align-middle">
+                                                            {{ __('forms.cluster') }}
+                                                        </th> --}}
+                                                        <th style="width:70px; min-width:70px;"
+                                                            class="text-center align-middle">
+                                                            Action
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @php
+                                                        $rowCollection =
+                                                            isset($groupedRows) && $groupedRows->count() > 0
+                                                                ? $groupedRows->values()
+                                                                : (isset($items) && count($items) > 0
+                                                                    ? collect([$items])
+                                                                    : collect([[$module]]));
+                                                        $rowCounts = $rowCollection->count();
+                                                    @endphp
 
-                                            @for ($i = 0; $i < $rowCounts; $i++)
-                                                @php
-                                                    $item = $items[$i] ?? ($module ?? null);
+                                                    @for ($i = 0; $i < max(1, $rowCounts); $i++)
+                                                        @php
+                                                            $rowGroup = $rowCollection[$i] ?? [];
+                                                            $firstItem =
+                                                                is_iterable($rowGroup) && count($rowGroup) > 0
+                                                                    ? (is_array($rowGroup)
+                                                                        ? reset($rowGroup)
+                                                                        : $rowGroup->first())
+                                                                    : $rowGroup;
 
-                                                    $valSubPro = old(
-                                                        "sub_pro.$i",
-                                                        $item->sub_project ?? ($item->sub_pro ?? ''),
-                                                    );
-                                                    $valAccountSub = old("accountSub.$i", $item->account_sub_id ?? '');
-                                                    $valProgram = old("program.$i", $item->program_id ?? '');
-                                                    $valProgramSub = old(
-                                                        "cboProgramSub.$i",
-                                                        $item->program_sub_id ?? '',
-                                                    );
-                                                    $valCluster = old("cboCluster.$i", $item->cluster_id ?? '');
+                                                            $valSubPro = old(
+                                                                "sub_pro.$i",
+                                                                $firstItem->sub_project ?? ($firstItem->sub_pro ?? ''),
+                                                            );
+                                                            $valAccountSub = old(
+                                                                "accountSub.$i",
+                                                                $firstItem->account_sub_id ?? '',
+                                                            );
+                                                            $valProgram = old(
+                                                                "program.$i",
+                                                                $firstItem->program_id ?? '',
+                                                            );
+                                                            $valProgramSub = old(
+                                                                "cboProgramSub.$i",
+                                                                $firstItem->program_sub_id ?? '',
+                                                            );
+                                                            $valCluster = old(
+                                                                "cboCluster.$i",
+                                                                $firstItem->cluster_id ?? '',
+                                                            );
 
-                                                    /* Universal Parser (Handles JSON, Comma Strings, & Raw Arrays) */
-                                                    $parseArray = function ($source) {
-                                                        if (is_array($source)) {
-                                                            return array_values(array_filter($source, fn($v) => !is_null($v) && trim((string)$v) !== ''));
-                                                        }
-                                                        if (is_string($source) && !empty(trim($source))) {
-                                                            $str = trim($source);
-                                                            if (str_starts_with($str, '[') || str_starts_with($str, '"')) {
-                                                                $decoded = json_decode($str, true);
-                                                                if (is_string($decoded)) {
-                                                                    $decoded = json_decode($decoded, true);
-                                                                }
-                                                                if (is_array($decoded)) {
-                                                                    return array_values(array_filter($decoded, fn($v) => !is_null($v) && trim((string)$v) !== ''));
+                                                            $structuredData = [];
+                                                            if (is_iterable($rowGroup)) {
+                                                                foreach ($rowGroup as $rItem) {
+                                                                    $cat = trim((string) ($rItem->category ?? ''));
+                                                                    $subCat = trim(
+                                                                        (string) ($rItem->sub_category ?? ''),
+                                                                    );
+                                                                    $detail = trim((string) ($rItem->detail ?? ''));
+
+                                                                    if ($cat !== '') {
+                                                                        if (!isset($structuredData[$cat])) {
+                                                                            $structuredData[$cat] = [];
+                                                                        }
+                                                                        if ($subCat !== '') {
+                                                                            if (
+                                                                                !isset($structuredData[$cat][$subCat])
+                                                                            ) {
+                                                                                $structuredData[$cat][$subCat] = [];
+                                                                            }
+                                                                            if ($detail !== '') {
+                                                                                $structuredData[$cat][
+                                                                                    $subCat
+                                                                                ][] = $detail;
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
                                                             }
-                                                            return array_values(array_filter(array_map('trim', explode(',', $str)), fn($v) => $v !== ''));
-                                                        }
-                                                        return [];
-                                                    };
 
-                                                    $rawCategories = old(
-                                                        "category.$i",
-                                                        $item->category ?? ($item->categories ?? null),
-                                                    );
-                                                    $valCategories = $parseArray($rawCategories);
-                                                    if (empty($valCategories)) {
-                                                        $valCategories = [''];
-                                                    }
+                                                            if (empty($structuredData)) {
+                                                                $structuredData = ['' => ['' => ['']]];
+                                                            }
+                                                        @endphp
 
-                                                    $rawSubCats = old(
-                                                        "sub_category.$i",
-                                                        $item->sub_category ?? ($item->sub_categories ?? null),
-                                                    );
-                                                    $valSubCategories = $parseArray($rawSubCats);
-                                                    if (empty($valSubCategories)) {
-                                                        $valSubCategories = [''];
-                                                    }
+                                                        <tr data-row-index="{{ $i }}">
+                                                            <td>
+                                                                @if (!empty($firstItem->id))
+                                                                    <input type="hidden"
+                                                                        name="item_id[{{ $i }}][]"
+                                                                        value="{{ $firstItem->id }}">
+                                                                @endif
+                                                                <input type="text" name="sub_pro[{{ $i }}]"
+                                                                    value="{{ $valSubPro }}" class="form-control">
+                                                            </td>
 
-                                                    $maxInputs = max(
-                                                        count($valCategories),
-                                                        count($valSubCategories),
-                                                        1,
-                                                    );
-                                                @endphp
+                                                            <td>
+                                                                <div class="category-container">
+                                                                    @foreach ($structuredData as $catName => $subCats)
+                                                                        @php $k = $loop->index; @endphp
+                                                                        <div class="category-block border p-2 mb-2 rounded bg-light"
+                                                                            data-cat-index="{{ $k }}">
 
-                                                <tr data-row-index="{{ $i }}">
-                                                    {{-- Sub Project --}}
-                                                    <td>
-                                                        @if (!empty($item->id))
-                                                            <input type="hidden" name="item_id[]"
-                                                                value="{{ $item->id }}">
-                                                        @endif
-                                                        <input type="text" name="sub_pro[]"
-                                                            value="{{ $valSubPro }}"
-                                                            class="form-control table-required" required>
-                                                    </td>
+                                                                            <div
+                                                                                class="d-flex mb-2 align-items-center category-item">
+                                                                                <input type="text"
+                                                                                    class="form-control me-1"
+                                                                                    name="category[{{ $i }}][{{ $k }}]"
+                                                                                    value="{{ $catName }}"
+                                                                                    placeholder="បញ្ចូលប្រភេទ (Category)">
+                                                                                <button type="button"
+                                                                                    class="btn btn-outline-success btn-sm addCategoryBtn"
+                                                                                    title="បន្ថែមប្រភេទ">+</button>
+                                                                                <button type="button"
+                                                                                    class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1"
+                                                                                    title="លុបប្រភេទ"
+                                                                                    style="{{ $k === 0 ? 'visibility: hidden;' : '' }}">-</button>
+                                                                            </div>
 
-                                                    {{-- Category Inputs --}}
-                                                    <td>
-                                                        <div class="category-wrapper">
-                                                            @for ($k = 0; $k < $maxInputs; $k++)
-                                                                @php $catVal = $valCategories[$k] ?? ''; @endphp
-                                                                <div class="d-flex mb-2 category-item">
-                                                                    <input type="text" class="form-control me-1"
-                                                                        name="category[{{ $i }}][]"
-                                                                        value="{{ is_scalar($catVal) ? $catVal : '' }}"
-                                                                        placeholder="បញ្ចូលប្រភេទ">
-                                                                    @if ($k === 0)
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-success btn-sm addCategoryBtn">+</button>
-                                                                    @else
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-danger btn-sm removeCategoryBtn">-</button>
-                                                                    @endif
+                                                                            <div
+                                                                                class="subcategory-wrapper ps-3 border-start">
+                                                                                @foreach ($subCats as $subCatName => $details)
+                                                                                    @php $subIdx = $loop->index; @endphp
+                                                                                    <div class="subcategory-item mb-2 border p-2 rounded bg-white"
+                                                                                        data-subcat-index="{{ $subIdx }}">
+                                                                                        <div
+                                                                                            class="d-flex align-items-center mb-2">
+                                                                                            <input type="text"
+                                                                                                class="form-control me-1"
+                                                                                                name="sub_category[{{ $i }}][{{ $k }}][{{ $subIdx }}]"
+                                                                                                value="{{ $subCatName }}"
+                                                                                                placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                                                                            <button type="button"
+                                                                                                class="btn btn-outline-success btn-sm addSubCategoryBtn"
+                                                                                                title="បន្ថែមប្រភេទរង">+</button>
+                                                                                            <button type="button"
+                                                                                                class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1"
+                                                                                                title="លុបប្រភេទរង"
+                                                                                                style="{{ $subIdx === 0 ? 'visibility: hidden;' : '' }}">-</button>
+                                                                                        </div>
+
+                                                                                        <div
+                                                                                            class="detail-wrapper ps-3 border-start">
+                                                                                            @if (empty($details))
+                                                                                                <div
+                                                                                                    class="d-flex mb-2 align-items-center detail-item">
+                                                                                                    <input type="text"
+                                                                                                        class="form-control me-1"
+                                                                                                        name="detail[{{ $i }}][{{ $k }}][{{ $subIdx }}][]"
+                                                                                                        placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                                                                                    <button type="button"
+                                                                                                        class="btn btn-outline-success btn-sm addDetailBtn"
+                                                                                                        title="បន្ថែមលម្អិត">+</button>
+                                                                                                </div>
+                                                                                            @else
+                                                                                                @foreach ($details as $dIdx => $detailVal)
+                                                                                                    <div
+                                                                                                        class="d-flex mb-2 align-items-center detail-item">
+                                                                                                        <input
+                                                                                                            type="text"
+                                                                                                            class="form-control me-1"
+                                                                                                            name="detail[{{ $i }}][{{ $k }}][{{ $subIdx }}][]"
+                                                                                                            value="{{ $detailVal }}"
+                                                                                                            placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                                                                                        @if ($dIdx === 0)
+                                                                                                            <button
+                                                                                                                type="button"
+                                                                                                                class="btn btn-outline-success btn-sm addDetailBtn"
+                                                                                                                title="បន្ថែមលម្អិត">+</button>
+                                                                                                        @else
+                                                                                                            <button
+                                                                                                                type="button"
+                                                                                                                class="btn btn-outline-danger btn-sm removeDetailBtn"
+                                                                                                                title="លុបលម្អិត">-</button>
+                                                                                                        @endif
+                                                                                                    </div>
+                                                                                                @endforeach
+                                                                                            @endif
+                                                                                        </div>
+                                                                                    </div>
+                                                                                @endforeach
+                                                                            </div>
+                                                                        </div>
+                                                                    @endforeach
                                                                 </div>
-                                                            @endfor
-                                                        </div>
-                                                    </td>
+                                                            </td>
 
-                                                    {{-- Sub Category Inputs --}}
-                                                    <td>
-                                                        <div class="subcategory-wrapper">
-                                                            @for ($k = 0; $k < $maxInputs; $k++)
-                                                                @php $subCatVal = $valSubCategories[$k] ?? ''; @endphp
-                                                                <div class="d-flex mb-2 subcategory-item">
-                                                                    <input type="text" class="form-control me-1"
-                                                                        name="sub_category[{{ $i }}][]"
-                                                                        value="{{ is_scalar($subCatVal) ? $subCatVal : '' }}"
-                                                                        placeholder="បញ្ចូលប្រភេទរង">
-                                                                </div>
-                                                            @endfor
-                                                        </div>
-                                                    </td>
+                                                            {{-- <td>
+                                                                <select class="form-select cboSubAccount"
+                                                                    name="accountSub[{{ $i }}]">
+                                                                    <option value="">ជ្រើសរើស</option>
+                                                                    @foreach ($accountSub as $bv)
+                                                                        <option value="{{ $bv->no }}"
+                                                                            {{ $valAccountSub == $bv->no ? 'selected' : '' }}>
+                                                                            {{ $bv->no }}-{{ $bv->name }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
 
-                                                    {{-- Account Sub --}}
-                                                    <td>
-                                                        <select class="form-select cboSubAccount" name="accountSub[]">
-                                                            <option value="">ជ្រើសរើស</option>
-                                                            @foreach ($accountSub as $bv)
-                                                                <option value="{{ $bv->no }}"
-                                                                    {{ $valAccountSub == $bv->no ? 'selected' : '' }}>
-                                                                    {{ $bv->no }}-{{ $bv->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
+                                                            <td>
+                                                                <select class="form-select cboProgram"
+                                                                    name="program[{{ $i }}]">
+                                                                    <option value="">ជ្រើសរើស</option>
+                                                                    @foreach ($program as $p)
+                                                                        <option value="{{ $p->id }}"
+                                                                            {{ $valProgram == $p->id ? 'selected' : '' }}>
+                                                                            {{ $p->no }}-{{ $p->title }}
+                                                                        </option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
 
-                                                    {{-- Program --}}
-                                                    <td>
-                                                        <select class="form-select cboProgram" name="program[]">
-                                                            <option value="">ជ្រើសរើស</option>
-                                                            @foreach ($program as $p)
-                                                                <option value="{{ $p->id }}"
-                                                                    {{ $valProgram == $p->id ? 'selected' : '' }}>
-                                                                    {{ $p->no }}-{{ $p->title }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
+                                                            <td>
+                                                                <select class="form-select cboProgramSub"
+                                                                    name="cboProgramSub[{{ $i }}]"
+                                                                    data-program-id="{{ $valProgram }}"
+                                                                    data-selected="{{ $valProgramSub }}">
+                                                                    <option value="">{{ __('forms.search...') }}
+                                                                    </option>
+                                                                </select>
+                                                            </td>
 
-                                                    {{-- Program Sub --}}
-                                                    <td>
-                                                        <select class="form-select cboProgramSub" name="cboProgramSub[]"
-                                                            data-program-id="{{ $valProgram }}"
-                                                            data-selected="{{ $valProgramSub }}">
-                                                            <option value="">{{ __('forms.search...') }}</option>
-                                                        </select>
-                                                    </td>
+                                                            <td>
+                                                                <select class="form-select cboCluster"
+                                                                    name="cboCluster[{{ $i }}]"
+                                                                    data-program-sub-id="{{ $valProgramSub }}"
+                                                                    data-selected="{{ $valCluster }}">
+                                                                    <option value="">{{ __('forms.search...') }}
+                                                                    </option>
+                                                                </select>
+                                                            </td> --}}
 
-                                                    {{-- Cluster --}}
-                                                    <td>
-                                                        <select class="form-select cboCluster" name="cboCluster[]"
-                                                            data-program-sub-id="{{ $valProgramSub }}"
-                                                            data-selected="{{ $valCluster }}">
-                                                            <option value="">{{ __('forms.search...') }}</option>
-                                                        </select>
-                                                    </td>
-
-                                                    <td class="text-center">
-                                                        @if ($i === 0)
-                                                            <button type="button"
-                                                                class="btn btn-success addRow">+</button>
-                                                        @else
-                                                            <button type="button"
-                                                                class="btn btn-danger removeRow">-</button>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endfor
-                                        </tbody>
-                                    </table>
+                                                            <td class="text-center align-middle">
+                                                                @if ($i === 0)
+                                                                    <button type="button"
+                                                                        class="btn btn-success btn-sm addRow"
+                                                                        title="បន្ថែមជួរដេក">+</button>
+                                                                @else
+                                                                    <button type="button"
+                                                                        class="btn btn-danger btn-sm removeRow"
+                                                                        title="លុបជួរដេក">-</button>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endfor
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
+                            {{-- =====================================================
+                            SECTION 3: NOTE, REFER & ACTIONS
+                        ====================================================== --}}
                             <div class="row mt-3">
                                 <div class="col-md-6">
                                     <div class="form-group mb-3">
@@ -520,16 +647,17 @@
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="d-flex flex-wrap gap-2">
-                                <button type="submit" class="btn btn-primary"
-                                    id="insertToTableBtn">{{ __('buttons.save') }}</button>
-                                <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                    <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
-                                </a>
-                                <a class="btn btn-dark"
-                                    href="{{ route('project.index', $params) }}">{{ __('buttons.back') }}</a>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button type="submit" class="btn btn-primary"
+                                        id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                                    <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
+                                        <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                                    </a>
+                                    <a class="btn btn-outline-secondary" href="{{ route('project.index', $params) }}">
+                                        <i class="bx bx-arrow-back me-1"></i> {{ __('buttons.back') }}
+                                    </a>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -550,7 +678,9 @@
 
         function initChoicesInstance(element) {
             if (!element) return null;
-            if (choicesMap.has(element)) return choicesMap.get(element);
+            if (choicesMap.has(element)) {
+                return choicesMap.get(element);
+            }
             const instance = new Choices(element, {
                 searchEnabled: true,
                 itemSelectText: '',
@@ -565,14 +695,77 @@
             return instance;
         }
 
+        function destroyChoicesInstance(element) {
+            if (choicesMap.has(element)) {
+                const instance = choicesMap.get(element);
+                if (instance && typeof instance.destroy === 'function') {
+                    instance.destroy();
+                }
+                choicesMap.delete(element);
+                element.classList.remove('choices-initialized');
+            }
+        }
+
+        // Toggle Table Skip / Disabled State on Change
+        $(document).on('change', '#skipItemTable', function() {
+            const wrapper = $('#itemTableWrapper');
+            const inputs = $('#itemTable').find('input, select');
+
+            if (this.checked) {
+                wrapper.addClass('table-skipped');
+                inputs.each(function() {
+                    $(this).prop('disabled', true).removeAttr('required');
+                    if ($(this).hasClass('choices-input') || $(this).data('choice')) {
+                        const choiceInstance = choicesMap.get(this);
+                        if (choiceInstance && typeof choiceInstance.disable === 'function') {
+                            choiceInstance.disable();
+                        }
+                    }
+                });
+            } else {
+                wrapper.removeClass('table-skipped');
+                inputs.each(function() {
+                    $(this).prop('disabled', false);
+                    if ($(this).hasClass('choices-input') || $(this).data('choice')) {
+                        const choiceInstance = choicesMap.get(this);
+                        if (choiceInstance && typeof choiceInstance.enable === 'function') {
+                            choiceInstance.enable();
+                        }
+                    }
+                });
+            }
+        });
+
+        if ($('#skipItemTable').is(':checked')) {
+            $('#skipItemTable').trigger('change');
+        }
+
         function updateRowIndices() {
             $('#itemTable tbody tr').each(function(newIndex) {
                 $(this).attr('data-row-index', newIndex);
-                $(this).find('.category-item input').each(function() {
-                    $(this).attr('name', `category[${newIndex}][]`);
-                });
-                $(this).find('.subcategory-item input').each(function() {
-                    $(this).attr('name', `sub_category[${newIndex}][]`);
+
+                $(this).find('input[name^="sub_pro"]').attr('name', `sub_pro[${newIndex}]`);
+                $(this).find('input[name^="item_id"]').attr('name', `item_id[${newIndex}][]`);
+
+                $(this).find('select.cboSubAccount').attr('name', `accountSub[${newIndex}]`);
+                $(this).find('select.cboProgram').attr('name', `program[${newIndex}]`);
+                $(this).find('select.cboProgramSub').attr('name', `cboProgramSub[${newIndex}]`);
+                $(this).find('select.cboCluster').attr('name', `cboCluster[${newIndex}]`);
+
+                $(this).find('.category-block').each(function(catIndex) {
+                    $(this).attr('data-cat-index', catIndex);
+                    $(this).find('.category-item input').attr('name', `category[${newIndex}][${catIndex}]`);
+
+                    $(this).find('.subcategory-item').each(function(subCatIndex) {
+                        $(this).attr('data-subcat-index', subCatIndex);
+                        $(this).find('> div > input').attr('name',
+                            `sub_category[${newIndex}][${catIndex}][${subCatIndex}]`);
+
+                        $(this).find('.detail-item input').each(function() {
+                            $(this).attr('name',
+                                `detail[${newIndex}][${catIndex}][${subCatIndex}][]`);
+                        });
+                    });
                 });
             });
         }
@@ -601,17 +794,12 @@
                 });
             }
 
-            document.querySelectorAll('.cboProgram, .cboSubAccount, .cboProgramSub, .cboCluster').forEach(function(select) {
+            document.querySelectorAll('.cboProgram, .cboSubAccount, .cboProgramSub, .cboCluster').forEach(function(
+                select) {
                 initChoicesInstance(select);
             });
 
-            document.querySelectorAll('.cboProgram, .cboSubAccount').forEach(function(select) {
-                const instance = choicesMap.get(select);
-                if (select.value && instance) {
-                    instance.setChoiceByValue(String(select.value));
-                }
-            });
-
+            // Pre-load cascade dropdowns for edit views
             $('#itemTable tbody tr').each(function() {
                 const row = $(this);
                 const programSelect = row.find('.cboProgram')[0];
@@ -629,13 +817,16 @@
                     $.ajax({
                         url: "{{ route('project.by.program_sub', $params) }}",
                         type: 'GET',
-                        data: { program_id: programVal },
+                        data: {
+                            program_id: programVal
+                        },
                         success: function(response) {
                             if (Array.isArray(response) && subChoices) {
                                 const options = response.map(item => ({
                                     value: String(item.value),
                                     label: item.label,
-                                    selected: String(item.value) === String(selectedSubId)
+                                    selected: String(item.value) === String(
+                                        selectedSubId)
                                 }));
                                 options.unshift({
                                     value: '',
@@ -653,23 +844,38 @@
                                     $.ajax({
                                         url: "{{ route('project.by.cluster', $params) }}",
                                         type: 'GET',
-                                        data: { program_sub_id: currentSubVal },
+                                        data: {
+                                            program_sub_id: currentSubVal
+                                        },
                                         success: function(clusterResponse) {
-                                            if (Array.isArray(clusterResponse) && clusterChoices) {
-                                                const clusterOptions = clusterResponse.map(item => ({
-                                                    value: String(item.value),
-                                                    label: item.label,
-                                                    selected: String(item.value) === String(selectedClusterId)
-                                                }));
+                                            if (Array.isArray(clusterResponse) &&
+                                                clusterChoices) {
+                                                const clusterOptions =
+                                                    clusterResponse.map(item => ({
+                                                        value: String(item
+                                                            .value),
+                                                        label: item.label,
+                                                        selected: String(
+                                                                item.value
+                                                            ) ===
+                                                            String(
+                                                                selectedClusterId
+                                                            )
+                                                    }));
                                                 clusterOptions.unshift({
                                                     value: '',
                                                     label: '{{ __('forms.search...') }}',
-                                                    selected: !selectedClusterId
+                                                    selected: !
+                                                        selectedClusterId
                                                 });
 
-                                                clusterChoices.setChoices(clusterOptions, 'value', 'label', true);
+                                                clusterChoices.setChoices(
+                                                    clusterOptions, 'value',
+                                                    'label', true);
                                                 if (selectedClusterId) {
-                                                    clusterChoices.setChoiceByValue(String(selectedClusterId));
+                                                    clusterChoices.setChoiceByValue(
+                                                        String(
+                                                            selectedClusterId));
                                                 }
                                             }
                                         }
@@ -691,107 +897,7 @@
                 });
             }
 
-            let pristine;
-            const pristineConfig = {
-                classTo: 'form-group',
-                errorClass: 'has-danger',
-                successClass: 'has-success',
-                errorTextParent: 'form-group',
-                errorTextTag: 'div',
-                errorTextClass: 'pristine-error text-help'
-            };
-
-            function reinitPristine() {
-                if (pristine) pristine.destroy();
-                if (form) {
-                    pristine = new Pristine(form, pristineConfig, true);
-                    setupSummernoteValidation();
-                }
-            }
-
-            function setupSummernoteValidation() {
-                const summernoteValidator = function(value, element) {
-                    if (!element) return false;
-                    const code = $(element).summernote('code');
-                    const plainText = code.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim();
-                    return plainText.length > 0;
-                };
-                const noteElem = document.getElementById('vNote');
-                const referElem = document.getElementById('vRefer');
-                const defaultMsg = "{{ __('messages.required') }}";
-                if (noteElem && noteElem.hasAttribute('required')) {
-                    const msg = noteElem.getAttribute('data-pristine-required-message') || defaultMsg;
-                    pristine.addValidator(noteElem, summernoteValidator, msg, 1, false);
-                }
-                if (referElem && referElem.hasAttribute('required')) {
-                    const msg = referElem.getAttribute('data-pristine-required-message') || defaultMsg;
-                    pristine.addValidator(referElem, summernoteValidator, msg, 1, false);
-                }
-            }
-
-            function clearPristineError(input) {
-                const parent = input.closest('.form-group');
-                if (!parent) return;
-                parent.classList.remove('has-danger', 'has-success');
-                const error = parent.querySelector('.pristine-error');
-                if (error) error.remove();
-            }
-
-            const skipItemTable = document.getElementById('skipItemTable');
-            const itemTable = document.getElementById('itemTable');
-            const itemTableWrapper = document.getElementById('itemTableWrapper');
-
-            function updateItemTableState() {
-                if (!skipItemTable || !itemTable) return;
-                const skipped = skipItemTable.checked;
-
-                if (itemTableWrapper) {
-                    itemTableWrapper.classList.toggle('table-skipped', skipped);
-                }
-
-                itemTable.querySelectorAll('tbody tr').forEach(function(row) {
-                    row.querySelectorAll('input').forEach(function(input) {
-                        clearPristineError(input);
-                        if (skipped) {
-                            input.disabled = true;
-                            input.removeAttribute('required');
-                            input.classList.add('bg-light', 'text-muted');
-                        } else {
-                            input.disabled = false;
-                            input.classList.remove('bg-light', 'text-muted');
-                            if (input.classList.contains('table-required')) {
-                                input.setAttribute('required', 'required');
-                            }
-                        }
-                    });
-
-                    row.querySelectorAll('select').forEach(function(select) {
-                        const choicesInstance = choicesMap.get(select);
-                        if (skipped) {
-                            select.disabled = true;
-                            if (choicesInstance) choicesInstance.disable();
-                        } else {
-                            select.disabled = false;
-                            if (choicesInstance) choicesInstance.enable();
-                        }
-                    });
-
-                    row.querySelectorAll('.addRow, .removeRow, .addCategoryBtn, .removeCategoryBtn')
-                        .forEach(function(button) {
-                            button.disabled = skipped;
-                        });
-                });
-
-                reinitPristine();
-            }
-
-            if (skipItemTable) {
-                skipItemTable.addEventListener('change', updateItemTableState);
-                updateItemTableState();
-            }
-
-            reinitPristine();
-
+            // Program -> Sub Program Cascade
             $(document).on('change', '.cboProgram', function() {
                 const row = $(this).closest('tr');
                 const programId = $(this).val();
@@ -803,12 +909,19 @@
 
                 if (subProgramChoices) {
                     subProgramChoices.clearChoices();
-                    subProgramChoices.setChoices([{ value: '', label: '{{ __('forms.search...') }}', selected: true }], 'value', 'label', true);
+                    subProgramChoices.setChoices([{
+                        value: '',
+                        label: '{{ __('forms.search...') }}',
+                        selected: true
+                    }], 'value', 'label', true);
                 }
-
                 if (clusterChoices) {
                     clusterChoices.clearChoices();
-                    clusterChoices.setChoices([{ value: '', label: '{{ __('forms.search...') }}', selected: true }], 'value', 'label', true);
+                    clusterChoices.setChoices([{
+                        value: '',
+                        label: '{{ __('forms.search...') }}',
+                        selected: true
+                    }], 'value', 'label', true);
                 }
 
                 if (!programId) return;
@@ -816,22 +929,30 @@
                 $.ajax({
                     url: "{{ route('project.by.program_sub', $params) }}",
                     type: 'GET',
-                    data: { program_id: programId },
+                    data: {
+                        program_id: programId
+                    },
                     success: function(response) {
-                        if (Array.isArray(response) && response.length > 0 && subProgramChoices) {
+                        if (Array.isArray(response) && response.length > 0 &&
+                            subProgramChoices) {
                             const formattedOptions = response.map(item => ({
                                 value: String(item.value),
                                 label: item.label,
                                 selected: false
                             }));
-                            formattedOptions.unshift({ value: '', label: '{{ __('forms.search...') }}', selected: true });
-                            subProgramChoices.setChoices(formattedOptions, 'value', 'label', true);
-                            subProgramChoices.showDropdown();
+                            formattedOptions.unshift({
+                                value: '',
+                                label: '{{ __('forms.search...') }}',
+                                selected: true
+                            });
+                            subProgramChoices.setChoices(formattedOptions, 'value', 'label',
+                                true);
                         }
                     }
                 });
             });
 
+            // Sub Program -> Cluster Cascade
             $(document).on('change', '.cboProgramSub', function() {
                 const row = $(this).closest('tr');
                 const programSubId = $(this).val();
@@ -840,7 +961,11 @@
 
                 if (clusterChoices) {
                     clusterChoices.clearChoices();
-                    clusterChoices.setChoices([{ value: '', label: '{{ __('forms.search...') }}', selected: true }], 'value', 'label', true);
+                    clusterChoices.setChoices([{
+                        value: '',
+                        label: '{{ __('forms.search...') }}',
+                        selected: true
+                    }], 'value', 'label', true);
                 }
 
                 if (!programSubId) return;
@@ -848,7 +973,9 @@
                 $.ajax({
                     url: "{{ route('project.by.cluster', $params) }}",
                     type: 'GET',
-                    data: { program_sub_id: programSubId },
+                    data: {
+                        program_sub_id: programSubId
+                    },
                     success: function(response) {
                         if (Array.isArray(response) && response.length > 0 && clusterChoices) {
                             const formattedOptions = response.map(item => ({
@@ -856,118 +983,224 @@
                                 label: item.label,
                                 selected: false
                             }));
-                            formattedOptions.unshift({ value: '', label: '{{ __('forms.search...') }}', selected: true });
+                            formattedOptions.unshift({
+                                value: '',
+                                label: '{{ __('forms.search...') }}',
+                                selected: true
+                            });
                             clusterChoices.setChoices(formattedOptions, 'value', 'label', true);
-                            clusterChoices.showDropdown();
                         }
                     }
                 });
             });
 
-            $(document).on('click', '.addCategoryBtn', function() {
+            // Add Category Block
+            $(document).on('click', '.addCategoryBtn', function(e) {
+                e.preventDefault();
                 const tr = $(this).closest('tr');
                 const mainRowIndex = tr.attr('data-row-index') || tr.index();
+                const container = tr.find('.category-container');
+                const newCatIndex = container.children('.category-block').length;
 
-                tr.find('.category-wrapper').append(`
-                    <div class="d-flex mb-2 category-item">
-                        <input type="text" class="form-control me-1" name="category[${mainRowIndex}][]" placeholder="បញ្ចូលប្រភេទ">
-                        <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn">-</button>
+                const blockHtml = `
+            <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="${newCatIndex}">
+                <div class="d-flex mb-2 align-items-center category-item">
+                    <input type="text" class="form-control me-1" name="category[${mainRowIndex}][${newCatIndex}]" placeholder="បញ្ចូលប្រភេទ (Category)">
+                    <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ">-</button>
+                </div>
+                <div class="subcategory-wrapper ps-3 border-start">
+                    <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
+                        <div class="d-flex align-items-center mb-2">
+                            <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${newCatIndex}][0]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
+                        </div>
+                        <div class="detail-wrapper ps-3 border-start">
+                            <div class="d-flex mb-2 align-items-center detail-item">
+                                <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${newCatIndex}][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                            </div>
+                        </div>
                     </div>
-                `);
-
-                tr.find('.subcategory-wrapper').append(`
-                    <div class="d-flex mb-2 subcategory-item">
-                        <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][]" placeholder="បញ្ចូលប្រភេទរង">
-                        <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn" style="visibility: hidden;">-</button>
-                    </div>
-                `);
+                </div>
+            </div>`;
+                container.append(blockHtml);
+                updateRowIndices();
             });
 
-            $(document).on('click', '.removeCategoryBtn', function() {
+            // Remove Category Block
+            $(document).on('click', '.removeCategoryBtn', function(e) {
+                e.preventDefault();
+                const container = $(this).closest('.category-container');
+                if (container.children('.category-block').length > 1) {
+                    $(this).closest('.category-block').remove();
+                    updateRowIndices();
+                } else {
+                    alert('ត្រូវមានយ៉ាងហោចណាស់ ១ ប្រភេទ!');
+                }
+            });
+
+            // Add Sub-Category Line
+            $(document).on('click', '.addSubCategoryBtn', function(e) {
+                e.preventDefault();
+                const block = $(this).closest('.category-block');
                 const tr = $(this).closest('tr');
-                const itemDiv = $(this).closest('.category-item, .subcategory-item');
-                const index = itemDiv.index();
+                const mainRowIndex = tr.attr('data-row-index') || tr.index();
+                const catIndex = block.attr('data-cat-index');
+                const subWrapper = block.find('.subcategory-wrapper');
+                const newSubCatIndex = subWrapper.children('.subcategory-item').length;
 
-                tr.find('.category-wrapper .category-item').eq(index).remove();
-                tr.find('.subcategory-wrapper .subcategory-item').eq(index).remove();
+                subWrapper.append(`
+            <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="${newSubCatIndex}">
+                <div class="d-flex align-items-center mb-2">
+                    <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${catIndex}][${newSubCatIndex}]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                    <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                    <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង">-</button>
+                </div>
+                <div class="detail-wrapper ps-3 border-start">
+                    <div class="d-flex mb-2 align-items-center detail-item">
+                        <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${newSubCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                        <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                    </div>
+                </div>
+            </div>`);
+                updateRowIndices();
             });
 
-            $(document).on('click', '.addRow', function() {
+            // Remove Sub-Category Line
+            $(document).on('click', '.removeSubCategoryBtn', function(e) {
+                e.preventDefault();
+                const wrapper = $(this).closest('.subcategory-wrapper');
+                if (wrapper.children('.subcategory-item').length > 1) {
+                    $(this).closest('.subcategory-item').remove();
+                    updateRowIndices();
+                } else {
+                    $(this).closest('.subcategory-item').find('input').val('');
+                }
+            });
+
+            // Add Detail Item
+            $(document).on('click', '.addDetailBtn', function(e) {
+                e.preventDefault();
+                const subItem = $(this).closest('.subcategory-item');
+                const catBlock = $(this).closest('.category-block');
+                const tr = $(this).closest('tr');
+
+                const mainRowIndex = tr.attr('data-row-index') || tr.index();
+                const catIndex = catBlock.attr('data-cat-index');
+                const subCatIndex = subItem.attr('data-subcat-index');
+                const detailWrapper = subItem.find('.detail-wrapper');
+
+                detailWrapper.append(`
+            <div class="d-flex mb-2 align-items-center detail-item">
+                <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${subCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                <button type="button" class="btn btn-outline-danger btn-sm removeDetailBtn" title="លុបលម្អិត">-</button>
+            </div>`);
+            });
+
+            // Remove Detail Item
+            $(document).on('click', '.removeDetailBtn', function(e) {
+                e.preventDefault();
+                const wrapper = $(this).closest('.detail-wrapper');
+                if (wrapper.children('.detail-item').length > 1) {
+                    $(this).closest('.detail-item').remove();
+                } else {
+                    $(this).closest('.detail-item').find('input').val('');
+                }
+            });
+
+            // Add Main Table Row (Triggered from action column + button)
+            $(document).on('click', '.addRow', function(e) {
+                e.preventDefault();
                 const tableBody = $('#itemTable tbody');
                 let rowIndex = tableBody.children('tr').length;
 
                 const newRowHtml = `
-                    <tr data-row-index="${rowIndex}">
-                        <td>
-                            <input type="text" name="sub_pro[]" class="form-control table-required" required>
-                        </td>
-                        <td>
-                            <div class="category-wrapper">
-                                <div class="d-flex mb-2 category-item">
-                                    <input type="text" class="form-control me-1" name="category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទ">
-                                    <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn">+</button>
+            <tr data-row-index="${rowIndex}">
+                <td>
+                    <input type="hidden" name="item_id[${rowIndex}][]" value="">
+                    <input type="text" name="sub_pro[${rowIndex}]" class="form-control">
+                </td>
+                <td>
+                    <div class="category-container">
+                        <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="0">
+                            <div class="d-flex mb-2 align-items-center category-item">
+                                <input type="text" class="form-control me-1" name="category[${rowIndex}][0]" placeholder="បញ្ចូលប្រភេទ (Category)">
+                                <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ" style="visibility: hidden;">-</button>
+                            </div>
+                            <div class="subcategory-wrapper ps-3 border-start">
+                                <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][0][0]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                        <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                                        <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
+                                    </div>
+                                    <div class="detail-wrapper ps-3 border-start">
+                                        <div class="d-flex mb-2 align-items-center detail-item">
+                                            <input type="text" class="form-control me-1" name="detail[${rowIndex}][0][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </td>
-                        <td>
-                            <div class="subcategory-wrapper">
-                                <div class="d-flex mb-2 subcategory-item">
-                                    <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទរង">
-                                    <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" style="visibility: hidden;">+</button>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <select class="form-select cboSubAccount" name="accountSub[]">
-                                <option value="">ជ្រើសរើស</option>
-                                @foreach ($accountSub as $bv)
-                                    <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select cboProgram" name="program[]">
-                                <option value="">ជ្រើសរើស</option>
-                                @foreach ($program as $p)
-                                    <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select cboProgramSub" name="cboProgramSub[]">
-                                <option value="">{{ __('forms.search...') }}</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="form-select cboCluster" name="cboCluster[]">
-                                <option value="">{{ __('forms.search...') }}</option>
-                            </select>
-                        </td>
-                        <td class="text-center">
-                            <button type="button" class="btn btn-danger removeRow">-</button>
-                        </td>
-                    </tr>`;
+                        </div>
+                    </div>
+                </td>
+                <td style="display: none;">
+                    <select class="form-select cboSubAccount" name="accountSub[${rowIndex}]">
+                        <option value="">ជ្រើសរើស</option>
+                        @foreach ($accountSub as $bv)
+                            <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td style="display: none;">
+                    <select class="form-select cboProgram" name="program[${rowIndex}]">
+                        <option value="">ជ្រើសរើស</option>
+                        @foreach ($program as $p)
+                            <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td style="display: none;">
+                    <select class="form-select cboProgramSub" name="cboProgramSub[${rowIndex}]">
+                        <option value="">{{ __('forms.search...') }}</option>
+                    </select>
+                </td>
+                <td style="display: none;">
+                    <select class="form-select cboCluster" name="cboCluster[${rowIndex}]">
+                        <option value="">{{ __('forms.search...') }}</option>
+                    </select>
+                </td>
+                <td class="text-center align-middle">
+                    <button type="button" class="btn btn-danger btn-sm removeRow" title="លុបជួរដេក">-</button>
+                </td>
+            </tr>`;
 
                 tableBody.append(newRowHtml);
                 const appendedRow = tableBody.children().last();
+
                 appendedRow.find('select').each(function() {
                     initChoicesInstance(this);
                 });
+
                 updateRowIndices();
-                updateItemTableState();
             });
 
-            $(document).on('click', '.removeRow', function() {
+            // Remove Main Table Row
+            $(document).on('click', '.removeRow', function(e) {
+                e.preventDefault();
                 const row = $(this).closest('tr');
                 row.find('select').each(function() {
-                    const instance = choicesMap.get(this);
-                    if (instance) instance.destroy();
+                    destroyChoicesInstance(this);
                 });
                 row.remove();
                 updateRowIndices();
-                reinitPristine();
             });
 
+            // Form Submit Handler
             if (form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -976,39 +1209,17 @@
                     if ($('#vRefer').length) $('#vRefer').val($('#vRefer').summernote('code'));
 
                     const skipTableSwitch = document.getElementById('skipItemTable');
-                    const isTableSkipped = skipTableSwitch && skipTableSwitch.checked;
-
-                    if (isTableSkipped) {
+                    if (skipTableSwitch && skipTableSwitch.checked) {
                         $('#itemTable').find('input, select').prop('disabled', true).removeAttr('required');
                     }
 
-                    let valid = false;
-                    try {
-                        valid = pristine ? pristine.validate() : true;
-                    } catch (err) {
-                        console.error("Pristine validation error:", err);
-                        valid = true;
+                    const submitBtn = document.getElementById('insertToTableBtn');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML =
+                            `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...`;
                     }
-
-                    if (valid) {
-                        const submitBtn = document.getElementById('insertToTableBtn');
-                        if (submitBtn) {
-                            submitBtn.disabled = true;
-                            submitBtn.innerHTML = `
-                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                                កំពុងរក្សាទុក...
-                            `;
-                        }
-                        form.submit();
-                    } else {
-                        const errorElement = form.querySelector('.has-danger, .pristine-error');
-                        if (errorElement) {
-                            errorElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-                        }
-                    }
+                    form.submit();
                 });
             }
         });

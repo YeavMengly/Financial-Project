@@ -17,6 +17,7 @@ use App\Models\BudgetAllocation;
 use App\Models\BudgetPlan\BudgetMandate;
 use App\Models\Content\Ministry;
 use App\Models\BudgetPlan\BudgetVoucher;
+use App\Models\Content\AgencyAssignment;
 use App\Models\Content\Chapter;
 use App\Models\Content\Cluster;
 use App\Models\Content\ExpenseType;
@@ -109,9 +110,17 @@ class BeginVoucherController extends Controller
 
     public function getByAgency(Request $request)
     {
-        if ($request->program_id) {
-            $data = Agency::select('id', 'program_id', 'no', 'name')
-                ->where('program_id', $request->program_id)
+        if ($request->program_id && $request->program_sub_id && $request->cluster_id) {
+            $data = AgencyAssignment::join('agencies', 'agencies.id', '=', 'agency_assignments.agency_id')
+                ->select(
+                    'agency_assignments.id as id',
+                    'agencies.no',
+                    'agencies.name'
+                )
+                ->where('agency_assignments.program_id', $request->program_id)
+                ->where('agency_assignments.program_sub_id', $request->program_sub_id)
+                ->where('agency_assignments.cluster_id', $request->cluster_id)
+                ->orderBy('agencies.no')
                 ->get();
 
             $selectedId = $request->selected_id ?? null;
@@ -130,12 +139,20 @@ class BeginVoucherController extends Controller
 
     public function editByAgency(Request $request)
     {
-        if (!$request->program_id) {
+        if (!$request->program_id || !$request->program_sub_id || !$request->cluster_id) {
             return response('<option value="">ស្វែងរក...</option>');
         }
 
-        $data = Agency::select('id', 'no', 'name')
-            ->where('program_id', $request->program_id)
+        $data = AgencyAssignment::join('agencies', 'agencies.id', '=', 'agency_assignments.agency_id')
+            ->select(
+                'agency_assignments.id as id',
+                'agencies.no',
+                'agencies.name'
+            )
+            ->where('agency_assignments.program_id', $request->program_id)
+            ->where('agency_assignments.program_sub_id', $request->program_sub_id)
+            ->where('agency_assignments.cluster_id', $request->cluster_id)
+            ->orderBy('agencies.no')
             ->get();
 
         $selectedId = (string) $request->selected_id;
@@ -143,7 +160,7 @@ class BeginVoucherController extends Controller
         $html = '<option value="">ស្វែងរក...</option>';
 
         foreach ($data as $d) {
-            $selected = ((string)$d->id === $selectedId) ? 'selected' : '';
+            $selected = ((string) $d->id === $selectedId) ? 'selected' : '';
             $html .= "<option value='{$d->id}' {$selected}>{$d->no} - {$d->name}</option>";
         }
 
@@ -445,16 +462,15 @@ class BeginVoucherController extends Controller
                 ->first();
 
 
-            // Get data query
+            // 1. Get the existing BeginVoucher BEFORE updating it
             $beginVoucher = BeginVoucher::where('id', $id)
-                ->where('program_id', $program->id)
                 ->where('ministry_id', $ministry->id)
-                ->first();
+                ->firstOrFail();
 
-            // Get data query
-            $beginMandate = BeginMandate::where('id', $id)
-                ->where('program_id', $program->id)
-                ->where('ministry_id', $ministry->id)
+            // 2. Find the matching BeginMandate using the original voucher's keys
+            $beginMandate = BeginMandate::where('ministry_id', $beginVoucher->ministry_id)
+                ->where('no', $beginVoucher->no)
+                ->where('account_sub_id', $beginVoucher->account_sub_id)
                 ->first();
 
             $validatedData['internal_increase']   = $validatedData['internal_increase']   ?? 0;
@@ -515,28 +531,29 @@ class BeginVoucherController extends Controller
                 'law_correction'    => $law_correction,
             ]);
 
-            $beginMandate->update([
-                'ministry_id'       => $ministry->id,
-                'agency_id'         => $validatedData['cboAgency'],
-                'program_id'        => $validatedData['cboProgram'],
-                'program_sub_id'    => $validatedData['cboProgramSub'],
-                'chapter_id'        => substr($validatedData['cboSubAccount'], 0, 2),
-                'account_id'        => substr($validatedData['cboSubAccount'], 0, 4),
-                'account_sub_id'    => $validatedData['cboSubAccount'],
-                'cluster_id'                => $validatedData['cboCluster'],
-                'no'                => $valueNo,
-                'txtDescription'    => $cluster->decription ?? null,
-                'fin_law'           => $validatedData['fin_law'],
-                'current_loan'      => $validatedData['current_loan'],
-                'new_credit_status' => $new_credit_status,
-                'apply'             => $currentApplyTotal,
-                'deadline_balance'  => $deadline_balance,
-                'early_balance'     => $early_balance,
-                'credit'            => $credit,
-                'law_average'       => $law_average,
-                'law_correction'    => $law_correction,
-            ]);
-
+            if ($beginMandate) {
+                $beginMandate->update([
+                    'ministry_id'       => $ministry->id,
+                    'agency_id'         => $validatedData['cboAgency'],
+                    'program_id'        => $validatedData['cboProgram'],
+                    'program_sub_id'    => $validatedData['cboProgramSub'],
+                    'chapter_id'        => substr($validatedData['cboSubAccount'], 0, 2),
+                    'account_id'        => substr($validatedData['cboSubAccount'], 0, 4),
+                    'account_sub_id'    => $validatedData['cboSubAccount'],
+                    'cluster_id'        => $validatedData['cboCluster'],
+                    'no'                => $valueNo,
+                    'txtDescription'    => $cluster->decription ?? null,
+                    'fin_law'           => $validatedData['fin_law'],
+                    'current_loan'      => $validatedData['current_loan'],
+                    'new_credit_status' => $new_credit_status,
+                    'apply'             => $currentApplyTotal,
+                    'deadline_balance'  => $deadline_balance,
+                    'early_balance'     => $early_balance,
+                    'credit'            => $credit,
+                    'law_average'       => $law_average,
+                    'law_correction'    => $law_correction,
+                ]);
+            }
             DB::commit();
 
             flash()
@@ -1006,7 +1023,7 @@ class BeginVoucherController extends Controller
             ->where('ministry_id', decode_params($params))
             ->first();
 
-        $HeaderExpenseTypes = HeaderExpenseType::whereIn('id', [1,2,3,4])->get();
+        $HeaderExpenseTypes = HeaderExpenseType::whereIn('id', [1, 2, 3, 4])->get();
         // Fetch the specific Budget Allocation entry
         $module = BudgetAllocation::where('id', decode_params($id))
             ->where('budget_begin_voucher_id', $beginVoucher->id)

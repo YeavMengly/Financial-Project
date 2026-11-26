@@ -41,7 +41,7 @@
                         @csrf
                         <input type="hidden" />
                         <div class="row">
-                            <div class="col-md-12">
+                            {{-- <div class="col-md-12">
                                 <div class="form-group mb-3">
                                     <label for="cboSubAccountNumber" class="form-label font-size-13 text-muted">
                                         {{ __('forms.program') }}
@@ -60,7 +60,7 @@
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="col-md-12">
                                 <div class="form-group mb-3">

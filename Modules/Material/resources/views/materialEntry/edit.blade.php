@@ -42,13 +42,13 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form id="pristine-valid-example" action="{{ route('materialEntry.update', [$params, $module->id]) }}" method="POST"
-                        enctype="multipart/form-data" novalidate>
+                    <form id="pristine-valid-example" action="{{ route('materialEntry.update', [$params, $module->id]) }}"
+                        method="POST" enctype="multipart/form-data" novalidate>
                         @csrf
-                 
+
                         <div class="row">
                             {{-- Project Selection --}}
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProject" class="form-label font-size-13 text-muted">
                                         ជ្រើសរើស{{ __('forms.project') }}
@@ -56,7 +56,8 @@
                                     <select class="form-select" id="cboProject" name="cboProject" required tabindex="1">
                                         <option value="">{{ __('forms.search...') }}</option>
                                         @foreach ($project as $p)
-                                            <option value="{{ $p->id }}" {{ old('cboProject', $module->project_id) == $p->id ? 'selected' : '' }}>
+                                            <option value="{{ $p->id }}"
+                                                {{ old('cboProject', $module->project_id) == $p->id ? 'selected' : '' }}>
                                                 {{ $p->stock_number }} - {{ $p->stock_name }}
                                             </option>
                                         @endforeach
@@ -66,9 +67,8 @@
                                     @enderror
                                 </div>
                             </div>
-
                             {{-- Sub Project with Skip Toggle --}}
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <label for="cboSubProject" class="form-label font-size-13 text-muted mb-0">
@@ -76,7 +76,8 @@
                                         </label>
                                         <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
                                             <input class="form-check-input mt-0" type="checkbox" role="switch"
-                                                id="skipSubProject" style="cursor: pointer;" {{ empty(old('cboSubProject', $module->project_sub_id)) ? 'checked' : '' }}>
+                                                id="skipSubProject" style="cursor: pointer;"
+                                                {{ empty(old('cboSubProject', $module->project_sub_id ?? '')) ? 'checked' : '' }}>
                                             <label class="form-check-label font-size-12 text-muted mb-0"
                                                 for="skipSubProject" style="cursor: pointer;">
                                                 រំលង/ មិនភ្ជាប់
@@ -91,12 +92,90 @@
                                     @enderror
                                 </div>
                             </div>
-
+                            {{-- Category with Skip Toggle --}}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboCategory" class="form-label font-size-13 text-muted mb-0">
+                                            ប្រភេទ (Category)
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0" type="checkbox" role="switch"
+                                                id="skipCategory" style="cursor: pointer;"
+                                                {{ empty(old('cboCategory', $module->category_id ?? '')) ? 'checked' : '' }}>
+                                            <label class="form-check-label font-size-12 text-muted mb-0" for="skipCategory"
+                                                style="cursor: pointer;">
+                                                រំលង
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboCategory" class="form-select" name="cboCategory" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboCategory')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- Sub-Category with Skip Toggle --}}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboSubCategory" class="form-label font-size-13 text-muted mb-0">
+                                            ប្រភេទរង (Sub-category)
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0" type="checkbox" role="switch"
+                                                id="skipSubCategory" style="cursor: pointer;"
+                                                {{ empty(old('cboSubCategory', $module->category_sub_id ?? '')) ? 'checked' : '' }}>
+                                            <label class="form-check-label font-size-12 text-muted mb-0"
+                                                for="skipSubCategory" style="cursor: pointer;">
+                                                រំលង
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboSubCategory" class="form-select" name="cboSubCategory" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboSubCategory')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- Detail with Skip Toggle --}}
+                            <div class="col-lg-3 col-md-6">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboDetail" class="form-label font-size-13 text-muted mb-0">
+                                            ព័ត៌មានលម្អិត (Detail)
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0" type="checkbox" role="switch"
+                                                id="skipDetail" style="cursor: pointer;"
+                                                {{ empty(old('cboDetail', $module->detail ?? '')) ? 'checked' : '' }}>
+                                            <label class="form-check-label font-size-12 text-muted mb-0" for="skipDetail"
+                                                style="cursor: pointer;">
+                                                រំលង
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboDetail" class="form-select" name="cboDetail" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboDetail')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                             <!-- Hidden inputs -->
-                            <input type="hidden" id="program_id" name="program_id" value="{{ old('program_id', $module->program_id) }}">
-                            <input type="hidden" id="program_sub_id" name="program_sub_id" value="{{ old('program_sub_id', $module->program_sub_id) }}">
-                            <input type="hidden" id="cluster_id" name="cluster_id" value="{{ old('cluster_id', $module->cluster_id) }}">
-                            <input type="hidden" id="account_sub_id" name="account_sub_id" value="{{ old('account_sub_id', $module->account_sub_id) }}">
+                            <input type="hidden" id="program_id" name="program_id"
+                                value="{{ old('program_id', $module->program_id) }}">
+                            <input type="hidden" id="program_sub_id" name="program_sub_id"
+                                value="{{ old('program_sub_id', $module->program_sub_id) }}">
+                            <input type="hidden" id="cluster_id" name="cluster_id"
+                                value="{{ old('cluster_id', $module->cluster_id) }}">
+                            <input type="hidden" id="account_sub_id" name="account_sub_id"
+                                value="{{ old('account_sub_id', $module->account_sub_id) }}">
 
                             {{-- Product Table --}}
                             <div class="col-xl-12 col-md-12 mt-3">
@@ -116,41 +195,54 @@
                                         @php
                                             $items = isset($items) && count($items) > 0 ? $items : [$module];
                                         @endphp
-                                        @foreach($items as $index => $item)
-                                        <tr>
-                                            <td class="form-group">
-                                                <input type="text" name="p_name[]" class="form-control" value="{{ old('p_name.'.$index, $item->p_name) }}" required>
-                                            </td>
-                                            <td class="form-group">
-                                                <select class="form-control unit-select" name="unit[]" required>
-                                                    <option value="">ជ្រើសរើស</option>
-                                                    @foreach ($unitType as $u)
-                                                        <option value="{{ $u->id }}" {{ (old('unit.'.$index, $item->unit) == $u->id || old('unit.'.$index, $item->unit) == $u->name) ? 'selected' : '' }}>
-                                                            {{ $u->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td class="form-group">
-                                                <input type="number" min="0" name="quantity[]" class="form-control" step="0.01" value="{{ old('quantity.'.$index, $item->qty ?? $item->quantity) }}" required>
-                                            </td>
-                                            <td class="form-group">
-                                                <input type="number" min="0" step="any" name="price[]" class="form-control" value="{{ old('price.'.$index, $item->price) }}" required>
-                                            </td>
-                                            <td class="form-group">
-                                                <input type="text" name="source[]" class="form-control source-input" value="{{ old('source.'.$index, $item->source) }}" placeholder="{{ __('forms.source') }}">
-                                            </td>
-                                            <td class="form-group">
-                                                <input type="text" name="p_year[]" class="form-control pro-year-input" value="{{ old('p_year.'.$index, $item->p_year) }}" placeholder="{{ __('forms.pro.year') }}">
-                                            </td>
-                                            <td class="text-center">
-                                                @if($loop->first)
-                                                    <button type="button" class="btn btn-success addRow">+</button>
-                                                @else
-                                                    <button type="button" class="btn btn-danger removeRow">-</button>
-                                                @endif
-                                            </td>
-                                        </tr>
+                                        @foreach ($items as $index => $item)
+                                            <tr>
+                                                <td class="form-group">
+                                                    <input type="text" name="p_name[]" class="form-control"
+                                                        value="{{ old('p_name.' . $index, $item->p_name) }}" required>
+                                                </td>
+                                                <td class="form-group">
+                                                    <select class="form-control unit-select" name="unit[]" required>
+                                                        <option value="">ជ្រើសរើស</option>
+                                                        @foreach ($unitType as $u)
+                                                            <option value="{{ $u->id }}"
+                                                                {{ old('unit.' . $index, $item->unit) == $u->id || old('unit.' . $index, $item->unit) == $u->name ? 'selected' : '' }}>
+                                                                {{ $u->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td class="form-group">
+                                                    <input type="number" min="0" name="quantity[]"
+                                                        class="form-control" step="0.01"
+                                                        value="{{ old('quantity.' . $index, $item->qty ?? $item->quantity) }}"
+                                                        required>
+                                                </td>
+                                                <td class="form-group">
+                                                    <input type="number" min="0" step="any" name="price[]"
+                                                        class="form-control"
+                                                        value="{{ old('price.' . $index, $item->price) }}" required>
+                                                </td>
+                                                <td class="form-group">
+                                                    <input type="text" name="source[]"
+                                                        class="form-control source-input"
+                                                        value="{{ old('source.' . $index, $item->source) }}"
+                                                        placeholder="{{ __('forms.source') }}">
+                                                </td>
+                                                <td class="form-group">
+                                                    <input type="text" name="p_year[]"
+                                                        class="form-control pro-year-input"
+                                                        value="{{ old('p_year.' . $index, $item->p_year) }}"
+                                                        placeholder="{{ __('forms.pro.year') }}">
+                                                </td>
+                                                <td class="text-center">
+                                                    @if ($loop->first)
+                                                        <button type="button" class="btn btn-success addRow">+</button>
+                                                    @else
+                                                        <button type="button" class="btn btn-danger removeRow">-</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -159,11 +251,13 @@
                         </div>
 
                         <div class="d-flex flex-wrap gap-2 mt-3">
-                            <button type="submit" class="btn btn-primary" id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                            <button type="submit" class="btn btn-primary"
+                                id="insertToTableBtn">{{ __('buttons.save') }}</button>
                             <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
                                 <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
                             </a>
-                            <a class="btn btn-dark" href="{{ route('materialEntry.index', $params) }}">{{ __('buttons.back') }}</a>
+                            <a class="btn btn-dark"
+                                href="{{ route('materialEntry.index', $params) }}">{{ __('buttons.back') }}</a>
                         </div>
                     </form>
                 </div>
@@ -182,10 +276,16 @@
         window.materialEntryConfig = {
             getProjectRoute: "{{ route('materialEntry.get.project') }}",
             searchPlaceholder: "{{ __('forms.search...') }}",
-            selectedSubProjectId: "{{ old('cboSubProject', $module->project_sub_id) }}"
+            selectedSubProjectId: "{{ old('cboSubProject', $module->project_sub_id ?? '') }}",
+            selectedCategory: "{{ old('cboCategory', $module->category_id ?? '') }}",
+            selectedSubCategory: "{{ old('cboSubCategory', $module->category_sub_id ?? '') }}",
+            selectedDetail: "{{ old('cboDetail', $module->detail ?? '') }}"
         };
 
         let subProjectChoices = null;
+        let categoryChoices = null;
+        let subCategoryChoices = null;
+        let detailChoices = null;
 
         /* ==========================================================================
            1. INITIALIZATION ON DOM CONTENT LOADED
@@ -243,59 +343,181 @@
                 });
             }
 
+            // Category Dropdown
+            const categorySelect = document.getElementById('cboCategory');
+            if (categorySelect) {
+                categoryChoices = new Choices(categorySelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false,
+                    allowHTML: true
+                });
+            }
+
+            // Sub Category Dropdown
+            const subCategorySelect = document.getElementById('cboSubCategory');
+            if (subCategorySelect) {
+                subCategoryChoices = new Choices(subCategorySelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false,
+                    allowHTML: true
+                });
+            }
+
+            // Detail Dropdown
+            const detailSelect = document.getElementById('cboDetail');
+            if (detailSelect) {
+                detailChoices = new Choices(detailSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false,
+                    allowHTML: true
+                });
+            }
+
             const form = document.getElementById('pristine-valid-example');
             const skipSubProjectCheckbox = document.getElementById('skipSubProject');
+            const skipCategoryCheckbox = document.getElementById('skipCategory');
+            const skipSubCategoryCheckbox = document.getElementById('skipSubCategory');
+            const skipDetailCheckbox = document.getElementById('skipDetail');
             const submitBtn = document.getElementById('insertToTableBtn');
 
-            // Skip logic handler
-            function setupSkipField(checkbox, inputsSelector, isChoices = false) {
-                if (!checkbox) return;
+            // Helper function to repopulate dropdown values from the active sub-project selection
+            function refreshFieldData() {
+                if (!subProjectChoices) return;
+                const selected = subProjectChoices.getValue();
+                if (!selected || !selected.customProperties) return;
+                const props = selected.customProperties;
+
+                // Refresh Category
+                if (categoryChoices && skipCategoryCheckbox && !skipCategoryCheckbox.checked) {
+                    categoryChoices.clearStore();
+                    const val = window.materialEntryConfig.selectedCategory || props.category;
+                    if (val) {
+                        categoryChoices.setChoices([{
+                            value: val,
+                            label: val,
+                            selected: true
+                        }], 'value', 'label', true);
+                    } else {
+                        categoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                }
+
+                // Refresh Sub-Category
+                if (subCategoryChoices && skipSubCategoryCheckbox && !skipSubCategoryCheckbox.checked) {
+                    subCategoryChoices.clearStore();
+                    const val = window.materialEntryConfig.selectedSubCategory || props.sub_category;
+                    if (val) {
+                        subCategoryChoices.setChoices([{
+                            value: val,
+                            label: val,
+                            selected: true
+                        }], 'value', 'label', true);
+                    } else {
+                        subCategoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                }
+
+                // Refresh Detail
+                if (detailChoices && skipDetailCheckbox && !skipDetailCheckbox.checked) {
+                    detailChoices.clearStore();
+                    const val = window.materialEntryConfig.selectedDetail || props.detail;
+                    if (val) {
+                        detailChoices.setChoices([{
+                            value: val,
+                            label: val,
+                            selected: true
+                        }], 'value', 'label', true);
+                    } else {
+                        detailChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                }
+            }
+
+            // Skip logic handler with automatic data refresh on unskip
+            function setupSkipField(checkbox, inputElement, choicesInstance) {
+                if (!checkbox || !inputElement) return;
 
                 const updateState = () => {
-                    const elements = document.querySelectorAll(inputsSelector);
-                    elements.forEach(input => {
-                        const choicesWrapper = input.closest('.choices');
+                    const choicesWrapper = inputElement.closest('.choices');
 
-                        if (checkbox.checked) {
-                            input.value = '';
-                            if (isChoices && subProjectChoices) {
-                                subProjectChoices.removeActiveItems();
-                                subProjectChoices.disable();
-                                if (choicesWrapper) choicesWrapper.classList.add('choices-skip-active');
-                            } else {
-                                input.disabled = true;
-                                input.classList.add('skip-active');
-                            }
-                            input.removeAttribute('required');
-                        } else {
-                            if (isChoices && subProjectChoices) {
-                                subProjectChoices.enable();
-                                if (choicesWrapper) choicesWrapper.classList.remove(
-                                    'choices-skip-active');
-                            } else {
-                                input.disabled = false;
-                                input.classList.remove('skip-active');
-                            }
-                            input.setAttribute('required', 'required');
+                    if (checkbox.checked) {
+                        inputElement.value = '';
+                        if (choicesInstance) {
+                            choicesInstance.removeActiveItems();
+                            choicesInstance.disable();
+                            if (choicesWrapper) choicesWrapper.classList.add('choices-skip-active');
                         }
-                    });
+                        inputElement.removeAttribute('required');
+                    } else {
+                        if (choicesInstance) {
+                            choicesInstance.enable();
+                            if (choicesWrapper) choicesWrapper.classList.remove('choices-skip-active');
+                        }
+                        inputElement.setAttribute('required', 'required');
+
+                        // Instantly reload dropdown content when unskipped
+                        refreshFieldData();
+                    }
                 };
 
                 checkbox.addEventListener('change', updateState);
                 updateState();
             }
 
-            setupSkipField(skipSubProjectCheckbox, '#cboSubProject', true);
+            setupSkipField(skipSubProjectCheckbox, subProjectSelect, subProjectChoices);
+            setupSkipField(skipCategoryCheckbox, categorySelect, categoryChoices);
+            setupSkipField(skipSubCategoryCheckbox, subCategorySelect, subCategoryChoices);
+            setupSkipField(skipDetailCheckbox, detailSelect, detailChoices);
 
             // Robust Form Submit Handler (Single-Click Prevention)
             if (form) {
                 form.addEventListener('submit', function(e) {
-                    if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked) {
-                        if (subProjectSelect) {
-                            subProjectSelect.removeAttribute('required');
-                            subProjectSelect.disabled = false;
-                            subProjectSelect.value = ''; // Submit empty value to Laravel
-                        }
+                    if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked && subProjectSelect) {
+                        subProjectSelect.removeAttribute('required');
+                        subProjectSelect.disabled = false;
+                        subProjectSelect.value = '';
+                    }
+                    if (skipCategoryCheckbox && skipCategoryCheckbox.checked && categorySelect) {
+                        categorySelect.removeAttribute('required');
+                        categorySelect.disabled = false;
+                        categorySelect.value = '';
+                    }
+                    if (skipSubCategoryCheckbox && skipSubCategoryCheckbox.checked && subCategorySelect) {
+                        subCategorySelect.removeAttribute('required');
+                        subCategorySelect.disabled = false;
+                        subCategorySelect.value = '';
+                    }
+                    if (skipDetailCheckbox && skipDetailCheckbox.checked && detailSelect) {
+                        detailSelect.removeAttribute('required');
+                        detailSelect.disabled = false;
+                        detailSelect.value = '';
                     }
 
                     // Native HTML validation check
@@ -303,28 +525,32 @@
                         e.preventDefault();
                         form.reportValidity();
 
-                        // Re-disable choices if check failed
-                        if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked && subProjectChoices) {
+                        if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked && subProjectChoices)
                             subProjectChoices.disable();
-                        }
+                        if (skipCategoryCheckbox && skipCategoryCheckbox.checked && categoryChoices)
+                            categoryChoices.disable();
+                        if (skipSubCategoryCheckbox && skipSubCategoryCheckbox.checked &&
+                            subCategoryChoices)
+                            subCategoryChoices.disable();
+                        if (skipDetailCheckbox && skipDetailCheckbox.checked && detailChoices)
+                            detailChoices.disable();
                         return false;
                     }
 
-                    // Disable button instantly upon valid submit
                     if (submitBtn) {
                         submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...';
+                        submitBtn.innerHTML =
+                            '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...';
                     }
                 });
             }
 
             /* ----------------------------------------------------------------------
-               2. DYNAMIC TABLE ROWS (Add / Remove & Init Existing Rows)
+               2. DYNAMIC TABLE ROWS (Add / Remove)
                ---------------------------------------------------------------------- */
             const tableBody = document.querySelector('#itemTable tbody');
 
             if (tableBody) {
-                // Initialize Choices.js on all existing rows loaded from DB
                 Array.from(tableBody.rows).forEach(row => {
                     initRowChoices(row);
                 });
@@ -372,21 +598,21 @@
                 });
             }
 
-            // function initRowChoices(row) {
-            //     const unitSelect = row.querySelector('.unit-select');
-            //     if (unitSelect && !unitSelect.classList.contains('choices-initialized')) {
-            //         new Choices(unitSelect, {
-            //             searchEnabled: true,
-            //             itemSelectText: '',
-            //             placeholder: true,
-            //             placeholderValue: 'ជ្រើសរើស',
-            //             searchPlaceholderValue: 'ស្វែងរក...',
-            //             shouldSort: false,
-            //             allowHTML: true
-            //         });
-            //         unitSelect.classList.add('choices-initialized');
-            //     }
-            // }
+            function initRowChoices(row) {
+                const unitSelect = row.querySelector('.unit-select');
+                if (unitSelect && !unitSelect.classList.contains('choices-initialized')) {
+                    new Choices(unitSelect, {
+                        searchEnabled: true,
+                        itemSelectText: '',
+                        placeholder: true,
+                        placeholderValue: 'ជ្រើសរើស',
+                        searchPlaceholderValue: 'ស្វែងរក...',
+                        shouldSort: false,
+                        allowHTML: true
+                    });
+                    unitSelect.classList.add('choices-initialized');
+                }
+            }
 
             /* ----------------------------------------------------------------------
                3. AJAX SUB-PROJECT HANDLER
@@ -435,7 +661,8 @@
                         }
 
                         const choices = data.map(function(item) {
-                            const isSelected = selectedSubId && String(item.value) === String(selectedSubId);
+                            const isSelected = selectedSubId && String(item.value) === String(
+                                selectedSubId);
                             return {
                                 value: String(item.value),
                                 label: item.label,
@@ -444,7 +671,10 @@
                                     program_id: item.program_id || '',
                                     program_sub_id: item.program_sub_id || '',
                                     cluster_id: item.cluster_id || '',
-                                    account_sub_id: item.account_sub_id || ''
+                                    account_sub_id: item.account_sub_id || '',
+                                    category: item.category || '',
+                                    sub_category: item.sub_category || '',
+                                    detail: item.detail || ''
                                 }
                             };
                         });
@@ -453,6 +683,10 @@
 
                         if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked) {
                             subProjectChoices.disable();
+                        }
+
+                        if (selectedSubId) {
+                            subProjectSelect.dispatchEvent(new Event('change'));
                         }
                     },
                     error: function() {
@@ -471,7 +705,6 @@
 
             const projectSelect = document.getElementById('cboProject');
 
-            // Fetch sub-projects initially if project is set
             if (projectSelect && projectSelect.value) {
                 fetchSubProjects(projectSelect.value, window.materialEntryConfig.selectedSubProjectId);
             }
@@ -482,6 +715,34 @@
                     $('#program_sub_id').val('');
                     $('#cluster_id').val('');
                     $('#account_sub_id').val('');
+
+                    if (categoryChoices) {
+                        categoryChoices.clearStore();
+                        categoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                    if (subCategoryChoices) {
+                        subCategoryChoices.clearStore();
+                        subCategoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                    if (detailChoices) {
+                        detailChoices.clearStore();
+                        detailChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
 
                     fetchSubProjects(this.value);
                 });
@@ -503,6 +764,9 @@
                     $('#program_sub_id').val(props.program_sub_id || '');
                     $('#cluster_id').val(props.cluster_id || '');
                     $('#account_sub_id').val(props.account_sub_id || '');
+
+                    // Populate fields using the helper function
+                    refreshFieldData();
                 });
             }
         });

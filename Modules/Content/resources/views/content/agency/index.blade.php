@@ -46,14 +46,16 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body row">
                     @if (hasPermission('agency.create') && $data->is_archived != 2)
-                        <div class="col-sm">
-                            <div class="mb-4">
-                                <a class="btn btn-light waves-effect waves-light"
-                                    href="{{ route('agency.create', $params) }}"><i class="bx bx-plus me-1"></i>
-                                    {{ __('buttons.create') }}</a>
-                            </div>
+                        <div class="col-12 mb-4 d-flex flex-wrap gap-2">
+                            <a class="btn btn-light waves-effect waves-light" href="{{ route('agency.create', $params) }}">
+                                <i class="bx bx-plus me-1"></i> {{ __('buttons.create') }}
+                            </a>
+                            <a href="{{ route('agencies.assignments') }}"
+                                class="btn btn-info text-white waves-effect waves-light">
+                                កំណត់អង្គភាពតាមកម្មវិធី
+                            </a>
                         </div>
                     @endif
                     <div class="table-responsive">

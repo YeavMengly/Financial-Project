@@ -47,7 +47,7 @@
                         @csrf
                         <div class="row">
                             {{-- Project Selection --}}
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <label for="cboProject" class="form-label font-size-13 text-muted">
                                         ជ្រើសរើស{{ __('forms.project') }}
@@ -65,7 +65,7 @@
                                 </div>
                             </div>
                             {{-- Sub Project with Skip Toggle --}}
-                            <div class="col-lg-4 col-md-6">
+                            <div class="col-lg-3 col-md-6">
                                 <div class="form-group mb-3">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
                                         <label for="cboSubProject" class="form-label font-size-13 text-muted mb-0">
@@ -76,7 +76,7 @@
                                                 id="skipSubProject" style="cursor: pointer;">
                                             <label class="form-check-label font-size-12 text-muted mb-0"
                                                 for="skipSubProject" style="cursor: pointer;">
-                                                រំលង/ មិនភ្ជាប់
+                                                រំលង
                                             </label>
                                         </div>
                                     </div>
@@ -84,6 +84,78 @@
                                         <option value="">{{ __('forms.search...') }}</option>
                                     </select>
                                     @error('cboSubProject')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- category with Skip Toggle --}}
+                            <div class="col-lg-3 col-md-4">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboCategory" class="form-label font-size-13 text-muted mb-0">
+                                            ប្រភេទ(Category)
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0" type="checkbox" role="switch"
+                                                id="skipCategory" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted mb-0" for="skipCategory"
+                                                style="cursor: pointer;">
+                                                រំលង
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboCategory" class="form-select" name="cboCategory" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboCategory')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- sub category with Skip Toggle --}}
+                            <div class="col-lg-3 col-md-4">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboSubCategory" class="form-label font-size-13 text-muted mb-0">
+                                            ប្រភេទរង(Sub Category)
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0" type="checkbox" role="switch"
+                                                id="skipSubCategory" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted mb-0"
+                                                for="skipSubCategory" style="cursor: pointer;">
+                                                រំលង
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboSubCategory" class="form-select" name="cboSubCategory" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboSubCategory')
+                                        <div class="pristine-error text-help">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            {{-- Detail with Skip Toggle --}}
+                            <div class="col-lg-3 col-md-4">
+                                <div class="form-group mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <label for="cboDetail" class="form-label font-size-13 text-muted mb-0">
+                                            លម្អិត(Detail)
+                                        </label>
+                                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-1">
+                                            <input class="form-check-input mt-0" type="checkbox" role="switch"
+                                                id="skipDetail" style="cursor: pointer;">
+                                            <label class="form-check-label font-size-12 text-muted mb-0" for="skipDetail"
+                                                style="cursor: pointer;">
+                                                រំលង
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <select id="cboDetail" class="form-select" name="cboDetail" required>
+                                        <option value="">{{ __('forms.search...') }}</option>
+                                    </select>
+                                    @error('cboDetail')
                                         <div class="pristine-error text-help">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -230,33 +302,141 @@
         };
 
         let subProjectChoices = null;
+        let categoryChoices = null;
+        let subCategoryChoices = null;
+        let detailChoices = null;
+        const choicesMap = new WeakMap();
+
+        function initChoicesInstance(element) {
+            if (!element) return null;
+            if (choicesMap.has(element)) {
+                return choicesMap.get(element);
+            }
+            const instance = new Choices(element, {
+                searchEnabled: true,
+                itemSelectText: '',
+                placeholderValue: 'ជ្រើសរើស',
+                searchPlaceholderValue: 'ស្វែងរក...',
+                shouldSort: false,
+                position: 'auto',
+                removeItemButton: false
+            });
+            choicesMap.set(element, instance);
+            element.classList.add('choices-initialized');
+            return instance;
+        }
+
+        function destroyChoicesInstance(element) {
+            if (choicesMap.has(element)) {
+                const instance = choicesMap.get(element);
+                if (instance && typeof instance.destroy === 'function') {
+                    instance.destroy();
+                }
+                choicesMap.delete(element);
+                element.classList.remove('choices-initialized');
+            }
+        }
+
+        // Toggle Table Skip / Disabled State on Change
+        $(document).on('change', '#skipItemTable', function() {
+            const wrapper = $('#itemTableWrapper');
+            const inputs = $('#itemTable').find('input, select');
+
+            if (this.checked) {
+                wrapper.addClass('table-skipped');
+                inputs.each(function() {
+                    $(this).prop('disabled', true).removeAttr('required');
+                    if ($(this).hasClass('choices-input') || $(this).data('choice')) {
+                        const choiceInstance = choicesMap.get(this);
+                        if (choiceInstance && typeof choiceInstance.disable === 'function') {
+                            choiceInstance.disable();
+                        }
+                    }
+                });
+            } else {
+                wrapper.removeClass('table-skipped');
+                inputs.each(function() {
+                    $(this).prop('disabled', false);
+                    if ($(this).hasClass('choices-input') || $(this).data('choice')) {
+                        const choiceInstance = choicesMap.get(this);
+                        if (choiceInstance && typeof choiceInstance.enable === 'function') {
+                            choiceInstance.enable();
+                        }
+                    }
+                });
+            }
+        });
+
+        if ($('#skipItemTable').is(':checked')) {
+            $('#skipItemTable').trigger('change');
+        }
+
+        function updateRowIndices() {
+            $('#itemTable tbody tr').each(function(newIndex) {
+                $(this).attr('data-row-index', newIndex);
+
+                $(this).find('input[name^="sub_pro"]').attr('name', `sub_pro[${newIndex}]`);
+                $(this).find('input[name^="item_id"]').attr('name', `item_id[${newIndex}][]`);
+
+                $(this).find('select.cboSubAccount').attr('name', `accountSub[${newIndex}]`);
+                $(this).find('select.cboProgram').attr('name', `program[${newIndex}]`);
+                $(this).find('select.cboProgramSub').attr('name', `cboProgramSub[${newIndex}]`);
+                $(this).find('select.cboCluster').attr('name', `cboCluster[${newIndex}]`);
+
+                $(this).find('.category-block').each(function(catIndex) {
+                    $(this).attr('data-cat-index', catIndex);
+                    $(this).find('.category-item input').attr('name', `category[${newIndex}][${catIndex}]`);
+
+                    $(this).find('.subcategory-item').each(function(subCatIndex) {
+                        $(this).attr('data-subcat-index', subCatIndex);
+                        $(this).find('> div > input').attr('name',
+                            `sub_category[${newIndex}][${catIndex}][${subCatIndex}]`);
+
+                        $(this).find('.detail-item input').each(function() {
+                            $(this).attr('name',
+                                `detail[${newIndex}][${catIndex}][${subCatIndex}][]`);
+                        });
+                    });
+                });
+            });
+        }
 
         /* ==========================================================================
-           1. INITIALIZATION ON DOM CONTENT LOADED
+           INITIALIZATION ON DOM CONTENT LOADED
            ========================================================================== */
         document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('pristine-valid-example');
+
             // Summernote
-            if ($('#vNote, #vRefer').length) {
-                $('#vNote, #vRefer').summernote({
-                    backColor: 'red',
-                    height: 150,
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['color', ['color']],
-                    ]
+            if ($('#vNote').length) {
+                $('#vNote').summernote({
+                    height: 120,
+                    callbacks: {
+                        onChange: function(contents) {
+                            $('#vNote').val(contents);
+                        }
+                    }
+                });
+            }
+            if ($('#vRefer').length) {
+                $('#vRefer').summernote({
+                    height: 120,
+                    callbacks: {
+                        onChange: function(contents) {
+                            $('#vRefer').val(contents);
+                        }
+                    }
                 });
             }
 
             // Flatpickr
-            const dateInput = document.getElementById('datepicker-basic');
+            const dateInput = document.getElementById('date');
             if (dateInput) {
                 flatpickr(dateInput, {
                     dateFormat: 'Y-m-d',
                     altInput: true,
                     altFormat: 'd/m/Y',
-                    allowInput: true,
-                    defaultDate: dateInput.value || null
+                    allowInput: true
                 });
             }
 
@@ -287,12 +467,61 @@
                 });
             }
 
-            const form = document.getElementById('pristine-valid-example');
+            // Category Dropdown
+            const categorySelect = document.getElementById('cboCategory');
+            if (categorySelect) {
+                categoryChoices = new Choices(categorySelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false,
+                    allowHTML: true
+                });
+            }
+
+            // Sub Category Dropdown
+            const subCategorySelect = document.getElementById('cboSubCategory');
+            if (subCategorySelect) {
+                subCategoryChoices = new Choices(subCategorySelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false,
+                    allowHTML: true
+                });
+            }
+
+            // Detail Dropdown
+            const detailSelect = document.getElementById('cboDetail');
+            if (detailSelect) {
+                detailChoices = new Choices(detailSelect, {
+                    searchEnabled: true,
+                    itemSelectText: '',
+                    placeholder: true,
+                    placeholderValue: 'ជ្រើសរើស',
+                    searchPlaceholderValue: 'ស្វែងរក...',
+                    shouldSort: false,
+                    allowHTML: true
+                });
+            }
+
+            document.querySelectorAll('.cboProgram, .cboSubAccount, .cboProgramSub, .cboCluster').forEach(function(
+                select) {
+                initChoicesInstance(select);
+            });
+
             const skipSubProjectCheckbox = document.getElementById('skipSubProject');
+            const skipCategoryCheckbox = document.getElementById('skipCategory');
+            const skipSubCategoryCheckbox = document.getElementById('skipSubCategory');
+            const skipDetailCheckbox = document.getElementById('skipDetail');
             const submitBtn = document.getElementById('insertToTableBtn');
 
             // Skip logic handler
-            function setupSkipField(checkbox, inputsSelector, isChoices = false) {
+            function setupSkipField(checkbox, inputsSelector, isChoices = false, choicesInstance = null) {
                 if (!checkbox) return;
 
                 const updateState = () => {
@@ -302,9 +531,9 @@
 
                         if (checkbox.checked) {
                             input.value = '';
-                            if (isChoices && subProjectChoices) {
-                                subProjectChoices.removeActiveItems();
-                                subProjectChoices.disable();
+                            if (isChoices && choicesInstance) {
+                                choicesInstance.removeActiveItems();
+                                choicesInstance.disable();
                                 if (choicesWrapper) choicesWrapper.classList.add('choices-skip-active');
                             } else {
                                 input.disabled = true;
@@ -312,8 +541,8 @@
                             }
                             input.removeAttribute('required');
                         } else {
-                            if (isChoices && subProjectChoices) {
-                                subProjectChoices.enable();
+                            if (isChoices && choicesInstance) {
+                                choicesInstance.enable();
                                 if (choicesWrapper) choicesWrapper.classList.remove(
                                     'choices-skip-active');
                             } else {
@@ -328,112 +557,257 @@
                 checkbox.addEventListener('change', updateState);
             }
 
-            setupSkipField(skipSubProjectCheckbox, '#cboSubProject', true);
+            setupSkipField(skipSubProjectCheckbox, '#cboSubProject', true, subProjectChoices);
+            setupSkipField(skipCategoryCheckbox, '#cboCategory', true, categoryChoices);
+            setupSkipField(skipSubCategoryCheckbox, '#cboSubCategory', true, subCategoryChoices);
+            setupSkipField(skipDetailCheckbox, '#cboDetail', true, detailChoices);
 
-            // Robust Form Submit Handler (Single-Click Prevention)
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked) {
-                        if (subProjectSelect) {
-                            subProjectSelect.removeAttribute('required');
-                            subProjectSelect.disabled = false;
-                            subProjectSelect.value = ''; // Submit empty value to Laravel
-                        }
-                    }
+            // Pre-load cascade dropdowns for edit views
+            $('#itemTable tbody tr').each(function() {
+                const row = $(this);
+                const programSelect = row.find('.cboProgram')[0];
+                const subSelect = row.find('.cboProgramSub')[0];
+                const clusterSelect = row.find('.cboCluster')[0];
 
-                    // Native HTML validation check
-                    if (!form.checkValidity()) {
-                        e.preventDefault();
-                        form.reportValidity();
+                const programVal = $(programSelect).val() || $(subSelect).attr('data-program-id');
+                const selectedSubId = $(subSelect).attr('data-selected');
+                const selectedClusterId = $(clusterSelect).attr('data-selected');
 
-                        // Re-disable choices if check failed
-                        if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked && subProjectChoices) {
-                            subProjectChoices.disable();
-                        }
-                        return false;
-                    }
+                const subChoices = choicesMap.get(subSelect);
+                const clusterChoices = choicesMap.get(clusterSelect);
 
-                    // Disable button instantly upon valid submit
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML =
-                            '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...';
-                    }
-                });
-            }
-
-            /* ----------------------------------------------------------------------
-               2. DYNAMIC TABLE ROWS (Add / Remove)
-               ---------------------------------------------------------------------- */
-            const tableBody = document.querySelector('#itemTable tbody');
-
-            if (tableBody && tableBody.rows[0]) {
-                initRowChoices(tableBody.rows[0]);
-            }
-
-            if (tableBody) {
-                tableBody.addEventListener('click', function(e) {
-                    if (e.target.classList.contains('addRow')) {
-                        const firstRow = tableBody.rows[0];
-                        const newRow = firstRow.cloneNode(true);
-
-                        newRow.querySelectorAll('.choices').forEach(choicesWrapper => {
-                            const originalSelect = choicesWrapper.querySelector('select');
-                            if (originalSelect) {
-                                originalSelect.classList.remove('choices-initialized');
-                                originalSelect.removeAttribute('data-choice');
-                                originalSelect.removeAttribute('tabindex');
-                                originalSelect.removeAttribute('aria-hidden');
-                                originalSelect.style.display = '';
-                                originalSelect.selectedIndex = 0;
-
-                                Array.from(originalSelect.options).forEach(opt => {
-                                    opt.removeAttribute('selected');
+                if (programVal) {
+                    $.ajax({
+                        url: "{{ route('project.by.program_sub', $params) }}",
+                        type: 'GET',
+                        data: {
+                            program_id: programVal
+                        },
+                        success: function(response) {
+                            if (Array.isArray(response) && subChoices) {
+                                const options = response.map(item => ({
+                                    value: String(item.value),
+                                    label: item.label,
+                                    selected: String(item.value) === String(
+                                        selectedSubId)
+                                }));
+                                options.unshift({
+                                    value: '',
+                                    label: '{{ __('forms.search...') }}',
+                                    selected: !selectedSubId
                                 });
 
-                                choicesWrapper.parentNode.replaceChild(originalSelect,
-                                    choicesWrapper);
+                                subChoices.setChoices(options, 'value', 'label', true);
+                                if (selectedSubId) {
+                                    subChoices.setChoiceByValue(String(selectedSubId));
+                                }
+
+                                const currentSubVal = selectedSubId || $(subSelect).val();
+                                if (currentSubVal) {
+                                    $.ajax({
+                                        url: "{{ route('project.by.cluster', $params) }}",
+                                        type: 'GET',
+                                        data: {
+                                            program_sub_id: currentSubVal
+                                        },
+                                        success: function(clusterResponse) {
+                                            if (Array.isArray(clusterResponse) &&
+                                                clusterChoices) {
+                                                const clusterOptions =
+                                                    clusterResponse.map(item => ({
+                                                        value: String(item
+                                                            .value),
+                                                        label: item.label,
+                                                        selected: String(
+                                                                item.value
+                                                            ) ===
+                                                            String(
+                                                                selectedClusterId
+                                                            )
+                                                    }));
+                                                clusterOptions.unshift({
+                                                    value: '',
+                                                    label: '{{ __('forms.search...') }}',
+                                                    selected: !
+                                                        selectedClusterId
+                                                });
+
+                                                clusterChoices.setChoices(
+                                                    clusterOptions, 'value',
+                                                    'label', true);
+                                                if (selectedClusterId) {
+                                                    clusterChoices.setChoiceByValue(
+                                                        String(
+                                                            selectedClusterId));
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
                             }
-                        });
+                        }
+                    });
+                }
+            });
 
-                        newRow.querySelectorAll('input').forEach(input => {
-                            if (input.type !== 'checkbox') input.value = '';
-                        });
+            // Program -> Sub Program Cascade
+            $(document).on('change', '.cboProgram', function() {
+                const row = $(this).closest('tr');
+                const programId = $(this).val();
+                const subProgramElement = row.find('.cboProgramSub')[0];
+                const clusterElement = row.find('.cboCluster')[0];
 
-                        const btn = newRow.querySelector('button');
-                        btn.classList.remove('btn-success', 'addRow');
-                        btn.classList.add('btn-danger', 'removeRow');
-                        btn.textContent = '-';
+                const subProgramChoices = choicesMap.get(subProgramElement);
+                const clusterChoices = choicesMap.get(clusterElement);
 
-                        tableBody.appendChild(newRow);
-                        initRowChoices(newRow);
-                    }
+                if (subProgramChoices) {
+                    subProgramChoices.clearChoices();
+                    subProgramChoices.setChoices([{
+                        value: '',
+                        label: '{{ __('forms.search...') }}',
+                        selected: true
+                    }], 'value', 'label', true);
+                }
+                if (clusterChoices) {
+                    clusterChoices.clearChoices();
+                    clusterChoices.setChoices([{
+                        value: '',
+                        label: '{{ __('forms.search...') }}',
+                        selected: true
+                    }], 'value', 'label', true);
+                }
 
-                    if (e.target.classList.contains('removeRow')) {
-                        e.target.closest('tr').remove();
+                if (!programId) return;
+
+                $.ajax({
+                    url: "{{ route('project.by.program_sub', $params) }}",
+                    type: 'GET',
+                    data: {
+                        program_id: programId
+                    },
+                    success: function(response) {
+                        if (Array.isArray(response) && response.length > 0 &&
+                            subProgramChoices) {
+                            const formattedOptions = response.map(item => ({
+                                value: String(item.value),
+                                label: item.label,
+                                selected: false
+                            }));
+                            formattedOptions.unshift({
+                                value: '',
+                                label: '{{ __('forms.search...') }}',
+                                selected: true
+                            });
+                            subProgramChoices.setChoices(formattedOptions, 'value', 'label',
+                                true);
+                        }
                     }
                 });
-            }
+            });
 
-            function initRowChoices(row) {
-                const unitSelect = row.querySelector('.unit-select');
-                if (unitSelect && !unitSelect.classList.contains('choices-initialized')) {
-                    unitSelect.value = '';
-                    new Choices(unitSelect, {
-                        searchEnabled: true,
-                        itemSelectText: '',
-                        placeholder: true,
-                        placeholderValue: 'ជ្រើសរើស',
-                        searchPlaceholderValue: 'ស្វែងរក...',
-                        shouldSort: false,
-                        allowHTML: true
-                    });
-                    unitSelect.classList.add('choices-initialized');
+            // Sub Program -> Cluster Cascade
+            $(document).on('change', '.cboProgramSub', function() {
+                const row = $(this).closest('tr');
+                const programSubId = $(this).val();
+                const clusterElement = row.find('.cboCluster')[0];
+                const clusterChoices = choicesMap.get(clusterElement);
+
+                if (clusterChoices) {
+                    clusterChoices.clearChoices();
+                    clusterChoices.setChoices([{
+                        value: '',
+                        label: '{{ __('forms.search...') }}',
+                        selected: true
+                    }], 'value', 'label', true);
                 }
-            }
+
+                if (!programSubId) return;
+
+                $.ajax({
+                    url: "{{ route('project.by.cluster', $params) }}",
+                    type: 'GET',
+                    data: {
+                        program_sub_id: programSubId
+                    },
+                    success: function(response) {
+                        if (Array.isArray(response) && response.length > 0 && clusterChoices) {
+                            const formattedOptions = response.map(item => ({
+                                value: String(item.value),
+                                label: item.label,
+                                selected: false
+                            }));
+                            formattedOptions.unshift({
+                                value: '',
+                                label: '{{ __('forms.search...') }}',
+                                selected: true
+                            });
+                            clusterChoices.setChoices(formattedOptions, 'value', 'label', true);
+                        }
+                    }
+                });
+            });
+
+            // Add Main Table Row
+            $(document).on('click', '.addRow', function(e) {
+                e.preventDefault();
+                const tableBody = $('#itemTable tbody');
+                let rowIndex = tableBody.children('tr').length;
+
+                const newRowHtml = `
+            <tr data-row-index="${rowIndex}">
+                <td>
+                    <input type="hidden" name="item_id[${rowIndex}][]" value="">
+                    <input type="text" name="p_name[]" class="form-control form-control-sm" required>
+                </td>
+                <td>
+                    <select class="form-control form-control-sm unit-select" name="unit[]" required>
+                        <option value="">ជ្រើសរើស</option>
+                        @foreach ($unitType as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @endforeach
+                        <option value="__add_new__">➕ បន្ថែម {{ __('menus.unit') }} ថ្មី</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="number" min="0" name="quantity[]" step="0.01" class="form-control form-control-sm" required>
+                </td>
+                <td>
+                    <input type="number" min="0" step="any" name="price[]" class="form-control form-control-sm" required>
+                </td>
+                <td>
+                    <input type="text" name="source[]" class="form-control form-control-sm source-input" placeholder="{{ __('forms.source') }}">
+                </td>
+                <td>
+                    <input type="text" name="p_year[]" class="form-control form-control-sm pro-year-input" placeholder="{{ __('forms.pro.year') }}">
+                </td>
+                <td class="text-center align-middle">
+                    <button type="button" class="btn btn-danger btn-sm removeRow" title="លុបជួរដេក">-</button>
+                </td>
+            </tr>`;
+
+                tableBody.append(newRowHtml);
+                const appendedRow = tableBody.children().last();
+
+                appendedRow.find('select').each(function() {
+                    initChoicesInstance(this);
+                });
+
+                updateRowIndices();
+            });
+
+            // Remove Main Table Row
+            $(document).on('click', '.removeRow', function(e) {
+                e.preventDefault();
+                const row = $(this).closest('tr');
+                row.find('select').each(function() {
+                    destroyChoicesInstance(this);
+                });
+                row.remove();
+                updateRowIndices();
+            });
 
             /* ----------------------------------------------------------------------
-               3. AJAX SUB-PROJECT HANDLER
+               AJAX CASCADING DROPDOWNS HANDLER
                ---------------------------------------------------------------------- */
             const projectSelect = document.getElementById('cboProject');
 
@@ -447,6 +821,33 @@
                     $('#account_sub_id').val('');
 
                     if (subProjectChoices) subProjectChoices.clearStore();
+                    if (categoryChoices) {
+                        categoryChoices.clearStore();
+                        categoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                    if (subCategoryChoices) {
+                        subCategoryChoices.clearStore();
+                        subCategoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                    if (detailChoices) {
+                        detailChoices.clearStore();
+                        detailChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
 
                     if (!projectId) {
                         if (subProjectChoices) {
@@ -500,7 +901,8 @@
                                         program_id: item.program_id || '',
                                         program_sub_id: item.program_sub_id || '',
                                         cluster_id: item.cluster_id || '',
-                                        account_sub_id: item.account_sub_id || ''
+                                        account_sub_id: item.account_sub_id || '',
+                                        hierarchy: item.hierarchy || {}
                                     }
                                 };
                             });
@@ -525,10 +927,32 @@
                     });
                 });
 
+                // 1. Sub-Project Change -> Populates Categories, Sub-Categories, and Details instantly
                 subProjectSelect.addEventListener('change', function() {
                     if (!subProjectChoices) return;
 
                     const selected = subProjectChoices.getValue();
+
+                    if (categoryChoices) categoryChoices.clearStore();
+                    if (subCategoryChoices) {
+                        subCategoryChoices.clearStore();
+                        subCategoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+                    if (detailChoices) {
+                        detailChoices.clearStore();
+                        detailChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+                    }
+
                     if (!selected || !selected.value) {
                         $('#program_id').val('');
                         $('#program_sub_id').val('');
@@ -542,6 +966,218 @@
                     $('#program_sub_id').val(props.program_sub_id || '');
                     $('#cluster_id').val(props.cluster_id || '');
                     $('#account_sub_id').val(props.account_sub_id || '');
+
+                    const hierarchy = props.hierarchy || {};
+                    const catKeys = Object.keys(hierarchy);
+
+                    if (catKeys.length > 0 && categoryChoices && (!skipCategoryCheckbox || !
+                            skipCategoryCheckbox.checked)) {
+                        const shouldAutoSelect = (catKeys.length === 1);
+                        const catOpts = catKeys.map((val, idx) => ({
+                            value: String(val),
+                            label: String(val),
+                            selected: shouldAutoSelect && idx === 0
+                        }));
+                        categoryChoices.setChoices(catOpts, 'value', 'label', true);
+
+                        if (shouldAutoSelect) {
+                            $('#cboCategory').trigger('change');
+                        }
+                    }
+
+                    let allSubCats = [];
+                    let allDetails = [];
+
+                    Object.values(hierarchy).forEach(subObj => {
+                        Object.keys(subObj).forEach(subCatKey => {
+                            if (subCatKey && !allSubCats.includes(subCatKey)) allSubCats
+                                .push(subCatKey);
+
+                            const dets = subObj[subCatKey] || [];
+                            dets.forEach(d => {
+                                if (d && d !== '-' && !allDetails.includes(d))
+                                    allDetails.push(d);
+                            });
+                        });
+                    });
+
+                    if (allSubCats.length > 0 && subCategoryChoices) {
+                        const subCatOpts = allSubCats.map((val, idx) => ({
+                            value: String(val),
+                            label: String(val),
+                            selected: allSubCats.length === 1 && idx === 0
+                        }));
+                        subCategoryChoices.setChoices(subCatOpts, 'value', 'label', true);
+                    }
+
+                    if (allDetails.length > 0 && detailChoices) {
+                        const detailOpts = allDetails.map((val, idx) => ({
+                            value: String(val),
+                            label: String(val),
+                            selected: allDetails.length === 1 && idx === 0
+                        }));
+                        detailChoices.setChoices(detailOpts, 'value', 'label', true);
+                    }
+                });
+
+                // 2. Category Change -> Filters Sub-Category & Detail Dropdowns dynamically
+                const categorySelectElement = document.getElementById('cboCategory');
+                if (categorySelectElement) {
+                    categorySelectElement.addEventListener('change', function() {
+                        if (!subProjectChoices || !subCategoryChoices || !detailChoices) return;
+
+                        const selectedSubProj = subProjectChoices.getValue();
+                        const selectedCat = this.value;
+
+                        subCategoryChoices.clearStore();
+                        subCategoryChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+
+                        detailChoices.clearStore();
+                        detailChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+
+                        if (!selectedSubProj || !selectedSubProj.customProperties || !selectedCat) return;
+
+                        const hierarchy = selectedSubProj.customProperties.hierarchy || {};
+                        const subCatsObj = hierarchy[selectedCat] || {};
+                        const subCatKeys = Object.keys(subCatsObj);
+
+                        if (subCatKeys.length > 0 && (!skipSubCategoryCheckbox || !skipSubCategoryCheckbox
+                                .checked)) {
+                            const shouldAutoSelectSub = (subCatKeys.length === 1);
+                            const subCatOpts = subCatKeys.map((val, idx) => ({
+                                value: String(val),
+                                label: String(val),
+                                selected: shouldAutoSelectSub && idx === 0
+                            }));
+                            subCategoryChoices.setChoices(subCatOpts, 'value', 'label', true);
+
+                            if (shouldAutoSelectSub) {
+                                $('#cboSubCategory').trigger('change');
+                            }
+                        }
+
+                        let categoryDetails = [];
+                        Object.values(subCatsObj).forEach(detailsArr => {
+                            if (Array.isArray(detailsArr)) {
+                                detailsArr.forEach(d => {
+                                    if (d && d !== '-' && !categoryDetails.includes(d)) {
+                                        categoryDetails.push(d);
+                                    }
+                                });
+                            }
+                        });
+
+                        const filteredDetails = categoryDetails.filter(v => v !== null && v !== undefined &&
+                            String(v).trim() !== '');
+
+                        if (filteredDetails.length > 0 && (!skipDetailCheckbox || !skipDetailCheckbox
+                                .checked)) {
+                            const shouldAutoSelectDetail = (filteredDetails.length === 1);
+                            const detailOpts = filteredDetails.map((val, idx) => ({
+                                value: String(val),
+                                label: String(val),
+                                selected: shouldAutoSelectDetail && idx === 0
+                            }));
+                            detailChoices.setChoices(detailOpts, 'value', 'label', true);
+                        }
+                    });
+                }
+
+                // 3. Sub-Category Change -> Filters Detail Dropdown specifically
+                const subCategorySelectElement = document.getElementById('cboSubCategory');
+                if (subCategorySelectElement) {
+                    subCategorySelectElement.addEventListener('change', function() {
+                        if (!subProjectChoices || !detailChoices) return;
+
+                        const selectedSubProj = subProjectChoices.getValue();
+                        const selectedCat = categoryChoices ? categoryChoices.getValue(true) : '';
+                        const selectedSubCat = this.value;
+
+                        detailChoices.clearStore();
+                        detailChoices.setChoices([{
+                            value: '',
+                            label: window.materialEntryConfig.searchPlaceholder,
+                            selected: true,
+                            disabled: true
+                        }], 'value', 'label', true);
+
+                        if (!selectedSubProj || !selectedSubProj.customProperties || !selectedCat || !
+                            selectedSubCat) return;
+
+                        const hierarchy = selectedSubProj.customProperties.hierarchy || {};
+                        let detailsArr = hierarchy[selectedCat]?.[selectedSubCat] || [];
+
+                        if (detailsArr.length === 0 && Array.isArray(selectedSubProj.customProperties
+                                .details)) {
+                            detailsArr = selectedSubProj.customProperties.details;
+                        }
+
+                        const filteredDetails = detailsArr.filter(v => v !== null && v !== undefined &&
+                            String(v).trim() !== '');
+
+                        if (filteredDetails.length > 0 && (!skipDetailCheckbox || !skipDetailCheckbox
+                                .checked)) {
+                            const shouldAutoSelect = (filteredDetails.length === 1);
+                            const detailOpts = filteredDetails.map((val, idx) => ({
+                                value: String(val),
+                                label: String(val),
+                                selected: shouldAutoSelect && idx === 0
+                            }));
+
+                            detailChoices.setChoices(detailOpts, 'value', 'label', true);
+                        }
+                    });
+                }
+            }
+
+            // Form Submit Handler
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (skipSubProjectCheckbox && skipSubProjectCheckbox.checked && subProjectSelect) {
+                        subProjectSelect.removeAttribute('required');
+                        subProjectSelect.disabled = false;
+                        subProjectSelect.value = '';
+                    }
+                    if (skipCategoryCheckbox && skipCategoryCheckbox.checked && categorySelect) {
+                        categorySelect.removeAttribute('required');
+                        categorySelect.disabled = false;
+                        categorySelect.value = '';
+                    }
+                    if (skipSubCategoryCheckbox && skipSubCategoryCheckbox.checked && subCategorySelect) {
+                        subCategorySelect.removeAttribute('required');
+                        subCategorySelect.disabled = false;
+                        subCategorySelect.value = '';
+                    }
+                    if (skipDetailCheckbox && skipDetailCheckbox.checked && detailSelect) {
+                        detailSelect.removeAttribute('required');
+                        detailSelect.disabled = false;
+                        detailSelect.value = '';
+                    }
+
+                    const skipTableSwitch = document.getElementById('skipItemTable');
+                    if (skipTableSwitch && skipTableSwitch.checked) {
+                        $('#itemTable').find('input, select').prop('disabled', true).removeAttr('required');
+                    }
+
+                    if ($('#vNote').length) $('#vNote').val($('#vNote').summernote('code'));
+                    if ($('#vRefer').length) $('#vRefer').val($('#vRefer').summernote('code'));
+
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML =
+                            `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> កំពុងរក្សាទុក...`;
+                    }
+                    form.submit();
                 });
             }
         });

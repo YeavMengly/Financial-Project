@@ -88,7 +88,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 col-md-6">
+                                <div class="col-lg-4 col-md-6" hidden>
                                     <div class="form-group mb-3">
                                         <label for="cboAgency" class="form-label font-size-13 text-muted">
                                             {{ __('forms.agency') }}
@@ -127,7 +127,8 @@
                                     <div class="form-group mb-3">
                                         <label for="fin_law"
                                             class="form-label font-size-13 text-muted">{{ __('forms.fin.law') }}</label>
-                                        <input type="number" min="1" name="fin_law" required
+                                        <input type="number" min="1" id="fin_law" name="fin_law" required
+                                            value="{{ old('fin_law', $module->fin_law ?? '') }}"
                                             data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
                                             data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" class="form-control" />
@@ -138,10 +139,12 @@
                                     <div class="form-group mb-3">
                                         <label for="current_loan"
                                             class="form-label font-size-13 text-muted">{{ __('forms.current.loan') }}</label>
-                                        <input type="number" min="1" required name="current_loan"
+                                        <input type="number" min="1" id="current_loan" name="current_loan" required
+                                            readonly value="{{ old('current_loan', $module->current_loan ?? '') }}"
                                             data-pristine-required-message="{{ __('messages.required') }}"
                                             data-pristine-min-message="លំដាប់ ត្រូវតែធំជាងសូន្យ"
-                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ" class="form-control" />
+                                            data-pristine-integer-message="លំដាប់ ត្រូវតែលេខ"
+                                            class="form-control bg-light" />
                                     </div>
                                 </div>
                             </div>
@@ -181,6 +184,16 @@
             });
         });
     </script> --}}
+    <script>
+        const finLawInput = document.getElementById('fin_law');
+        const currentLoanInput = document.getElementById('current_loan');
+
+        if (finLawInput && currentLoanInput) {
+            finLawInput.addEventListener('input', function() {
+                currentLoanInput.value = this.value;
+            });
+        }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('pristine-valid-example');
@@ -360,17 +373,19 @@
                 });
             }
 
-            // ========= Script 2: Program -> Agency =========
-            function handleProgramChangeForAgency(programId) {
+            // ========= Script 2: Program + ProgramSub + Cluster -> Agency =========
+            function handleClusterChangeForAgency(programId, programSubId, clusterId) {
                 resetSelect('#cboAgency');
                 agencyChoices = resetChoices('#cboAgency', agencyChoices);
 
-                if (!programId) return;
+                if (!programId || !programSubId || !clusterId) return;
 
                 loadOptions({
                     url: "{{ route('beginVoucher.by.agency') }}",
                     data: {
-                        program_id: programId
+                        program_id: programId,
+                        program_sub_id: programSubId,
+                        cluster_id: clusterId
                     },
                     targetSelect: '#cboAgency',
                     instanceRefSetter: () => {
@@ -402,15 +417,24 @@
             $('#cboProgram').on('change', function() {
                 const programId = $(this).val();
 
-                // when program changes -> always clear cluster too
                 handleProgramChangeForProgramSub(programId);
-                handleProgramChangeForAgency(programId);
-                handleProgramSubChangeForCluster(null); // reset cluster
+                handleProgramSubChangeForCluster(null);
+                handleClusterChangeForAgency(null, null, null);
             });
 
             $('#cboProgramSub').on('change', function() {
                 const programSubId = $(this).val();
+
                 handleProgramSubChangeForCluster(programSubId);
+                handleClusterChangeForAgency(null, null, null);
+            });
+
+            $('#cboCluster').on('change', function() {
+                const programId = $('#cboProgram').val();
+                const programSubId = $('#cboProgramSub').val();
+                const clusterId = $(this).val();
+
+                handleClusterChangeForAgency(programId, programSubId, clusterId);
             });
 
         });
