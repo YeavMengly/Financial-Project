@@ -96,4 +96,18 @@ class Agency extends Model
         $activity->browser_version = $agent->version($browser);
         $activity->browser = $browser;
     }
+    // In Agency model
+    public function assignments()
+    {
+        return $this->hasMany(AgencyAssignment::class, 'agency_id');
+    }
+
+    public function scopeForHierarchy($query, $programId, $programSubId = null, $clusterId = null)
+    {
+        return $query->whereHas('assignments', function ($q) use ($programId, $programSubId, $clusterId) {
+            $q->where('program_id', $programId)
+                ->when($programSubId, fn($subQ) => $subQ->where('program_sub_id', $programSubId))
+                ->when($clusterId, fn($clusQ) => $clusQ->where('cluster_id', $clusterId));
+        });
+    }
 }

@@ -25,6 +25,7 @@ class Projects extends Model
         'sub_project',
         'category',
         'sub_category',
+        'detail',
         'program_id',
         'program_sub_id',
         'cluster_id',

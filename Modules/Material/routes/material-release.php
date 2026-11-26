@@ -17,3 +17,6 @@ Route::controller(MaterialReleaseController::class)->group(function () {
 });
 Route::get('/getByProjectSubId', [MaterialReleaseController::class,'getByProjectSubId'])->name('materialRelease.get.project');
 Route::get('/getByItemId', [MaterialReleaseController::class,'getByItemId'])->name('materialRelease.get.projectItem');
+Route::get('/getCategory', [MaterialReleaseController::class,'getCategory'])->name('materialRelease.get.category');
+Route::get('/getSubCategory', [MaterialReleaseController::class,'getSubCategory'])->name('materialRelease.get.subCategory');
+Route::get('/getDetial', [MaterialReleaseController::class,'getDetial'])->name('materialRelease.get.detail');

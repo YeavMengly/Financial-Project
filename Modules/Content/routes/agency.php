@@ -15,7 +15,6 @@ Route::middleware('PermissionCheck')->controller(AgencyController::class)->group
     Route::get('/{params}/agency/{executiveId}/executive-unit/create', 'executiveCreate')->name('executiveUnit.create');
     Route::get('/{params}/agency/{executiveId}/executive-unit/edit/{id}', 'executiveEdit')->name('executiveUnit.edit');
     Route::get('/{params}/agency/{executiveId}/executive-unit/destroy/{id}', 'executiveDestroy')->name('executiveUnit.destroy');
-
 });
 Route::controller(AgencyController::class)->group(function () {
     Route::post('/{params}/agency/store', 'store')->name('agency.store');
@@ -24,6 +23,7 @@ Route::controller(AgencyController::class)->group(function () {
 
     Route::post('/{params}/agency/{executiveId}/executive-unit/store', 'executiveStore')->name('executiveUnit.store');
     Route::post('/{params}/agency/{executiveId}/executive-unit/update/{id}', 'executiveUpdate')->name('executiveUnit.update');
-    Route::get('/{params}/agency/{executiveId}/executive-unit/restore/{id}', 'executiveRestore')->name('executiveUnit.restore');    
-    
+    Route::get('/{params}/agency/{executiveId}/executive-unit/restore/{id}', 'executiveRestore')->name('executiveUnit.restore');
 });
+Route::get('/agencies/assignments', [AgencyController::class, 'assignments'])->name('agencies.assignments');
+Route::post('/agencies/assignments', [AgencyController::class, 'saveAssignments'])->name('agencies.assignments.save');

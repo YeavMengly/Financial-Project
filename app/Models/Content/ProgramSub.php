@@ -52,6 +52,10 @@ class ProgramSub extends Model
         return $this->belongsTo(Cluster::class, 'program_sub_id', 'id');
     }
 
+    public function clusters()
+    {
+        return $this->hasMany(Cluster::class, 'program_sub_id', 'id');
+    }
     /* -----------------------------------------------------------------
      |  Activity Log Configuration
      | -----------------------------------------------------------------

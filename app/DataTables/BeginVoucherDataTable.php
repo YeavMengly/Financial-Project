@@ -61,13 +61,14 @@ class BeginVoucherDataTable extends DataTable
         $model = $model->newQuery();
 
         $model->leftJoin('account_subs', 'begin_vouchers.account_sub_id', '=', 'account_subs.id');
-        $model->leftJoin('agencies', 'begin_vouchers.agency_id', '=', 'agencies.id');
+        $model->leftJoin('agency_assignments', 'begin_vouchers.agency_id', '=', 'agency_assignments.id');
+        $model->leftJoin('agencies', 'agency_assignments.agency_id', '=', 'agencies.id');
         $model->leftJoin('clusters', 'begin_vouchers.cluster_id', '=', 'clusters.id');
 
         // ===== FILTERS =====
 
         if ($request->agency) {
-            $model->where('begin_vouchers.agency_id', $request->agency);
+            $model->where('agency_assignments.agency_id', $request->agency);
         }
 
         if ($request->chapter) {
