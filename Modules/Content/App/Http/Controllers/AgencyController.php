@@ -59,7 +59,7 @@ class AgencyController extends Controller
     public function store(Request $request, $params)
     {
         $validateData = $request->validate([
-            'cboProgram' => ['nullable'],
+            // 'cboProgram' => ['nullable'],
             'no' => ['required'],
             'name' => ['required'],
             'nick_name' => ['required'],
@@ -73,7 +73,7 @@ class AgencyController extends Controller
             $ministries = Ministry::where('id', $id)->first();
             Agency::create([
                 'ministry_id' => $ministries->id,
-                'program_id' => $validateData['cboProgram'] ?? null,
+                // 'program_id' => $validateData['cboProgram'] ?? null,
                 'no' => $validateData['no'],
                 'name' => $validateData['name'],
                 'nick_name' => $validateData['nick_name'],
@@ -123,7 +123,7 @@ class AgencyController extends Controller
     public function update(Request $request, $params, $id)
     {
         $validateData = $request->validate([
-            'cboProgram' => ['nullable'],
+            // 'cboProgram' => ['nullable'],
             'no' => ['required'],
             'name' => ['required'],
             'nick_name' => ['required'],
@@ -134,7 +134,7 @@ class AgencyController extends Controller
         try {
             $agency = Agency::findOrfail($id);
             $agency->update([
-                'program_id' => $validateData['cboProgram'] ?? null,
+                // 'program_id' => $validateData['cboProgram'] ?? null,
                 'no' => $validateData['no'],
                 'name' => $validateData['name'],
                 'nick_name' => $validateData['nick_name'],

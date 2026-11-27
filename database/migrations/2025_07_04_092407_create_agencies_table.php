@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('agencies', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ministry_id');
-            $table->unsignedBigInteger('program_id');
+            // $table->unsignedBigInteger('program_id');
             $table->string('no');
             $table->string('name');
             $table->string('nick_name');
