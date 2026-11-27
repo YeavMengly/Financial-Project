@@ -45,7 +45,7 @@ class MissionController extends Controller
         $level = Levels::all();
         $provinces = Province::all();
         $employees = Employee::whereNotNull('id_number')->orderBy('id')->get();
-        $pendingMissionCount = Mission::where('payment_is_archived', 2)->count();
+        $pendingMissionCount = Mission::where('payment_is_archived', 2)->where('missions.ministry_id', decode_params($params))->count();
         // $exportLogsCount = Mission::where('payment_status', 'paid')->count();
         $exportLogs = Mission::query()
             ->where('missions.ministry_id', decode_params($params))
@@ -446,7 +446,7 @@ class MissionController extends Controller
                 'account_id'     => substr($accountSub->no, 0, 4),
                 'account_sub_id' => $accountSub->no,
             ]);
-// dd($mission->id);
+            // dd($mission->id);
             foreach ($validated['cboName'] as $index => $employeeId) {
 
                 /*
@@ -574,15 +574,15 @@ class MissionController extends Controller
                     ->whereDate('start_date', '<=', $monthEnd)
                     ->whereDate('end_date', '>=', $monthStart)
                     ->get(['id', 'start_date', 'end_date']);
-// dd($mission->id);
+                // dd($mission->id);
                 $usedDays = 0;
 
                 // foreach ($missions as $mission) {
 
-                    $missionStart = Carbon::parse($mission->start_date)->max($monthStart);
-                    $missionEnd   = Carbon::parse($mission->end_date)->min($monthEnd);
+                $missionStart = Carbon::parse($mission->start_date)->max($monthStart);
+                $missionEnd   = Carbon::parse($mission->end_date)->min($monthEnd);
 
-                    $usedDays += $missionStart->diffInDays($missionEnd) + 1;
+                $usedDays += $missionStart->diffInDays($missionEnd) + 1;
                 // }
 
                 $totalDays = $usedDays + $newMissionDays;
@@ -623,7 +623,7 @@ class MissionController extends Controller
                 $duplicateEmployee = MissionEmployee::where('mission_id', $mission->id)
                     ->where('employee_id', $employeeId)
                     ->exists();
-// dd($duplicateEmployee);
+                // dd($duplicateEmployee);
                 if ($duplicateEmployee) {
 
                     throw new \Exception(

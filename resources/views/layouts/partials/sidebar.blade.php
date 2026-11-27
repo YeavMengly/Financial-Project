@@ -127,7 +127,7 @@
                         @endif
                 </li>
                 {{-- Reneue --}}
-                @if (hasPermission('initialRevenue.index'))
+                {{-- @if (hasPermission('initialRevenue.index'))
                     <li>
                         <a href="{{ route('initialRevenue.index') }}"
                             class="{{ Request::routeIs('revenue.*') ? 'active' : '' }}">
@@ -135,7 +135,7 @@
                             <span data-key="t-duel-entry">ចំណូល</span>
                         </a>
                     </li>
-                @endif
+                @endif --}}
 
             </ul>
 
@@ -653,7 +653,7 @@
                         </li>
                     @endif
 
-                     @if (hasPermission('ministries.index'))
+                     {{-- @if (hasPermission('ministries.index'))
                         <li>
                             <a href="{{ route('publicServices.index') }}"
                                 class="{{ Request::routeIs('publicServices.*') ? 'active' : '' }}">
@@ -661,7 +661,7 @@
                                 {{ __('menus.content.public.service') }}
                             </a>
                         </li>
-                    @endif
+                    @endif --}}
 
                 </ul>
             </li>
