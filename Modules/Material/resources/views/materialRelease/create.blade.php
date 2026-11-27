@@ -724,13 +724,60 @@
                 initRowChoices(tableBody.rows[0]);
             }
 
+            function isSkipped(checkboxId) {
+                return Boolean(document.getElementById(checkboxId)?.checked);
+            }
+
+            function getChoiceVal(selectEl, choiceInst) {
+                if (choiceInst) {
+                    const val = choiceInst.getValue(true);
+                    if (Array.isArray(val)) return String(val[0] ?? '');
+                    if (val !== undefined && val !== null) return String(val);
+                }
+                return selectEl ? String(selectEl.value || '') : '';
+            }
+
+            function setChoiceVal(choiceInst, selectEl, value) {
+                if (!choiceInst || !selectEl) return;
+                const val = value !== undefined && value !== null ? String(value) : '';
+                choiceInst.removeActiveItems();
+                if (val) {
+                    choiceInst.setChoiceByValue(val);
+                }
+                selectEl.value = val;
+            }
+
             /**
              * Helper: Get active sub-project ID (empty string if skipped)
              */
             function getActiveSubProjectId() {
-                const isSkipped = document.getElementById('skipSubProject')?.checked;
-                if (isSkipped || !subProjectSelect) return '';
-                return subProjectSelect.value || '';
+                if (isSkipped('skipSubProject') || !subProjectSelect) return '';
+                return getChoiceVal(subProjectSelect, subProjectChoices);
+            }
+
+            function getActiveCategoryId() {
+                if (isSkipped('skipCategory') || !categorySelect) return '';
+                return getChoiceVal(categorySelect, categoryChoices);
+            }
+
+            function getActiveSubCategoryId() {
+                if (isSkipped('skipSubCategory') || !subCategorySelect) return '';
+                return getChoiceVal(subCategorySelect, subCategoryChoices);
+            }
+
+            function getActiveDetailId() {
+                if (isSkipped('skipDetail') || !detailSelect) return '';
+                return getChoiceVal(detailSelect, detailChoices);
+            }
+
+            function getCurrentItemFilters() {
+                return {
+                    project_id: cboProject ? String(cboProject.value || '') : '',
+                    sub_project_id: getActiveSubProjectId(),
+                    category_id: getActiveCategoryId(),
+                    sub_category_id: getActiveSubCategoryId(),
+                    detail_id: getActiveDetailId()
+                };
             }
 
             /**
@@ -772,6 +819,7 @@
              */
             function resetChoicesDropdown(instance, emptyLabel = 'ជ្រើសរើស') {
                 if (!instance) return;
+                instance.removeActiveItems();
                 instance.clearStore();
                 instance.setChoices([{
                     value: '',
@@ -786,6 +834,7 @@
              */
             function populateChoicesDropdown(instance, data) {
                 if (!instance) return;
+                instance.removeActiveItems();
                 instance.clearStore();
 
                 if (!Array.isArray(data) || data.length === 0) {
@@ -799,8 +848,9 @@
                 }
 
                 const choices = data.map(item => ({
-                    value: String(item.value ?? item.id),
-                    label: item.label ?? item.name ?? ('#' + item.id)
+                    value: String(item.value ?? item.id ?? ''),
+                    label: item.label ?? item.name ?? ('#' + item.id),
+                    disabled: Boolean(item.no_data)
                 }));
 
                 choices.unshift({
@@ -854,29 +904,34 @@
             /**
              * Fetch items dynamically via AJAX
              */
-            function fetchAndPopulateItems(params, targetSelect = null) {
+            function fetchAndPopulateItems(params = null, targetSelect = null) {
+                const queryParams = params || getCurrentItemFilters();
+
                 $.ajax({
                     url: window.materialReleaseConfig.getItemRoute,
                     type: "GET",
-                    data: params,
+                    data: queryParams,
                     dataType: "json",
                     success: function(data) {
                         const $targets = targetSelect ? $(targetSelect) : $('.item-select');
 
                         $targets.each(function() {
                             const select = this;
-                            if (!select.choicesInstance) return;
+                            const inst = select.choicesInstance;
+                            if (!inst) return;
 
-                            const currentValue = select.choicesInstance.getValue(true);
-                            select.choicesInstance.clearStore();
+                            const currentValue = String(inst.getValue(true) || '');
+                            inst.removeActiveItems();
+                            inst.clearStore();
 
                             if (!Array.isArray(data) || data.length === 0) {
-                                select.choicesInstance.setChoices([{
+                                inst.setChoices([{
                                     value: '',
                                     label: 'មិនមានទិន្នន័យ',
                                     selected: true,
                                     disabled: true
                                 }], 'value', 'label', true);
+                                clearRowAutoFields(select.closest('tr'));
                                 return;
                             }
 
@@ -885,7 +940,7 @@
                                 return {
                                     value: itemVal,
                                     label: item.p_name || 'Item #' + item.id,
-                                    selected: itemVal === String(currentValue),
+                                    selected: false,
                                     disabled: false,
                                     customProperties: {
                                         unit: item.unit ?? item.unit_id ?? '',
@@ -900,22 +955,21 @@
                             formattedChoices.unshift({
                                 value: '',
                                 label: 'ជ្រើសរើស',
-                                selected: !currentValue,
+                                selected: true,
                                 disabled: true
                             });
 
-                            select.choicesInstance.setChoices(formattedChoices, 'value',
-                                'label', true);
+                            inst.setChoices(formattedChoices, 'value', 'label', true);
 
-                            if (currentValue) {
-                                const matched = formattedChoices.find(c => c.value === String(
-                                    currentValue));
-                                if (matched) {
-                                    select.choicesInstance.setChoiceByValue(String(
-                                        currentValue));
-                                } else {
-                                    clearRowAutoFields(select.closest('tr'));
-                                }
+                            const matched = currentValue ?
+                                formattedChoices.find(c => !c.disabled && c.value ===
+                                    currentValue) :
+                                null;
+
+                            if (matched) {
+                                inst.setChoiceByValue(currentValue);
+                            } else {
+                                clearRowAutoFields(select.closest('tr'));
                             }
                         });
                     },
@@ -944,7 +998,7 @@
 
                 let props = null;
                 if (selectInstance && selectInstance._store && Array.isArray(selectInstance._store
-                    .choices)) {
+                        .choices)) {
                     const matched = selectInstance._store.choices.find(
                         c => String(c.value) === String(selectedValue)
                     );
@@ -965,7 +1019,6 @@
 
                 if (!props) return;
 
-                // 1. Auto-fill Price input
                 const priceInput = row.querySelector('input[name="price[]"]');
                 if (priceInput) {
                     priceInput.value = props.price ?? '';
@@ -974,7 +1027,6 @@
                     }));
                 }
 
-                // 2. Auto-select Unit Dropdown
                 const unitSelect = row.querySelector('.unit-select');
                 if (unitSelect && props.unit !== undefined && props.unit !== null && props.unit !== '') {
                     const unitVal = String(props.unit).trim();
@@ -985,13 +1037,11 @@
                     }
                 }
 
-                // 3. Auto-fill Source input
                 const sourceInput = row.querySelector('input[name="source[]"]');
                 if (sourceInput) {
                     sourceInput.value = props.source ?? '';
                 }
 
-                // 4. Auto-fill Project Year (p_year) input
                 const proYearInput = row.querySelector('input[name="p_year[]"]');
                 if (proYearInput) {
                     proYearInput.value = props.p_year ?? '';
@@ -1006,7 +1056,7 @@
                 resetChoicesDropdown(subCategoryChoices);
                 resetChoicesDropdown(detailChoices);
 
-                if (!projectId) return $.Deferred().resolve().promise();
+                if (!projectId) return $.Deferred().resolve('').promise();
 
                 return $.ajax({
                     url: window.materialReleaseConfig.getCategoryRoute,
@@ -1016,12 +1066,15 @@
                         sub_project_id: subProjectId
                     },
                     dataType: "json"
-                }).done(function(data) {
+                }).then(function(data) {
                     populateChoicesDropdown(categoryChoices, data);
-                    const autoVal = preselectCategory || (data.length === 1 ? String(data[0].value) : '');
-                    if (autoVal && categoryChoices && !document.getElementById('skipCategory')?.checked) {
-                        categoryChoices.setChoiceByValue(autoVal);
+                    const autoVal = preselectCategory || (Array.isArray(data) && data.length === 1 ? String(
+                        data[0].value) : '');
+                    if (autoVal && categoryChoices && categorySelect && !isSkipped('skipCategory')) {
+                        setChoiceVal(categoryChoices, categorySelect, autoVal);
+                        return autoVal;
                     }
+                    return '';
                 });
             }
 
@@ -1032,7 +1085,7 @@
                 const projectId = cboProject ? cboProject.value : '';
                 const subProjectId = getActiveSubProjectId();
 
-                if (!projectId) return $.Deferred().resolve().promise();
+                if (!projectId) return $.Deferred().resolve('').promise();
 
                 return $.ajax({
                     url: window.materialReleaseConfig.getSubCategoryRoute,
@@ -1043,14 +1096,16 @@
                         category_id: categoryId
                     },
                     dataType: "json"
-                }).done(function(data) {
+                }).then(function(data) {
                     populateChoicesDropdown(subCategoryChoices, data);
-                    const autoVal = preselectSubCategory || (data.length === 1 ? String(data[0].value) :
-                    '');
-                    if (autoVal && subCategoryChoices && !document.getElementById('skipSubCategory')
-                        ?.checked) {
-                        subCategoryChoices.setChoiceByValue(autoVal);
+                    const autoVal = preselectSubCategory || (Array.isArray(data) && data.length === 1 ?
+                        String(data[0].value) : '');
+                    if (autoVal && subCategoryChoices && subCategorySelect && !isSkipped(
+                        'skipSubCategory')) {
+                        setChoiceVal(subCategoryChoices, subCategorySelect, autoVal);
+                        return autoVal;
                     }
+                    return '';
                 });
             }
 
@@ -1059,11 +1114,9 @@
 
                 const projectId = cboProject ? cboProject.value : '';
                 const subProjectId = getActiveSubProjectId();
-                const categoryId = (!document.getElementById('skipCategory')?.checked && categorySelect) ?
-                    categorySelect.value :
-                    '';
+                const categoryId = getActiveCategoryId();
 
-                if (!projectId) return $.Deferred().resolve().promise();
+                if (!projectId) return $.Deferred().resolve('').promise();
 
                 return $.ajax({
                     url: window.materialReleaseConfig.getDetailRoute,
@@ -1075,13 +1128,45 @@
                         sub_category_id: subCategoryId
                     },
                     dataType: "json"
-                }).done(function(data) {
+                }).then(function(data) {
                     populateChoicesDropdown(detailChoices, data);
-                    const autoVal = preselectDetail || (data.length === 1 ? String(data[0].value) : '');
-                    if (autoVal && detailChoices && !document.getElementById('skipDetail')?.checked) {
-                        detailChoices.setChoiceByValue(autoVal);
+                    const autoVal = preselectDetail || (Array.isArray(data) && data.length === 1 ? String(
+                        data[0].value) : '');
+                    if (autoVal && detailChoices && detailSelect && !isSkipped('skipDetail')) {
+                        setChoiceVal(detailChoices, detailSelect, autoVal);
+                        return autoVal;
                     }
+                    return '';
                 });
+            }
+
+            function runCascadeAndRefreshItems(preselect = {}) {
+                const projectId = cboProject ? (cboProject.value || '') : '';
+                const subProjectId = getActiveSubProjectId();
+
+                if (!projectId) {
+                    fetchAndPopulateItems({
+                        project_id: '',
+                        sub_project_id: '',
+                        category_id: '',
+                        sub_category_id: '',
+                        detail_id: ''
+                    });
+                    return;
+                }
+
+                loadCategories(projectId, subProjectId, preselect.category || '')
+                    .then(function(activeCat) {
+                        const catVal = activeCat || getActiveCategoryId();
+                        return loadSubCategories(catVal, preselect.sub_category || '');
+                    })
+                    .then(function(activeSubCat) {
+                        const subCatVal = activeSubCat || getActiveSubCategoryId();
+                        return loadDetails(subCatVal, preselect.detail || '');
+                    })
+                    .then(function() {
+                        fetchAndPopulateItems();
+                    });
             }
 
             /**
@@ -1098,7 +1183,7 @@
                     resetChoicesDropdown(detailChoices);
 
                     if (!projectId) {
-                        fetchAndPopulateItems({});
+                        runCascadeAndRefreshItems();
                         return;
                     }
 
@@ -1110,50 +1195,9 @@
                         },
                         dataType: "json",
                         success: function(data) {
-                            if (!subProjectChoices) return;
-                            subProjectChoices.clearStore();
-
-                            if (!Array.isArray(data) || data.length === 0) {
-                                subProjectChoices.setChoices([{
-                                    value: '',
-                                    label: 'មិនមានទិន្នន័យ',
-                                    selected: true,
-                                    disabled: true
-                                }], 'value', 'label', true);
-                            } else {
-                                const choices = data.map(function(item) {
-                                    return {
-                                        value: String(item.value),
-                                        label: item.label,
-                                        customProperties: {
-                                            program_id: item.program_id || '',
-                                            program_sub_id: item.program_sub_id || '',
-                                            cluster_id: item.cluster_id || '',
-                                            account_sub_id: item.account_sub_id || '',
-                                            category: item.category || '',
-                                            sub_category: item.sub_category || '',
-                                            detail: item.detail || ''
-                                        }
-                                    };
-                                });
-                                choices.unshift({
-                                    value: '',
-                                    label: 'ជ្រើសរើស',
-                                    selected: true,
-                                    disabled: true
-                                });
-                                subProjectChoices.setChoices(choices, 'value', 'label', true);
-                            }
-
-                            loadCategories(projectId, '')
-                                .then(() => loadSubCategories(categorySelect?.value || ''))
-                                .then(() => loadDetails(subCategorySelect?.value || ''));
+                            populateChoicesDropdown(subProjectChoices, data);
+                            runCascadeAndRefreshItems();
                         }
-                    });
-
-                    fetchAndPopulateItems({
-                        project_id: projectId,
-                        sub_project_id: ''
                     });
                 });
             }
@@ -1163,26 +1207,7 @@
              */
             if (subProjectSelect) {
                 subProjectSelect.addEventListener('change', function() {
-                    const selected = subProjectChoices ? subProjectChoices.getValue() : null;
-                    const props = (selected && selected.customProperties) ? selected.customProperties : {};
-
-                    $('#program_id').val(props.program_id || '');
-                    $('#program_sub_id').val(props.program_sub_id || '');
-                    $('#cluster_id').val(props.cluster_id || '');
-                    $('#account_sub_id').val(props.account_sub_id || '');
-
-                    const subProjectId = getActiveSubProjectId();
-                    const projectId = cboProject ? cboProject.value : '';
-
-                    loadCategories(projectId, subProjectId, props.category || '')
-                        .then(() => loadSubCategories(categorySelect?.value || '', props.sub_category ||
-                            ''))
-                        .then(() => loadDetails(subCategorySelect?.value || '', props.detail || ''));
-
-                    fetchAndPopulateItems({
-                        project_id: projectId,
-                        sub_project_id: subProjectId
-                    });
+                    runCascadeAndRefreshItems();
                 });
             }
 
@@ -1191,14 +1216,31 @@
              */
             if (categorySelect) {
                 categorySelect.addEventListener('change', function() {
-                    loadSubCategories(this.value)
-                        .then(() => loadDetails(subCategorySelect?.value || ''));
+                    const catVal = getActiveCategoryId();
+                    loadSubCategories(catVal)
+                        .then(function(activeSubCat) {
+                            const subCatVal = activeSubCat || getActiveSubCategoryId();
+                            return loadDetails(subCatVal);
+                        })
+                        .then(function() {
+                            fetchAndPopulateItems();
+                        });
                 });
             }
 
             if (subCategorySelect) {
                 subCategorySelect.addEventListener('change', function() {
-                    loadDetails(this.value);
+                    const subCatVal = getActiveSubCategoryId();
+                    loadDetails(subCatVal)
+                        .then(function() {
+                            fetchAndPopulateItems();
+                        });
+                });
+            }
+
+            if (detailSelect) {
+                detailSelect.addEventListener('change', function() {
+                    fetchAndPopulateItems();
                 });
             }
 
@@ -1209,23 +1251,8 @@
                 checkboxId: 'skipSubProject',
                 selectEl: subProjectSelect,
                 getInstance: () => subProjectChoices,
-                onSkipChange: (isSkipped) => {
-                    const projectId = cboProject ? cboProject.value : '';
-                    if (isSkipped) {
-                        loadCategories(projectId, '')
-                            .then(() => loadSubCategories(categorySelect?.value || ''))
-                            .then(() => loadDetails(subCategorySelect?.value || ''));
-
-                        fetchAndPopulateItems({
-                            project_id: projectId,
-                            sub_project_id: ''
-                        });
-                    } else {
-                        fetchAndPopulateItems({
-                            project_id: projectId,
-                            sub_project_id: getActiveSubProjectId()
-                        });
-                    }
+                onSkipChange: () => {
+                    runCascadeAndRefreshItems();
                 }
             });
 
@@ -1233,17 +1260,8 @@
                 checkboxId: 'skipCategory',
                 selectEl: categorySelect,
                 getInstance: () => categoryChoices,
-                onSkipChange: (isSkipped) => {
-                    if (isSkipped) {
-                        loadSubCategories('')
-                            .then(() => loadDetails(subCategorySelect?.value || ''));
-                    } else {
-                        const projectId = cboProject ? cboProject.value : '';
-                        const subProjectId = getActiveSubProjectId();
-                        loadCategories(projectId, subProjectId)
-                            .then(() => loadSubCategories(categorySelect?.value || ''))
-                            .then(() => loadDetails(subCategorySelect?.value || ''));
-                    }
+                onSkipChange: () => {
+                    runCascadeAndRefreshItems();
                 }
             });
 
@@ -1251,20 +1269,26 @@
                 checkboxId: 'skipSubCategory',
                 selectEl: subCategorySelect,
                 getInstance: () => subCategoryChoices,
-                onSkipChange: (isSkipped) => {
-                    if (isSkipped) {
-                        loadDetails('');
-                    } else {
-                        loadSubCategories(categorySelect?.value || '')
-                            .then(() => loadDetails(subCategorySelect?.value || ''));
-                    }
+                onSkipChange: () => {
+                    const catVal = getActiveCategoryId();
+                    loadSubCategories(catVal)
+                        .then(function(activeSubCat) {
+                            const subCatVal = activeSubCat || getActiveSubCategoryId();
+                            return loadDetails(subCatVal);
+                        })
+                        .then(function() {
+                            fetchAndPopulateItems();
+                        });
                 }
             });
 
             bindSkipToggle({
                 checkboxId: 'skipDetail',
                 selectEl: detailSelect,
-                getInstance: () => detailChoices
+                getInstance: () => detailChoices,
+                onSkipChange: () => {
+                    fetchAndPopulateItems();
+                }
             });
 
             /**
@@ -1308,14 +1332,8 @@
                         tableBody.appendChild(newRow);
                         initRowChoices(newRow);
 
-                        const projectId = cboProject ? cboProject.value : null;
-                        const subProjectId = getActiveSubProjectId();
                         const newSelect = newRow.querySelector('.item-select');
-
-                        fetchAndPopulateItems({
-                            project_id: projectId,
-                            sub_project_id: subProjectId
-                        }, newSelect);
+                        fetchAndPopulateItems(getCurrentItemFilters(), newSelect);
                     }
 
                     if (e.target.classList.contains('removeRow')) {

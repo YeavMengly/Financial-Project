@@ -71,13 +71,23 @@ class MaterialReleaseController extends Controller
             return Projects::whereRaw('1 = 0');
         }
 
-        return Projects::query()
+        $query = Projects::query()
             ->when(
                 !empty($selectedProject->stock_number),
                 fn($q) => $q->where('stock_number', $selectedProject->stock_number),
                 fn($q) => $q->where('id', $selectedProject->id)
-            )
-            ->when(!empty($subProjectId), fn($q) => $q->where('id', $subProjectId));
+            );
+
+        if (!empty($subProjectId)) {
+            $selectedSub = Projects::find($subProjectId);
+            if ($selectedSub && trim((string) $selectedSub->sub_project) !== '') {
+                $query->where('sub_project', trim((string) $selectedSub->sub_project));
+            } else {
+                $query->where('id', $subProjectId);
+            }
+        }
+
+        return $query;
     }
 
     public function getByProjectSubId(Request $request)
@@ -85,12 +95,16 @@ class MaterialReleaseController extends Controller
         try {
             $projectId = $request->input('project_id');
             if (empty($projectId)) {
-                return response()->json([]);
+                return response()->json([
+                    ['value' => '', 'label' => 'មិនមានទិន្នន័យ', 'no_data' => true],
+                ]);
             }
 
             $selectedProject = Projects::find($projectId);
             if (!$selectedProject) {
-                return response()->json([]);
+                return response()->json([
+                    ['value' => '', 'label' => 'មិនមានទិន្នន័យ', 'no_data' => true],
+                ]);
             }
 
             $subProjects = Projects::query()
@@ -99,42 +113,26 @@ class MaterialReleaseController extends Controller
                     fn($query) => $query->where('stock_number', $selectedProject->stock_number),
                     fn($query) => $query->where('id', $selectedProject->id)
                 )
-                ->whereNotNull('program_id')
-                ->whereNotNull('program_sub_id')
-                ->whereNotNull('cluster_id')
-                ->whereNotNull('account_sub_id')
-                ->get();
+                ->whereNotNull('sub_project')
+                ->where('sub_project', '!=', '')
+                ->get()
+                ->unique(fn($item) => trim((string) $item->sub_project));
+
+            if ($subProjects->isEmpty()) {
+                return response()->json([
+                    ['value' => '', 'label' => 'មិនមានទិន្នន័យ', 'no_data' => true],
+                ]);
+            }
 
             $data = $subProjects->map(function ($item) {
-                $subProjectName = !empty($item->sub_project)
-                    ? $item->sub_project
-                    : 'Sub-project #' . $item->id;
-                $accountSubId = $item->account_sub_id ?? '';
-
-                $programNo    = $item->program_id ? (Program::find($item->program_id)->no ?? '') : '';
-                $programSubNo = $item->program_sub_id ? (ProgramSub::find($item->program_sub_id)->no ?? '') : '';
-                $clusterNo    = $item->cluster_id ? (Cluster::find($item->cluster_id)->no ?? '') : '';
-
-                $label = trim(
-                    implode(' ', array_filter([
-                        $subProjectName . ' - ',
-                        'អនុគណនី' . $accountSubId,
-                        'កម្មវិធីទី' . $programNo,
-                        'អនុកម្មវិធីទី' . $programSubNo,
-                        'ចង្កោមសកម្មភាព' . $clusterNo,
-                    ]))
-                );
+                $subProjectName = trim((string) $item->sub_project);
 
                 return [
-                    'value'          => (string) $item->id,
-                    'label'          => preg_replace('/\s+/', ' ', $label),
-                    'program_id'     => (string) $item->program_id,
-                    'program_sub_id' => (string) $item->program_sub_id,
-                    'cluster_id'     => (string) $item->cluster_id,
-                    'account_sub_id' => (string) $item->account_sub_id,
-                    'category'       => (string) ($item->category ?? ''),
-                    'sub_category'   => (string) ($item->sub_category ?? ''),
-                    'detail'         => (string) ($item->detail ?? ''),
+                    'value'        => (string) $item->id,
+                    'label'        => $subProjectName,
+                    'category'     => (string) ($item->category ?? ''),
+                    'sub_category' => (string) ($item->sub_category ?? ''),
+                    'detail'       => (string) ($item->detail ?? ''),
                 ];
             });
 
@@ -275,16 +273,22 @@ class MaterialReleaseController extends Controller
         try {
             $projectId    = $request->input('project_id');
             $subProjectId = $request->input('sub_project_id');
+            $category     = $request->input('category_id');
+            $subCategory  = $request->input('sub_category_id');
+            $detail       = $request->input('detail_id');
             $releaseId    = $request->input('release_id');
 
-            $projectId    = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? $projectId : null;
-            $subProjectId = ($subProjectId && $subProjectId !== 'null' && $subProjectId !== 'undefined') ? $subProjectId : null;
+            $projectId    = ($projectId && $projectId !== 'null' && $projectId !== 'undefined') ? trim((string) $projectId) : null;
+            $subProjectId = ($subProjectId && $subProjectId !== 'null' && $subProjectId !== 'undefined') ? trim((string) $subProjectId) : null;
+            $category     = ($category && $category !== 'null' && $category !== 'undefined') ? trim((string) $category) : null;
+            $subCategory  = ($subCategory && $subCategory !== 'null' && $subCategory !== 'undefined') ? trim((string) $subCategory) : null;
+            $detail       = ($detail && $detail !== 'null' && $detail !== 'undefined') ? trim((string) $detail) : null;
 
             if (!$projectId && !$subProjectId) {
                 return response()->json([]);
             }
 
-            $existingEntryIds = [];
+            $existingEntryIds   = [];
             $excludedReleaseIds = [];
 
             if ($releaseId) {
@@ -307,24 +311,29 @@ class MaterialReleaseController extends Controller
                 }
             }
 
-            if ($subProjectId) {
-                $subEntries = MaterialEntry::query()
-                    ->where('project_sub_id', $subProjectId)
-                    ->get();
+            $query = MaterialEntry::query();
 
-                // Fallback to project-level entries if sub-project has none directly attached
-                if ($subEntries->isEmpty() && $projectId) {
-                    $materials = MaterialEntry::query()
-                        ->where('project_id', $projectId)
-                        ->get();
-                } else {
-                    $materials = $subEntries;
-                }
-            } else {
-                $materials = MaterialEntry::query()
-                    ->where('project_id', $projectId)
-                    ->get();
+            if ($projectId) {
+                $query->where('project_id', $projectId);
             }
+
+            if ($subProjectId) {
+                $query->where('project_sub_id', $subProjectId);
+            }
+
+            if ($category) {
+                $query->where('category_id', $category);
+            }
+
+            if ($subCategory) {
+                $query->where('category_sub_id', $subCategory);
+            }
+
+            if ($detail) {
+                $query->where('detail', $detail);
+            }
+
+            $materials = $query->get();
 
             if ($materials->isEmpty()) {
                 return response()->json([]);

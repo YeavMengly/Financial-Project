@@ -8,13 +8,15 @@
         </div>
 
         {{-- Ministry Filter & Live Search --}}
-        <form method="GET" action="{{ route('agencies.assignments') }}" class="card card-body mb-3 py-2">
+        <form method="GET" action="{{ route('agencies.assignments', ['params' => $params]) }}"
+            class="card card-body mb-3 py-2">
             <div class="row align-items-center g-2">
                 <div class="col-md-4">
                     <label class="form-label small fw-bold mb-1">ជ្រើសរើសក្រសួង</label>
                     <select name="ministry_id" class="form-select form-select-sm" onchange="this.form.submit()">
                         @foreach ($ministries as $ministry)
-                            <option value="{{ $ministry->id }}" {{ $ministryId == $ministry->id ? 'selected' : '' }}>
+                            <option value="{{ $ministry->id }}"
+                                {{ (int) $ministryId === (int) $ministry->id ? 'selected' : '' }}>
                                 [ឆ្នាំ {{ $ministry->year }}] {{ $ministry->no }} - {{ $ministry->name }}
                                 ({{ $ministry->title }})
                             </option>
@@ -31,9 +33,8 @@
                 </div>
             </div>
         </form>
-
         {{-- Assignment Matrix Form --}}
-        <form action="{{ route('agencies.assignments.save') }}" method="POST">
+        <form action="{{ route('agencies.assignments.save', ['params' => $params]) }}" method="POST">
             @csrf
             <input type="hidden" name="ministry_id" value="{{ $ministryId }}">
 
@@ -223,7 +224,7 @@
                 if (!term) {
                     document.querySelectorAll('.prog-row').forEach(r => r.classList.remove('d-none'));
                     document.querySelectorAll('.sub-row, .clus-row').forEach(r => r.classList.add(
-                    'd-none'));
+                        'd-none'));
                     document.querySelectorAll('.toggle-btn').forEach(b => b.textContent = '+');
                     return;
                 }

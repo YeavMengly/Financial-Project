@@ -7,28 +7,28 @@
 
     <style>
         /* =========================================================
-                                                                                                                                         * TABLE WRAPPER & SCROLL FIXES
-                                                                                                                                         * ========================================================= */
+                                                                                                                                                                 * TABLE WRAPPER & SCROLL FIXES
+                                                                                                                                                                 * ========================================================= */
         #itemTableWrapper,
         /* .table-responsive {
-            width: 100% !important;
-            overflow-x: visible !important;
-            overflow-y: visible !important;
-            position: relative !important;
-            display: block;
-        } */
+                                    width: 100% !important;
+                                    overflow-x: visible !important;
+                                    overflow-y: visible !important;
+                                    position: relative !important;
+                                    display: block;
+                                } */
 
         /* #itemTableWrapper {
-            overflow-x: auto !important;
-            padding-top: 300px !important;
-            margin-top: -300px !important;
-        } */
+                                    overflow-x: auto !important;
+                                    padding-top: 300px !important;
+                                    margin-top: -300px !important;
+                                } */
 
         /* #itemTable {
-            table-layout: auto !important;
-            width: 100% !important;
-            min-width: 1300px !important;
-        } */
+                                    table-layout: auto !important;
+                                    width: 100% !important;
+                                    min-width: 1300px !important;
+                                } */
 
         #itemTable th {
             white-space: nowrap !important;
@@ -68,8 +68,8 @@
         }
 
         /* =========================================================
-                                                                                                                                         * CHOICES.JS STYLING & STRICT INPUT-WIDTH CONTROL
-                                                                                                                                         * ========================================================= */
+                                                                                                                                                                 * CHOICES.JS STYLING & STRICT INPUT-WIDTH CONTROL
+                                                                                                                                                                 * ========================================================= */
         .choices {
             margin-bottom: 0 !important;
             width: 100% !important;
@@ -163,8 +163,8 @@
         }
 
         /* =========================================================
-                                                                                                                         * FIX SWITCH CLICKABILITY & OVERLAPS
-                                                                                                                         * ========================================================= */
+                                                                                                                                                 * FIX SWITCH CLICKABILITY & OVERLAPS
+                                                                                                                                                 * ========================================================= */
         .form-check.form-switch {
             position: relative !important;
             z-index: 100 !important;
@@ -358,10 +358,9 @@
                                 </div>
                             </div>
                         </div>
-
                         {{-- =====================================================
-                            SECTION 2: PROJECT TABLE
-                        ====================================================== --}}
+    SECTION 2: PROJECT TABLE
+====================================================== --}}
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <label class="form-label mb-0">
                                 {{ __('forms.sub.project') }}
@@ -381,11 +380,17 @@
                                 <table class="table table-bordered align-middle text-nowrap" id="itemTable">
                                     <thead>
                                         <tr>
-                                            <th   class="align-middle">
+                                            <th class="align-middle">
                                                 {{ __('forms.project') }}
                                             </th>
-                                            <th  class="align-middle">
-                                                ប្រភេទ (Category, Sub-category & Detail)
+                                            <th class="align-middle">
+                                                ប្រភេទ (Category)
+                                            </th>
+                                            <th class="align-middle">
+                                                ប្រភេទរង (Sub-category)
+                                            </th>
+                                            <th class="align-middle">
+                                                ព័ត៌មានលម្អិត (Detail)
                                             </th>
                                             {{-- <th style="width:150px; min-width:150px;" class="align-middle">
                                                 {{ __('forms.sub.account') }}
@@ -399,73 +404,55 @@
                                             <th style="width:150px; min-width:150px;" class="align-middle">
                                                 {{ __('forms.cluster') }}
                                             </th> --}}
-                                            <th style="width:70px; min-width:70px;" class="text-center align-middle">
+                                            <th style="width:85px; min-width:85px;" class="text-center align-middle">
                                                 Action
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr data-row-index="0">
-                                            <td>
-                                                {{-- Removed 'required' and 'table-required' class --}}
+                                        <tr data-row-index="0" data-cat-index="0" data-subcat-index="0">
+                                            {{-- TD 1: Project --}}
+                                            <td data-col="project" class="td-project">
                                                 <input type="text" name="sub_pro[]" class="form-control">
                                             </td>
-                                            {{-- Grouped Category, Sub-Category & Detail Column --}}
-                                            <td>
-                                                <div class="category-container">
-                                                    <div class="category-block border p-2 mb-2 rounded bg-light"
-                                                        data-cat-index="0">
 
-                                                        {{-- Category Line on Top --}}
-                                                        <div class="d-flex mb-2 align-items-center category-item">
-                                                            {{-- Removed 'required' --}}
-                                                            <input type="text" class="form-control me-1"
-                                                                name="category[0][]"
-                                                                placeholder="បញ្ចូលប្រភេទ (Category)">
-                                                            <button type="button"
-                                                                class="btn btn-outline-success btn-sm addCategoryBtn"
-                                                                title="បន្ថែមប្រភេទ">+</button>
-                                                            <button type="button"
-                                                                class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1"
-                                                                title="លុបប្រភេទ" style="visibility: hidden;">-</button>
-                                                        </div>
-
-                                                        {{-- Sub-categories wrapper underneath --}}
-                                                        <div class="subcategory-wrapper ps-3 border-start">
-                                                            <div class="subcategory-item mb-2 border p-2 rounded bg-white"
-                                                                data-subcat-index="0">
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <input type="text" class="form-control me-1"
-                                                                        name="sub_category[0][0][]"
-                                                                        placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                                                                    <button type="button"
-                                                                        class="btn btn-outline-success btn-sm addSubCategoryBtn"
-                                                                        title="បន្ថែមប្រភេទរង">+</button>
-                                                                    <button type="button"
-                                                                        class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1"
-                                                                        title="លុបប្រភេទរង"
-                                                                        style="visibility: hidden;">-</button>
-                                                                </div>
-
-                                                                {{-- Details wrapper underneath Sub-category --}}
-                                                                <div class="detail-wrapper ps-3 border-start">
-                                                                    <div
-                                                                        class="d-flex mb-2 align-items-center detail-item">
-                                                                        <input type="text" class="form-control me-1"
-                                                                            name="detail[0][0][0][]"
-                                                                            placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                                                        <button type="button"
-                                                                            class="btn btn-outline-success btn-sm addDetailBtn"
-                                                                            title="បន្ថែមលម្អិត">+</button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
+                                            {{-- TD 2: Category (first/header item has only +) --}}
+                                            <td data-col="category" class="td-category">
+                                                <div class="d-flex align-items-center category-item">
+                                                    <input type="text" class="form-control me-1" name="category[0][]"
+                                                        placeholder="បញ្ចូលប្រភេទ (Category)">
+                                                    <button type="button"
+                                                        class="btn btn-outline-success btn-sm addCategoryBtn"
+                                                        title="បន្ថែមប្រភេទ">+</button>
                                                 </div>
                                             </td>
-                                            {{-- <td>
+
+                                            {{-- TD 3: Sub-category (first/header item has only +) --}}
+                                            <td data-col="subcategory" class="td-subcategory">
+                                                <div class="d-flex align-items-center subcategory-item">
+                                                    <input type="text" class="form-control me-1"
+                                                        name="sub_category[0][0][]"
+                                                        placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                                    <button type="button"
+                                                        class="btn btn-outline-success btn-sm addSubCategoryBtn"
+                                                        title="បន្ថែមប្រភេទរង">+</button>
+                                                </div>
+                                            </td>
+
+                                            {{-- TD 4: Detail (first/header item has only +) --}}
+                                            <td data-col="detail" class="td-detail">
+                                                <div class="d-flex align-items-center detail-item">
+                                                    <input type="text" class="form-control me-1"
+                                                        name="detail[0][0][0][]"
+                                                        placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                                    <button type="button"
+                                                        class="btn btn-outline-success btn-sm addDetailBtn"
+                                                        title="បន្ថែមលម្អិត">+</button>
+                                                </div>
+                                            </td>
+
+                                            {{-- Hidden Choices.js selects preserved --}}
+                                            <td style="display: none;">
                                                 <select class="form-select cboSubAccount" name="accountSub[]">
                                                     <option value="">ជ្រើសរើស</option>
                                                     @foreach ($accountSub as $bv)
@@ -474,7 +461,7 @@
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td>
+                                            <td style="display: none;">
                                                 <select class="form-select cboProgram" name="program[]">
                                                     <option value="">ជ្រើសរើស</option>
                                                     @foreach ($program as $p)
@@ -483,25 +470,27 @@
                                                     @endforeach
                                                 </select>
                                             </td>
-                                            <td>
+                                            <td style="display: none;">
                                                 <select class="form-select cboProgramSub" name="cboProgramSub[]">
                                                     <option value="">{{ __('forms.search...') }}</option>
                                                 </select>
                                             </td>
-                                            <td>
+                                            <td style="display: none;">
                                                 <select class="form-select cboCluster" name="cboCluster[]">
                                                     <option value="">{{ __('forms.search...') }}</option>
                                                 </select>
-                                            </td> --}}
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-success addRow">+</button>
+                                            </td>
+
+                                            {{-- Action TD --}}
+                                            <td data-col="action" class="td-action text-center">
+                                                <button type="button" class="btn btn-success btn-sm addRow"
+                                                    title="បន្ថែមជួរ">+</button>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-
                         {{-- =====================================================
                             SECTION 3: NOTE, REFER & ACTIONS
                         ====================================================== --}}
@@ -578,24 +567,132 @@
             return instance;
         }
 
+        function destroyChoicesInstance(element) {
+            if (choicesMap.has(element)) {
+                const instance = choicesMap.get(element);
+                if (instance && typeof instance.destroy === 'function') {
+                    instance.destroy();
+                }
+                choicesMap.delete(element);
+                element.classList.remove('choices-initialized');
+            }
+        }
+
+        /* =========================================================
+         * 2. GROUP HELPERS & INDEX / ROWSPAN SYNC (4-TD + ACTION)
+         * ========================================================= */
+        let groupUidCounter = 1;
+
+        function nextUid(prefix) {
+            return `${prefix}_${groupUidCounter++}`;
+        }
+
+        function ensureRowGroupIds() {
+            const $rows = $('#itemTable tbody tr');
+            let curProjectUid = null;
+            let curCatUid = null;
+            let curSubUid = null;
+
+            $rows.each(function() {
+                const $tr = $(this);
+
+                if ($tr.find('td[data-col="project"]').length) {
+                    curProjectUid = $tr.attr('data-puid') || nextUid('p');
+                    $tr.attr('data-puid', curProjectUid);
+
+                    if ($tr.find('td[data-col="category"]').length) {
+                        curCatUid = $tr.attr('data-cuid') || nextUid('c');
+                        $tr.attr('data-cuid', curCatUid);
+                    }
+                    if ($tr.find('td[data-col="subcategory"]').length) {
+                        curSubUid = $tr.attr('data-suid') || nextUid('s');
+                        $tr.attr('data-suid', curSubUid);
+                    }
+                } else if ($tr.find('td[data-col="category"]').length) {
+                    curCatUid = $tr.attr('data-cuid') || nextUid('c');
+                    $tr.attr('data-cuid', curCatUid);
+
+                    if ($tr.find('td[data-col="subcategory"]').length) {
+                        curSubUid = $tr.attr('data-suid') || nextUid('s');
+                        $tr.attr('data-suid', curSubUid);
+                    }
+                } else if ($tr.find('td[data-col="subcategory"]').length) {
+                    curSubUid = $tr.attr('data-suid') || nextUid('s');
+                    $tr.attr('data-suid', curSubUid);
+                }
+
+                $tr.attr('data-puid', curProjectUid);
+                $tr.attr('data-cuid', curCatUid);
+                $tr.attr('data-suid', curSubUid);
+            });
+        }
+
         function updateRowIndices() {
-            $('#itemTable tbody tr').each(function(newIndex) {
-                $(this).attr('data-row-index', newIndex);
+            ensureRowGroupIds();
 
-                // Update categories, sub-categories, and details index paths
-                $(this).find('.category-block').each(function(catIndex) {
-                    $(this).attr('data-cat-index', catIndex);
-                    $(this).find('.category-item input').attr('name', `category[${newIndex}][]`);
+            const $rows = $('#itemTable tbody tr');
+            $rows.find('td').removeAttr('rowspan');
 
-                    $(this).find('.subcategory-item').each(function(subCatIndex) {
-                        $(this).attr('data-subcat-index', subCatIndex);
-                        $(this).find('> div > input').attr('name',
-                            `sub_category[${newIndex}][${catIndex}][]`);
+            const projectOrder = [];
+            const catOrderByProject = {};
+            const subOrderByCat = {};
 
-                        $(this).find('.detail-item input').each(function() {
-                            $(this).attr('name',
-                                `detail[${newIndex}][${catIndex}][${subCatIndex}][]`);
-                        });
+            $rows.each(function() {
+                const $tr = $(this);
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+
+                if (!projectOrder.includes(puid)) {
+                    projectOrder.push(puid);
+                    catOrderByProject[puid] = [];
+                }
+                if (!catOrderByProject[puid].includes(cuid)) {
+                    catOrderByProject[puid].push(cuid);
+                    subOrderByCat[cuid] = [];
+                }
+                if (!subOrderByCat[cuid].includes(suid)) {
+                    subOrderByCat[cuid].push(suid);
+                }
+
+                const rowIdx = projectOrder.indexOf(puid);
+                const catIdx = catOrderByProject[puid].indexOf(cuid);
+                const subIdx = subOrderByCat[cuid].indexOf(suid);
+
+                $tr.attr('data-row-index', rowIdx);
+                $tr.attr('data-cat-index', catIdx);
+                $tr.attr('data-subcat-index', subIdx);
+
+                $tr.find('.category-item input').attr('name', `category[${rowIdx}][]`);
+                $tr.find('.subcategory-item input').attr('name', `sub_category[${rowIdx}][${catIdx}][]`);
+                $tr.find('.detail-item input').attr('name', `detail[${rowIdx}][${catIdx}][${subIdx}][]`);
+            });
+
+            projectOrder.forEach(function(puid) {
+                const $pRows = $rows.filter(`[data-puid="${puid}"]`);
+                const $pFirst = $pRows.first();
+                $pFirst.find('td[data-col="project"], td[data-col="action"]').attr('rowspan', $pRows.length);
+
+                const catList = catOrderByProject[puid] || [];
+                catList.forEach(function(cuid, cIdx) {
+                    const $cRows = $pRows.filter(`[data-cuid="${cuid}"]`);
+                    const $cFirst = $cRows.first();
+                    $cFirst.find('td[data-col="category"]').attr('rowspan', $cRows.length);
+
+                    if (cIdx === 0) {
+                        $cFirst.find('.removeCategoryBtn').remove();
+                    }
+
+                    const subList = subOrderByCat[cuid] || [];
+                    subList.forEach(function(suid, sIdx) {
+                        const $sRows = $cRows.filter(`[data-suid="${suid}"]`);
+                        const $sFirst = $sRows.first();
+                        $sFirst.find('td[data-col="subcategory"]').attr('rowspan', $sRows.length);
+
+                        if (sIdx === 0) {
+                            $sFirst.find('.removeSubCategoryBtn').remove();
+                        }
+                        $sFirst.find('.removeDetailBtn').remove();
                     });
                 });
             });
@@ -605,7 +702,7 @@
             const form = document.getElementById('pristine-valid-example');
 
             /* =========================================================
-             * 2. PLUGINS INITIALIZATION (SELECTS, SUMMERNOTE, FLATPICKR)
+             * 3. PLUGINS INITIALIZATION (SELECTS, SUMMERNOTE, FLATPICKR)
              * ========================================================= */
             document.querySelectorAll('.cboProgram, .cboSubAccount, .cboProgramSub, .cboCluster').forEach(function(
                 select) {
@@ -630,7 +727,7 @@
             }
 
             /* =========================================================
-             * 3. PRISTINE VALIDATION SETUP
+             * 4. PRISTINE VALIDATION SETUP
              * ========================================================= */
             let pristine;
             const pristineConfig = {
@@ -656,7 +753,7 @@
             }
 
             /* =========================================================
-             * 4. FIELD SKIP TOGGLES (TITLE & FILE)
+             * 5. FIELD SKIP TOGGLES (TITLE & FILE)
              * ========================================================= */
             function setupSkipToggle(checkboxId, inputId) {
                 const checkbox = document.getElementById(checkboxId);
@@ -672,15 +769,22 @@
                     if (checkbox.checked) {
                         input.value = '';
                         input.disabled = true;
+                        input.setAttribute('disabled', 'disabled');
+                        input.setAttribute('tabindex', '-1');
                         input.removeAttribute('required');
                         input.removeAttribute('data-pristine-required-message');
-                        input.classList.add('bg-success-subtle', 'text-success-emphasis', 'border-success');
+                        input.style.pointerEvents = 'none';
+                        input.classList.add('bg-success-subtle', 'text-success-emphasis', 'border-success',
+                            'opacity-75');
                     } else {
                         input.disabled = false;
                         input.removeAttribute('disabled');
+                        input.removeAttribute('tabindex');
+                        input.style.pointerEvents = '';
                         input.setAttribute('required', 'required');
                         input.setAttribute('data-pristine-required-message', requiredMessage);
-                        input.classList.remove('bg-success-subtle', 'text-success-emphasis', 'border-success');
+                        input.classList.remove('bg-success-subtle', 'text-success-emphasis', 'border-success',
+                            'opacity-75');
                     }
                     reinitPristine();
                 }
@@ -693,7 +797,7 @@
             setupSkipToggle('skipFileInput', 'fileInput');
 
             /* =========================================================
-             * 5. TABLE SKIP TOGGLE
+             * 6. TABLE SKIP TOGGLE
              * ========================================================= */
             const itemTableWrapper = document.getElementById('itemTableWrapper');
             const itemTable = document.getElementById('itemTable');
@@ -705,16 +809,14 @@
                     el.disabled = isSkipped;
                     if (isSkipped) {
                         el.removeAttribute('required');
-                    } else {
-                        if (el.classList.contains('table-required')) {
-                            el.setAttribute('required', 'required');
-                        }
+                    } else if (el.classList.contains('table-required')) {
+                        el.setAttribute('required', 'required');
                     }
                 });
                 if (typeof reinitPristine === 'function') reinitPristine();
             }
 
-            $(document).on('change click', '#skipItemTable', function() {
+            $(document).on('change', '#skipItemTable', function() {
                 applyTableSkipState(this.checked);
             });
 
@@ -722,7 +824,7 @@
             if (initialSkipSwitch) applyTableSkipState(initialSkipSwitch.checked);
 
             /* =========================================================
-             * 6. DYNAMIC DROPDOWNS: PROGRAM -> SUB PROGRAM
+             * 7. DYNAMIC DROPDOWNS: PROGRAM -> SUB PROGRAM -> CLUSTER
              * ========================================================= */
             $(document).on('change', '.cboProgram', function() {
                 const row = $(this).closest('tr');
@@ -779,9 +881,6 @@
                 });
             });
 
-            /* =========================================================
-             * 7. DYNAMIC DROPDOWN: SUB PROGRAM -> CLUSTER
-             * ========================================================= */
             $(document).on('change', '.cboProgramSub', function() {
                 const row = $(this).closest('tr');
                 const programSubId = $(this).val();
@@ -825,161 +924,206 @@
             });
 
             /* =========================================================
-             * 8. GROUPED CATEGORY, SUB-CATEGORY & DETAIL MANAGEMENT
+             * 8. 4-TD CATEGORY, SUB-CATEGORY & DETAIL MANAGEMENT
              * ========================================================= */
 
-            // 1. Add Category block
+            // 1. Add Category Row inside project group
             $(document).on('click', '.addCategoryBtn', function(e) {
                 e.preventDefault();
-                const tr = $(this).closest('tr');
-                const mainRowIndex = tr.attr('data-row-index') || tr.index();
-                const container = tr.find('.category-container');
-                const newCatIndex = container.children('.category-block').length;
+                e.stopPropagation();
 
-                const blockHtml = `
-                <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="${newCatIndex}">
-                    <div class="d-flex mb-2 align-items-center category-item">
-                        <input type="text" class="form-control me-1" name="category[${mainRowIndex}][]" placeholder="បញ្ចូលប្រភេទ (Category)" required>
-                        <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ">-</button>
-                    </div>
-                    <div class="subcategory-wrapper ps-3 border-start">
-                        <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
-                            <div class="d-flex align-items-center mb-2">
-                                <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${newCatIndex}][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                                <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
-                                <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
-                            </div>
-                            <div class="detail-wrapper ps-3 border-start">
-                                <div class="d-flex mb-2 align-items-center detail-item">
-                                    <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${newCatIndex}][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                    <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
-                                </div>
-                            </div>
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const $projectRows = $(`#itemTable tbody tr[data-puid="${puid}"]`);
+                const $lastInProject = $projectRows.last();
+                const newCuid = nextUid('c');
+                const newSuid = nextUid('s');
+
+                const newTrHtml = `
+                <tr data-puid="${puid}" data-cuid="${newCuid}" data-suid="${newSuid}">
+                    <td data-col="category">
+                        <div class="d-flex align-items-center category-item">
+                            <input type="text" class="form-control me-1" name="category[][]" placeholder="បញ្ចូលប្រភេទ (Category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ">-</button>
                         </div>
-                    </div>
-                </div>
-            `;
-                container.append(blockHtml);
-            });
-
-            // 2. Remove Category block
-            $(document).on('click', '.removeCategoryBtn', function(e) {
-                e.preventDefault();
-                const container = $(this).closest('.category-container');
-                if (container.children('.category-block').length > 1) {
-                    $(this).closest('.category-block').remove();
-                    updateRowIndices();
-                } else {
-                    alert('ត្រូវមានយ៉ាងហោចណាស់ ១ ប្រភេទ!');
-                }
-            });
-
-            // 3. Add Sub-Category item
-            $(document).on('click', '.addSubCategoryBtn', function(e) {
-                e.preventDefault();
-                const block = $(this).closest('.category-block');
-                const tr = $(this).closest('tr');
-                const mainRowIndex = tr.attr('data-row-index') || tr.index();
-                const catIndex = block.attr('data-cat-index');
-                const subWrapper = block.find('.subcategory-wrapper');
-                const newSubCatIndex = subWrapper.children('.subcategory-item').length;
-
-                subWrapper.append(`
-                <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="${newSubCatIndex}">
-                    <div class="d-flex align-items-center mb-2">
-                        <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${catIndex}][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                        <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
-                        <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង">-</button>
-                    </div>
-                    <div class="detail-wrapper ps-3 border-start">
-                        <div class="d-flex mb-2 align-items-center detail-item">
-                            <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${newSubCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                    </td>
+                    <td data-col="subcategory">
+                        <div class="d-flex align-items-center subcategory-item">
+                            <input type="text" class="form-control me-1" name="sub_category[][][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                        </div>
+                    </td>
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[][][][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
                             <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
                         </div>
-                    </div>
-                </div>
-            `);
+                    </td>
+                </tr>`;
+
+                $lastInProject.after(newTrHtml);
+                updateRowIndices();
             });
 
-            // 4. Remove Sub-Category item
+            // 2. Remove Category Group
+            $(document).on('click', '.removeCategoryBtn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const $projectRows = $(`#itemTable tbody tr[data-puid="${puid}"]`);
+                const $catRows = $projectRows.filter(`[data-cuid="${cuid}"]`);
+
+                const uniqueCats = new Set();
+                $projectRows.each(function() {
+                    uniqueCats.add($(this).attr('data-cuid'));
+                });
+
+                if (uniqueCats.size > 1) {
+                    $catRows.remove();
+                    updateRowIndices();
+                }
+            });
+
+            // 3. Add Sub-Category Row inside category group
+            $(document).on('click', '.addSubCategoryBtn', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const $catRows = $(`#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"]`);
+                const $lastInCat = $catRows.last();
+                const newSuid = nextUid('s');
+
+                const newSubHtml = `
+                <tr data-puid="${puid}" data-cuid="${cuid}" data-suid="${newSuid}">
+                    <td data-col="subcategory">
+                        <div class="d-flex align-items-center subcategory-item">
+                            <input type="text" class="form-control me-1" name="sub_category[][][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង">-</button>
+                        </div>
+                    </td>
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[][][][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                        </div>
+                    </td>
+                </tr>`;
+
+                $lastInCat.after(newSubHtml);
+                updateRowIndices();
+            });
+
+            // 4. Remove Sub-Category Group
             $(document).on('click', '.removeSubCategoryBtn', function(e) {
                 e.preventDefault();
-                const wrapper = $(this).closest('.subcategory-wrapper');
-                if (wrapper.children('.subcategory-item').length > 1) {
-                    $(this).closest('.subcategory-item').remove();
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+                const $catRows = $(`#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"]`);
+                const $subRows = $catRows.filter(`[data-suid="${suid}"]`);
+
+                const uniqueSubs = new Set();
+                $catRows.each(function() {
+                    uniqueSubs.add($(this).attr('data-suid'));
+                });
+
+                if (uniqueSubs.size > 1) {
+                    $subRows.remove();
                     updateRowIndices();
-                } else {
-                    $(this).closest('.subcategory-item').find('input').val('');
                 }
             });
 
-            // 5. Add Detail item
+            // 5. Add Detail Row inside sub-category group
             $(document).on('click', '.addDetailBtn', function(e) {
                 e.preventDefault();
-                const subItem = $(this).closest('.subcategory-item');
-                const catBlock = $(this).closest('.category-block');
-                const tr = $(this).closest('tr');
+                e.stopPropagation();
 
-                const mainRowIndex = tr.attr('data-row-index') || tr.index();
-                const catIndex = catBlock.attr('data-cat-index');
-                const subCatIndex = subItem.attr('data-subcat-index');
-                const detailWrapper = subItem.find('.detail-wrapper');
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+                const $subRows = $(
+                    `#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"][data-suid="${suid}"]`
+                );
+                const $lastInSub = $subRows.last();
 
-                detailWrapper.append(`
-                <div class="d-flex mb-2 align-items-center detail-item">
-                    <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${subCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                    <button type="button" class="btn btn-outline-danger btn-sm removeDetailBtn" title="លុបលម្អិត">-</button>
-                </div>
-            `);
+                const newDetailHtml = `
+                <tr data-puid="${puid}" data-cuid="${cuid}" data-suid="${suid}">
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[][][][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeDetailBtn ms-1" title="លុបលម្អិត">-</button>
+                        </div>
+                    </td>
+                </tr>`;
+
+                $lastInSub.after(newDetailHtml);
+                updateRowIndices();
             });
 
-            // 6. Remove Detail item
+            // 6. Remove Detail Row
             $(document).on('click', '.removeDetailBtn', function(e) {
                 e.preventDefault();
-                const wrapper = $(this).closest('.detail-wrapper');
-                if (wrapper.children('.detail-item').length > 1) {
-                    $(this).closest('.detail-item').remove();
-                } else {
-                    $(this).closest('.detail-item').find('input').val('');
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+                const $subRows = $(
+                    `#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"][data-suid="${suid}"]`
+                );
+
+                if ($subRows.length > 1) {
+                    $tr.remove();
+                    updateRowIndices();
                 }
             });
 
-            // 7. Add brand new main table row
+            // 7. Add Main Project Row
             $(document).on('click', '.addRow', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+
                 const tableBody = $('#itemTable tbody');
-                let rowIndex = tableBody.children('tr').length;
+                const newPuid = nextUid('p');
+                const newCuid = nextUid('c');
+                const newSuid = nextUid('s');
+                const rowIndex = tableBody.find('td[data-col="project"]').length;
 
                 const newRowHtml = `
-                <tr data-row-index="${rowIndex}">
-                    <td>
-                        <input type="text" name="sub_pro[]" class="form-control table-required" required>
+                <tr data-row-index="${rowIndex}" data-cat-index="0" data-subcat-index="0" data-puid="${newPuid}" data-cuid="${newCuid}" data-suid="${newSuid}">
+                    <td data-col="project">
+                        <input type="text" name="sub_pro[]" class="form-control table-required">
                     </td>
-                    <td>
-                        <div class="category-container">
-                            <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="0">
-                                <div class="d-flex mb-2 align-items-center category-item">
-                                    <input type="text" class="form-control me-1" name="category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទ (Category)" required>
-                                    <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
-                                    <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ" style="visibility: hidden;">-</button>
-                                </div>
-                                <div class="subcategory-wrapper ps-3 border-start">
-                                    <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][0][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
-                                            <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
-                                        </div>
-                                        <div class="detail-wrapper ps-3 border-start">
-                                            <div class="d-flex mb-2 align-items-center detail-item">
-                                                <input type="text" class="form-control me-1" name="detail[${rowIndex}][0][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                                <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <td data-col="category">
+                        <div class="d-flex align-items-center category-item">
+                            <input type="text" class="form-control me-1" name="category[${rowIndex}][]" placeholder="បញ្ចូលប្រភេទ (Category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                        </div>
+                    </td>
+                    <td data-col="subcategory">
+                        <div class="d-flex align-items-center subcategory-item">
+                            <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][0][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                        </div>
+                    </td>
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[${rowIndex}][0][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
                         </div>
                     </td>
                     <td style="display: none;">
@@ -1008,8 +1152,8 @@
                             <option value="">{{ __('forms.search...') }}</option>
                         </select>
                     </td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-danger removeRow">-</button>
+                    <td data-col="action" class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm removeRow" title="លុបជួរ">-</button>
                     </td>
                 </tr>`;
 
@@ -1021,19 +1165,31 @@
                     }
                 });
 
-                if (typeof updateRowIndices === 'function') updateRowIndices();
+                updateRowIndices();
             });
 
-            // 8. Remove an entire main table row
+            // 8. Remove Main Project Group
             $(document).on('click', '.removeRow', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+
                 const tableBody = $('#itemTable tbody');
-                if (tableBody.children('tr').length > 1) {
-                    $(this).closest('tr').remove();
+                const puid = $(this).closest('tr').attr('data-puid');
+                const uniqueProjects = new Set();
+                tableBody.find('tr[data-puid]').each(function() {
+                    uniqueProjects.add($(this).attr('data-puid'));
+                });
+
+                if (uniqueProjects.size > 1) {
+                    const $groupRows = $(`#itemTable tbody tr[data-puid="${puid}"]`);
+                    $groupRows.find('select').each(function() {
+                        destroyChoicesInstance(this);
+                    });
+                    $groupRows.remove();
+                    updateRowIndices();
                 } else {
                     alert('ត្រូវមានយ៉ាងហោចណាស់ ១ បន្ទាត់!');
                 }
-                if (typeof updateRowIndices === 'function') updateRowIndices();
             });
 
             /* =========================================================
@@ -1066,9 +1222,9 @@
                         if (submitBtn) {
                             submitBtn.disabled = true;
                             submitBtn.innerHTML = `
-                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                            កំពុងរក្សាទុក...
-                        `;
+                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                        កំពុងរក្សាទុក...
+                    `;
                         }
                         form.submit();
                     } else {
@@ -1082,6 +1238,9 @@
                     }
                 });
             }
+
+            // Initialize group IDs & spans on initial load
+            updateRowIndices();
         });
     </script>
 @endsection
