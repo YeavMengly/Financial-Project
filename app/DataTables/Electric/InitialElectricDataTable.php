@@ -87,7 +87,7 @@ class InitialElectricDataTable extends DataTable
             'ministries.deleted_at'
         ]);
 
-        return $model->orderBy('ministries.id', 'DESC');
+        return $model->orderBy('ministries.id', 'asc');
     }
 
     /**

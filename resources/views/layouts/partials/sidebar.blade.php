@@ -21,7 +21,7 @@
                 </li>
 
                 {{-- ========== Credit ========== --}}
-                <li class="menu-title" data-key="t-inventory">{{ __('menus.inventory') }}</li>
+                <li class="menu-title" data-key="t-inventory">{{ __('menus.not.inventory') }}</li>
                 @php
                     $credit =
                         Request::routeIs('initialBudgetVoucher.*') ||
@@ -110,42 +110,6 @@
                                             </a>
                                         </li>
                                     @endif
-
-                                    {{-- Direct Payment Submenu --}}
-                                    {{-- <li class="{{ $directPaymentActive ? 'mm-active' : '' }}">
-                            <a href="javascript: void(0);"
-                                class="has-arrow {{ $directPaymentActive ? 'active' : '' }}">
-                                <i data-feather="sliders"></i>
-                                <span data-key="t-direct-payment">{{ __('menus.direct.payment') }}</span>
-                            </a>
-                            <ul class="sub-menu {{ $directPaymentActive ? 'mm-show' : '' }}"
-                                aria-expanded="{{ $directPaymentActive ? 'true' : 'false' }}">
-                                @if (hasPermission('initialDirectPayment.expenseRecord.index'))
-                                    <li>
-                                        <a href="{{ route('initialDirectPayment.expenseRecord.index') }}"
-                                            class="{{ Request::routeIs('initialDirectPayment.expenseRecord.*') ? 'active' : '' }}">
-                                            <i data-feather="file-plus"></i>
-                                            <span
-                                                data-key="t-direct-expense-record">{{ __('menus.expense.record.book') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
-
-                                @if (hasPermission('initialDirectPayment.paymentDeadline.index'))
-                                    <li>
-                                        <a href="{{ route('initialDirectPayment.paymentDeadline.index') }}"
-                                            class="{{ Request::routeIs('initialDirectPayment.paymentDeadline.*') ? 'active' : '' }}">
-                                            <i data-feather="file-plus"></i>
-                                            <span
-                                                data-key="t-direct-payment-deadline">{{ __('menus.payment.deadline') }}</span>
-                                        </a>
-                                    </li>
-                                @endif
-                            </ul>
-                        </li> --}}
-
-                                    {{-- Pre-Financing Submenu --}}
-
 
                                     {{-- Mandate Payment --}}
                                     @if (hasPermission('initialMandate.index'))
@@ -685,6 +649,16 @@
                                 class="{{ Request::routeIs('employees.*') ? 'active' : '' }}">
                                 <i data-feather="layers"></i>
                                 {{ __('menus.content.employee') }}
+                            </a>
+                        </li>
+                    @endif
+
+                     @if (hasPermission('ministries.index'))
+                        <li>
+                            <a href="{{ route('publicServices.index') }}"
+                                class="{{ Request::routeIs('publicServices.*') ? 'active' : '' }}">
+                                <i data-feather="layers"></i>
+                                {{ __('menus.content.public.service') }}
                             </a>
                         </li>
                     @endif

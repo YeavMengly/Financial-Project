@@ -27,13 +27,13 @@ class MissionDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addIndexColumn()
             ->addColumn('select', function ($mission) {
-    return '
+                return '
         <input type="checkbox"
             class="form-check-input mission-checkbox"
             name="mission_ids[]"
             value="' . $mission->id . '">
     ';
-})
+            })
             ->addColumn('select', function ($row) {
                 if ((int) $row->payment_is_archived === 2) {
                     // return '';
@@ -92,10 +92,10 @@ class MissionDataTable extends DataTable
             // })
             ->editColumn('payment_status', function ($row) {
                 return match ((int) $row->payment_is_archived) {
-                    1 => '1. មិនទាន់ទូទាត់ - Unpaid',
-                    2 => '2. រក្សាទុកទូទាត់ - Pending',
-                    3 => '3. បានទូទាត់រួចរាល់ - Paid',
-                    default => 'Unknown',
+                    1 => '1. បញ្ជីមិនទាន់ទូទាត់ - Unpaid List',
+                    2 => '2. បញ្ជីគ្រោងទូទាត់ - Pending List',
+                    3 => '3. បញ្ជីបានទូទាត់ - Paid List',
+                    default => 'មិនស្គាល់',
                 };
             })
             ->editColumn('payment_is_archived', function ($row) {
@@ -164,7 +164,7 @@ class MissionDataTable extends DataTable
                 <i class='fas fa-file-alt me-1'></i>Preview
             </a>";
             })
-    
+
             ->rawColumns([
                 'select',
                 'description',

@@ -36,6 +36,7 @@ return [
     'content.employee' => 'មន្ត្រីរាជការ',
     'content.province'  =>  'រាជធានី / ខេត្ត',
     'content.missions'  =>  'បេសកកម្ម',
+    'content.public.service'  =>  'សេវាសាធារណៈ',
 
     'description' => 'បរិយាយ',
     'type' => 'ប្រភេទ',
@@ -52,6 +53,7 @@ return [
     'mandate' => 'អាណត្តិ',
     'number.voucher' => 'សលាកបត្រ',
     'number.mandate' => 'អាណត្តិ',
+    'public.service' => 'សេវាសាធារណៈ',
 
     'expenditure.guarantee' => 'ធានាចំណាយ',
     'expenditure.procurement' => 'ធានាចំណាយលទ្ធកម្ម',
@@ -97,6 +99,7 @@ return [
     'release' => 'បញ្ចេញ',
     'remain' => 'នៅសល់',
     'inventory' => 'សារពើភ័ណ្ឌ',
+    'not.inventory' => 'មិនមែនសារពើភ័ណ្ឌ',
 
     // Duel
     'duel' => 'ប្រេងឥន្ធនៈ',

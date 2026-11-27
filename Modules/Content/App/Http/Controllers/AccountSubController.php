@@ -188,6 +188,7 @@ class AccountSubController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
     public function update(Request $request, $params, $chId, $accId, $id)
     {
         $request->validate([
@@ -196,40 +197,19 @@ class AccountSubController extends Controller
         ]);
 
         DB::beginTransaction();
+
         try {
+            // $id = decode_params($id);
 
-            $id = decode_params($id);
-            $ministry = Ministry::where('id', decode_params($params))->first();
-            $chapter = Chapter::where('id', decode_params($chId))
-                ->where('ministry_id', $ministry->id)
-                ->first();
-            $account = Account::where('id', decode_params($accId))
+            $ministry = Ministry::findOrFail(decode_params($params));
 
-                ->where('ministry_id', $ministry->id)
-                ->where('chapter_id', $chapter->id)->first();
+            // Retrieve one AccountSub record
+            $existingRecord = AccountSub::where('id', $id)->firstOrFail();
 
-            // $existingRecord = AccountSub::where('account_id', $account->id)
-            //     ->where('chapter_id', $chapter->id)
-            //     ->where('no', $request->no)
-            //     ->where('id', '<>', $id)
-            //     ->first();
-            $existingRecord = AccountSub::findOrFail($id);
-
-            // if (!$existingRecord) {
-            //     flash()
-            //         ->translate('en')
-            //         ->option('timeout', 2000)
-            //         ->error(__('messages.sub.account.number'), 'បញ្ហា')
-            //         ->flash();
-
-            //     return redirect()->back()->withInput();
-            // }
-
-            $existingRecord->update([
-      
-                'no' => $request->no,
-                'name' => $request->name,
-            ]);
+            // Update record
+            $existingRecord->no = $request->no;
+            $existingRecord->name = $request->name;
+            $existingRecord->save();
 
             DB::commit();
 
@@ -239,9 +219,14 @@ class AccountSubController extends Controller
                 ->success('success_msg', 'successful')
                 ->flash();
 
-            return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
+            return redirect()->route('accountSub.index', [
+                'params' => $params,
+                'chId' => $chId,
+                'accId' => $accId
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
+
             Log::error($e->getMessage());
 
             flash()
@@ -250,7 +235,11 @@ class AccountSubController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('accountSub.index', ['params' => $params, 'chId' => $chId, 'accId' => $accId]);
+            return redirect()->route('accountSub.index', [
+                'params' => $params,
+                'chId' => $chId,
+                'accId' => $accId
+            ]);
         }
     }
 

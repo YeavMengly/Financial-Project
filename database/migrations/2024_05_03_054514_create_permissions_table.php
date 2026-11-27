@@ -226,17 +226,17 @@ return new class extends Migration
             ],
 
             'content.program.sub'                  => [
-                'view'   => 'programSub.index',
-                'create' => 'programSub.create',
-                'edit'   => 'programSub.edit',
-                'delete' => 'programSub.destroy',
+                'view'   => 'program.sub.index',
+                'create' => 'program.sub.create',
+                'edit'   => 'program.sub.edit',
+                'delete' => 'program.sub.destroy',
             ],
 
             'content.cluster'                  => [
-                'view'   => 'programSub.index',
-                'create' => 'programSub.create',
-                'edit'   => 'programSub.edit',
-                'delete' => 'programSub.destroy',
+                'view'   => 'cluster.index',
+                'create' => 'cluster.create',
+                'edit'   => 'cluster.edit',
+                'delete' => 'cluster.destroy',
             ],
 
             'content.agency'                  => [
