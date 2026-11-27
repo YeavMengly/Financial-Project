@@ -7,24 +7,24 @@
     <style>
         #itemTableWrapper,
         /* .table-responsive {
-            width: 100% !important;
-            overflow-x: visible !important;
-            overflow-y: visible !important;
-            position: relative !important;
-            display: block;
-        } */
+                                width: 100% !important;
+                                overflow-x: visible !important;
+                                overflow-y: visible !important;
+                                position: relative !important;
+                                display: block;
+                            } */
 
         /* #itemTableWrapper {
-            overflow-x: auto !important;
-            padding-top: 300px !important;
-            margin-top: -300px !important;
-        } */
+                                overflow-x: auto !important;
+                                padding-top: 300px !important;
+                                margin-top: -300px !important;
+                            } */
 
         /* #itemTable {
-            table-layout: fixed !important;
-            width: 100% !important;
-            min-width: 1300px !important;
-        } */
+                                table-layout: fixed !important;
+                                width: 100% !important;
+                                min-width: 1300px !important;
+                            } */
 
         #itemTable th {
             white-space: nowrap !important;
@@ -322,343 +322,399 @@
                                         @enderror
                                     </div>
                                 </div>
-                            </div>
 
-                            {{-- =====================================================
-                            SECTION 2: PROJECT TABLE
-                        ====================================================== --}}
-                            @php
-                                $isTableChecked = old('skipItemTable', $isTableSkipped ?? false);
-                            @endphp
+                                {{-- =====================================================
+                                    SECTION 2: PROJECT TABLE (EDIT - 4 TDs + ACTION)
+                                ====================================================== --}}
+                                @php
+                                    $isTableChecked = old('skipItemTable', $isTableSkipped ?? false);
+                                @endphp
 
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label mb-0">
-                                    {{ __('forms.sub.project') }}
-                                </label>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="skipItemTable"
-                                        name="skipItemTable" value="1" style="cursor:pointer;"
-                                        {{ $isTableChecked ? 'checked' : '' }}>
-                                    <label class="form-check-label font-size-12 text-muted skip-label"
-                                        for="skipItemTable">
-                                        រំលង / មិនភ្ជាប់
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label mb-0">
+                                        {{ __('forms.sub.project') }}
                                     </label>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch"
+                                            id="skipItemTable" name="skipItemTable" value="1"
+                                            style="cursor:pointer;" {{ $isTableChecked ? 'checked' : '' }}>
+                                        <label class="form-check-label font-size-12 text-muted skip-label"
+                                            for="skipItemTable">
+                                            រំលង / មិនភ្ជាប់
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="col-xl-12 col-md-12 mt-3" id="itemTableWrapper">
-                                <div class="table-responsive">
-                                    <div class="card mb-3">
-                                        <div class="card-body p-0">
-                                            <table class="table table-bordered align-middle text-nowrap mb-0"
-                                                id="itemTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="align-middle">
-                                                            {{ __('forms.project') }}
-                                                        </th>
-                                                        <th class="align-middle">
-                                                            ប្រភេទ (Category, Sub-category & Detail)
-                                                        </th>
-                                                        {{-- <th style="width:150px; min-width:150px;" class="align-middle">
-                                                            {{ __('forms.sub.account') }}
-                                                        </th>
-                                                        <th style="width:150px; min-width:150px;" class="align-middle">
-                                                            {{ __('forms.program') }}
-                                                        </th>
-                                                        <th style="width:150px; min-width:150px;" class="align-middle">
-                                                            {{ __('forms.program.sub') }}
-                                                        </th>
-                                                        <th style="width:150px; min-width:150px;" class="align-middle">
-                                                            {{ __('forms.cluster') }}
-                                                        </th> --}}
-                                                        <th style="width:70px; min-width:70px;"
-                                                            class="text-center align-middle">
-                                                            Action
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @php
-                                                        $rowCollection =
-                                                            isset($groupedRows) && $groupedRows->count() > 0
-                                                                ? $groupedRows->values()
-                                                                : (isset($items) && count($items) > 0
-                                                                    ? collect([$items])
-                                                                    : collect([[$module]]));
-                                                        $rowCounts = $rowCollection->count();
-                                                    @endphp
-
-                                                    @for ($i = 0; $i < max(1, $rowCounts); $i++)
+                                <div class="col-xl-12 col-md-12 mt-3" id="itemTableWrapper">
+                                    <div class="table-responsive">
+                                        <div class="card mb-3">
+                                            <div class="card-body p-0">
+                                                <table class="table table-bordered align-middle text-nowrap mb-0"
+                                                    id="itemTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="align-middle">
+                                                                {{ __('forms.project') }}
+                                                            </th>
+                                                            <th class="align-middle">
+                                                                ប្រភេទ (Category)
+                                                            </th>
+                                                            <th class="align-middle">
+                                                                ប្រភេទរង (Sub-category)
+                                                            </th>
+                                                            <th class="align-middle">
+                                                                ព័ត៌មានលម្អិត (Detail)
+                                                            </th>
+                                                            {{-- <th style="width:150px; min-width:150px;" class="align-middle">
+                                                                {{ __('forms.sub.account') }}
+                                                            </th>
+                                                            <th style="width:150px; min-width:150px;" class="align-middle">
+                                                                {{ __('forms.program') }}
+                                                            </th>
+                                                            <th style="width:150px; min-width:150px;" class="align-middle">
+                                                                {{ __('forms.program.sub') }}
+                                                            </th>
+                                                            <th style="width:150px; min-width:150px;" class="align-middle">
+                                                                {{ __('forms.cluster') }}
+                                                            </th> --}}
+                                                            <th style="width:85px; min-width:85px;"
+                                                                class="text-center align-middle">
+                                                                Action
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
                                                         @php
-                                                            $rowGroup = $rowCollection[$i] ?? [];
-                                                            $firstItem =
-                                                                is_iterable($rowGroup) && count($rowGroup) > 0
-                                                                    ? (is_array($rowGroup)
-                                                                        ? reset($rowGroup)
-                                                                        : $rowGroup->first())
-                                                                    : $rowGroup;
+                                                            $rowCollection =
+                                                                isset($groupedRows) && $groupedRows->count() > 0
+                                                                    ? $groupedRows->values()
+                                                                    : (isset($items) && count($items) > 0
+                                                                        ? collect([$items])
+                                                                        : collect([[$module]]));
+                                                            $rowCounts = $rowCollection->count();
+                                                        @endphp
 
-                                                            $valSubPro = old(
-                                                                "sub_pro.$i",
-                                                                $firstItem->sub_project ?? ($firstItem->sub_pro ?? ''),
-                                                            );
-                                                            $valAccountSub = old(
-                                                                "accountSub.$i",
-                                                                $firstItem->account_sub_id ?? '',
-                                                            );
-                                                            $valProgram = old(
-                                                                "program.$i",
-                                                                $firstItem->program_id ?? '',
-                                                            );
-                                                            $valProgramSub = old(
-                                                                "cboProgramSub.$i",
-                                                                $firstItem->program_sub_id ?? '',
-                                                            );
-                                                            $valCluster = old(
-                                                                "cboCluster.$i",
-                                                                $firstItem->cluster_id ?? '',
-                                                            );
+                                                        @for ($i = 0; $i < max(1, $rowCounts); $i++)
+                                                            @php
+                                                                $rowGroup = $rowCollection[$i] ?? [];
+                                                                $firstItem =
+                                                                    is_iterable($rowGroup) && count($rowGroup) > 0
+                                                                        ? (is_array($rowGroup)
+                                                                            ? reset($rowGroup)
+                                                                            : $rowGroup->first())
+                                                                        : $rowGroup;
 
-                                                            $structuredData = [];
-                                                            if (is_iterable($rowGroup)) {
-                                                                foreach ($rowGroup as $rItem) {
-                                                                    $cat = trim((string) ($rItem->category ?? ''));
-                                                                    $subCat = trim(
-                                                                        (string) ($rItem->sub_category ?? ''),
-                                                                    );
-                                                                    $detail = trim((string) ($rItem->detail ?? ''));
+                                                                $valSubPro = old(
+                                                                    "sub_pro.$i",
+                                                                    $firstItem->sub_project ??
+                                                                        ($firstItem->sub_pro ?? ''),
+                                                                );
+                                                                $valAccountSub = old(
+                                                                    "accountSub.$i",
+                                                                    $firstItem->account_sub_id ?? '',
+                                                                );
+                                                                $valProgram = old(
+                                                                    "program.$i",
+                                                                    $firstItem->program_id ?? '',
+                                                                );
+                                                                $valProgramSub = old(
+                                                                    "cboProgramSub.$i",
+                                                                    $firstItem->program_sub_id ?? '',
+                                                                );
+                                                                $valCluster = old(
+                                                                    "cboCluster.$i",
+                                                                    $firstItem->cluster_id ?? '',
+                                                                );
 
-                                                                    if ($cat !== '') {
-                                                                        if (!isset($structuredData[$cat])) {
-                                                                            $structuredData[$cat] = [];
-                                                                        }
-                                                                        if ($subCat !== '') {
+                                                                $structuredData = [];
+                                                                if (is_iterable($rowGroup)) {
+                                                                    foreach ($rowGroup as $rItem) {
+                                                                        $cat = trim((string) ($rItem->category ?? ''));
+                                                                        $subCat = trim(
+                                                                            (string) ($rItem->sub_category ?? ''),
+                                                                        );
+                                                                        $detail = trim((string) ($rItem->detail ?? ''));
+
+                                                                        if (
+                                                                            $cat !== '' ||
+                                                                            $subCat !== '' ||
+                                                                            $detail !== ''
+                                                                        ) {
+                                                                            $catKey = $cat !== '' ? $cat : '';
+                                                                            if (!isset($structuredData[$catKey])) {
+                                                                                $structuredData[$catKey] = [];
+                                                                            }
+                                                                            $subKey = $subCat !== '' ? $subCat : '';
                                                                             if (
-                                                                                !isset($structuredData[$cat][$subCat])
+                                                                                !isset(
+                                                                                    $structuredData[$catKey][$subKey],
+                                                                                )
                                                                             ) {
-                                                                                $structuredData[$cat][$subCat] = [];
+                                                                                $structuredData[$catKey][$subKey] = [];
                                                                             }
                                                                             if ($detail !== '') {
-                                                                                $structuredData[$cat][
-                                                                                    $subCat
+                                                                                $structuredData[$catKey][
+                                                                                    $subKey
                                                                                 ][] = $detail;
+                                                                            } elseif (
+                                                                                empty($structuredData[$catKey][$subKey])
+                                                                            ) {
+                                                                                $structuredData[$catKey][$subKey] = [
+                                                                                    '',
+                                                                                ];
                                                                             }
                                                                         }
                                                                     }
                                                                 }
-                                                            }
 
-                                                            if (empty($structuredData)) {
-                                                                $structuredData = ['' => ['' => ['']]];
-                                                            }
-                                                        @endphp
+                                                                if (empty($structuredData)) {
+                                                                    $structuredData = ['' => ['' => ['']]];
+                                                                }
 
-                                                        <tr data-row-index="{{ $i }}">
-                                                            <td>
-                                                                @if (!empty($firstItem->id))
-                                                                    <input type="hidden"
-                                                                        name="item_id[{{ $i }}][]"
-                                                                        value="{{ $firstItem->id }}">
-                                                                @endif
-                                                                <input type="text" name="sub_pro[{{ $i }}]"
-                                                                    value="{{ $valSubPro }}" class="form-control">
-                                                            </td>
+                                                                // Total leaf rows for this project group
+                                                                $projectSpan = 0;
+                                                                foreach ($structuredData as $subCats) {
+                                                                    foreach ($subCats as $details) {
+                                                                        $projectSpan += max(1, count($details));
+                                                                    }
+                                                                }
 
-                                                            <td>
-                                                                <div class="category-container">
-                                                                    @foreach ($structuredData as $catName => $subCats)
-                                                                        @php $k = $loop->index; @endphp
-                                                                        <div class="category-block border p-2 mb-2 rounded bg-light"
-                                                                            data-cat-index="{{ $k }}">
+                                                                $catCount = count($structuredData);
+                                                                $isFirstProjectRow = true;
+                                                            @endphp
 
-                                                                            <div
-                                                                                class="d-flex mb-2 align-items-center category-item">
-                                                                                <input type="text"
-                                                                                    class="form-control me-1"
-                                                                                    name="category[{{ $i }}][{{ $k }}]"
-                                                                                    value="{{ $catName }}"
-                                                                                    placeholder="បញ្ចូលប្រភេទ (Category)">
-                                                                                <button type="button"
-                                                                                    class="btn btn-outline-success btn-sm addCategoryBtn"
-                                                                                    title="បន្ថែមប្រភេទ">+</button>
-                                                                                <button type="button"
-                                                                                    class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1"
-                                                                                    title="លុបប្រភេទ"
-                                                                                    style="{{ $k === 0 ? 'visibility: hidden;' : '' }}">-</button>
-                                                                            </div>
+                                                            @foreach ($structuredData as $catName => $subCats)
+                                                                @php
+                                                                    $k = $loop->index;
+                                                                    $catSpan = 0;
+                                                                    foreach ($subCats as $details) {
+                                                                        $catSpan += max(1, count($details));
+                                                                    }
+                                                                    $subCatCount = count($subCats);
+                                                                    $isFirstCatRow = true;
+                                                                @endphp
 
-                                                                            <div
-                                                                                class="subcategory-wrapper ps-3 border-start">
-                                                                                @foreach ($subCats as $subCatName => $details)
-                                                                                    @php $subIdx = $loop->index; @endphp
-                                                                                    <div class="subcategory-item mb-2 border p-2 rounded bg-white"
-                                                                                        data-subcat-index="{{ $subIdx }}">
-                                                                                        <div
-                                                                                            class="d-flex align-items-center mb-2">
-                                                                                            <input type="text"
-                                                                                                class="form-control me-1"
-                                                                                                name="sub_category[{{ $i }}][{{ $k }}][{{ $subIdx }}]"
-                                                                                                value="{{ $subCatName }}"
-                                                                                                placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                                                                                            <button type="button"
-                                                                                                class="btn btn-outline-success btn-sm addSubCategoryBtn"
-                                                                                                title="បន្ថែមប្រភេទរង">+</button>
-                                                                                            <button type="button"
-                                                                                                class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1"
-                                                                                                title="លុបប្រភេទរង"
-                                                                                                style="{{ $subIdx === 0 ? 'visibility: hidden;' : '' }}">-</button>
-                                                                                        </div>
+                                                                @foreach ($subCats as $subCatName => $details)
+                                                                    @php
+                                                                        $subIdx = $loop->index;
+                                                                        $detailList = !empty($details)
+                                                                            ? $details
+                                                                            : [''];
+                                                                        $subSpan = count($detailList);
+                                                                        $isFirstSubRow = true;
+                                                                    @endphp
 
-                                                                                        <div
-                                                                                            class="detail-wrapper ps-3 border-start">
-                                                                                            @if (empty($details))
-                                                                                                <div
-                                                                                                    class="d-flex mb-2 align-items-center detail-item">
-                                                                                                    <input type="text"
-                                                                                                        class="form-control me-1"
-                                                                                                        name="detail[{{ $i }}][{{ $k }}][{{ $subIdx }}][]"
-                                                                                                        placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                                                                                    <button type="button"
-                                                                                                        class="btn btn-outline-success btn-sm addDetailBtn"
-                                                                                                        title="បន្ថែមលម្អិត">+</button>
-                                                                                                </div>
-                                                                                            @else
-                                                                                                @foreach ($details as $dIdx => $detailVal)
-                                                                                                    <div
-                                                                                                        class="d-flex mb-2 align-items-center detail-item">
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            class="form-control me-1"
-                                                                                                            name="detail[{{ $i }}][{{ $k }}][{{ $subIdx }}][]"
-                                                                                                            value="{{ $detailVal }}"
-                                                                                                            placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                                                                                        @if ($dIdx === 0)
-                                                                                                            <button
-                                                                                                                type="button"
-                                                                                                                class="btn btn-outline-success btn-sm addDetailBtn"
-                                                                                                                title="បន្ថែមលម្អិត">+</button>
-                                                                                                        @else
-                                                                                                            <button
-                                                                                                                type="button"
-                                                                                                                class="btn btn-outline-danger btn-sm removeDetailBtn"
-                                                                                                                title="លុបលម្អិត">-</button>
-                                                                                                        @endif
-                                                                                                    </div>
-                                                                                                @endforeach
-                                                                                            @endif
-                                                                                        </div>
+                                                                    @foreach ($detailList as $dIdx => $detailVal)
+                                                                        <tr data-row-index="{{ $i }}"
+                                                                            data-cat-index="{{ $k }}"
+                                                                            data-subcat-index="{{ $subIdx }}">
+
+                                                                            {{-- TD 1: Project (once per project group) --}}
+                                                                            @if ($isFirstProjectRow)
+                                                                                <td data-col="project"
+                                                                                    rowspan="{{ $projectSpan }}">
+                                                                                    @if (!empty($firstItem->id))
+                                                                                        <input type="hidden"
+                                                                                            name="item_id[{{ $i }}][]"
+                                                                                            value="{{ $firstItem->id }}">
+                                                                                    @endif
+                                                                                    <input type="text"
+                                                                                        name="sub_pro[{{ $i }}]"
+                                                                                        value="{{ $valSubPro }}"
+                                                                                        class="form-control">
+                                                                                </td>
+                                                                            @endif
+
+                                                                            {{-- TD 2: Category (once per category group) --}}
+                                                                            @if ($isFirstCatRow)
+                                                                                <td data-col="category"
+                                                                                    rowspan="{{ $catSpan }}">
+                                                                                    <div
+                                                                                        class="d-flex align-items-center category-item">
+                                                                                        <input type="text"
+                                                                                            class="form-control me-1"
+                                                                                            name="category[{{ $i }}][{{ $k }}]"
+                                                                                            value="{{ $catName }}"
+                                                                                            placeholder="បញ្ចូលប្រភេទ (Category)">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-outline-success btn-sm addCategoryBtn"
+                                                                                            title="បន្ថែមប្រភេទ">+</button>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1"
+                                                                                            title="លុបប្រភេទ"
+                                                                                            style="{{ $catCount <= 1 ? 'visibility: hidden;' : '' }}">-</button>
                                                                                     </div>
-                                                                                @endforeach
-                                                                            </div>
-                                                                        </div>
+                                                                                </td>
+                                                                            @endif
+
+                                                                            {{-- TD 3: Sub-category (once per sub-category group) --}}
+                                                                            @if ($isFirstSubRow)
+                                                                                <td data-col="subcategory"
+                                                                                    rowspan="{{ $subSpan }}">
+                                                                                    <div
+                                                                                        class="d-flex align-items-center subcategory-item">
+                                                                                        <input type="text"
+                                                                                            class="form-control me-1"
+                                                                                            name="sub_category[{{ $i }}][{{ $k }}][{{ $subIdx }}]"
+                                                                                            value="{{ $subCatName }}"
+                                                                                            placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                                                                                        <button type="button"
+                                                                                            class="btn btn-outline-success btn-sm addSubCategoryBtn"
+                                                                                            title="បន្ថែមប្រភេទរង">+</button>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1"
+                                                                                            title="លុបប្រភេទរង"
+                                                                                            style="{{ $subCatCount <= 1 ? 'visibility: hidden;' : '' }}">-</button>
+                                                                                    </div>
+                                                                                </td>
+                                                                            @endif
+
+                                                                            {{-- TD 4: Detail (every leaf row) --}}
+                                                                            <td data-col="detail">
+                                                                                <div
+                                                                                    class="d-flex align-items-center detail-item">
+                                                                                    <input type="text"
+                                                                                        class="form-control me-1"
+                                                                                        name="detail[{{ $i }}][{{ $k }}][{{ $subIdx }}][]"
+                                                                                        value="{{ $detailVal }}"
+                                                                                        placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                                                                                    <button type="button"
+                                                                                        class="btn btn-outline-success btn-sm addDetailBtn"
+                                                                                        title="បន្ថែមលម្អិត">+</button>
+                                                                                    <button type="button"
+                                                                                        class="btn btn-outline-danger btn-sm removeDetailBtn ms-1"
+                                                                                        title="លុបលម្អិត"
+                                                                                        style="{{ $subSpan <= 1 ? 'visibility: hidden;' : '' }}">-</button>
+                                                                                </div>
+                                                                            </td>
+
+                                                                            {{-- Hidden Choices.js selects on first project row --}}
+                                                                            @if ($isFirstProjectRow)
+                                                                                <td style="display: none;">
+                                                                                    <select
+                                                                                        class="form-select cboSubAccount"
+                                                                                        name="accountSub[{{ $i }}]">
+                                                                                        <option value="">ជ្រើសរើស
+                                                                                        </option>
+                                                                                        @foreach ($accountSub as $bv)
+                                                                                            <option
+                                                                                                value="{{ $bv->no }}"
+                                                                                                {{ $valAccountSub == $bv->no ? 'selected' : '' }}>
+                                                                                                {{ $bv->no }}-{{ $bv->name }}
+                                                                                            </option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </td>
+
+                                                                                <td style="display: none;">
+                                                                                    <select class="form-select cboProgram"
+                                                                                        name="program[{{ $i }}]">
+                                                                                        <option value="">ជ្រើសរើស
+                                                                                        </option>
+                                                                                        @foreach ($program as $p)
+                                                                                            <option
+                                                                                                value="{{ $p->id }}"
+                                                                                                {{ $valProgram == $p->id ? 'selected' : '' }}>
+                                                                                                {{ $p->no }}-{{ $p->title }}
+                                                                                            </option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </td>
+
+                                                                                <td style="display: none;">
+                                                                                    <select
+                                                                                        class="form-select cboProgramSub"
+                                                                                        name="cboProgramSub[{{ $i }}]"
+                                                                                        data-program-id="{{ $valProgram }}"
+                                                                                        data-selected="{{ $valProgramSub }}">
+                                                                                        <option value="">
+                                                                                            {{ __('forms.search...') }}
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </td>
+
+                                                                                <td style="display: none;">
+                                                                                    <select class="form-select cboCluster"
+                                                                                        name="cboCluster[{{ $i }}]"
+                                                                                        data-program-sub-id="{{ $valProgramSub }}"
+                                                                                        data-selected="{{ $valCluster }}">
+                                                                                        <option value="">
+                                                                                            {{ __('forms.search...') }}
+                                                                                        </option>
+                                                                                    </select>
+                                                                                </td>
+
+                                                                                {{-- Action TD (once per project group) --}}
+                                                                                <td data-col="action"
+                                                                                    rowspan="{{ $projectSpan }}"
+                                                                                    class="text-center align-middle">
+                                                                                    @if ($i === 0)
+                                                                                        <button type="button"
+                                                                                            class="btn btn-success btn-sm addRow"
+                                                                                            title="បន្ថែមជួរដេក">+</button>
+                                                                                    @else
+                                                                                        <button type="button"
+                                                                                            class="btn btn-danger btn-sm removeRow"
+                                                                                            title="លុបជួរដេក">-</button>
+                                                                                    @endif
+                                                                                </td>
+                                                                            @endif
+                                                                        </tr>
+
+                                                                        @php
+                                                                            $isFirstProjectRow = false;
+                                                                            $isFirstCatRow = false;
+                                                                            $isFirstSubRow = false;
+                                                                        @endphp
                                                                     @endforeach
-                                                                </div>
-                                                            </td>
-
-                                                            {{-- <td>
-                                                                <select class="form-select cboSubAccount"
-                                                                    name="accountSub[{{ $i }}]">
-                                                                    <option value="">ជ្រើសរើស</option>
-                                                                    @foreach ($accountSub as $bv)
-                                                                        <option value="{{ $bv->no }}"
-                                                                            {{ $valAccountSub == $bv->no ? 'selected' : '' }}>
-                                                                            {{ $bv->no }}-{{ $bv->name }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </td>
-
-                                                            <td>
-                                                                <select class="form-select cboProgram"
-                                                                    name="program[{{ $i }}]">
-                                                                    <option value="">ជ្រើសរើស</option>
-                                                                    @foreach ($program as $p)
-                                                                        <option value="{{ $p->id }}"
-                                                                            {{ $valProgram == $p->id ? 'selected' : '' }}>
-                                                                            {{ $p->no }}-{{ $p->title }}
-                                                                        </option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </td>
-
-                                                            <td>
-                                                                <select class="form-select cboProgramSub"
-                                                                    name="cboProgramSub[{{ $i }}]"
-                                                                    data-program-id="{{ $valProgram }}"
-                                                                    data-selected="{{ $valProgramSub }}">
-                                                                    <option value="">{{ __('forms.search...') }}
-                                                                    </option>
-                                                                </select>
-                                                            </td>
-
-                                                            <td>
-                                                                <select class="form-select cboCluster"
-                                                                    name="cboCluster[{{ $i }}]"
-                                                                    data-program-sub-id="{{ $valProgramSub }}"
-                                                                    data-selected="{{ $valCluster }}">
-                                                                    <option value="">{{ __('forms.search...') }}
-                                                                    </option>
-                                                                </select>
-                                                            </td> --}}
-
-                                                            <td class="text-center align-middle">
-                                                                @if ($i === 0)
-                                                                    <button type="button"
-                                                                        class="btn btn-success btn-sm addRow"
-                                                                        title="បន្ថែមជួរដេក">+</button>
-                                                                @else
-                                                                    <button type="button"
-                                                                        class="btn btn-danger btn-sm removeRow"
-                                                                        title="លុបជួរដេក">-</button>
-                                                                @endif
-                                                            </td>
-                                                        </tr>
-                                                    @endfor
-                                                </tbody>
-                                            </table>
+                                                                @endforeach
+                                                            @endforeach
+                                                        @endfor
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {{-- =====================================================
+                                {{-- =====================================================
                             SECTION 3: NOTE, REFER & ACTIONS
                         ====================================================== --}}
-                            <div class="row mt-3">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="vRefer" class="form-label">{{ __('forms.refer') }}</label>
-                                        <textarea name="refer" id="vRefer" rows="5" class="form-control" tabindex="9"
-                                            data-pristine-required-message="{{ __('messages.required') }}">{{ old('refer', $module->refer ?? '') }}</textarea>
-                                        @error('refer')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="vRefer" class="form-label">{{ __('forms.refer') }}</label>
+                                            <textarea name="refer" id="vRefer" rows="5" class="form-control" tabindex="9"
+                                                data-pristine-required-message="{{ __('messages.required') }}">{{ old('refer', $module->refer ?? '') }}</textarea>
+                                            @error('refer')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="vNote" class="form-label">{{ __('forms.note') }}</label>
+                                            <textarea name="note" id="vNote" rows="5" class="form-control" tabindex="10"
+                                                data-pristine-required-message="{{ __('messages.required') }}">{{ old('note', $module->note ?? '') }}</textarea>
+                                            @error('note')
+                                                <div class="pristine-error text-help">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button type="submit" class="btn btn-primary"
+                                            id="insertToTableBtn">{{ __('buttons.save') }}</button>
+                                        <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
+                                            <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
+                                        </a>
+                                        <a class="btn btn-outline-secondary"
+                                            href="{{ route('project.index', $params) }}">
+                                            <i class="bx bx-arrow-back me-1"></i> {{ __('buttons.back') }}
+                                        </a>
                                     </div>
                                 </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label for="vNote" class="form-label">{{ __('forms.note') }}</label>
-                                        <textarea name="note" id="vNote" rows="5" class="form-control" tabindex="10"
-                                            data-pristine-required-message="{{ __('messages.required') }}">{{ old('note', $module->note ?? '') }}</textarea>
-                                        @error('note')
-                                            <div class="pristine-error text-help">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="d-flex flex-wrap gap-2">
-                                    <button type="submit" class="btn btn-primary"
-                                        id="insertToTableBtn">{{ __('buttons.save') }}</button>
-                                    <a href="{{ url()->current() }}" class="btn btn-danger" style="width: 80px;">
-                                        <i class="bi bi-arrow-clockwise"></i> {{ __('buttons.delete') }}
-                                    </a>
-                                    <a class="btn btn-outline-secondary" href="{{ route('project.index', $params) }}">
-                                        <i class="bx bx-arrow-back me-1"></i> {{ __('buttons.back') }}
-                                    </a>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -706,14 +762,181 @@
             }
         }
 
+        let groupUidCounter = 1;
+
+        function nextUid(prefix) {
+            return `${prefix}_${groupUidCounter++}`;
+        }
+
+        function setupSkipToggle(checkboxId, inputId) {
+            const checkbox = document.getElementById(checkboxId);
+            const input = document.getElementById(inputId);
+            if (!checkbox || !input) return;
+
+            const requiredMessage = input.getAttribute('data-pristine-required-message') || '';
+
+            function updateState() {
+                const isSkipped = checkbox.checked;
+
+                if (isSkipped) {
+                    input.value = '';
+                    input.disabled = true;
+                    input.setAttribute('disabled', 'disabled');
+                    input.setAttribute('tabindex', '-1');
+                    input.removeAttribute('required');
+                    input.removeAttribute('data-pristine-required-message');
+                    input.style.pointerEvents = 'none';
+                    input.classList.add('bg-success-subtle', 'text-success-emphasis', 'border-success', 'opacity-75');
+                } else {
+                    input.disabled = false;
+                    input.removeAttribute('disabled');
+                    input.removeAttribute('tabindex');
+                    input.style.pointerEvents = '';
+                    if (requiredMessage) {
+                        input.setAttribute('required', 'required');
+                        input.setAttribute('data-pristine-required-message', requiredMessage);
+                    }
+                    input.classList.remove('bg-success-subtle', 'text-success-emphasis', 'border-success', 'opacity-75');
+                }
+            }
+
+            checkbox.addEventListener('change', updateState);
+            updateState();
+        }
+
+        setupSkipToggle('skipTitleInput', 'titleInput');
+        setupSkipToggle('skipFileInput', 'fileInput');
+
+        /* =========================================================
+         * GROUP & ROWSPAN / INDEX SYNC FOR 4-TD EDIT + CREATE TABLE
+         * ========================================================= */
+        function ensureRowGroupIds() {
+            const $rows = $('#itemTable tbody tr');
+            let curProjectUid = null;
+            let curCatUid = null;
+            let curSubUid = null;
+
+            $rows.each(function() {
+                const $tr = $(this);
+
+                if ($tr.find('td[data-col="project"]').length) {
+                    curProjectUid = $tr.attr('data-puid') || nextUid('p');
+                    $tr.attr('data-puid', curProjectUid);
+
+                    if ($tr.find('td[data-col="category"]').length) {
+                        curCatUid = $tr.attr('data-cuid') || nextUid('c');
+                        $tr.attr('data-cuid', curCatUid);
+                    }
+                    if ($tr.find('td[data-col="subcategory"]').length) {
+                        curSubUid = $tr.attr('data-suid') || nextUid('s');
+                        $tr.attr('data-suid', curSubUid);
+                    }
+                } else if ($tr.find('td[data-col="category"]').length) {
+                    curCatUid = $tr.attr('data-cuid') || nextUid('c');
+                    $tr.attr('data-cuid', curCatUid);
+
+                    if ($tr.find('td[data-col="subcategory"]').length) {
+                        curSubUid = $tr.attr('data-suid') || nextUid('s');
+                        $tr.attr('data-suid', curSubUid);
+                    }
+                } else if ($tr.find('td[data-col="subcategory"]').length) {
+                    curSubUid = $tr.attr('data-suid') || nextUid('s');
+                    $tr.attr('data-suid', curSubUid);
+                }
+
+                $tr.attr('data-puid', curProjectUid);
+                $tr.attr('data-cuid', curCatUid);
+                $tr.attr('data-suid', curSubUid);
+            });
+        }
+
+        function updateRowIndices() {
+            ensureRowGroupIds();
+
+            const $rows = $('#itemTable tbody tr');
+            $rows.find('td').removeAttr('rowspan');
+
+            const projectOrder = [];
+            const catOrderByProject = {};
+            const subOrderByCat = {};
+
+            $rows.each(function() {
+                const $tr = $(this);
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+
+                if (!projectOrder.includes(puid)) {
+                    projectOrder.push(puid);
+                    catOrderByProject[puid] = [];
+                }
+                if (!catOrderByProject[puid].includes(cuid)) {
+                    catOrderByProject[puid].push(cuid);
+                    subOrderByCat[cuid] = [];
+                }
+                if (!subOrderByCat[cuid].includes(suid)) {
+                    subOrderByCat[cuid].push(suid);
+                }
+
+                const rowIdx = projectOrder.indexOf(puid);
+                const catIdx = catOrderByProject[puid].indexOf(cuid);
+                const subIdx = subOrderByCat[cuid].indexOf(suid);
+
+                $tr.attr('data-row-index', rowIdx);
+                $tr.attr('data-cat-index', catIdx);
+                $tr.attr('data-subcat-index', subIdx);
+
+                $tr.find('input[name^="sub_pro"]').attr('name', `sub_pro[${rowIdx}]`);
+                $tr.find('input[name^="item_id"]').attr('name', `item_id[${rowIdx}][]`);
+
+                $tr.find('select.cboSubAccount').attr('name', `accountSub[${rowIdx}]`);
+                $tr.find('select.cboProgram').attr('name', `program[${rowIdx}]`);
+                $tr.find('select.cboProgramSub').attr('name', `cboProgramSub[${rowIdx}]`);
+                $tr.find('select.cboCluster').attr('name', `cboCluster[${rowIdx}]`);
+
+                $tr.find('.category-item input').attr('name', `category[${rowIdx}][${catIdx}]`);
+                $tr.find('.subcategory-item input').attr('name', `sub_category[${rowIdx}][${catIdx}][${subIdx}]`);
+                $tr.find('.detail-item input').attr('name', `detail[${rowIdx}][${catIdx}][${subIdx}][]`);
+            });
+
+            projectOrder.forEach(function(puid) {
+                const $pRows = $rows.filter(`[data-puid="${puid}"]`);
+                const $pFirst = $pRows.first();
+                $pFirst.find('td[data-col="project"], td[data-col="action"]').attr('rowspan', $pRows.length);
+
+                const catList = catOrderByProject[puid] || [];
+                catList.forEach(function(cuid, cIdx) {
+                    const $cRows = $pRows.filter(`[data-cuid="${cuid}"]`);
+                    const $cFirst = $cRows.first();
+                    $cFirst.find('td[data-col="category"]').attr('rowspan', $cRows.length);
+
+                    if (cIdx === 0) {
+                        $cFirst.find('.removeCategoryBtn').remove();
+                    }
+
+                    const subList = subOrderByCat[cuid] || [];
+                    subList.forEach(function(suid, sIdx) {
+                        const $sRows = $cRows.filter(`[data-suid="${suid}"]`);
+                        const $sFirst = $sRows.first();
+                        $sFirst.find('td[data-col="subcategory"]').attr('rowspan', $sRows.length);
+
+                        if (sIdx === 0) {
+                            $sFirst.find('.removeSubCategoryBtn').remove();
+                        }
+                        $sFirst.find('.removeDetailBtn').remove();
+                    });
+                });
+            });
+        }
+
         // Toggle Table Skip / Disabled State on Change
         $(document).on('change', '#skipItemTable', function() {
             const wrapper = $('#itemTableWrapper');
-            const inputs = $('#itemTable').find('input, select');
+            const controls = $('#itemTable').find('input, select, button');
 
             if (this.checked) {
                 wrapper.addClass('table-skipped');
-                inputs.each(function() {
+                controls.each(function() {
                     $(this).prop('disabled', true).removeAttr('required');
                     if ($(this).hasClass('choices-input') || $(this).data('choice')) {
                         const choiceInstance = choicesMap.get(this);
@@ -724,7 +947,7 @@
                 });
             } else {
                 wrapper.removeClass('table-skipped');
-                inputs.each(function() {
+                controls.each(function() {
                     $(this).prop('disabled', false);
                     if ($(this).hasClass('choices-input') || $(this).data('choice')) {
                         const choiceInstance = choicesMap.get(this);
@@ -735,40 +958,6 @@
                 });
             }
         });
-
-        if ($('#skipItemTable').is(':checked')) {
-            $('#skipItemTable').trigger('change');
-        }
-
-        function updateRowIndices() {
-            $('#itemTable tbody tr').each(function(newIndex) {
-                $(this).attr('data-row-index', newIndex);
-
-                $(this).find('input[name^="sub_pro"]').attr('name', `sub_pro[${newIndex}]`);
-                $(this).find('input[name^="item_id"]').attr('name', `item_id[${newIndex}][]`);
-
-                $(this).find('select.cboSubAccount').attr('name', `accountSub[${newIndex}]`);
-                $(this).find('select.cboProgram').attr('name', `program[${newIndex}]`);
-                $(this).find('select.cboProgramSub').attr('name', `cboProgramSub[${newIndex}]`);
-                $(this).find('select.cboCluster').attr('name', `cboCluster[${newIndex}]`);
-
-                $(this).find('.category-block').each(function(catIndex) {
-                    $(this).attr('data-cat-index', catIndex);
-                    $(this).find('.category-item input').attr('name', `category[${newIndex}][${catIndex}]`);
-
-                    $(this).find('.subcategory-item').each(function(subCatIndex) {
-                        $(this).attr('data-subcat-index', subCatIndex);
-                        $(this).find('> div > input').attr('name',
-                            `sub_category[${newIndex}][${catIndex}][${subCatIndex}]`);
-
-                        $(this).find('.detail-item input').each(function() {
-                            $(this).attr('name',
-                                `detail[${newIndex}][${catIndex}][${subCatIndex}][]`);
-                        });
-                    });
-                });
-            });
-        }
 
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('pristine-valid-example');
@@ -857,10 +1046,10 @@
                                                         label: item.label,
                                                         selected: String(
                                                                 item.value
-                                                            ) ===
+                                                                ) ===
                                                             String(
                                                                 selectedClusterId
-                                                            )
+                                                                )
                                                     }));
                                                 clusterOptions.unshift({
                                                     value: '',
@@ -994,190 +1183,236 @@
                 });
             });
 
-            // Add Category Block
+            // 1. Add Category Row inside project group (has removeCategoryBtn since it is newly added)
             $(document).on('click', '.addCategoryBtn', function(e) {
                 e.preventDefault();
-                const tr = $(this).closest('tr');
-                const mainRowIndex = tr.attr('data-row-index') || tr.index();
-                const container = tr.find('.category-container');
-                const newCatIndex = container.children('.category-block').length;
+                e.stopPropagation();
 
-                const blockHtml = `
-            <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="${newCatIndex}">
-                <div class="d-flex mb-2 align-items-center category-item">
-                    <input type="text" class="form-control me-1" name="category[${mainRowIndex}][${newCatIndex}]" placeholder="បញ្ចូលប្រភេទ (Category)">
-                    <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
-                    <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ">-</button>
-                </div>
-                <div class="subcategory-wrapper ps-3 border-start">
-                    <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
-                        <div class="d-flex align-items-center mb-2">
-                            <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${newCatIndex}][0]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const $projectRows = $(`#itemTable tbody tr[data-puid="${puid}"]`);
+                const $lastInProject = $projectRows.last();
+                const newCuid = nextUid('c');
+                const newSuid = nextUid('s');
+
+                const newTrHtml = `
+                <tr data-puid="${puid}" data-cuid="${newCuid}" data-suid="${newSuid}">
+                    <td data-col="category">
+                        <div class="d-flex align-items-center category-item">
+                            <input type="text" class="form-control me-1" name="category[][]" placeholder="បញ្ចូលប្រភេទ (Category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ">-</button>
+                        </div>
+                    </td>
+                    <td data-col="subcategory">
+                        <div class="d-flex align-items-center subcategory-item">
+                            <input type="text" class="form-control me-1" name="sub_category[][][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
                             <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
-                            <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
                         </div>
-                        <div class="detail-wrapper ps-3 border-start">
-                            <div class="d-flex mb-2 align-items-center detail-item">
-                                <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${newCatIndex}][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
-                            </div>
+                    </td>
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[][][][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
                         </div>
-                    </div>
-                </div>
-            </div>`;
-                container.append(blockHtml);
+                    </td>
+                </tr>`;
+
+                $lastInProject.after(newTrHtml);
                 updateRowIndices();
             });
 
-            // Remove Category Block
+            // 2. Remove Category Group
             $(document).on('click', '.removeCategoryBtn', function(e) {
                 e.preventDefault();
-                const container = $(this).closest('.category-container');
-                if (container.children('.category-block').length > 1) {
-                    $(this).closest('.category-block').remove();
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const $projectRows = $(`#itemTable tbody tr[data-puid="${puid}"]`);
+                const $catRows = $projectRows.filter(`[data-cuid="${cuid}"]`);
+
+                const uniqueCats = new Set();
+                $projectRows.each(function() {
+                    uniqueCats.add($(this).attr('data-cuid'));
+                });
+
+                if (uniqueCats.size > 1) {
+                    $catRows.remove();
                     updateRowIndices();
-                } else {
-                    alert('ត្រូវមានយ៉ាងហោចណាស់ ១ ប្រភេទ!');
                 }
             });
 
-            // Add Sub-Category Line
+            // 3. Add Sub-Category Row inside category group (has removeSubCategoryBtn since it is newly added)
             $(document).on('click', '.addSubCategoryBtn', function(e) {
                 e.preventDefault();
-                const block = $(this).closest('.category-block');
-                const tr = $(this).closest('tr');
-                const mainRowIndex = tr.attr('data-row-index') || tr.index();
-                const catIndex = block.attr('data-cat-index');
-                const subWrapper = block.find('.subcategory-wrapper');
-                const newSubCatIndex = subWrapper.children('.subcategory-item').length;
+                e.stopPropagation();
 
-                subWrapper.append(`
-            <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="${newSubCatIndex}">
-                <div class="d-flex align-items-center mb-2">
-                    <input type="text" class="form-control me-1" name="sub_category[${mainRowIndex}][${catIndex}][${newSubCatIndex}]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                    <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
-                    <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង">-</button>
-                </div>
-                <div class="detail-wrapper ps-3 border-start">
-                    <div class="d-flex mb-2 align-items-center detail-item">
-                        <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${newSubCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                        <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
-                    </div>
-                </div>
-            </div>`);
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const $catRows = $(`#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"]`);
+                const $lastInCat = $catRows.last();
+                const newSuid = nextUid('s');
+
+                const newSubHtml = `
+                <tr data-puid="${puid}" data-cuid="${cuid}" data-suid="${newSuid}">
+                    <td data-col="subcategory">
+                        <div class="d-flex align-items-center subcategory-item">
+                            <input type="text" class="form-control me-1" name="sub_category[][][]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង">-</button>
+                        </div>
+                    </td>
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[][][][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                        </div>
+                    </td>
+                </tr>`;
+
+                $lastInCat.after(newSubHtml);
                 updateRowIndices();
             });
 
-            // Remove Sub-Category Line
+            // 4. Remove Sub-Category Group
             $(document).on('click', '.removeSubCategoryBtn', function(e) {
                 e.preventDefault();
-                const wrapper = $(this).closest('.subcategory-wrapper');
-                if (wrapper.children('.subcategory-item').length > 1) {
-                    $(this).closest('.subcategory-item').remove();
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+                const $catRows = $(`#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"]`);
+                const $subRows = $catRows.filter(`[data-suid="${suid}"]`);
+
+                const uniqueSubs = new Set();
+                $catRows.each(function() {
+                    uniqueSubs.add($(this).attr('data-suid'));
+                });
+
+                if (uniqueSubs.size > 1) {
+                    $subRows.remove();
                     updateRowIndices();
-                } else {
-                    $(this).closest('.subcategory-item').find('input').val('');
                 }
             });
 
-            // Add Detail Item
+            // 5. Add Detail Row inside sub-category group (has removeDetailBtn since it is newly added)
             $(document).on('click', '.addDetailBtn', function(e) {
                 e.preventDefault();
-                const subItem = $(this).closest('.subcategory-item');
-                const catBlock = $(this).closest('.category-block');
-                const tr = $(this).closest('tr');
+                e.stopPropagation();
 
-                const mainRowIndex = tr.attr('data-row-index') || tr.index();
-                const catIndex = catBlock.attr('data-cat-index');
-                const subCatIndex = subItem.attr('data-subcat-index');
-                const detailWrapper = subItem.find('.detail-wrapper');
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+                const $subRows = $(
+                    `#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"][data-suid="${suid}"]`
+                );
+                const $lastInSub = $subRows.last();
 
-                detailWrapper.append(`
-            <div class="d-flex mb-2 align-items-center detail-item">
-                <input type="text" class="form-control me-1" name="detail[${mainRowIndex}][${catIndex}][${subCatIndex}][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                <button type="button" class="btn btn-outline-danger btn-sm removeDetailBtn" title="លុបលម្អិត">-</button>
-            </div>`);
+                const newDetailHtml = `
+                <tr data-puid="${puid}" data-cuid="${cuid}" data-suid="${suid}">
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[][][][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm removeDetailBtn ms-1" title="លុបលម្អិត">-</button>
+                        </div>
+                    </td>
+                </tr>`;
+
+                $lastInSub.after(newDetailHtml);
+                updateRowIndices();
             });
 
-            // Remove Detail Item
+            // 6. Remove Detail Row
             $(document).on('click', '.removeDetailBtn', function(e) {
                 e.preventDefault();
-                const wrapper = $(this).closest('.detail-wrapper');
-                if (wrapper.children('.detail-item').length > 1) {
-                    $(this).closest('.detail-item').remove();
-                } else {
-                    $(this).closest('.detail-item').find('input').val('');
+                e.stopPropagation();
+
+                const $tr = $(this).closest('tr');
+                const puid = $tr.attr('data-puid');
+                const cuid = $tr.attr('data-cuid');
+                const suid = $tr.attr('data-suid');
+                const $subRows = $(
+                    `#itemTable tbody tr[data-puid="${puid}"][data-cuid="${cuid}"][data-suid="${suid}"]`
+                );
+
+                if ($subRows.length > 1) {
+                    $tr.remove();
+                    updateRowIndices();
                 }
             });
 
-            // Add Main Table Row (Triggered from action column + button)
+            // 7. Add Main Project Row
             $(document).on('click', '.addRow', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+
                 const tableBody = $('#itemTable tbody');
-                let rowIndex = tableBody.children('tr').length;
+                const newPuid = nextUid('p');
+                const newCuid = nextUid('c');
+                const newSuid = nextUid('s');
+                const rowIndex = tableBody.find('td[data-col="project"]').length;
 
                 const newRowHtml = `
-            <tr data-row-index="${rowIndex}">
-                <td>
-                    <input type="hidden" name="item_id[${rowIndex}][]" value="">
-                    <input type="text" name="sub_pro[${rowIndex}]" class="form-control">
-                </td>
-                <td>
-                    <div class="category-container">
-                        <div class="category-block border p-2 mb-2 rounded bg-light" data-cat-index="0">
-                            <div class="d-flex mb-2 align-items-center category-item">
-                                <input type="text" class="form-control me-1" name="category[${rowIndex}][0]" placeholder="បញ្ចូលប្រភេទ (Category)">
-                                <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
-                                <button type="button" class="btn btn-outline-danger btn-sm removeCategoryBtn ms-1" title="លុបប្រភេទ" style="visibility: hidden;">-</button>
-                            </div>
-                            <div class="subcategory-wrapper ps-3 border-start">
-                                <div class="subcategory-item mb-2 border p-2 rounded bg-white" data-subcat-index="0">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][0][0]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
-                                        <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm removeSubCategoryBtn ms-1" title="លុបប្រភេទរង" style="visibility: hidden;">-</button>
-                                    </div>
-                                    <div class="detail-wrapper ps-3 border-start">
-                                        <div class="d-flex mb-2 align-items-center detail-item">
-                                            <input type="text" class="form-control me-1" name="detail[${rowIndex}][0][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
-                                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <tr data-row-index="${rowIndex}" data-cat-index="0" data-subcat-index="0" data-puid="${newPuid}" data-cuid="${newCuid}" data-suid="${newSuid}">
+                    <td data-col="project">
+                        <input type="hidden" name="item_id[${rowIndex}][]" value="">
+                        <input type="text" name="sub_pro[${rowIndex}]" class="form-control">
+                    </td>
+                    <td data-col="category">
+                        <div class="d-flex align-items-center category-item">
+                            <input type="text" class="form-control me-1" name="category[${rowIndex}][0]" placeholder="បញ្ចូលប្រភេទ (Category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addCategoryBtn" title="បន្ថែមប្រភេទ">+</button>
                         </div>
-                    </div>
-                </td>
-                <td style="display: none;">
-                    <select class="form-select cboSubAccount" name="accountSub[${rowIndex}]">
-                        <option value="">ជ្រើសរើស</option>
-                        @foreach ($accountSub as $bv)
-                            <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td style="display: none;">
-                    <select class="form-select cboProgram" name="program[${rowIndex}]">
-                        <option value="">ជ្រើសរើស</option>
-                        @foreach ($program as $p)
-                            <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td style="display: none;">
-                    <select class="form-select cboProgramSub" name="cboProgramSub[${rowIndex}]">
-                        <option value="">{{ __('forms.search...') }}</option>
-                    </select>
-                </td>
-                <td style="display: none;">
-                    <select class="form-select cboCluster" name="cboCluster[${rowIndex}]">
-                        <option value="">{{ __('forms.search...') }}</option>
-                    </select>
-                </td>
-                <td class="text-center align-middle">
-                    <button type="button" class="btn btn-danger btn-sm removeRow" title="លុបជួរដេក">-</button>
-                </td>
-            </tr>`;
+                    </td>
+                    <td data-col="subcategory">
+                        <div class="d-flex align-items-center subcategory-item">
+                            <input type="text" class="form-control me-1" name="sub_category[${rowIndex}][0][0]" placeholder="បញ្ចូលប្រភេទរង (Sub-category)">
+                            <button type="button" class="btn btn-outline-success btn-sm addSubCategoryBtn" title="បន្ថែមប្រភេទរង">+</button>
+                        </div>
+                    </td>
+                    <td data-col="detail">
+                        <div class="d-flex align-items-center detail-item">
+                            <input type="text" class="form-control me-1" name="detail[${rowIndex}][0][0][]" placeholder="បញ្ចូលព័ត៌មានលម្អិត (Detail)">
+                            <button type="button" class="btn btn-outline-success btn-sm addDetailBtn" title="បន្ថែមលម្អិត">+</button>
+                        </div>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboSubAccount" name="accountSub[${rowIndex}]">
+                            <option value="">ជ្រើសរើស</option>
+                            @foreach ($accountSub as $bv)
+                                <option value="{{ $bv->no }}">{{ $bv->no }}-{{ $bv->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboProgram" name="program[${rowIndex}]">
+                            <option value="">ជ្រើសរើស</option>
+                            @foreach ($program as $p)
+                                <option value="{{ $p->id }}">{{ $p->no }}-{{ $p->title }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboProgramSub" name="cboProgramSub[${rowIndex}]">
+                            <option value="">{{ __('forms.search...') }}</option>
+                        </select>
+                    </td>
+                    <td style="display: none;">
+                        <select class="form-select cboCluster" name="cboCluster[${rowIndex}]">
+                            <option value="">{{ __('forms.search...') }}</option>
+                        </select>
+                    </td>
+                    <td data-col="action" class="text-center align-middle">
+                        <button type="button" class="btn btn-danger btn-sm removeRow" title="លុបជួរដេក">-</button>
+                    </td>
+                </tr>`;
 
                 tableBody.append(newRowHtml);
                 const appendedRow = tableBody.children().last();
@@ -1189,15 +1424,25 @@
                 updateRowIndices();
             });
 
-            // Remove Main Table Row
+            // 8. Remove Main Project Group
             $(document).on('click', '.removeRow', function(e) {
                 e.preventDefault();
-                const row = $(this).closest('tr');
-                row.find('select').each(function() {
-                    destroyChoicesInstance(this);
-                });
-                row.remove();
-                updateRowIndices();
+                e.stopPropagation();
+
+                const puid = $(this).closest('tr').attr('data-puid');
+                const $groupRows = $(`#itemTable tbody tr[data-puid="${puid}"]`);
+
+                if ($('#itemTable tbody tr[data-puid]').map(function() {
+                        return $(this).attr('data-puid');
+                    }).get().filter((v, i, a) => a.indexOf(v) === i).length > 1) {
+                    $groupRows.find('select').each(function() {
+                        destroyChoicesInstance(this);
+                    });
+                    $groupRows.remove();
+                    updateRowIndices();
+                } else {
+                    alert('ត្រូវមានយ៉ាងហោចណាស់ ១ បន្ទាត់!');
+                }
             });
 
             // Form Submit Handler
@@ -1221,6 +1466,12 @@
                     }
                     form.submit();
                 });
+            }
+
+            // Sync spans, group IDs, and skip toggle state on initial load
+            updateRowIndices();
+            if ($('#skipItemTable').is(':checked')) {
+                $('#skipItemTable').trigger('change');
             }
         });
     </script>

@@ -32,7 +32,8 @@ class MaterialReleaseDataTable extends DataTable
                 return number_format($row->total_price ?? 0) . ' ៛';
             })
             ->editColumn('quantity_request', function ($row) {
-                return number_format((float)($row->quantity_request ?? 0),2);
+                $num = (float) ($row->quantity_request ?? 0);
+                return rtrim(rtrim(number_format($num, 2, '.', ','), '0'), '.');
             })
             ->editColumn('soft_delete', function ($soft_delete) {
                 $active = (is_null($soft_delete->deleted_at)) ? '<span class="badge bg-success">' . __('buttons.active') . '</span>' : '<span class="badge bg-danger">' . __('buttons.deleted') . '</span>';

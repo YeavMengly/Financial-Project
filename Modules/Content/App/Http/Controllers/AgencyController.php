@@ -349,9 +349,10 @@ class AgencyController extends Controller
 
         return redirect()->route('executiveUnit.index', ['params' => $params, 'executiveId' => $executiveId]);
     }
-    public function assignments(Request $request)
+    public function assignments(Request $request, $params)
     {
-        $ministries = Ministry::orderByDesc('year')->orderBy('no')->get();
+        $id  = decode_params($params);
+        $ministries = Ministry::where('id', $id)->get();
         $ministryId = $request->input('ministry_id', $ministries->first()?->id);
 
         $programs = Program::with([
@@ -400,20 +401,40 @@ class AgencyController extends Controller
             'agencies',
             'progMap',
             'subMap',
-            'clusMap'
+            'clusMap',
+            'params'
         ));
     }
 
-    public function saveAssignments(Request $request)
+    public function saveAssignments(Request $request, $params)
     {
-        $ministryId      = $request->input('ministry_id');
-        $rawClusAgencies = $request->input('clus_agency', []); // keep empty values to detect removals
+        $id = decode_params($params);
+        $ministryId = $request->input('ministry_id', $id);
+        $ministry = Ministry::find($ministryId);
+
+        if (!$ministry) {
+            flash()
+                ->translate('en')
+                ->option('timeout', 2000)
+                ->error('រកមិនឃើញទិន្នន័យក្រសួង!', 'បញ្ហា')
+                ->flash();
+
+            return redirect()->route('agencies.assignments', ['params' => $params]);
+        }
+
+        $rawClusAgencies = $request->input('clus_agency', []);
 
         DB::beginTransaction();
 
         try {
-            $programIds   = Program::where('ministry_id', $ministryId)->pluck('id');
-            $clustersById = Cluster::whereIn('id', array_keys($rawClusAgencies))->get()->keyBy('id');
+            $programIds = Program::where('ministry_id', $ministry->id)->pluck('id');
+            $programSubIds = ProgramSub::whereIn('program_id', $programIds)->pluck('id');
+
+            $clustersById = Cluster::with('programSub')
+                ->whereIn('id', array_keys($rawClusAgencies))
+                ->whereIn('program_sub_id', $programSubIds)
+                ->get()
+                ->keyBy('id');
 
             $toDeleteClusterIds = [];
 
@@ -423,14 +444,14 @@ class AgencyController extends Controller
                     continue;
                 }
 
+                $programId = $clus->program_id ?? $clus->programSub?->program_id;
+
                 if (empty($agencyId)) {
-                    // User cleared the dropdown -> delete only this cluster's assignment
                     $toDeleteClusterIds[] = $clus->id;
                 } else {
-                    // Update existing row in-place or insert if new
                     AgencyAssignment::updateOrCreate(
                         [
-                            'program_id'     => $clus->program_id,
+                            'program_id'     => $programId,
                             'program_sub_id' => $clus->program_sub_id,
                             'cluster_id'     => $clus->id,
                         ],
@@ -455,7 +476,10 @@ class AgencyController extends Controller
                 ->success('រក្សាទុកការកំណត់អង្គភាពថវិកាបានជោគជ័យ!', 'ជោគជ័យ')
                 ->flash();
 
-            return redirect()->route('agencies.assignments', ['ministry_id' => $ministryId]);
+            return redirect()->route('agencies.assignments', [
+                'params'      => $params,
+                'ministry_id' => $ministry->id,
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
@@ -466,7 +490,10 @@ class AgencyController extends Controller
                 ->error($e->getMessage(), 'បញ្ហា')
                 ->flash();
 
-            return redirect()->route('agencies.assignments', ['ministry_id' => $ministryId]);
+            return redirect()->route('agencies.assignments', [
+                'params'      => $params,
+                'ministry_id' => $ministry->id,
+            ]);
         }
     }
 }

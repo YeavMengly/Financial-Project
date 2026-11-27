@@ -24,6 +24,7 @@ Route::controller(AgencyController::class)->group(function () {
     Route::post('/{params}/agency/{executiveId}/executive-unit/store', 'executiveStore')->name('executiveUnit.store');
     Route::post('/{params}/agency/{executiveId}/executive-unit/update/{id}', 'executiveUpdate')->name('executiveUnit.update');
     Route::get('/{params}/agency/{executiveId}/executive-unit/restore/{id}', 'executiveRestore')->name('executiveUnit.restore');
+
+    Route::get('/{params}/agencies/assignments', 'assignments')->name('agencies.assignments');
+    Route::post('/{params}/agencies/assignments', 'saveAssignments')->name('agencies.assignments.save');
 });
-Route::get('/agencies/assignments', [AgencyController::class, 'assignments'])->name('agencies.assignments');
-Route::post('/agencies/assignments', [AgencyController::class, 'saveAssignments'])->name('agencies.assignments.save');
