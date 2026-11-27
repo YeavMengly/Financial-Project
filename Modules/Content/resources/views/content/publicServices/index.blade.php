@@ -31,13 +31,28 @@
     </div>
     <!-- end page title -->
 
-    {{-- <div class="row">
+    <div class="row">
         <div class="col-12">
             <div class="card">
-
+                <div class="card-body">
+                    <form id="filter" method="GET" class="row gx-3 gy-2 align-items-center mb-4 mb-lg-0">
+                        <div class="col-sm-3">
+                            <label class="visually" for="cboCate">ជ្រើសរើស សេវាតាមអង្គភាព</label>
+                            <select class="form-select" id="cboCate" name="cboCate" required
+                                data-pristine-required-message="{{ __('messages.required') }}">
+                                <option value="">{{ __('forms.search...') }}</option>
+                                @foreach ($publicServiceCategory as $psc)
+                                    <option value="{{ $psc->id }}">
+                                        {{ $psc->code }}-
+                                        {{ $psc->service_cate_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <div class="row">
         <div class="col-12">
@@ -100,6 +115,15 @@
             }
         }
     </script>
+
+    <script>
+        $('#cboCate')
+            .on('change keyup',
+                function() {
+                    $('#publicservice-table').DataTable().ajax.reload();
+                });
+    </script>
+
     {!! $dataTable->scripts() !!}
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 @endsection

@@ -22,5 +22,5 @@ Route::middleware('PermissionCheck')->controller(PublicServiceController::class)
 Route::controller(PublicServiceController::class)->group(function () {
     Route::post('publicServices/store', 'store')->name('publicServices.store');
     Route::post('publicServices/update/{params}', 'update')->name('publicServices.update');
-    Route::get('ministries/restore/{id}', 'restore')->name('ministries.restore');
+    Route::get('publicServices/restore/{params}', 'restore')->name('publicServices.restore');
 });

@@ -19,12 +19,13 @@ return new class extends Migration
             $table->unsignedBigInteger('categories_id');
             $table->integer('service_price');
             $table->tinyInteger('max_service_time')->default(0);
-            $table->tinyInteger('expired')->default(0);
+            $table->string('expired');
             $table->decimal('percentage_national', 10, 2)->default(0);
             $table->decimal('percentage_mlvt', 10, 2)->default(0);
             $table->decimal('percentage_interior', 10, 2)->default(0);
             $table->decimal('percentage_mef', 10, 2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
